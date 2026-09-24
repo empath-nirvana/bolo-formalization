@@ -159,7 +159,7 @@ possible in the paper's own prose, and records it where the definition is
 transcribed (tag `[repair]`) and in `docs/adjudications.md`, which gives for each the
 printed form, the sentences that ground the reading, the reading adopted and what
 the literal reading admits.  `Paper/INDEX.md` (*Repaired definitions*) lists every
-such row.  The main groups:
+such row.  The main groups (section numbers are those of `docs/adjudications.md`):
 
 **In the trust base of `adequacy` (`[TR]` §§1–3).**
 
