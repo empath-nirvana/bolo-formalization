@@ -156,6 +156,7 @@ for r, info in DEFROWS.items():
 SECDIR = CFG["secdir"]
 def paper_target(uid):
     """target for a unit that implements a printed row, or None"""
+    if uid[0] in CFG.get("support_modules", []): return None
     rs = [r for r in unit_rows.get(uid, []) if DEFROWS[r]["status"] != "plumbing"]
     if not rs: return None
     rs.sort(key=rowkey)
@@ -163,12 +164,11 @@ def paper_target(uid):
     ov = CFG["row_target"].get(r)
     if ov == "SUPPORT": return None
     if ov: return ov
-    if uid[0] in ("BoCa.TypedWorld", "BoCa.TypedWp", "BoCa.TypedRel", "BoCa.TypedImage",
-                  "BoCa.TypedFundamental"):
-        return SECDIR["4"] + "/Definitions"
     return SECDIR[r.split(".")[0]] + "/Definitions"
 
 def support_topic(uid):
+    for m, rx, t in CFG.get("topic_rules", []):
+        if uid[0] == m and any(re.fullmatch(rx, o) for o in owners_of(uid)): return t
     for m, a, b, t in CFG.get("topic_ranges", []):
         if uid[0] == m and a <= uid[1] <= b: return t
     return CFG["topic"].get(uid[0], "Misc")
@@ -246,7 +246,9 @@ def assign(sel):
         groups.append((cur, clo))
         for us2, L in groups:
             name = "Support/" + t if len(groups) == 1 else \
-                "Support/" + t + "/" + ("Base" if L < 0 else "After" + SHORT[ORDER[L]])
+                "Support/" + t + "@" + ("Base" if L < 0 else "After" + SHORT[ORDER[L]])
+            name = CFG.get("support_names", {}).get(name, name)
+            if "@" in name: probs.append(("unnamed support layer", name))
             for u in us2: tgt[u] = name
     # an attribute-only lemma (simp) goes with its latest dependency, emitted as early as it can be
     g = file_graph([u for u in sel if not (u in SIMPSET and not rev[u])], tgt)
@@ -394,6 +396,21 @@ def unit_comment(rs, seenrows):
         out.append("### %s · %s · %s · `%s`\n\n%s" % (r, info["printed"], info["page"], tag, dehistory(info["note"])))
     return "/-!\n" + "\n\n".join(out) + "\n-/"
 
+def support_row_comment(rs, sel, tgt, seenrows):
+    """a Support declaration that implements a row: point to the paper file holding the row"""
+    out = []
+    for r in rs:
+        homes = sorted(set(tgt[x] for x in sel if tgt[x].startswith("Paper") and r in unit_rows.get(x, [])))
+        info = DEFROWS[r]; tag = STATUS_TAG.get(info["status"], info["status"])
+        if r in seenrows:
+            out.append("Row %s, continued." % r)
+        elif homes:
+            out.append("Row %s · %s · `%s` — %s are in %s." % (r, info["printed"], tag,
+                       "the repaired reading; the printed row, its adjudication and the literal reading" if info["status"] == "repair" else "the printed row and its note", ", ".join("`%s.lean`" % h for h in homes)))
+        else:
+            out.append("### %s · %s · %s · `%s`\n\n%s" % (r, info["printed"], info["page"], tag, dehistory(info["note"])))
+    return "/-!\n" + "\n\n".join(out) + "\n-/"
+
 def emit(sel, tgt, banners, header_of=None, extra_files=()):
     SUPPORT_BANNER = banners["__support__"]; SUPPORT_WHAT = banners["__what__"]
     files = sorted(set(tgt[u] for u in sel))
@@ -460,6 +477,9 @@ def emit(sel, tgt, banners, header_of=None, extra_files=()):
                 if rs:
                     body.append(unit_comment(rs, seenrows)); seenrows.update(rs)
                 prev_inline = False
+            elif f.startswith("Support") and [r for r in unit_rows.get(u, []) if DEFROWS[r]["status"] != "plumbing"]:
+                rs = sorted([r for r in unit_rows.get(u, []) if DEFROWS[r]["status"] != "plumbing"], key=rowkey)
+                body.append(support_row_comment(rs, sel, tgt, seenrows)); seenrows.update(rs)
             elif f.startswith("Paper") and not prev_inline:
                 body.append("/-! `[about ours]` — what Lean needs before the next printed definition; the paper prints nothing here. -/")
                 prev_inline = True

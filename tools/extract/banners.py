@@ -111,9 +111,9 @@ banners["Paper/S4_LogicalRelation/Definitions"] = """/-!
     𝒢⟦Γ⟧(γ)              ≜ ⌜dom(Γ) ⊆ dom(δ)⌝ ⋆ ⊛_{x ∈ dom(Γ)} 𝒱⟦Γ(x)⟧δ(γ(x))
     Δ; Γ ⊨ e : T         ≜ !∀ δ, γ. 𝒟⟦Δ⟧(δ) ─⋆ 𝒢⟦Γ⟧δ(γ) ─⋆ ℰ⟦T⟧δ(γ(e))
 
-**Two readings of this display are here, and both are kept.**  The literal one
-is `Fig16.LogRel.vDen`, `eDen`, `gDen`, `SemTy`: each clause as printed, over
-`[TR]` p. 6's `wp`.  The repaired one is the typed world, `Fig16.LogRel.Typed.vX`,
+**This display has two readings, and both are kept.**  The literal one is in
+this file: `Fig16.LogRel.vDen`, `eDen`, `gDen`, `SemTy`, each clause as printed,
+over `[TR]` p. 6's `wp`.  The repaired one is the typed world, `Fig16.LogRel.Typed.vX`,
 `wpTS`, `gDenX`, `SemX` (source `docs/boca-rules.md` §12.69–§12.72): an `Imm`
 payload is read at its observable view, borrow payloads are stratified by a
 record list, the `Imm` clause carries the type the world recorded at the cell,
@@ -122,9 +122,15 @@ worlds `TW` that the printed proofs' operations produce.  `[TR]` 6.151 holds at
 the repaired judgment with no hypothesis; at the literal one it needs
 `WithloadEscrow`, which the configuration `Fig16.LogRel.ViewWitness` refuses
 (source `BoCa/ViewWitness.lean`).
-The typed world's `wp` (row 5.33's repair) is in this file rather than in §5's:
-the worlds it ranges over are defined through value shapes, which read
-lifetimes through this section's `atLife` (row 4.15).
+Each row below records both readings: its comment gives the printed clause,
+the adjudication, and what the repair changes.  The repaired declarations are
+not in this file.  They are in `Support/TypedWorld/`, which imports it:
+`Records.lean` (frame records, positions, coherence, the Kripke order `Ext`),
+`World.lean` (value shapes `vShape`, the typed worlds `TW`, tagging, and
+`wpTS`, row 5.33's repair) and `Relation.lean` (`vX`, the repaired `Imm`/`Mut`
+points-to `ptoImmS`/`ptoMutS`, and `gDenX`, `SemX`).  They come after this file
+because the worlds are defined through value shapes, which read lifetimes
+through this section's `atLife` (row 4.15).
 """ + READING + "-/\n"
 
 banners["Paper/S5_Model/Definitions"] = """/-!
@@ -212,16 +218,19 @@ paper's definitions and results need in Lean and the paper leaves implicit:
 -/
 """
 SUPPORT_WHAT = {
- "Support/Syntax": "substitution and shifting on de Bruijn terms, value inversion lemmas, and the pretty names of `[TR]` p. 3's derived forms",
- "Support/Lifetimes/AfterS1": "lifetime-syntax plumbing: lookup, extension, printing, occurrence and well-formedness of `Life` terms",
- "Support/Lifetimes/AfterS2": "lifetime-substitution plumbing used after the statics",
- "Support/Statics/Base": "context plumbing for the typing judgment",
- "Support/Statics/AfterS4": "facts about the statics stated through the logical relation",
- "Support/Dynamics/Machine": "the machines' plumbing: frame composition, the reflexive-transitive closure `→*`, and heap deletion",
+ "Support/Syntax/Terms": "value inversion lemmas, shifting and substitution on de Bruijn terms (single and parallel), and the names of `[TR]` p. 3's derived forms and of the first de Bruijn variables",
+ "Support/Lifetimes/Terms": "lifetime terms and contexts: the order and lattice operations on `Life`, lookup and extension of contexts, well-formedness, fresh variables and printing",
+ "Support/Lifetimes/Substitution": "substitution of lifetimes into lifetime terms and types, with the capture and range bounds it needs",
+ "Support/Lifetimes/Interpretation": "extension of a lifetime interpretation `δ` by one variable",
+ "Support/Statics/Contexts": "typing contexts as lists of slots with a liveness bit, and their splitting",
+ "Support/Dynamics/Machine": "the machines' plumbing: frame composition and the reflexive-transitive closure `→*`",
  "Support/Dynamics/Interpreter": "an executable interpreter — memories as association lists, a step function, a fuelled run — which `[TR]` does not print (it gives a relation) and which no result of the paper uses",
- "Support/Model/Base": "the carrier's prelude: finite partial maps, bijections, and the notation for the lifetime order",
- "Support/Model/AfterS5": "facts about the model's definitions: extensionality, the stratum embeddings, and the equations of the cell constructors",
- "Support/LogicalRelation/AfterS5": "the pieces of the logical relation that are not printed clauses: closing substitutions and free lifetime variables",
- "Support/LogicalRelation/AfterS4": "facts about the logical relation used by later sections",
- "Support/TypedWorld": "the typed-world machinery the repaired judgment ranges over: frame records, value shapes, root and chain positions, coherence and relevance of records, and the Kripke order `Ext`",
+ "Support/Model/Prelude": "the carrier's prelude: `min`/`max` arithmetic, the finite-domain predicate, casts, bundled bijections, and the index `ι ∈ {own, imm, mut}` of `ρ∣ι`",
+ "Support/Model/Notation": "the notation of the propositions of `[TR]` p. 6 (`⌜−⌝`, `⋆`, `─⋆`, `!`) and of `↓α`",
+ "Support/Model/Cells": "facts about cells: the lifetime set of an `imm` cell, extensionality of `mut` cells, the constructor set of `Cell`, and the difference of lifetime sets",
+ "Support/LogicalRelation/ClosingSubstitutions": "closing substitutions `γ(e)`, free lifetime variables of a type, and the empty resource in every stratum",
+ "Support/LogicalRelation/ClosedJudgment": "the judgment `Δ; Γ ⊨ e : T` at the empty resource",
+ "Support/TypedWorld/Records": "the records the typed world keeps: frame records and their lineages, root, chain and `Mut` positions, coherence of a record with the world, tags, and the Kripke order `Ext`",
+ "Support/TypedWorld/World": "the typed worlds: value shapes `vShape`, the family `TW` of configurations the printed proofs' operations produce, tagging, and `[TR]` p. 6's `wp` over them (`wpTS`, row 5.33's repair)",
+ "Support/TypedWorld/Relation": "the repaired logical relation of `[TR]` §4: `vX`, the `Imm`/`Mut` points-to at a record list, the context relation `gDenX` and the judgment `SemX`",
 }

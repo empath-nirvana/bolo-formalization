@@ -1,17 +1,17 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S2_Statics.Definitions
 import Paper.S5_Model.Definitions
-import Support.Lifetimes.AfterS2
-import Support.LogicalRelation.AfterS5
-import Support.Model.AfterS5
-import Support.Model.Base
+import Support.Lifetimes.Interpretation
+import Support.LogicalRelation.ClosingSubstitutions
+import Support.Model.Cells
+import Support.Model.Prelude
 
 /-!
-# Support — TypedWorld
+# Support — TypedWorld — Records
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the typed-world machinery the repaired judgment ranges over: frame records, value shapes, root and chain positions, coherence and relevance of records, and the Kripke order `Ext`.  Declaration names are the source repository's (`borrow_lang` at
+the records the typed world keeps: frame records and their lineages, root, chain and `Mut` positions, coherence of a record with the world, tags, and the Kripke order `Ext`.  Declaration names are the source repository's (`borrow_lang` at
 `970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
 -/
 

@@ -51,12 +51,12 @@
   "BoCa.Ancestor": "Model",
   "BoCa.Fig16Wp": "Model",
   "BoCa.Fig16LogRel": "LogicalRelation",
-  "BoCa.TypedWorld": "TypedWorld",
-  "BoCa.TypedWp": "TypedWorld",
-  "BoCa.TypedRel": "TypedWorld",
-  "BoCa.TypedImage": "TypedWorld",
-  "BoCa.TypedFundamental": "TypedWorld",
-  "BoCa.TypedReborrow": "TypedWorld",
+  "BoCa.TypedWorld": "TypedWorld/Records",
+  "BoCa.TypedWp": "TypedWorld/Records",
+  "BoCa.TypedRel": "TypedWorld/Records",
+  "BoCa.TypedImage": "TypedWorld/Records",
+  "BoCa.TypedFundamental": "TypedWorld/Records",
+  "BoCa.TypedReborrow": "TypedWorld/Records",
   "BoCa.DefectB": "LiteralSupport",
   "BoCa.Adequacy": "Adequacy",
   "BoCa.RebWp": "Model",
@@ -78,6 +78,12 @@
    270,
    999999,
    "Dynamics/Interpreter"
+  ],
+  [
+   "BoCa.Syntax",
+   0,
+   269,
+   "Syntax/Terms"
   ]
  ],
  "no_mathlib": [
@@ -91,5 +97,114 @@
  ],
  "mod_priority": {
   "BoCa.TR3": -1
+ },
+ "support_modules": [
+  "BoCa.TypedWorld",
+  "BoCa.TypedWp",
+  "BoCa.TypedRel",
+  "BoCa.TypedImage",
+  "BoCa.TypedFundamental",
+  "BoCa.TypedReborrow"
+ ],
+ "topic_rules": [
+  [
+   "BoCa.Fig16",
+   "(.*\\.)?_aux_.*",
+   "Model/Notation"
+  ],
+  [
+   "BoCa.Fig16LogRel",
+   ".*\\.(substAll|LFree|empty_inStratum)",
+   "LogicalRelation/ClosingSubstitutions"
+  ],
+  [
+   "BoCa.Fig16",
+   ".*\\.(minLeL|minLeR|leMaxL|leMaxR|FinDom|cast_left|cast_right|Equiv|Kind)",
+   "Model/Prelude"
+  ],
+  [
+   "BoCa.Life",
+   ".*LSub\\.extend",
+   "Lifetimes/Interpretation"
+  ],
+  [
+   "BoCa.Life",
+   ".*",
+   "Lifetimes/Terms"
+  ],
+  [
+   "BoCa.Fig16",
+   ".*\\.(MutU\\.ext|CellU\\.rep|LSet\\.Diff|LSet\\.DiffEmpty)",
+   "Model/Cells"
+  ],
+  [
+   "BoCa.Reborrow",
+   ".*\\.CellU\\.lsOf.*",
+   "Model/Cells"
+  ],
+  [
+   "BoCa.Ty",
+   "BoCa\\.(Slot|Ctx)",
+   "Statics/Contexts"
+  ],
+  [
+   "BoCa.Ty",
+   ".*",
+   "Lifetimes/Substitution"
+  ],
+  [
+   "BoCa.Notation",
+   ".*",
+   "Syntax/Terms"
+  ],
+  [
+   "BoCa.Subst",
+   ".*",
+   "Syntax/Terms"
+  ],
+  [
+   "BoCa.Derives",
+   "BoCa\\.Ctx\\.Split",
+   "Statics/Contexts"
+  ],
+  [
+   "BoCa.Fig16LogRel",
+   "BoCa\\.Fig16\\.LogRel\\.Sem",
+   "LogicalRelation/ClosedJudgment"
+  ],
+  [
+   "BoCa.TypedImage",
+   "BoCa.Fig16.LogRel.Typed.(vShape|TW|Tagged|wpTS)",
+   "TypedWorld/World"
+  ],
+  [
+   "BoCa.TypedWorld",
+   "BoCa.Fig16.LogRel.Typed.(vShape|TW|Tagged|wpTS)",
+   "TypedWorld/World"
+  ],
+  [
+   "BoCa.TypedWp",
+   "BoCa.Fig16.LogRel.Typed.(vShape|TW|Tagged|wpTS)",
+   "TypedWorld/World"
+  ],
+  [
+   "BoCa.TypedRel",
+   "BoCa.Fig16.LogRel.Typed.(vX|ptoImmS|ptoMutS|CohE|vP|gSepX|gDenX|SemX)",
+   "TypedWorld/Relation"
+  ],
+  [
+   "BoCa.TypedWp",
+   "BoCa.Fig16.LogRel.Typed.(vX|ptoImmS|ptoMutS|CohE|vP|gSepX|gDenX|SemX)",
+   "TypedWorld/Relation"
+  ],
+  [
+   "BoCa.TypedFundamental",
+   "BoCa.Fig16.LogRel.Typed.(vX|ptoImmS|ptoMutS|CohE|vP|gSepX|gDenX|SemX)",
+   "TypedWorld/Relation"
+  ]
+ ],
+ "support_names": {
+  "Support/Lifetimes/Terms@AfterS1": "Support/Lifetimes/Terms",
+  "Support/Lifetimes/Terms@AfterS2": "Support/Lifetimes/Interpretation"
  }
 }

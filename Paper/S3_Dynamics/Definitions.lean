@@ -1,6 +1,6 @@
 import Mathlib
 import Paper.S1_Syntax.Definitions
-import Support.Syntax
+import Support.Syntax.Terms
 
 /-!
 # [TR] §3 Dynamics  (physical pp. 3–4)

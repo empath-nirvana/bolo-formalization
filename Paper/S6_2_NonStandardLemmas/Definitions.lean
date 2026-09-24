@@ -1,6 +1,6 @@
 import Paper.S5_Model.Definitions
-import Support.Model.AfterS5
-import Support.Model.Base
+import Support.Model.Cells
+import Support.Model.Prelude
 
 /-!
 # [TR] §6.2 Non-standard Lemmas — the three printed Definitions  (pp. 9, 13, 17)

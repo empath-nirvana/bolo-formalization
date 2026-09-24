@@ -1,11 +1,11 @@
 import Paper.S5_Model.Definitions
 
 /-!
-# Support — Model — AfterS5
+# Support — Model — Cells
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-facts about the model's definitions: extensionality, the stratum embeddings, and the equations of the cell constructors.  Declaration names are the source repository's (`borrow_lang` at
+facts about cells: the lifetime set of an `imm` cell, extensionality of `mut` cells, the constructor set of `Cell`, and the difference of lifetime sets.  Declaration names are the source repository's (`borrow_lang` at
 `970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
 -/
 
@@ -28,17 +28,6 @@ def CellU.lsOf : CellU Loc Val → Option LSet
 @[simp] theorem CellU.lsOf_mutOf (b : Life) (v : Val) (ρ : ResU Loc Val)
     (h : ρ.InStratum b) (P : Val → SPropS Loc Val b) (hw : P v ⟨ρ, h⟩) :
     CellU.lsOf (CellU.mutOf b v ρ h P hw) = none := rfl
-
-end BoCa.Fig16
-
-namespace BoCa.Fig16
-
-@[inherit_doc] scoped notation:max "↓" a => Life.down a
-
-end BoCa.Fig16
-
-namespace BoCa.Fig16
-variable {Loc Val : Type}
 
 theorem MutU.ext {m n : MutU Loc Val} (hb : m.β = n.β) (hv : m.v = n.v)
     (hρ : m.ρ ≍ n.ρ) (hP : m.P ≍ n.P) : m = n := by
@@ -92,17 +81,5 @@ def LSet.Diff (s t u : LSet) : Prop := ∀ x, u.mem x ↔ (s.mem x ∧ ¬ t.mem 
 def LSet.DiffEmpty (s t : LSet) : Prop := ∀ x, s.mem x → t.mem x
 
 end BoCa.Fig16
-
-namespace BoCa.Fig16.BoLo
-
-@[inherit_doc] scoped notation "⌜" p "⌝" => pure p
-
-@[inherit_doc] scoped infixr:35 " ⋆ " => sep
-
-@[inherit_doc] scoped infixr:27 " ─⋆ " => wand
-
-@[inherit_doc] scoped prefix:max "!ₛ" => bang
-
-end BoCa.Fig16.BoLo
 
 end

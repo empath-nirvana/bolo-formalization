@@ -1,6 +1,6 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S5_Model.Definitions
-import Support.LogicalRelation.AfterS5
+import Support.LogicalRelation.ClosingSubstitutions
 
 /-!
 # Literal readings — [TR] §4

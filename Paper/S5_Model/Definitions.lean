@@ -1,7 +1,7 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S3_Dynamics.Definitions
 import Support.Dynamics.Machine
-import Support.Model.Base
+import Support.Model.Prelude
 
 /-!
 # [TR] §5 Model  (physical pp. 4–6)

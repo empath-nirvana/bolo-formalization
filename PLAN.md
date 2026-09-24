@@ -20,7 +20,7 @@ Paper/                                 what the paper prints, in its order
   S1_Syntax/Definitions.lean           [TR] §1, p. 1
   S2_Statics/Definitions.lean          [TR] §2, pp. 2–3
   S3_Dynamics/Definitions.lean         [TR] §3, pp. 3–4
-  S4_LogicalRelation/Definitions.lean  [TR] §4, p. 4   (literal and typed-world readings)
+  S4_LogicalRelation/Definitions.lean  [TR] §4, p. 4   (the literal reading; each row records its repair)
   S5_Model/Definitions.lean            [TR] §5, pp. 4–6
   S6_1_StandardLemmas/Lemmas.lean      [TR] §6.1 ─┐
   S6_2_NonStandardLemmas/Definitions.lean   Definitions 6.1, 6.2, 6.3
@@ -33,7 +33,17 @@ Paper/                                 what the paper prints, in its order
   S6_8_FundamentalProperty/Lemmas.lean [TR] §6.8 ─┘
   CONF/Results.lean                    [CONF] 3.1–3.3 (skeleton)
   LiteralReadings/                     measurements of printed definitions read literally
-Support/                               [about ours]: what makes the paper tree go
+Support/                               [about ours]: what makes the paper tree go, by topic
+  Syntax/Terms                         value inversion, shifting, substitution, derived-form names
+  Lifetimes/Terms, Substitution, Interpretation
+                                       lifetime terms and contexts; substitution into types; δ-extension
+  Statics/Contexts                     contexts as slot lists, and their splitting
+  Dynamics/Machine, Interpreter        the machines' `→*`; an executable interpreter no result uses
+  Model/Prelude, Notation, Cells       arithmetic, casts, bijections, ι; the notation of p. 6; cell facts
+  LogicalRelation/ClosingSubstitutions, ClosedJudgment
+                                       γ(e) and free lifetime variables; ⊨ at the empty resource
+  TypedWorld/Records, World, Relation  the typed world: records; TW and wpTS (row 5.33's repair);
+                                       the repaired relation vX, gDenX, SemX (rows 4.4–4.14's repairs)
 Bridge/Names.csv                       every declaration here → its source declaration
 Bridge/Plan.csv                        every declaration of the closure → its target file (both stages)
 scripts/                               bridge, axiom and hygiene checks
@@ -103,11 +113,11 @@ Stage 2 re-derives placement by the same layering that places Stage 1.
 | `Paper/S1_Syntax/Definitions.lean` | 31 |
 | `Paper/S2_Statics/Definitions.lean` | 34 |
 | `Paper/S3_Dynamics/Definitions.lean` | 22 |
-| `Paper/S4_LogicalRelation/Definitions.lean` | 36 |
+| `Paper/S4_LogicalRelation/Definitions.lean` | 24 |
 | `Paper/S5_Model/Definitions.lean` | 200 |
 | `Paper/S6_2_NonStandardLemmas/Definitions.lean` | 10 |
 | `Paper/LiteralReadings/S4_LogicalRelation.lean` | 3 |
-| `Support/…` (11 files) | 119 |
+| `Support/…` (16 files) | 131 |
 
 Checks, all passing:
 
@@ -115,7 +125,7 @@ Checks, all passing:
   mismatches (kind, type, and value for definitions; auxiliary declarations are
   compared through the declarations that use them).
 * `scripts/check-hygiene.sh` — no `sorry`/`axiom`/`native_decide`/`implemented_by`/
-  `opaque`/`partial`/`unsafe` outside comments; `#print axioms` of all 1,985
+  `opaque`/`partial`/`unsafe` outside comments; `#print axioms` of all 1,987
   constants ⊆ `[propext, Classical.choice, Quot.sound]`.
 
 ## Design decisions that depart from the brief, and why
@@ -126,10 +136,14 @@ Checks, all passing:
 2. **Definitions 6.1–6.3 are in `S6_2_NonStandardLemmas/Definitions.lean`**, where
    `[TR]` prints them (pp. 9, 13, 17), not in §5 where the inventory lists them
    (rows 5.61, 5.65, 5.66).  Nothing in §§1–5 uses them.
-3. **The typed world's `wp` (row 5.33's repair) is in §4's file.**  Its worlds
-   (`Typed.TW`) are defined through value shapes (`Typed.vShape`), which read
-   lifetimes through §4's `atLife` (row 4.15), so it cannot precede §4.  §5's
-   file has the printed `wp`.
+3. **The typed world is in `Support/TypedWorld/`, imported after §4.**  Its
+   worlds (`Typed.TW`) are defined through value shapes (`Typed.vShape`), which
+   read lifetimes through §4's `atLife` (row 4.15), so it cannot precede §4; and
+   nothing in the paper files uses it, so it can follow.  §4's file holds the
+   literal reading, and each of its `[repair]` rows (4.4, 4.5, 4.8, 4.9, 4.11,
+   4.13, 4.14) records the adjudication and the repair in its comment; §5's file
+   holds the printed `wp` and row 5.33's record.  Each declaration of the repair
+   opens with a pointer back to its row (`cfg.json`'s `support_modules`).
 4. **`[about ours]` declarations inside `Definitions.lean`.**  When a
    declaration the paper does not print is both defined through a printed row
    and needed by a later printed row of the same section (the finite map, the
@@ -153,10 +167,11 @@ Checks, all passing:
    public here because their users landed in another file.  Numbered names
    (`TR.lemma_6_60`, with the paper's own name as a second alias) are for §6's
    results, in Stage 2.
-7. **`Support/` files are layered by what they need.**  A topic whose
-   declarations sit on both sides of a paper file is split, and the part is
-   named for the paper file it follows (`Support/Model/Base`,
-   `Support/Model/AfterS5`, …).
+7. **`Support/` files are named by topic and layered by what they need.**
+   `cfg.json`'s `topic_rules` (source module and declaration-name pattern) and
+   `topic` (source module) give each unsupported declaration a topic; a topic
+   whose declarations sit on both sides of a paper file is split in two, and
+   `support_names` names each part (the generator refuses an unnamed part).
 8. **The executable interpreter** (`BoCa.Mem`, `step`, `run`; rows 3.10, 3.37)
    is in `Support/Dynamics/Interpreter.lean`: the paper gives a relation, and no
    result uses the interpreter.

@@ -1,14 +1,14 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S4_LogicalRelation.Definitions
 import Paper.S5_Model.Definitions
-import Support.Syntax
+import Support.Statics.Contexts
 
 /-!
-# Support — LogicalRelation — AfterS4
+# Support — LogicalRelation — ClosedJudgment
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-facts about the logical relation used by later sections.  Declaration names are the source repository's (`borrow_lang` at
+the judgment `Δ; Γ ⊨ e : T` at the empty resource.  Declaration names are the source repository's (`borrow_lang` at
 `970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
 -/
 

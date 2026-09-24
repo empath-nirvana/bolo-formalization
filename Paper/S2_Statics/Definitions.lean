@@ -1,8 +1,9 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S3_Dynamics.Definitions
-import Support.Lifetimes.AfterS1
-import Support.Statics.Base
-import Support.Syntax
+import Support.Lifetimes.Substitution
+import Support.Lifetimes.Terms
+import Support.Statics.Contexts
+import Support.Syntax.Terms
 
 /-!
 # [TR] §2 Statics  (physical pp. 2–3)

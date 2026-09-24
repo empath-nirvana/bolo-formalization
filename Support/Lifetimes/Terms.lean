@@ -1,11 +1,11 @@
 import Paper.S1_Syntax.Definitions
 
 /-!
-# Support — Lifetimes — AfterS1
+# Support — Lifetimes — Terms
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-lifetime-syntax plumbing: lookup, extension, printing, occurrence and well-formedness of `Life` terms.  Declaration names are the source repository's (`borrow_lang` at
+lifetime terms and contexts: the order and lattice operations on `Life`, lookup and extension of contexts, well-formedness, fresh variables and printing.  Declaration names are the source repository's (`borrow_lang` at
 `970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
 -/
 

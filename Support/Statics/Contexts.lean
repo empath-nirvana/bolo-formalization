@@ -1,18 +1,22 @@
-import Support.Syntax
-
 /-!
-# Support — Statics — Base
+# Support — Statics — Contexts
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-context plumbing for the typing judgment.  Declaration names are the source repository's (`borrow_lang` at
+typing contexts as lists of slots with a liveness bit, and their splitting.  Declaration names are the source repository's (`borrow_lang` at
 `970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
 -/
 
 noncomputable section
 
 namespace BoCa
-open BoCa.Lifetime
+
+structure Slot (τ : Type) where
+  ty   : τ
+  live : Bool
+  deriving Repr, DecidableEq, Inhabited
+
+abbrev Ctx (τ : Type) := List (Slot τ)
 
 /-- `Γ = Γ₁, Γ₂` — a genuine partition of the live slots, positions preserved.
     Exchange is free (positions are independent), weakening and contraction are
