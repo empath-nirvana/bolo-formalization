@@ -60,26 +60,50 @@ proof.  None of this trusts our build: comparator builds `Challenge` and `Paper`
 itself in a `landrun` sandbox, reads them through `lean4export` rather than
 loading `.olean` files, and replays the export in both kernels.
 
+**Regenerating the copies.**  `Challenge/**` is generated, not written by hand:
+
+```
+lake build Paper
+tools/challenge/run.sh            # rewrites comparator/Challenge/**
+tools/challenge/run.sh /tmp/out   # or writes /tmp/out/Challenge/** to compare
+```
+
+`tools/challenge/Closure.lean` lists every constant the statement of `adequacy`
+reaches, as comparator's crawl reaches it, from this repository's build of
+`Paper`.  `tools/challenge/extract.py` copies, from each source file, the
+declarations the list names or that own an auxiliary it names, with docstrings,
+namespaces and `open`s, one module per source file.  `Challenge.lean` itself is
+not generated.  If a declaration of the trust base changes in `Paper/` or
+`Support/`, the judge fails with `Const does not match between challenge and
+target '<name>'`; rerun `tools/challenge/run.sh`, check the diff to
+`comparator/Challenge/` is the change intended, then `lake build Challenge` and
+re-run the judge.  If the statement comes to reach a declaration in a source file
+not listed in `extract.py`'s `FILES`, add that file there, keeping the list in
+import order.
+
 **Running it.**  CI runs the judge (`.github/workflows/comparator.yml`) on Linux,
 where `landrun` sandboxes the build.  Locally, comparator's
 `scripts/fake-landrun.sh` stands in for `landrun` on macOS; that runs the same
-comparison and the same two kernels, without the sandbox:
+comparison and the same two kernels, without the sandbox.  From this repository's
+root:
 
 ```
 git clone https://github.com/leanprover/comparator ../comparator-tool
 git -C ../comparator-tool checkout c0c5a52
 cp lean-toolchain ../comparator-tool/lean-toolchain   # and do not `lake update` there
 (cd ../comparator-tool && lake build lean4export comparator)
+git clone https://github.com/ammkrn/nanoda_lib ../nanoda_lib
+git -C ../nanoda_lib checkout 3a2407216ee84a75f9e1aead6803d0578be06ae7
+(cd ../nanoda_lib && cargo build --release)
+lake build Paper Challenge
 COMPARATOR_LANDRUN=$PWD/../comparator-tool/scripts/fake-landrun.sh \
 COMPARATOR_LEAN4EXPORT=$PWD/../comparator-tool/.lake/packages/lean4export/.lake/build/bin/lean4export \
-COMPARATOR_NANODA=/path/to/nanoda_lib/target/release/nanoda_bin \
+COMPARATOR_NANODA=$PWD/../nanoda_lib/target/release/nanoda_bin \
   lake env ../comparator-tool/.lake/build/bin/comparator comparator/config.json
 ```
+
+It ends `Your solution is okay!` on a pass.
 
 `c0c5a52` is comparator's last commit on Lean v4.33.0; this repository is on
 v4.33.1, and the judge is built with this repository's `lean-toolchain` so that
 `lean4export` reads our `.olean` files.
-
-**Keeping it in step.**  If a declaration of the trust base changes in `Paper/` or
-`Support/`, the judge fails with `Const does not match between challenge and
-target '<name>'` until the copy in `Challenge/` is updated to match.

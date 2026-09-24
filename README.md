@@ -88,6 +88,7 @@ Bridge/Names.csv           each declaration here → its source declaration
 Bridge/Plan.csv            each unit of the dependency closure → its file
 scripts/                   the checks
 comparator/                the comparator challenge: the statement of adequacy over its trust base
+tools/challenge/           the generator of comparator/Challenge/**
 .github/workflows/         CI and the comparator judge
 tools/extract/             the generator: the Lean files are its output
 ```
