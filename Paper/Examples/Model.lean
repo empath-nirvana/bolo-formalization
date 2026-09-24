@@ -5,11 +5,9 @@ import Paper.S6_2_NonStandardLemmas.Lemmas
 /-!
 # Examples — the model's walks and splits at a shared location
 
-`[TR]` Lemmas 6.7, 6.18 and 6.20 are Kleene equalities whose difficulty is the case
-where two operands share an `imm` location.  These declarations build that case —
+`[TR]` Lemmas 6.7 and 6.20 run at two operands that share an `imm` location,
 `0 ↦ imm({2}, 5, ∅)` and `0 ↦ imm({3}, 5, ∅)`, composed by `[TR]` Lemma 6.43 to
-`0 ↦ imm({2,3}, 5, ∅)` — and run the lemmas on it, so their hypotheses are
-inhabited at the configuration the printed proofs spend their last step on.
+`0 ↦ imm({2,3}, 5, ∅)`.
 
 The last section inhabits hypotheses that rows of `[TR]` §6.2 bind or add.
 
@@ -63,9 +61,7 @@ private theorem cell_kind (s : LSet) : (cell s).kind = Kind.imm := rfl
 
 private theorem cell_wit (s : LSet) : (cell s).wit = wit := CellU.wit_immOf _ _ _ _
 
-/-- `ag(0 ↦ imm(ᾱ, 5, ∅)) = 0 ↦ imm(ᾱ, 5, ∅)`.  The derivation goes through
-`AgWitsI.cons`: the resource has an `imm` cell, so the imm family is not empty
-and the walk descends into the witness. -/
+/-- `ag(0 ↦ imm(ᾱ, 5, ∅)) = 0 ↦ imm(ᾱ, 5, ∅)`, through `AgWitsI.cons`. -/
 theorem agW_res (s : LSet) :
     AgW (ResU.single 0 (cell s)) (ResU.single 0 (cell s)) := by
   have hget : (ResU.single 0 (cell s)).get 0 = some (cell s) := ResU.single_get_self _ _
@@ -106,11 +102,7 @@ theorem agW_res (s : LSet) :
 def sA : LSet := LSet.singleton 2
 def sB : LSet := LSet.singleton 3
 
-/-- **`AgW.split` at a genuine `imm` overlap.**  `0 ↦ imm({2}, 5, ∅)` and
-`0 ↦ imm({3}, 5, ∅)` are `▸◂`-compatible and their `●` is
-`0 ↦ imm({2,3}, 5, ∅)`, so both operands and the composite have a value of `ag`
-and 6.20 relates them.  Reading the conclusion back through `AgW.functional`
-turns it into `ag(ρ₁) ○ ag(ρ₂) = ag(ρ₁ ● ρ₂)` at these three resources. -/
+/-- 6.20 (`AgW.split`) at the shared `imm` location: `ag(ρ₁) ○ ag(ρ₂) = ag(ρ₁ ● ρ₂)`. -/
 theorem overlap :
     ResU.CompR (ResU.single 0 (cell sA)) (ResU.single 0 (cell sB))
       (ResU.single 0 (cell (sA.union sB))) := by
@@ -161,9 +153,7 @@ theorem flat_res (s : LSet) :
   ⟨PMap.empty, ResU.single 0 (cell s), exS_res s, agW_res s,
     ResU.CompS.comm (ResU.comp_empty_right _)⟩
 
-/-- The two operands share the location `0`, at different lifetime sets over one
-witness and one value — the composition `[TR]` Lemma 6.43 licenses, and the one
-`SplitExample.overlap` runs 6.20 on.
+/-- The two operands' composite, by `[TR]` Lemma 6.43.
 `[about ours: an instance of `ResU.compS_single_imm`, which is the printed
 Lemma 6.43]` -/
 theorem compS_res :
@@ -172,16 +162,13 @@ theorem compS_res :
   ResU.compS_single_imm 0 sA sB 5 wit (wit_inStratum _) (wit_inStratum _)
     (wit_inStratum _)
 
-/-- `0 ↦ imm({2}, 5, ∅) # 0 ↦ imm({3}, 5, ∅)`: they are `▸◂`-compatible and
-their `●` is valid, so 6.7's printed hypothesis holds of a pair that shares a
-location. -/
+/-- `0 ↦ imm({2}, 5, ∅) # 0 ↦ imm({3}, 5, ∅)`, 6.7's hypothesis. -/
 theorem hash_res :
     ResU.Hash (ResU.single 0 (cell sA)) (ResU.single 0 (cell sB)) :=
   ⟨compS_res.1, _, compS_res, _, flat_res (sA.union sB)⟩
 
-/-- **6.7 at a genuine overlap.**  Both operands of the `∪` are defined at `0`
-and carry the same value there, so `OptUnion`'s overlap clause is the one that
-runs, and the union it produces is `⟦ρ₁ ● ρ₂⟧`. -/
+/-- 6.7 at the shared location: `OptUnion`'s overlap clause produces
+`⟦ρ₁ ● ρ₂⟧`. -/
 theorem split_overlap :
     ∃ m₁ m₂ m,
       ResU.Lower (ResU.single 0 (cell sA)) m₁ ∧
@@ -215,7 +202,7 @@ section Inhabited
 variable {Loc Val : Type}
 
 /-- `⦇ℓ ↦ own(v)⦈_○ = ℓ ↦ own(v)`: the `FlatR` hypothesis of `ResU.flatR_idem`
-(`[TR]` Lemma 6.19), which binds it and does not use it, is satisfiable. -/
+(`[TR]` Lemma 6.19) is satisfiable. -/
 theorem ResU.flatR_single_own (l : Loc) (v : Val) :
     ResU.FlatR (ResU.single l (CellU.ownOf v)) (ResU.single l (CellU.ownOf v)) :=
   ⟨PMap.empty, ResU.single l (CellU.ownOf v),

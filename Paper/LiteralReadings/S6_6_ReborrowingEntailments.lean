@@ -9,17 +9,12 @@ import Support.Model.Singletons
 /-!
 # Literal readings — [TR] §6.6
 
-* 6.130: `reborrow_emp_outside_stratum`, a resource outside `Res_α` against
-  `↺_α emp` — the hypothesis the Lean adds is not free — at the resource
-  `RebExample` builds;
+* 6.130: `reborrow_emp_outside_stratum`, the added hypothesis measured at a
+  resource outside `Res_α`;
 * 6.131 (`↺V₁`): `RefPrintedChainResidual`, what the `Ref` bullet's printed chain
-  leaves at our objects, recorded as a `def … : Prop` and not derived; no
-  obstruction to it is verified.
+  leaves at our objects.
 
-**How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  Each declaration carries its tag; an
-`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
-this file.
+Nothing depends on this file.
 -/
 
 noncomputable section
@@ -33,15 +28,12 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### Lemma 6.131 (↺V₁) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.131 (↺V₁).
+The record is in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`.
 -/
-/-- **What `[TR]` 6.131's `Ref` bullet leaves, followed as printed.**  After
-"Apply IH", "Apply theorem 6.130", "Apply `↺⋆`" and the unit law the antecedent
-is `↺_α (↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′))` and the goal is `↺_α 𝒱⟦Imm 'a T′⟧δ(v)`, with
-`Imm` the constructor (clause (5)).  This is that entailment: the modality is
-doubled and the value is the cell's *contents* `v′` where the goal names the
-*location* `v`.  It is not derived, and no obstruction to it has been verified;
-`reborrow_vDen`'s `Ref` block takes `[TR]` 6.121 (`↺↦`) at this step instead.
+/-- The entailment 6.131's `Ref` bullet reaches after "Apply IH", "Apply
+theorem 6.130", "Apply `↺⋆`" and the unit law: antecedent
+`↺_α (↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′))`, goal `↺_α 𝒱⟦Imm 'a T′⟧δ(v)`.  Not derived, and no
+obstruction to it is verified.
 `[about ours: the residual of 6.131's printed `Ref` chain, at our objects]` -/
 def RefPrintedChainResidual (α : Life) (x : LifeVar) (δ : LSub) (T : Ty) (v : Val) : Prop :=
   ∀ v' : Val,
@@ -52,7 +44,7 @@ end BoCa.Fig16.LogRel
 
 namespace BoCa.Fig16.RebExample
 
-/-! `[about ours]` — what the Lean of Lemma 6.130 needs; the paper prints nothing here. -/
+/-! `[about ours]` -/
 private def mutWit (w : Nat) : ResU Nat Nat := ResU.single 1 (CellU.ownOf w)
 
 private theorem mutWit_stratum (w : Nat) (α : Life) : (mutWit w).InStratum α := by
@@ -71,9 +63,7 @@ private def mutRes (v w : Nat) : ResU Nat Nat := ResU.single 0 (mutCell v w)
 private theorem mutRes_zero (v w : Nat) : (mutRes v w).get 0 = some (mutCell v w) :=
   ResU.single_get_self _ _
 
-/-- **`reb_α` is not satisfied by everything.**  `@ρ ⊐ α` refuses a lifetime the
-resource does not outlive: `@ρ = 3` here, so no `ρ′` whatever is a reborrow of
-`ρ` at `α = 1`.
+/-- `@ρ = 3`, so no `ρ′` is a reborrow of `ρ` at `α = 1`.
 `[about ours: a non-inhabitant of the printed set]` -/
 theorem not_reb_of_at (v w : Nat) (ρ' : ResU Nat Nat) : ¬ ResU.Reb 1 (mutRes v w) ρ' := by
   rintro ⟨hs, -⟩
@@ -87,13 +77,10 @@ namespace BoCa.Fig16.BoLo
 /-!
 ### Lemma 6.130 — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.130.
+The record is in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`.
 -/
-/-- **The added hypothesis is not free.**  `RebExample`'s `mut` witness is
-`ℓ₀ ↦ mut(3, v, ℓ₁ ↦ own(w), −)`, whose borrow does not outlive `α = 1`, and
-`RebExample.not_reb_of_at` refuses it *every* `ρ′` — `∅` with the rest.  So
-`↻_1 emp` does not reach this resource, while `⊤` does, and 6.130's hypothesis
-is what separates them.
+/-- `↻_1 emp` does not hold at `ℓ₀ ↦ mut(3, v, ℓ₁ ↦ own(w), −)`, a resource
+outside `Res_1`.
 `[about ours: a resource outside `Res_α`, measured against `↻_α emp`]` -/
 theorem reborrow_emp_outside_stratum (v w : Nat) :
     ¬ reborrow 1 (emp : SPropU Nat Nat) (RebExample.mutRes v w) := by

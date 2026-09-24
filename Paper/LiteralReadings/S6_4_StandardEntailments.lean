@@ -13,10 +13,7 @@ omits and the printed proof uses:
 * 6.88 (`!∀`): `bang_all_needs_nonempty`, the index type the printed proof's
   *"Suppose `X ≠ ∅`"* excludes.
 
-**How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  Each declaration carries its tag; an
-`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
-this file.
+Nothing depends on this file.
 -/
 
 noncomputable section
@@ -27,13 +24,10 @@ variable {Loc Val : Type}
 /-!
 ### Lemma 6.84 (!l) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_4_StandardEntailments/Lemmas.lean`, under the record of Lemma 6.84 (!l).
+The record is in `Paper/S6_4_StandardEntailments/Lemmas.lean`.
 -/
-/-- **6.84's premise is not assumed.**  `bang_L` carries `P ⊨ Q`; read with the
-free `Q` and no premise at all, the row would say `∀P Q. !P ⊨ Q`, and the
-display's own `!P ≜ emp ∧ P` does not give that at `P ≜ emp` and `Q ≜ ⊥`.  So
-the hypothesis is load-bearing rather than decoration, and it is discharged
-rather than carried at the value 6.97 prints (`bang_L_dereliction`).
+/-- Without the premise `P ⊨ Q`, 6.84 would read `∀P Q. !P ⊨ Q`, which fails at
+`P ≜ emp`, `Q ≜ ⊥`.
 `[about ours: 6.84's added hypothesis, checked at the values where dropping it
 would leave the entailment alone]` -/
 theorem bang_L_needs_premise : ¬ ∀ (P Q : SPropU Loc Val), !ₛP ⊨ Q :=
@@ -42,11 +36,10 @@ theorem bang_L_needs_premise : ¬ ∀ (P Q : SPropU Loc Val), !ₛP ⊨ Q :=
 /-!
 ### Lemma 6.88 (!∀) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_4_StandardEntailments/Lemmas.lean`, under the record of Lemma 6.88 (!∀).
+The record is in `Paper/S6_4_StandardEntailments/Lemmas.lean`.
 -/
-/-- 6.88's restriction is not assumed: at an empty index type the premise is
-vacuous and the conclusion still demands `ρ = ∅`, so the printed statement fails
-at any resource with a cell.
+/-- At an empty index type the premise is vacuous and the conclusion demands
+`ρ = ∅`; the witness is a resource with a cell.
 `[about ours: the printed 6.88 at the index type where it is false]` -/
 theorem bang_all_needs_nonempty (l : Loc) (v : Val) :
     ¬ (all (fun _ : Empty => !ₛ(top : SPropU Loc Val)) ⊨

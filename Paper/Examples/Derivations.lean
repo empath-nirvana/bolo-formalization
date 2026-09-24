@@ -9,13 +9,9 @@ import Support.Syntax.Terms
 # Examples — the typing rules and the axiom table, inhabited
 
 Each typing rule of `[TR]` p. 2 and each line of the axiom table of `[TR]` p. 3,
-derived at a concrete instance in `DerivesWf` — `Δ; Γ ⊢ e : T` under the
-presuppositions p. 2's judgment boxes carry, the judgment
+derived at a concrete instance in `DerivesWf`, the judgment
 `Fig16.LogRel.Typed.fundamentalProperty` and `Fig16.LogRel.Typed.adequacy` take as
-hypothesis.  §1 is the rules; §2 is the axiom table.
-
-`Paper/Examples/Programs.lean` derives whole closed programs of type `1` from
-these rules and applies adequacy to them.
+hypothesis (§C.26).  §1 is the rules; §2 is the axiom table.
 
 `[about ours: instances of [TR] p. 2's rules and p. 3's axiom table]`
 -/
@@ -87,8 +83,7 @@ theorem d_unit : DerivesWf LifeCtx.empty [] (.val .unit) .unit := .unitI .nil
 theorem d_pair : DerivesWf LifeCtx.empty [] (.pair unit' unit') (.tensor .unit .unit) :=
   .tensorI .nil (.unitI .nil) (.unitI .nil)
 
-/-- `⊸I` and `ID`: `λx.x : 1 ⊸ 1`.  The binder's slot is live in the premise, so the
-body consumes it. -/
+/-- `⊸I` and `ID`: `λx.x : 1 ⊸ 1`. -/
 theorem d_id : DerivesWf LifeCtx.empty [] (.val (.lam (.var 0))) (.lolli .unit .unit) :=
   .lolliI rfl (.var (.here .nil))
 

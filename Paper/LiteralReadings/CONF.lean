@@ -6,15 +6,9 @@ import Support.Dynamics.Machine
 /-!
 # Literal readings — [CONF] §3
 
-* Corollary 3.3: `TR3.corThree_unreachable` — the closed term `free (alloc ()); ()`,
-  typed at `1` by `[TR]` p. 2, has no run to `()` on `[TR]` §3's printed machine.
-  Over that machine `TR3.wp_seq_false` refuses the corollary's semantic hypothesis at
-  the same term, so what this measures is the composite with Lemma 3.1.
-
-**How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  Each declaration carries its tag; an
-`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
-this file.
+Corollary 3.3 over `[TR]` §3's printed machine (§12.42, D6):
+`TR3.corThree_unreachable`, at the closed term `free (alloc ()); ()` that `[TR]`
+p. 2 types at `1`.  Nothing depends on this file.
 -/
 
 noncomputable section
@@ -28,11 +22,10 @@ open BoCa.Lifetime
 /-!
 ### Corollary 3.3 (Adequacy at 1) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/CONF/Results.lean`, under the record of Corollary 3.3 (Adequacy at 1).
+The record is in `Paper/CONF/Results.lean`.
 -/
-/-- **Corollary 3.3's conclusion is unreachable here**, at a closed term `[TR]`
-p. 2 types at `1`: no run of the printed machine from `wSeq` ends at `()`, from
-any heap to any heap.  `derives_wSeq` types it and `stuck_wSeq` stops it.
+/-- No run of the printed machine from `wSeq` ends at `()`; `derives_wSeq`
+types `wSeq` at `1`.
 `[about ours: `[CONF]` Corollary 3.3's conclusion at `[TR]` §3's machine]` -/
 theorem corThree_unreachable {μ μ' : Heap} (h : Steps μ wSeq μ' (.val .unit)) :
     False :=

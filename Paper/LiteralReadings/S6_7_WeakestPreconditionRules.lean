@@ -21,20 +21,15 @@ import Support.Syntax.Terms
 /-!
 # Literal readings — [TR] §6.7
 
-* 6.135 (`wp-bind`), over `[TR]` §3's printed machine: the closed, well-typed terms
-  `inj₁ (free (alloc ()))` and `free (alloc ()); ()` are stuck there
-  (`stuck_wInj`, `stuck_wSeq`), `TR3.wp` is false at such a term
-  (`wp_inj₁_false`, `wp_seq_false`, with `wp_stuck_false_nonvacuous`), and
-  `TR3.wp` is strictly below the library's `wp` (`wp_lt_fig16`);
-* 6.150 (`↺ rule`): `DeepReborrow.wp_reborrow_unreconciled_at_split_view`, the
-  entailment written without the hypothesis `RebEscrow`, measured at a configuration
-  built in this file (namespace `DeepReborrow`), and `deepReborrow_not_rebEscrow`,
-  that configuration outside `RebEscrow` — the two stand together.
+* 6.135 (`wp-bind`) over `[TR]` §3's printed machine (§12.42, D6): the closed,
+  well-typed terms `inj₁ (free (alloc ()))` and `free (alloc ()); ()` are stuck
+  there, `TR3.wp` is false at such a term, and `TR3.wp` is strictly below the
+  library's `wp`;
+* 6.150 (`↺ rule`): the entailment without the hypothesis `RebEscrow`, measured at
+  the configuration `DeepReborrow`, and that configuration outside `RebEscrow`
+  (§12.57).
 
-**How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  Each declaration carries its tag; an
-`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
-this file.
+Nothing depends on this file.
 -/
 
 noncomputable section
@@ -47,10 +42,10 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 /-!
 ### Lemma 6.135 (wp-bind) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.135 (wp-bind).
+The record is in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`.
 -/
-/-- **The `injᵢ K` gap at a closed, well typed term.**  `inj₁ (free (alloc ()))` takes
-no step and never reaches a value, and `derives_wInj` types it at `1 ⊕ T`.
+/-- `inj₁ (free (alloc ()))`, typed at `1 ⊕ T` by `derives_wInj`, takes no step and
+never reaches a value.
 `[about ours: the printed `Kont` of `[TR]` p. 3, at `[TR]` p. 1's `inj₁ e`]` -/
 theorem stuck_wInj (μ : Heap) :
     (∀ μ' e', ¬ Step1 μ wInj μ' e') ∧ ∀ (μ' : Heap) (v : Val), ¬ Steps μ wInj μ' (.val v) :=
@@ -59,8 +54,8 @@ theorem stuck_wInj (μ : Heap) :
     exact absurd (IsVal.inj₁_inv (he ▸ Val.isVal v)) (by simp [wFreeAlloc])⟩
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- **The `K; e` gap at a closed, well typed term.**  `(free (alloc ())); ()` takes
-no step and never reaches a value, and `derives_wSeq` types it at `1`.
+/-- `(free (alloc ())); ()`, typed at `1` by `derives_wSeq`, takes no step and never
+reaches a value.
 `[about ours: the printed `Kont` of `[TR]` p. 3, at `[TR]` p. 1's `e₁;e₂`]` -/
 theorem stuck_wSeq (μ : Heap) :
     (∀ μ' e', ¬ Step1 μ wSeq μ' e') ∧ ∀ (μ' : Heap) (v : Val), ¬ Steps μ wSeq μ' (.val v) :=
@@ -68,9 +63,7 @@ theorem stuck_wSeq (μ : Heap) :
    fun _ _ => steps_seq_ne_val (by simp [wFreeAlloc])⟩
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- `wp(inj₁ e)` is false whenever `e` is not a value: `[TR]` p. 3 prints no
-`injᵢ K` frame, so the run cannot start, and `inj₁ e` is not itself a value for
-it to end at.  This is the `injᵢ K` frame gap at the level of `wp`.
+/-- `wp(inj₁ e)` is false whenever `e` is not a value.
 `[about ours: `[TR]` p. 6's row over the printed machine, at p. 1's
 `inj₁ e`]` -/
 theorem wp_inj₁_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) (e : Expr)
@@ -81,8 +74,7 @@ theorem wp_inj₁_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) (e : Expr)
   exact he (IsVal.inj₁_inv (hv ▸ Val.isVal _))
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- `wp(e₁; e₂)` is false whenever `e₁` is not literally `()` — including when
-`e₁` is a redex, which is the `K; e` gap (§12.42) and no reading repairs it.
+/-- `wp(e₁; e₂)` is false whenever `e₁` is not literally `()`.
 `[about ours: `[TR]` p. 6's row over the printed machine, at p. 1's
 `e₁;e₂`]` -/
 theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂ : Expr)
@@ -92,8 +84,7 @@ theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂
   exact steps_seq_ne_val h₁ h₈
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- The refutations are not vacuous: an owned cell has `∅` as an admissible
-frame, so `wp` really is false at a resource `[TR]` p. 6's row reaches.
+/-- An owned cell, with `∅` as an admissible frame, at which `wp wSeq` is false.
 `[about ours: an inhabited instance of the refutations]` -/
 theorem wp_stuck_false_nonvacuous (l : BoCa.Loc) (w : Val) (Q : Val → WProp) :
     ¬ wp wSeq Q (ResU.single l (CellU.ownOf w)) := by
@@ -102,11 +93,8 @@ theorem wp_stuck_false_nonvacuous (l : BoCa.Loc) (w : Val) (Q : Val → WProp) :
   simp [wFreeAlloc]
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- **`wp_le_fig16` is strict, at a reading-independent witness.**
-`inj₁ (free ℓ)` is stuck on the printed machine because `[TR]` p. 3 prints no
-`injᵢ K` frame (`docs/adjudications.md` §12.42), and `BoLo.Steps` adds one — so `Fig16Wp`'s row
-holds of the owned cell and this file's does not.  The two `wp`s are therefore
-different propositions, not merely defined over different relations.
+/-- `wp_le_fig16` is strict: at `inj₁ (free ℓ)` and an owned cell, the library's `wp`
+holds and `TR3.wp` does not.
 `[about ours: the two `wp`s, over the two machines]` -/
 theorem wp_lt_fig16 (l : BoCa.Loc) :
     Fig16.BoLo.wp (.inj₁ (.app (.val (.prim .free)) (.val (.loc l))))
@@ -117,8 +105,7 @@ theorem wp_lt_fig16 (l : BoCa.Loc) :
   · refine Fig16.BoLo.wp_bind (.inj₁ .hole) _ _ _ ?_
     refine Fig16.BoLo.wp_free l .unit _ _ ⟨_, PMap.empty,
       ResU.comp_empty_right _, rfl, ?_⟩
-    -- `inj₁ ()` IS the value `inj₁ ()`, so `wp-val` lands the run with no
-    -- step in between.
+    -- `inj₁ ()` is a value, so `wp-val` applies.
     exact Fig16.BoLo.wp_val (.inj₁ .unit) _ _ trivial
   · exact wp_inj₁_false
       (ResU.hash_symm (ResU.hash_empty_right (ResU.valid_single_own l .unit)))
@@ -133,8 +120,7 @@ open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
-/-! `[about ours]` — what the Lean of Lemma 6.150 needs; the paper prints nothing here. -/
-/-- One fixed carrier value used everywhere. -/
+/-! `[about ours]` -/
 def 𝓋 : BoCa.Val := BoCa.Val.unit
 
 def mk2 (a b : Nat) (x y : CellU Nat BoCa.Val) : ResU Nat BoCa.Val where
@@ -426,12 +412,11 @@ theorem flat_composite : ResU.Flat (comp α β v u w) (sigma α β v u w) :=
   ⟨PMap.empty, sigma α β v u w, exS_comp α β v u w, agW_comp α β v u w,
     ResU.comp_empty_left _⟩
 
-/-- **The configuration's composite is valid.** -/
+/-- The configuration's composite is valid. -/
 theorem Valid_composite : ResU.Valid (comp α β v u w) :=
   ⟨_, flat_composite α β v u w⟩
 
-/-- `ρ_f ● (borrow cell) = comp`, with the borrow cell FIRST (the order the
-`⋆` in the `↺` rule's LHS needs). -/
+/-- `ρ_f ● (borrow cell) = comp`, borrow cell first, as the `↺` rule's LHS needs. -/
 theorem bcell_frame_comp :
     ResU.CompS (ResU.single 2 (cellB α v u w)) (ResU.single 0 (cellF β v))
       (comp α β v u w) := by
@@ -472,16 +457,11 @@ open BoCa.BoLo (Heap Steps)
 /-!
 ### Theorem 6.150 (↺ rule) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Theorem 6.150 (↺ rule).
+The record is in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`.
 -/
-/-- **The `DeepReborrow` configuration fails `RebEscrow`'s escrow half.**
-`ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)` reborrows at `β` to `rebA β = 0↦imm({β}, 𝓋, 1↦own(𝓋))`
-— the `own` clause of `reb_β`, whose witness `reb_β` fabricates — while
-`ag(comp)`, the aliasable walk of the very composite the measurement is taken at,
-carries `0↦imm({β}, 𝓋, ∅)` there.  `∅ ≠ 1↦own(𝓋)`, which is exactly what
-`Fig16.EscrowAgree` forbids.  The measurement is written at the same `β`-indexed
-`P̂` the rule above takes, so the escrow conjunct is the whole of what
-separates the two results.
+/-- `ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)` reborrows at `β` to `rebA β = 0↦imm({β}, 𝓋, 1↦own(𝓋))`,
+while `ag(comp)` carries `0↦imm({β}, 𝓋, ∅)`; the witnesses differ, which
+`Fig16.EscrowAgree` forbids.
 `[about ours: the `DeepReborrow` witness measured against this rule's added
 hypothesis]` -/
 theorem deepReborrow_not_rebEscrow (b : Life) :
@@ -513,11 +493,9 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 variable (α β : Life) (v u w : BoCa.Val)
 
-/-! `[about ours]` — what the Lean of Lemma 6.150 needs; the paper prints nothing here. -/
-/-- **The shallow and the deep `imm` cell are incompatible**, at any lifetime and
-value of the shallow cell.  The shallow imm `0↦imm(s, x, ∅)` and the deep reborrow
-`rebA β = 0↦imm({β}, v, 1↦own(u))` are strict-INCOMPATIBLE — their witnesses
-(`∅` vs `1↦own(u)`) differ. -/
+/-! `[about ours]` -/
+/-- The shallow `0↦imm(s, x, ∅)` and the deep `rebA β = 0↦imm({β}, v, 1↦own(u))`
+are incompatible: their witnesses differ. -/
 theorem noCompat (b : Life) (x : BoCa.Val) (c : Life) :
     ¬ ResU.CompatS (ResU.single 0 (cellF b x)) (rebA c v u) := by
   intro hc
@@ -564,8 +542,8 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 variable (α β : Life) (v u w : BoCa.Val)
 
-/-- **`ρ″ = 0↦own(v) ⊎ 1↦own(u)` reborrows at any `β ⊏ ⊤` to `rebA β`.**  The
-`own` clause of `reb_β`, with witness `π(0)/0 = 1↦own(u)`. -/
+/-- `ρ″ = 0↦own(v) ⊎ 1↦own(u)` reborrows at any `β ⊏ ⊤` to `rebA β`, by the `own`
+clause of `reb_β` with witness `π(0)/0 = 1↦own(u)`. -/
 theorem reb_rho2_rebA (hβ : (⊤ : Life) ⊐ β) :
     ResU.Reb β (rho2 v u) (rebA β v u) := by
   refine ⟨rho2_stratum v u β,
@@ -624,7 +602,7 @@ theorem hash_empty_of_valid {ρ : WRes} (hv : ResU.Valid ρ) :
     ResU.Hash (PMap.empty) ρ :=
   ⟨ResU.Compat.of_disjoint (fun _ => Or.inl rfl), ρ, compS_empty_left ρ, hv⟩
 
-/-- **A bare variable has no `wp` at any valid resource.** -/
+/-- A bare variable has no `wp` at any valid resource. -/
 theorem no_wp_var {i : Nat} (Q : Val → WProp) {ρ : WRes} (hv : ResU.Valid ρ) :
     ¬ wp (Expr.var i) Q ρ := by
   intro hwp
@@ -632,13 +610,13 @@ theorem no_wp_var {i : Nat} (Q : Val → WProp) {ρ : WRes} (hv : ResU.Valid ρ)
     hwp PMap.empty (hash_empty_of_valid hv)
   exact var_ne_val i x (steps_var hsteps).symm
 
-/-- `P` of the `↺`-rule instance: the only witness is the DEEP reborrow. -/
+/-- `P` of the `↺`-rule instance: the only witness is the deep reborrow. -/
 def Pfam : Life → Val → WProp := fun b _ => (fun ρ => ρ = rebA b 𝓋 𝓋)
 
-/-- `Q` of the instance — irrelevant (the wand is vacuous). -/
+/-- `Q` of the instance; the wand is vacuous. -/
 def Qpost : Val → WProp := fun _ => emp
 
-/-- **The LHS of the `↺` rule holds at the valid, incoherent `comp`.** -/
+/-- The LHS of the `↺` rule holds at `comp`. -/
 theorem lhs_holds :
     (ptoImm 2 (⊤ : Life) (fun v_ => fresh fun b => reborrow b (Pfam b v_)) ⋆
       (fresh fun b => all fun v_ =>
@@ -651,7 +629,7 @@ theorem lhs_holds :
     -- `fresh b. ↺b (Pfam b 𝓋)` at `ρ″`
     refine ⟨⊤, fun a ha => ⟨⟨rebA a 𝓋 𝓋, reb_rho2_rebA a 𝓋 𝓋 ha, rfl⟩, ?_⟩⟩
     exact rho2_stratum 𝓋 𝓋 a
-  · -- conjunct 2: the shallow view; the wand is VACUOUS
+  · -- conjunct 2: the shallow view; the wand is vacuous
     refine ⟨⊤, fun a ha => ⟨fun v_ r_a r_b hP hcomp => ?_, ?_⟩⟩
     · -- `hP : r_a = rebA a 𝓋 𝓋`, and `rebA a` is incompatible with the shallow cell
       subst hP
@@ -673,28 +651,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 variable (α β : Life) (v u w : BoCa.Val)
 
 /-! Theorem 6.150 (↺ rule), literal reading, continued. -/
-/-- **Our transcription of `[TR]` 6.150's entailment, written without 6.53,
-6.55 and 6.61, does not hold at a resource our `✓` admits.**  It fails at
-`comp`: the LHS holds (`lhs_holds`) while the RHS `wp (var 0) Q` cannot
-(`no_wp_var`, `Valid_composite`).
-
-This is a fact about what is missing here, not about `[TR]` 6.150.  Its printed
-proof (p. 39) spends the three composition lemmas, which are unstated on this
-carrier, so what is refused below is a strictly weaker transcription than the
-one the paper proves.
-
-The configuration is `DeepReborrow` — a valid composite holding a shallow view
-`imm({β}, 𝓋, ∅)` at location 0, whose real owner sits inside the borrow cell's
-witness `ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)`: two views of one location disagreeing on
-ownership, which our `✓` does not exclude (`CompR.immOwn` checks the value and
-not the witness) and which our frame calculus quantifies over.  The escrow our
-`reb_α` leaves is not pinned, because the lemma that pins it — 6.53, whose proof
-asserts *"witnesses and values always stay the same"* — is not transcribed.
-`Fig16.BoLo.RebEscrow` is that escrow taken as a hypothesis, and
-`Fig16.BoLo.deepReborrow_not_rebEscrow` refuses it at this very configuration, so
-the rule below and `Fig16.BoLo.wp_reborrow` stand together.
-`[about ours: our own `↺` row, written without 6.53/6.55/6.61, at one resource
-our `✓` admits — not a claim about the paper's rule.]` -/
+/-- `[TR]` 6.150's entailment without `RebEscrow`, at `comp`: the LHS holds
+(`lhs_holds`) and the RHS does not (`no_wp_var`, `Valid_composite`).  §12.57.
+`[about ours: our `↺` row without `RebEscrow`, at one resource our `✓` admits]` -/
 theorem wp_reborrow_unreconciled_at_split_view :
     ¬ Entails
         (ptoImm 2 (⊤ : Life) (fun v_ => fresh fun b => reborrow b (Pfam b v_)) ⋆

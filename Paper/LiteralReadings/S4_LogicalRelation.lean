@@ -8,29 +8,8 @@ import Support.LogicalRelation.Facts
 /-!
 # Literal readings — [TR] §4
 
-Declarations that measure a printed definition read literally, where the
-library uses a repaired one.  They are kept so the adjudication can be checked,
-and nothing in the paper tree depends on them.
-
-* `MutImmCell` (row 4.17): the cell and lifetime set at which, under the literal
-  `α ⊑ ⊔β̄` of `ℓ ↦ Imm α P̂`, `𝒱⟦Mut @a (Imm @b 1)⟧` is empty.
-
-**How this file reads.**  Each printed item is a row of `[TR]`'s section, in the
-order the page prints it, as far as Lean's definition-before-use allows; a row
-that has to come earlier than printed does so because something printed before
-it is defined through it.  Each row opens with a comment giving its number, the
-printed form, the page, a tag, and the reason the Lean has the shape it has:
-
-* `[as printed]` — the Lean is the printed item, symbol for symbol;
-* `[encoding]` — it differs only by a representation choice that changes nothing
-  (de Bruijn indices, a graph for a partial function, a list for a finite map);
-* `[repair]` — it deliberately differs, and the comment gives the adjudication
-  and the sentences of the paper that ground it;
-* `[about ours]` — a declaration the paper does not print, placed here only
-  because Lean needs it before the next printed row.
-
-Row numbers are those of `Paper/INDEX.md` (*Definitions*); `§N` citations are
-to `docs/adjudications.md`.
+`MutImmCell` (row 4.17): the `imm` cell recording `{α₀, β}` that measures the
+literal `α ⊑ ⊔β̄` of `ℓ ↦ Imm α P̂` (§12.67(a)).  Nothing depends on this file.
 -/
 
 noncomputable section
@@ -44,7 +23,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### 4.17 · — no printed counterpart — · [TR] p. 4 · `[repair]`
 
-An `imm` cell recording `{α₀, β}`, outside `Res_β`; with the connective at `⊓β̄` (row 5.30) it is in `𝒱⟦Imm @b 1⟧δ` only where `@bδ ⊑ α₀ ⊓ β`, and `BoCa.Fig16.LogRel.MutImmCell.inRel_same` is the case `β = α₀`. Adjudicated at `docs/adjudications.md` §12.67(a): at the literal `⊔β̄` this cell emptied `𝒱⟦Mut @a (Imm @b 1)⟧δ`, and the declarations that measured that reading are removed
+An `imm` cell recording `{α₀, β}`, outside `Res_β`.  At row 5.30's `⊓β̄` it is in
+`𝒱⟦Imm @b 1⟧δ` only where `@bδ ⊑ α₀ ⊓ β`; at the literal `⊔β̄` it empties
+`𝒱⟦Mut @a (Imm @b 1)⟧δ` (§12.67(a)).
 -/
 /-- `β̄ = {α₀, β}`. -/
 def lset (α₀ β : Life) : LSet := (LSet.singleton α₀).union (LSet.singleton β)
@@ -57,7 +38,7 @@ noncomputable def cell (α₀ β : Life) : WRes :=
   ResU.single 0 (CellU.immOf (lset α₀ β) .unit PMap.empty
     (empty_inStratum (lset α₀ β).join))
 
-/-! `[about ours]` — what the Lean of row 4.17's theorem needs; the paper prints nothing here. -/
+/-! `[about ours]` -/
 theorem lset_meet (α₀ β : Life) : (lset α₀ β).meet = α₀ ⊓ β := rfl
 
 /-!

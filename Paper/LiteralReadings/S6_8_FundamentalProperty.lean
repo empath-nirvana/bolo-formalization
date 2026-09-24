@@ -40,27 +40,18 @@ import Support.TypedWorld.World
 /-!
 # Literal readings — [TR] §6.8
 
-* 6.151: `ViewWitness.fundamentalProperty_refused` — at a `withloadAx` node of our
-  carrier, the statement at `Sem` without `WithloadEscrow` is refused (the
-  configuration and its runs are in this file, namespace `ViewWitness`);
-  `ViewWitness.excluded` — that configuration is not a typed world with the
-  argument in its type;
-* 6.151, the antecedent read as the rule figures alone (`Derives` instead of p. 2's
-  `DerivesWf`): `FundamentalPropertyOverRules`, `not_everyDerivationWf`, the route
-  through `DerivesIn` (`fundamental_of_open`, `fundamental_in`,
-  `fundamentalProperty_of`) and `not_everyDerivationInRegime`; and `SemArising`,
-  which is not a route to the row (`sem_of_semArising` concludes at `gDenB`);
-* 6.154, 6.155, 6.157, 6.169, 6.170: each compatibility lemma's step measured over
-  `[TR]` §3's printed machine (`…_refused_on_TR3`, `…_step_on_TR3`,
-  `swap_step_blocked_on_TR3`), at the closed terms `[TR]` p. 2 types there;
+* 6.151 at `Sem` (§12.68, §12.73): `ViewWitness.fundamentalProperty_refused`, the
+  statement without `WithloadEscrow` refused at a `withloadAx` node, and
+  `ViewWitness.excluded`, that configuration is not a typed world;
+* 6.151 with the antecedent over `Derives` instead of `DerivesWf` (§C.26):
+  `FundamentalPropertyOverRules`, `not_everyDerivationWf`, the route through
+  `DerivesIn` and `not_everyDerivationInRegime`;
+* 6.154, 6.155, 6.157, 6.169, 6.170: each compatibility lemma's step over `[TR]` §3's
+  printed machine (§12.42, D6);
 * 6.162: `MutPayloadSubst.subst_eq`, the substitution step at a `Mut` type whose
-  payload mentions the substituted variable, through the printed `mut` cell, which
-  stores the predicate.
+  payload mentions the substituted variable.
 
-**How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  Each declaration carries its tag; an
-`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
-this file.
+Nothing depends on this file.
 -/
 
 noncomputable section
@@ -74,30 +65,16 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### Lemma 6.151 (Fundamental Property) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.151 (Fundamental Property).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
-/-- **6.151's antecedent read as the rule figures alone**, i.e. over
-`BoCa.Derives`, which is [TR] p. 2's typing rules and nothing else and which
-therefore consumes `Δ ⊢ T` at no constructor
-(definition row 2.19).
-
-The two readings differ, and `not_everyDerivationWf` is where: `witness` is
-`∅; • ⊢ λ().() : ∀('a ⊏ 'a). 1`, whose bound mentions its own binder — a
-`Derives` node, and no `DerivesWf` node, since `DerivesWf.allI` reads p. 2's
-own `Δ ⊧ @b` beside `'a ∉ dom(Δ)`.  So this quantifier reaches derivations the
-presuppositions exclude, which is why it is kept apart from
-`FundamentalProperty` rather than identified with it.
-
-`fundamentalProperty_of` is this reading, from `fundamental_in` and
-`EveryDerivationInRegime`.
+/-- 6.151's antecedent over `BoCa.Derives`, the typing rules without `Δ ⊢ T`
+(row 2.19, §C.26).  `not_everyDerivationWf` separates it from `FundamentalProperty`.
 `[about ours: 6.151's antecedent over `BoCa.Derives`]` -/
 def FundamentalPropertyOverRules : Prop :=
   ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty), Derives Δ Γ e T → Sem Δ Γ e T
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **`Δ; Γ ⊨ e : T` with the slot conditions.**  Input: `𝒢⟦Γ⟧δ(γ)` carrying
-`TyAt` at each live slot.  Output: `TyAt` at `T`, so the induction
-feeds itself instead of having to recover the fact from the denotation.
+/-- `Δ; Γ ⊨ e : T` with `TyAt` at each live slot of `𝒢⟦Γ⟧δ(γ)` and at `T`.
 `[restricted: to `gDenB` contexts — `[TR]` p. 4's `𝒢⟦Γ⟧δ` with a scope
 condition of the kind its own `dom(Γ) ⊆ dom(δ)` already is]` -/
 def SemArising (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=
@@ -105,22 +82,15 @@ def SemArising (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=
     wp (substAll γ e) (fun v ρ' => vDen T δ v ρ' ∧ TyAt δ T ρ') ρ
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- The projection adequacy uses: at `ρ = ∅` the input condition holds of the
-empty context, so the restriction costs nothing there. -/
+/-- At the empty context the slot condition holds. -/
 theorem sem_of_semArising {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty}
     (h : SemArising Δ Γ e T) :
     ∀ δ γ ρ, Δ.Models δ → gDenB Δ δ Γ γ ρ → wp (substAll γ e) (vDen T δ) ρ :=
   fun δ γ ρ hδ hg => wp_mono (fun _ _ hx => hx.1) _ _ (h δ γ ρ hδ hg)
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **The resources the calculus puts together, at a licence `L`.**  Three of
-the four places `[CONF]` 415:19–24 names are operations on resources: the empty
-resource, the composition `●` — and either part of one, since a slot is read
-off a composite — and the reborrow `reb_α`, which mints the borrow it takes.
-
-Membership is a derivation and not a test, so `⋆`-closure (`comp`) and
-splitting (`part`) hold by construction rather than having to be checked of a
-predicate, and a resource is outside the family when nothing builds it.
+/-- The resources built from `∅` by `●`, its parts and `reb_α` at a lifetime `L`
+covers ([CONF] 415:19–24).
 `[about ours: the three resource operations `[CONF]` 415:19–24 names, as the
 family they generate]` -/
 inductive Arises (L : Life → Prop) : WRes → Prop
@@ -136,9 +106,8 @@ inductive Arises (L : Life → Prop) : WRes → Prop
       Arises L src → L α → Arises L img
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **The assembly.**  The closure lemmas are the four steps of this one
-induction — `lifeMembers_empty`, `lifeMembers_compS`, `lifeMembers_compS_left`
-and `lifeMembers_reb` — and nothing else is used.
+/-- By induction on `Arises`, from `lifeMembers_empty`, `lifeMembers_compS`,
+`lifeMembers_compS_left` and `lifeMembers_reb`.
 `[about ours: the closure lemmas read as the family's recursor]` -/
 theorem lifeMembers_of_arises {L : Life → Prop} {ρ : WRes} (h : Arises L ρ) :
     LifeMembers L ρ := by
@@ -149,30 +118,16 @@ theorem lifeMembers_of_arises {L : Life → Prop} {ρ : WRes} (h : Arises L ρ) 
   | reb hr _ hα ih => exact lifeMembers_reb hr ih hα
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **The induction of `[TR]` Lemma 6.151, with the §6.8 lemmas not proved
-at the literal reading carried as hypotheses.**
+/-- The induction of `[TR]` Lemma 6.151, with the §6.8 lemmas not proved at the
+literal reading carried as hypotheses, over `DerivesIn` derivations: those whose
+`∀I`, `withbor` and `withload` binders are fresh, and whose `withload` nodes carry
+6.150's escrow.
 `[restricted: 6.161, 6.162, 6.163, 6.165 and 6.172–6.176 are assumed, and the
-derivation is one of the `DerivesIn`]`
-
-The Fundamental Property is proved for derivations in the regime: for every
-`DerivesIn` derivation, whose `∀I` nodes have a binder fresh for its bound, for
-`Δ`'s bounds and for `Γ`'s live types, whose `withbor1`, `withbor2` and
-`withbor3` nodes have a binder fresh for `T₁` and `T₂`, and whose `withload`
-nodes have that freshness and 6.150's escrow.  What it excludes is a derivation
-with a `∀I`, `withbor1`, `withbor2`, `withbor3` or `withload` binder that
-captures — which `[TR]`'s named presentation never writes, so that presentation
-works in the regime throughout.  Each hypothesis is one `[TR]` §6.8 lemma at the constructor
-it discharges; the comment on each names it and its physical page.  Every other
-constructor closes from its compatibility lemma directly, and the `induction` block below is the
-proof that the two lists together are all of `DerivesIn`. -/
+derivation is one of the `DerivesIn`]` -/
 theorem fundamental_of_open
-    /- **[TR] Lemma 6.161 (∀I-compat), p. 42** `[variant: adds the freshness of
-       `'a` for `@b`, for `Δ`'s bounds and for `Γ`'s live types, as
-       `allI_compat` does]`.  The premise's `Δ, ('a ⊏ @b)` is `Δ.extend x b`
-       together with `hx`, which is what makes the extension a genuine one
-       rather than a shadowing; the premise's context gains a slot already dead
-       because `Λ.e ≜ λ_.e` (§12.14).  `allI_compat` is a term of this type, and
-       the induction reads the three freshnesses off `AllISide` at the node. -/
+    /- [TR] Lemma 6.161 (∀I-compat), p. 42 `[variant: adds the freshness of
+       `'a` for `@b`, for `Δ`'s bounds and for `Γ`'s live types]` (§12.44, C14);
+       `allI_compat`. -/
     (open_allI : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {b : Lifetime.Life}
       {S : Ty} {e : Expr} {T : Ty}, Δ.find? x = none →
       b.mentions x = false →
@@ -180,76 +135,50 @@ theorem fundamental_of_open
       (∀ s ∈ Γ, s.live = true → ¬ LFree x s.ty) →
       Sem (Δ.extend x b) (⟨S, false⟩ :: Γ) e T →
       Sem Δ Γ (.val (.lam e)) (.all x b T))
-    /- **[TR] Lemma 6.162 (∀E-compat), p. 42** `[as printed]`.  `e[] ≜ e ()`
-       (§12.14) and `T[@a/'a]` is `Ty.instLife`.  `allE_compat` is a term
-       of this type. -/
+    /- [TR] Lemma 6.162 (∀E-compat), p. 42 `[as printed]`; `allE_compat`. -/
     (open_allE : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {x : LifeVar}
       {b : Lifetime.Life} {T : Ty} {a : Lifetime.Life},
       Sem Δ Γ e (.all x b T) → Δ.EntailsLt a b →
       Sem Δ Γ (.app e (.val .unit)) (Ty.instLife x a T))
-    /- **[TR] Lemma 6.163 ([]I-compat), p. 42** `[as printed]`.
-       `Δ ⊢ Γ ⊐ @a` is `Ctx.Outlives`, and `□` leaves the term alone (§12.5).
-       `boxI_compat` is a term of this type. -/
+    /- [TR] Lemma 6.163 ([]I-compat), p. 42 `[as printed]`; `boxI_compat`. -/
     (open_boxI : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty}
       {a : Lifetime.Life}, Sem Δ Γ e T → Ctx.Outlives Δ Γ a →
       Sem Δ Γ e (.box a T))
-    /- **[TR] Lemma 6.165 (alloc-compat), p. 43** `[as printed]`.  `∅` is
-       `Ctx.Dead Γ` (§12.19), and `Ref T` is `Ty.ref`.  `alloc_compat` is a term
-       of this type. -/
+    /- [TR] Lemma 6.165 (alloc-compat), p. 43 `[as printed]`; `alloc_compat`. -/
     (open_alloc : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {T : Ty}, Ctx.Dead Γ →
       Sem Δ Γ (.val (.prim .alloc)) (.lolli T (.ref T)))
-    /- **[TR] Lemma 6.172 (withbor-compat1), p. 45** `[variant: with the two
-       freshness hypotheses `withbor1_compat` adds]`.  `⊓Δ` is
-       `LifeCtx.meetOfDom` (§12.15); the `∀` binder is schematic on the page, so
-       it is a parameter here, fresh for `Δ` by `hx` (§12.44).  Its proof applies
-       `ImmFrame`, which — unlike 6.173's `MutFrame` — asks no side condition on
-       `T₁`; the third and fourth premises are the binder's freshness for `T₁`
-       and `T₂`, which its last step folds by.  `withbor1_compat` is the term to
-       supply, and the induction reads the two off `Withbor1Side` at the node. -/
+    /- [TR] Lemma 6.172 (withbor-compat1), p. 45 `[variant: the binder's
+       freshness for `T₁` and `T₂`]`; `withbor1_compat`. -/
     (open_withbor1 : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (x : LifeVar),
       Ctx.Dead Γ → Δ.find? x = none →
       ¬ LFree x T₁ → ¬ LFree x T₂ →
       Sem Δ Γ withbor (axWithbor1Ty x Δ.meetOfDom T₁ T₂))
-    /- **[TR] Lemma 6.173 (withbor-compat2), p. 46** `[variant: with the two
-       freshness hypotheses `withbor2_compat` adds]`.  Its "If `Δ ⊢ T₁ ⊐ @b`
-       then" binds `@b` nowhere else, so it is read existentially (§12.9);
-       `Δ ⊢ T ⊐ @a` presupposes `Δ ⊨ @a` (§C.25), which is the `Defines`
-       conjunct.  The fourth and fifth premises are the binder's freshness for
-       `T₁` and `T₂`; `withbor2_compat` is the term to supply, and the
-       induction reads the two off `Withbor2Side` at the node. -/
+    /- [TR] Lemma 6.173 (withbor-compat2), p. 46 `[variant: the binder's
+       freshness for `T₁` and `T₂`]`; the side condition is read existentially
+       (§12.9); `withbor2_compat`. -/
     (open_withbor2 : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (x : LifeVar),
       Ctx.Dead Γ → Δ.find? x = none →
       (∃ b, Δ.Defines b ∧ BoCa.Outlives Δ T₁ b) →
       ¬ LFree x T₁ → ¬ LFree x T₂ →
       Sem Δ Γ withbor (axWithbor2Ty x Δ.meetOfDom T₁ T₂))
-    /- **[TR] Lemma 6.174 (withbor-compat3), p. 47** `[variant: with the two
-       freshness hypotheses `withbor3_compat` adds]`.  The third and fourth
-       premises are the binder's freshness for `T₁` and `T₂`, 6.172's
-       convention that 6.174 inherits; `withbor3_compat` is the term to
-       supply, and the induction reads the two off `Withbor3Side` at the
-       node. -/
+    /- [TR] Lemma 6.174 (withbor-compat3), p. 47 `[variant: the binder's
+       freshness for `T₁` and `T₂`]`; `withbor3_compat`. -/
     (open_withbor3 : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life}
       {T₁ T₂ : Ty} (x : LifeVar), Ctx.Dead Γ → Δ.find? x = none →
       ¬ LFree x T₁ → ¬ LFree x T₂ →
       Sem Δ Γ withbor (axWithbor3Ty a x Δ.meetOfDom T₁ T₂))
-    /- **[TR] Lemma 6.175 (withload-compat), p. 47** `[variant: with the three
-       hypotheses `withload_compat` adds that name the node]`; the callback's
-       argument is `Imm̲ 'b T₁`, i.e. `Ty.immReborrow` (§12.11).  The third
-       premise is the escrow `[TR]` 6.150 inherits from 6.55, at the `P̂` this
-       proof builds, and the fourth and fifth the binder's freshness for `T₁`
-       and `T₂` — `↺V₂`'s *"if `'a` not free in `T`"* and the closing
-       sentence's *"because `'b` does not occur free in `T₂`"*;
-       `withload_compat` is the term to supply, and the induction reads the
-       three off `WithloadSide` at the node. -/
+    /- [TR] Lemma 6.175 (withload-compat), p. 47 `[variant: 6.150's escrow at
+       the `P̂` the proof builds, and the binder's freshness for `T₁` and `T₂` —
+       `↺V₂`'s "if `'a` not free in `T`" and "because `'b` does not occur free in
+       `T₂`"]`; `withload_compat`. -/
     (open_withload : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life}
       {T₁ T₂ : Ty} (x : LifeVar), Ctx.Dead Γ → Δ.find? x = none →
       (∀ (δ : LSub) (vℓ : Val), RebEscrow
         (fun β v' => ⌜vℓ = v'⌝ ⋆ vDen (T₁.immReborrow (.var x)) (δ.extend x β) vℓ)) →
       ¬ LFree x T₁ → ¬ LFree x T₂ →
       Sem Δ Γ withload (axWithloadTy a x Δ.meetOfDom T₁ T₂))
-    /- **[TR] Lemma 6.176 (withswap-compat), p. 48** `[as printed]`.  The
-       callback is a bare `⊸`: no thunk, no fresh lifetime, no modality.
-       `withswap_compat` is a term of this type. -/
+    /- [TR] Lemma 6.176 (withswap-compat), p. 48 `[as printed]`;
+       `withswap_compat`. -/
     (open_withswap : ∀ {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life}
       {T₁ T₂ : Ty}, Ctx.Dead Γ →
       Sem Δ Γ withswap (axWithswapTy a T₁ T₂)) :
@@ -289,9 +218,8 @@ theorem fundamental_of_open
   | withswapAx hΓ             => exact open_withswap hΓ
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **`[TR]` Lemma 6.151 (Fundamental Property, p. 40) for derivations in the
-regime**, with every one of `fundamental_of_open`'s nine slots discharged by
-the §6.8 lemma the comment at it names.
+/-- `[TR]` Lemma 6.151 (p. 40) for `DerivesIn` derivations, `fundamental_of_open`'s
+slots discharged by the §6.8 lemmas.
 `[restricted: to the `DerivesIn`]` -/
 theorem fundamental_in :
     ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty),
@@ -313,23 +241,16 @@ theorem not_everyDerivationInRegime : ¬ EveryDerivationInRegime := by
   exact aux (hreg _ _ _ _ witness) rfl (by simp [stripBox])
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **`[TR]` Lemma 6.151 from the two**, at the antecedent read as the rule
-figures alone.  `fundamental_in` run at the derivation
-`EveryDerivationInRegime` supplies; the conclusion is
-`FundamentalPropertyOverRules` on the nose, over `BoCa.Derives`.
+/-- `[TR]` Lemma 6.151 over `BoCa.Derives`, from `fundamental_in` and
+`EveryDerivationInRegime`.
 `[restricted: to `EveryDerivationInRegime`]` -/
 theorem fundamentalProperty_of
     (hreg : EveryDerivationInRegime) : FundamentalPropertyOverRules :=
   fun Δ Γ e T hD => fundamental_in Δ Γ e T (hreg Δ Γ e T hD)
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **The bridge is refused at the same node `EveryDerivationInRegime` is.**
-`witness` is `∅; • ⊢ λ().() : ∀('a ⊏ 'a). 1`, which `Derives` admits because it
-is the printed rules and nothing else; `DerivesWf.allI` reads p. 2's own
-`Δ ⊧ @b` beside `'a ∉ dom(Δ)` and refuses it.  So `fundamental` reaches
-`FundamentalPropertyOverRules` no more directly than `fundamental_in` does —
-what stands between them is the presupposition, at both, and it is the reason
-`FundamentalProperty` is stated at the presupposed judgment instead.
+/-- `witness`, `∅; • ⊢ λ().() : ∀('a ⊏ 'a). 1`, is a `Derives` node that no
+`DerivesWf` node types.
 `[about ours: `EveryDerivationWf` refused at `witness`]` -/
 theorem not_everyDerivationWf : ¬ EveryDerivationWf := by
   intro hwf
@@ -345,10 +266,9 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 /-!
 ### Lemma 6.154 (1E-compat) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.154 (1E-compat).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
-/-- `Δ; • ⊢ (free (alloc ())); () : 1`.  `1E` types `e₁; e₂` at *any* `e₁ : 1`,
-so the `K; e` gap is a class of well typed terms and not a corner case.
+/-- `Δ; • ⊢ (free (alloc ())); () : 1`.
 `[as printed]` (`[TR]` p. 2's `1E`) -/
 theorem derives_wSeq (Δ : BoCa.Lifetime.LifeCtx) :
     Derives Δ [] wSeq .unit :=
@@ -363,18 +283,9 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-! Lemma 6.154 (1E-compat), literal reading, continued. -/
-/-- **6.154 (`1E-compat`) is unreachable over §3 read as exact — which is the
-measure of §3's elision, not of 6.154.**  Both premises hold at
-`Γ₁ = Γ₂ = ∅`, `e₁ = free (alloc ())`, `e₂ = ()`, `T = 1` — a closed instance
-`[TR]` p. 2's `1E` types (`TR3.derives_wSeq`) — and the conclusion cannot:
-`[TR]` p. 3 prints no `K; e` frame and the printed `1↦` fires only at a literal
-`()`, so `(free (alloc ())); ()` is stuck beside its own redex.
-`docs/adjudications.md` §12.42 settles which reading that argues for: §3 is
-**elided**, since read as exact it makes `[CONF]` Corollary 3.3 unreachable too.
-So this is a fact about the seven productions `TR3.Kont` transcribes
-literally, and 6.154 is not in question.
-`[about ours: 6.154's own statement, over `TR3.Steps`, the literal reading of
-an elided figure]` -/
+/-- Over `TR3.Steps`, 6.154's premises hold at `e₁ = free (alloc ())`, `e₂ = ()`,
+`T = 1` and its conclusion does not: p. 3 prints no `K; e` frame (§12.42).
+`[about ours: 6.154's own statement, over `TR3.Steps`]` -/
 theorem unitE_refused_on_TR3 (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty
     ∧ TR3.wp (.val .unit) (vDen .unit δ) PMap.empty
@@ -386,15 +297,9 @@ theorem unitE_refused_on_TR3 (δ : LSub) :
 /-!
 ### Lemma 6.155 (⊗I-compat) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.155 (⊗I-compat).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
-/-- **`[TR]` 6.155 (`⊗I-compat`)'s last step goes through on the printed
-machine.**  Both premises are `wp-val` at `()`, so no evaluation order is at
-issue and the two frames the proof binds with, `(K,e)` and `(v,K)`, are never
-reached.  `[TR]`'s own last step — `wp-val` at the *expression* `(v₁,v₂)`, which
-`[CONF]` Fig. 1 takes silently because its grammar derives `(v₁,v₂)` both
-through `v` and through `(e₁,e₂)` — is `wp-val` at the value, the two being one
-term here.
+/-- 6.155's last step, `wp-val` at `(v₁,v₂)`, over `TR3.Steps`.
 `[about ours: 6.155's own last step, over `TR3.Steps`, the printed machine]` -/
 theorem tensorI_step_on_TR3 (Q : Val → WProp) {ρ : WRes}
     (h : Q (Val.pair Val.unit Val.unit) ρ) :
@@ -411,7 +316,7 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 /-!
 ### Lemma 6.157 (⊕I-compat) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.157 (⊕I-compat).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
 /-- `Δ; • ⊢ inj₁ (free (alloc ())) : 1 ⊕ T`, closed and at every `Δ` and `T`.
 `[as printed]` (`[TR]` p. 2's `⊕I`, as `Derives` transcribes it) -/
@@ -428,14 +333,9 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-! Lemma 6.157 (⊕I-compat), literal reading, continued. -/
-/-- **6.157 (`⊕I-compat`) is unreachable over §3 read as exact**, for the same
-reason as 6.154 above and with the same verdict.  The premise holds at
-`Γ = ∅`, `e = free (alloc ())`, `T₁ = T₂ = 1`, and the conclusion cannot:
-`[TR]` p. 3 prints no `injᵢ K`, so `inj₁ (free (alloc ()))` — which `[TR]`
-p. 2's `⊕I` types (`TR3.derives_wInj`) — is stuck.  `docs/adjudications.md` §12.42:
-§3 is elided, so this measures the elision and not 6.157.
-`[about ours: 6.157's own statement, over `TR3.Steps`, the literal reading of
-an elided figure]` -/
+/-- Over `TR3.Steps`, 6.157's premise holds at `e = free (alloc ())` and its
+conclusion does not: p. 3 prints no `injᵢ K` frame (§12.42).
+`[about ours: 6.157's own statement, over `TR3.Steps`]` -/
 theorem sumI₁_refused_on_TR3 (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty
     ∧ ¬ TR3.wp TR3.wInj (vDen (.sum .unit .unit) δ) PMap.empty :=
@@ -454,11 +354,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### Lemma 6.162 (∀E-compat) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.162 (∀E-compat).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
-/-- **Substitution into a `Mut` type's payload commutes with `𝒱⟦−⟧`**, at
-`Tpayload`: `𝒱⟦T[⊤/'x]⟧δ = 𝒱⟦T⟧_{δ['x↦⊤]}`.  The printed `mut` cell stores the
-payload predicate, so this is `vDen_mut_congr` at the payload's two readings.
+/-- `𝒱⟦T[⊤/'x]⟧δ = 𝒱⟦T⟧_{δ['x↦⊤]}` at `Tpayload`, by `vDen_mut_congr`.
 `[about ours: 6.162's substitution step at a `Mut` type whose payload mentions the
 substituted variable]` -/
 theorem subst_eq (δ : LSub) :
@@ -479,15 +377,10 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### Lemma 6.169 (swap-compat) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.169 (swap-compat).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
-/-- **6.169 (`swap-compat`) reaches a term the printed machine cannot step.**
-`swap`'s type is a `⊸`, so its row is not stateable over the printed machine
-without a second `𝒱` (see the section header); what is checked is the step
-`[TR]` p. 44's own proof takes.  After `wp-⊸` twice, `wp-bind` at `e K` and
-`wp-load`, the goal is a `wp` at `store ℓ v; (ℓ, z)` — `[CONF]` Fig. 3b's body,
-and `[TR]` p. 4's own `swap` has the same shape — whose left component is not
-`()`, so `1↦` does not fire and there is no `K; e` frame to bind it under.
+/-- The step of 6.169's proof (p. 44) after `wp-⊸` twice, `wp-bind` and `wp-load`:
+`store ℓ v; (ℓ, z)` is stuck over `TR3.Steps`, which has no `K; e` frame.
 `[about ours: 6.169's own proof at its `;`, over `TR3.Steps`]` -/
 theorem swap_step_blocked_on_TR3 (ℓ : BoCa.Loc) (v : Val) (e : Expr)
     (Q : Val → WProp) {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) :
@@ -498,13 +391,10 @@ theorem swap_step_blocked_on_TR3 (ℓ : BoCa.Loc) (v : Val) (e : Expr)
 /-!
 ### Lemma 6.170 (copy-compat) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.170 (copy-compat).
+The record is in `Paper/S6_8_FundamentalProperty/Lemmas.lean`.
 -/
-/-- **6.170 (`copy-compat`) reaches a term the printed machine handles.**  Same
-caveat as `swap`: `copy : Imm @a T ⊸ (Imm @a T ⊗ Imm @a T)` is a `⊸`, so the row
-is not stateable over the printed machine.  No evaluation context is reached at
-all — `copy ≜ λx.(x,x)` β-reduces straight to `(v,v)`, which IS the value
-`(v,v)` — so the step 6.155 needs is `wp-val` and this row is no longer blocked.
+/-- 6.170's proof over `TR3.Steps`: `copy ≜ λx.(x,x)` β-reduces to the value
+`(v,v)`.
 `[about ours: 6.170's own proof at its `(v,v)`, over `TR3.Steps`]` -/
 theorem copy_step_on_TR3 (v : Val) (Q : Val → WProp) {ρ : WRes}
     (h : Q (Val.pair v v) ρ) :
@@ -518,7 +408,7 @@ open BoCa
 open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
-/-! `[about ours]` — what the Lean of Lemma 6.151 needs; the paper prints nothing here. -/
+/-! `[about ours]` -/
 theorem step_app_inv {μ μ' : Heap} {f a e' : Expr} (h : Step1 μ (.app f a) μ' e') :
     Head μ (.app f a) μ' e' ∨ (∃ a', Step1 μ a μ' a' ∧ e' = .app f a') ∨
       (∃ (v : Val) (f' : Expr), a = v.1 ∧ Step1 μ f μ' f' ∧ e' = .app f' a) := by
@@ -693,9 +583,8 @@ theorem vf_app : ((Val.lam B).1).subst 0 Val.unit = (Val.lam B).1 := by
 macro "no_head" h:ident : tactic =>
   `(tactic| (generalize hE : _ = E at $h:ident; cases $h:ident <;> simp_all [Val.lam, Val.loc, Val.unit, Val.pair, Val.prim, vf, B, C, v0]))
 
-/-- **The callback's run at a location other than `ℓ₀`.**  At `y = ℓ_k ≠ 0` whose
-cell holds a pair, `B` stores `()` at `0`, reads `k`, restores `0` and
-eliminates the pair: it returns `()` and leaves the memory as it found it. -/
+/-- At `y = ℓ_k ≠ 0` whose cell holds a pair, `B` returns `()` and leaves the
+memory unchanged. -/
 theorem run_legit (μ : Heap) (k : Loc) (hk : k ≠ 0) (p q : Val)
     (h0 : μ 0 = some v0) (hkv : μ k = some (Val.pair p q)) :
     Steps μ (B.subst 0 (Val.loc k)) μ Val.unit.1 := by
@@ -732,8 +621,8 @@ theorem stuck_letpair (μ μ' : Heap) (r : Val) :
       · no_head hh
       · exact no_step_isVal .unit ha
 
-/-- **The callback's run at `ℓ₀`, inside `withload`.**  With `ℓ₂ ↦ ℓ₀` in memory,
-`(λf. f () (load ℓ₂)) vf` reaches `let (_,_) = () in ()` and stops. -/
+/-- With `ℓ₂ ↦ ℓ₀` in memory, `(λf. f () (load ℓ₂)) vf` reaches
+`let (_,_) = () in ()` and stops. -/
 theorem run_stuck (μ μ' : Heap) (r : Val) (h2 : μ 2 = some (Val.loc 0)) :
     ¬ Steps μ (.app (.lam wlApplied) vf.1) μ' r.1 := by
   intro hs
@@ -897,8 +786,8 @@ theorem pair_den_has_cell {δ : LSub} {pv : Val} {W : WRes}
   obtain ⟨χ, hχ, -⟩ := compS_get_erase hc hψ
   exact ⟨l, χ, hχ⟩
 
-/-- **A run that returns and leaves the memory alone discards its whole resource.**  The
-`wp` row at `ρ′ := ∅`, `ρ⁺ := ρ`. -/
+/-- A run that returns and leaves the memory unchanged satisfies `wp` with
+`ρ′ := ∅`, `ρ⁺ := ρ`. -/
 theorem wp_run_discard {e : Expr} {Q : Val → WProp} {ρ : WRes} {v : Val}
     (hno : NoOwn ρ) (hQ : Q v PMap.empty)
     (hrun : ∀ ρf fρ μ, ResU.Hash ρf ρ → ResU.CompS ρf ρ fρ → ResU.Lower fρ μ →
@@ -920,10 +809,8 @@ theorem lower_read {ρ ρc ρf fρ : WRes} {μ : Heap} {l : Loc} {ψ : CellU Loc
   obtain ⟨χ', hχ', e₂⟩ := compS_get_erase (ResU.CompS.comm h₂) hχ
   rw [lower_get hμ hχ', e₂, e₁]
 
-/-- **The callback is in its type.**  Every argument `𝒱⟦Imm̲ 'x T₁⟧` admits is
-`ℓ_k ↦ imm(_, (p,q), W)` with `W` carrying a cell, and one compatible with
-`ρ₂`'s view at `ℓ₀` — whose witness is `∅` — has `k ≠ 0`; there `B` returns `()`
-and leaves memory unchanged.
+/-- Every argument compatible with `ρ₂`'s view at `ℓ₀` is at some `ℓ_k`,
+`k ≠ 0`, where `B` returns `()` and leaves memory unchanged.
 `[about ours: the callback at `ρ₂`, against `𝒱⟦∀'x ⊏ ⊓Δ₀. Imm̲ 'x T₁ ⊸ ['x] 1⟧`]` -/
 theorem f_den : vDen (.all 2 Δ₀.meetOfDom
       (.lolli (Ty.immReborrow (.var 2) T₁) (.box (.var 2) .unit))) δ₀ vf ρ₂ := by
@@ -969,9 +856,9 @@ our `Sem`, at `T₁ = Ref (Ref 1 ⊗ 1)`.
 def WithloadSem : Prop :=
   Sem Δ₀ [] withload (axWithloadTy (.var 1) 2 Δ₀.meetOfDom T₁ .unit)
 
-/-- **Our carrier refuses `WithloadSem`.**  The argument is `ρ₁`, the callback
-`vf` at `ρ₂`; `ρ₁ ● ρ₂` is `✓` (`DeepReborrow.Valid_composite`), `vf` is in the
-callback type (`f_den`), and the run gets stuck (`run_stuck`).
+/-- The argument is `ρ₁`, the callback `vf` at `ρ₂`; `ρ₁ ● ρ₂` is `✓`
+(`DeepReborrow.Valid_composite`), `vf` is in the callback type (`f_den`), and the
+run gets stuck (`run_stuck`).
 `[about ours: `WithloadSem` at the view-witness configuration]` -/
 theorem withloadSem_refused : ¬ WithloadSem := by
   intro hs
@@ -1020,7 +907,7 @@ theorem ok : Δ₀.Ok := by decide
 theorem scopedNil : Ctx.ScopedB Δ₀ [] := fun _ hs => absurd hs (List.not_mem_nil)
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **Our `FundamentalProperty` is refused at the `withloadAx` node above.**
+/-- `FundamentalProperty` is refused at the `withloadAx` node above.
 `[about ours: `FundamentalProperty` at the view-witness configuration]` -/
 theorem fundamentalProperty_refused : ¬ FundamentalProperty := fun h =>
   withloadSem_refused (h _ _ _ _ derivesWf ok scopedNil)
@@ -1034,7 +921,7 @@ open BoCa.Fig16.BoLo
 open BoCa.Fig16.LogRel.Typed
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-! `[about ours]` — what the Lean of Lemma 6.151 needs; the paper prints nothing here. -/
+/-! `[about ours]` -/
 /-- `T₁` names no lifetime, so the only type `TyEq` relates it to is itself. -/
 theorem tyEq_T₁ {δ δ' : LSub} {S : Ty} (h : TyEq T₁ δ S δ') : S = T₁ := by
   cases S <;> simp [T₁, TyEq] at h ⊢
@@ -1084,13 +971,9 @@ theorem chain_refuses {W F a : WRes} {ps rs : List FrameRec} (hT : TI W ps rs) {
   exact not_vShape_pair_empty _ _ hs
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- **The configuration of `ViewWitness` is excluded by the typed-world judgment.**  No typed
-world holding `ρ₁ ● ρ₂` has the argument `ρ₁` in `𝒱X⟦Imm 'b T₁⟧` at its record list, at any
-`δ`.  The argument's `CohE` names a record at `ℓ₂` of type `T₁` or a chain position there of
-pointee `T₁`; either way the escrow `ℓ₀ ↦ own((ℓ₁,())) ⊎ ℓ₁ ↦ own(())` is a record's, `ℓ₀` is
-a chain position of it at pointee `Ref 1 ⊗ 1`, and `DeepInv` asks the view there to be of that
-shape — its witness `∅` is not.  So the run `withloadSem_refused` builds needs, at its second
-stage, a world `wpTS` does not quantify over.
+/-- No typed world holding `ρ₁ ● ρ₂` has `ρ₁` in `𝒱X⟦Imm 'b T₁⟧` at its record list, at
+any `δ`: `CohE` makes `ℓ₀` a chain position at pointee `Ref 1 ⊗ 1`, and `DeepInv`
+asks the view there to be of that shape, which its witness `∅` is not.  §12.73.
 `[about ours: the view-witness configuration against `TW` and `𝒱X`]` -/
 theorem excluded {W F : WRes} {ps : List FrameRec} {ls : List SRec} {δ : LSub}
     (hc : ResU.CompS (DeepReborrow.comp 1 1 v0 Val.unit (Val.loc 0)) F W)

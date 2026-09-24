@@ -12,10 +12,7 @@ import Support.Model.Singletons
 * 6.115 (`I-ag`): `not_iAgreeAtJoin`, the printed index `α ⊔ β` of the conclusion
   measured against the cells `{1}` and `{2}` under row 5.30's `α ⊑ ⊔β̄`.
 
-**How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  Each declaration carries its tag; an
-`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
-this file.
+Nothing depends on this file.
 -/
 
 noncomputable section
@@ -26,12 +23,10 @@ variable {Loc Val : Type}
 /-!
 ### Lemma 6.102 ([]∀) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`, under the record of Lemma 6.102 ([]∀).
+The record is in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`.
 -/
-/-- 6.102's restriction is not assumed: at an empty index type the left side
-holds of every resource, including one that does not outlive `α`, so the `⊨`
-direction fails.  The witness is any `ρ` outside `Res_⊤` — that is, any `ρ`
-holding a borrow cell, which is what the right side's `[⊤]` refuses.
+/-- At an empty index type the left side holds of every resource; the witness
+is any `ρ` outside `Res_⊤`, which the right side's `[⊤]` refuses.
 `[about ours: the printed 6.102 at the index type and lifetime where its `⊨`
 direction is false]` -/
 theorem box_all_needs_nonempty {ρ : ResU Loc Val} (hρ : ¬ ρ.InStratum ⊤) :
@@ -42,11 +37,10 @@ theorem box_all_needs_nonempty {ρ : ResU Loc Val} (hρ : ¬ ρ.InStratum ⊤) :
 /-!
 ### Lemma 6.115 (I-ag) — literal reading
 
-The printed statement, the printed proof and the adjudication are in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`, under the record of Lemma 6.115 (I-ag).
+The record is in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`.
 -/
-/-- **Our `ptoImm` refuses `IAgreeAtJoin`.**  Cells at `{1}` and at `{2}`
-compose to `{1, 2}`, whose meet `2` is not `⊒ 1 ⊔ 2 = 1`.  `ptoImm_agree` is
-6.115 at `α ⊓ β`, which this configuration does not separate.
+/-- Cells at `{1}` and at `{2}` compose to `{1, 2}`, whose meet `2` is not
+`⊒ 1 ⊔ 2 = 1`.
 `[about ours: `IAgreeAtJoin` at `ℓ ↦ imm({1},(),∅) ● ℓ ↦ imm({2},(),∅)`]` -/
 theorem not_iAgreeAtJoin : ¬ IAgreeAtJoin := by
   intro H

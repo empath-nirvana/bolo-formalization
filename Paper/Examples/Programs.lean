@@ -7,8 +7,8 @@ import Support.Dynamics.Interpreter
 
 Closed programs that use the borrowing constructs of `[CONF]` §2, each with
 
-* a derivation `DerivesWf ∅ [] e 1` — `[TR]` p. 2's judgment under its
-  presuppositions, the hypothesis of `Fig16.LogRel.Typed.adequacy`;
+* a derivation `DerivesWf ∅ [] e 1`, the hypothesis of
+  `Fig16.LogRel.Typed.adequacy`;
 * the adequacy instance `BoLo.Steps ∅ e ∅ ()`, from `Fig16.LogRel.Typed.adequacy`:
   from the empty memory the program runs to `()` and frees everything it allocates;
 * a kernel-checked run of the executable interpreter `BoCa.eval`
