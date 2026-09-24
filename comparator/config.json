@@ -1,0 +1,14 @@
+{
+    "challenge_module": "Challenge",
+    "solution_module": "Paper",
+    "theorem_names": [
+        "BoCa.Fig16.LogRel.Typed.adequacy"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+    ],
+    "enable_nanoda": true
+}

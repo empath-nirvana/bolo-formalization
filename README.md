@@ -87,6 +87,8 @@ Support/                   [about ours]: what the paper leaves implicit, by topi
 Bridge/Names.csv           each declaration here → its source declaration
 Bridge/Plan.csv            each unit of the dependency closure → its file
 scripts/                   the checks
+comparator/                the comparator challenge: the statement of adequacy over its trust base
+.github/workflows/         CI and the comparator judge
 tools/extract/             the generator: the Lean files are its output
 ```
 
@@ -107,16 +109,18 @@ and the stages.
 
 ## Building and checking
 
-The toolchain and Mathlib are the source's.  `.lake/packages` is a symlink to the
-source's packages:
+The toolchain and Mathlib are the source's.  With the source checked out beside
+this repository, `.lake/packages` can be a symlink to its packages (otherwise
+`lake exe cache get` fetches Mathlib at the pinned revision, as CI does):
 
 ```
 ln -s ../../borrow_lang/.lake/packages .lake/packages
 lake build
 ```
 
-The checks (the source must be built, `lake build BoCa` in `borrow_lang`; nothing
-is written inside it):
+The checks (`check-bridge.sh` needs the source built, `lake build BoCa` in
+`borrow_lang`, and writes nothing inside it; `check-hygiene.sh` needs only this
+repository):
 
 ```
 scripts/check-bridge.sh     # every declaration against its source: kind, type, value
@@ -132,3 +136,32 @@ BORROW_LANG_SRC=/path/to/borrow_lang tools/extract/run.sh [--dump]
 The placement decisions are in `tools/extract/cfg.json`, the section banners in
 `tools/extract/banners.py`, and the records of §6 and `[CONF]` §3 in
 `tools/extract/results/*.txt`; change those, not the Lean.
+
+## Verification
+
+Two GitHub workflows, and one check that stays local.
+
+* **CI** (`.github/workflows/ci.yml`, on every push and pull request): builds
+  `Paper`, `Support` and `Challenge` with Mathlib's build cache; runs
+  `scripts/check-hygiene.sh` (the keyword scan, and every declaration's axioms
+  against `[propext, Classical.choice, Quot.sound]`); and runs the axiom audit,
+  `scripts/AxiomCheck.lean`, whose output — `#print axioms` of
+  `Fig16.LogRel.Typed.fundamentalProperty`, `Typed.adequacy`, `Typed.theorem32`,
+  `Typed.corollary33`, the `CONF.*` results and every `TR.lemma_*` alias,
+  enumerated from the environment — must equal `scripts/axioms.expected`.  A pass
+  certifies that the library builds from a clean checkout, has no forbidden
+  keyword, and that no result's axioms changed.
+* **Comparator judge** (`.github/workflows/comparator.yml`, on pushes to `main`
+  touching the Lean, and on demand): runs
+  [leanprover/comparator](https://github.com/leanprover/comparator) with the
+  nanoda kernel on `comparator/config.json`.  The judged theorem is
+  `Fig16.LogRel.Typed.adequacy`, stated in `comparator/Challenge.lean` over a
+  verbatim copy of what its statement reaches — the syntax, `DerivesWf` and the
+  machine, `[TR]` §§1–3 — without importing `Paper` or `Support`.  A pass
+  certifies that `Paper` proves exactly that statement from the three standard
+  axioms, re-checked by the Lean kernel and by the independent nanoda kernel,
+  without trusting our build; the model (`[TR]` §§4–6) and its repairs are not in
+  the trust base.  `comparator/README.md` says what is trusted and why.
+* **The bridge** (`scripts/check-bridge.sh`) is local only: it elaborates every
+  declaration against the source repository `borrow_lang` at `970a9d0`, which CI
+  does not have.

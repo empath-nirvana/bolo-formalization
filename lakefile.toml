@@ -11,3 +11,10 @@ name = "Support"
 
 [[lean_lib]]
 name = "Paper"
+
+# The comparator challenge: the statement of `Fig16.LogRel.Typed.adequacy` over
+# a verbatim copy of its trust base, importing neither `Paper` nor `Support`
+# (comparator/README.md).
+[[lean_lib]]
+name = "Challenge"
+srcDir = "comparator"

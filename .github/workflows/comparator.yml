@@ -1,0 +1,71 @@
+name: Comparator judge
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['comparator/**', 'Paper/**', 'Support/**', 'Paper.lean', 'Support.lean', 'lakefile.toml', 'lake-manifest.json', 'lean-toolchain', '.github/workflows/comparator.yml']
+
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build solution and challenge
+        run: |
+          lake exe cache get
+          lake build Paper Challenge
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build landrun
+        run: |
+          git clone --depth 1 https://github.com/Zouuup/landrun
+          cd landrun
+          go build -o landrun ./cmd/landrun 2>/dev/null || go build -o landrun .
+          echo "$PWD" >> "$GITHUB_PATH"
+
+      - name: Build nanoda
+        run: |
+          git clone https://github.com/ammkrn/nanoda_lib
+          git -C nanoda_lib checkout 3a2407216ee84a75f9e1aead6803d0578be06ae7
+          cd nanoda_lib
+          cargo build --release
+          echo "$PWD/target/release" >> "$GITHUB_PATH"
+
+      - name: Build comparator (with lean4export)
+        run: |
+          git clone https://github.com/leanprover/comparator ../comparator-tool
+          # c0c5a52 is comparator's last commit on Lean v4.33.0 (the next,
+          # 011e9d3, moves to v4.34.0-rc1); this repository is on v4.33.1.
+          git -C ../comparator-tool checkout c0c5a52
+          # Build the judge with THIS PROJECT's toolchain so the lean4export
+          # binary it spawns can read our .olean files.
+          #
+          # NOTE: do NOT run `lake update` here.  Lake's toolchain uplift would
+          # rewrite ../comparator-tool/lean-toolchain to a dependency's newer
+          # toolchain and build comparator and lean4export with it, and they
+          # would then reject our oleans with "incompatible header".  The revs
+          # pinned in comparator's lake-manifest.json build as they are.
+          cp lean-toolchain ../comparator-tool/lean-toolchain
+          cd ../comparator-tool
+          lake build lean4export comparator
+          # Fail fast if anything bumped the judge's toolchain behind our back.
+          cmp lean-toolchain "$GITHUB_WORKSPACE/lean-toolchain"
+          echo "COMPARATOR_BIN=$(find . -type f -name comparator -path '*/bin/*' | head -1 | xargs realpath)" >> "$GITHUB_ENV"
+          L4E=$(find . .lake -type f -name lean4export -path '*/bin/*' 2>/dev/null | head -1)
+          if [ -n "$L4E" ]; then echo "COMPARATOR_LEAN4EXPORT=$(realpath "$L4E")" >> "$GITHUB_ENV"; fi
+
+      - name: Run judge
+        run: |
+          which landrun nanoda_bin || true
+          echo "lean4export: $COMPARATOR_LEAN4EXPORT"
+          lake env "$COMPARATOR_BIN" comparator/config.json
