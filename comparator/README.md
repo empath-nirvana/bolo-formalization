@@ -25,18 +25,19 @@ Every definition here is written in core Lean; none uses Mathlib.  Nothing of th
 model is in it: the logical relation, the resource algebra, `wp` and the typed
 world of `[TR]` §§4–6, and the repairs recorded there, are used by the proof and
 are not in the statement, so a pass does not ask anyone to trust them.  The
-`[repair]` rows of `[TR]` §§1–3 that the statement does reach (the typing rules
-and the two evaluation frames, README, *Which printed definitions are repaired*)
-are in the trust base, and are read in `Challenge/`.
+`[repair]` rows of `[TR]` §§1–3 that the statement does reach (the typing rules,
+the axiom terms, and the two evaluation frames; README, *Where the mechanisation
+departs from the printed text*) are in the trust base, and are read in
+`Challenge/`.
 
 **The files.**  `Challenge.lean` states the theorem with a `sorry` body, which is
 comparator's convention for a challenge; it is the only `sorry` in the repository,
 and `scripts/check-hygiene.sh` permits exactly it.  `Challenge.lean` does NOT import
 `Paper` or `Support`.  The modules under `Challenge/` replicate, verbatim, the
-declarations the statement reaches, each copied from the source file its path names
-(`Challenge/Paper/S1_Syntax/Definitions.lean` from `Paper/S1_Syntax/Definitions.lean`,
-and so on), under the same namespaces, `open`s and names, one module per source
-file.  The module split is not cosmetic: Lean reuses a pattern-matching auxiliary
+declarations the statement reaches, each copied from the file of this repository
+its path names (`Challenge/Paper/S1_Syntax/Definitions.lean` from
+`Paper/S1_Syntax/Definitions.lean`, and so on), under the same namespaces, `open`s
+and names, one module per file.  The module split is not cosmetic: Lean reuses a pattern-matching auxiliary
 (`f.match_1`) across definitions of the same shape, which ones are candidates
 depends on module boundaries, and comparator compares those auxiliaries too.  For
 the same reason `Lifetime.Life.depth` and `Ty.wfB`, which the statement does not
@@ -70,14 +71,14 @@ tools/challenge/run.sh /tmp/out   # or writes /tmp/out/Challenge/** to compare
 
 `tools/challenge/Closure.lean` lists every constant the statement of `adequacy`
 reaches, as comparator's crawl reaches it, from this repository's build of
-`Paper`.  `tools/challenge/extract.py` copies, from each source file, the
+`Paper`.  `tools/challenge/extract.py` copies, from each file, the
 declarations the list names or that own an auxiliary it names, with docstrings,
-namespaces and `open`s, one module per source file.  `Challenge.lean` itself is
+namespaces and `open`s, one module per file.  `Challenge.lean` itself is
 not generated.  If a declaration of the trust base changes in `Paper/` or
 `Support/`, the judge fails with `Const does not match between challenge and
 target '<name>'`; rerun `tools/challenge/run.sh`, check the diff to
 `comparator/Challenge/` is the change intended, then `lake build Challenge` and
-re-run the judge.  If the statement comes to reach a declaration in a source file
+re-run the judge.  If the statement comes to reach a declaration in a file
 not listed in `extract.py`'s `FILES`, add that file there, keeping the list in
 import order.
 
