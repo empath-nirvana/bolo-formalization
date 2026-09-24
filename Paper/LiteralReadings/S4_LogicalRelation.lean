@@ -1,6 +1,9 @@
 import Paper.S1_Syntax.Definitions
+import Paper.S2_Statics.Definitions
+import Paper.S4_LogicalRelation.Definitions
 import Paper.S5_Model.Definitions
 import Support.LogicalRelation.ClosingSubstitutions
+import Support.LogicalRelation.Facts
 
 /-!
 # Literal readings — [TR] §4
@@ -37,7 +40,7 @@ noncomputable section
 namespace BoCa.Fig16.LogRel.MutImmGap
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.Lifetime (LifeCtx LifeVar)
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
@@ -56,12 +59,25 @@ noncomputable def cell (α₀ β : Life) : WRes :=
   ResU.single 0 (CellU.immOf (lset α₀ β) .unit PMap.empty
     (empty_inStratum (lset α₀ β).join))
 
+/-! `[about ours]` — what the Lean of row 4.17's theorem needs; the paper prints nothing here. -/
+theorem lset_meet (α₀ β : Life) : (lset α₀ β).meet = α₀ ⊓ β := rfl
+
+/-!
+Row 4.17, continued.
+-/
+/-- At `β = α₀` the cell is in `𝒱⟦Imm @b 1⟧δ`, `@bδ = α₀`. -/
+theorem inRel_same {δ : LSub} {b : Lifetime.Life} {α₀ : Life} (hb : b.interp δ = some α₀) :
+    vDen (.imm b .unit) δ (.loc 0) (cell α₀ α₀) := by
+  refine ⟨α₀, hb, 0, pure_sep_mk rfl ?_⟩
+  exact ⟨lset α₀ α₀, .unit, PMap.empty, empty_inStratum _, rfl, ⟨rfl, rfl⟩,
+    by rw [lset_meet, inf_idem]⟩
+
 end BoCa.Fig16.LogRel.MutImmGap
 
 namespace BoCa.Fig16.LogRel.MutGapClosed
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.Lifetime (LifeCtx LifeVar)
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!

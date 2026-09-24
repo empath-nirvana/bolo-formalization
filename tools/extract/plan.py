@@ -1,5 +1,9 @@
-exec(open("stage1.py").read().split("tgt,inline,probs=assign(sel)")[0])
-S1SEL=set(sel); S1TGT,_,_=assign(sel)
+exec(open("gen.py").read())
+sel,_=stage1_selection()
+S1SEL=set(sel)
+PLACED={}
+for k,t in json.load(open("stage2.json"))["tgt"].items():
+    m,l=k.rsplit(":",1); PLACED[(m,int(l))]=t
 SUB={"6.1":(1,15),"6.2":(16,63),"6.3":(64,66),"6.4":(67,95),"6.5":(96,119),"6.6":(120,134),"6.7":(135,150),"6.8":(151,176)}
 SUBDIR={"6.1":"Paper/S6_1_StandardLemmas","6.2":"Paper/S6_2_NonStandardLemmas","6.3":"Paper/S6_3_FrameAndAntiFrame",
  "6.4":"Paper/S6_4_StandardEntailments","6.5":"Paper/S6_5_NonStandardEntailments","6.6":"Paper/S6_6_ReborrowingEntailments",
@@ -25,12 +29,12 @@ for o in ROWS:
         u=unit_of_owner[own[n]]
         if first and not LIT.search(n): primary.setdefault(u,r); first=False
         else: cited.setdefault(u,r)
-rootsF=set(S1SEL)|set(primary)|set(cited)|set(DEF2 for DEF2 in unit_rows if True)
+rootsF=set(PLACED)|set(primary)|set(cited)|set(DEF2 for DEF2 in unit_rows if True)
 selF=select(rootsF)
 print("full selection units",len(selF),"lines",sum(UBY[u]["e"]-UBY[u]["s"]+1 for u in selF))
 tgtF={}
 for u in selF:
-    if u in S1SEL: tgtF[u]=S1TGT[u]; continue
+    if u in PLACED: tgtF[u]=PLACED[u]; continue
     if u in primary and u[0]!="BoCa.Wp":
         r=primary[u]
         if r.startswith("6."): tgtF[u]=SUBDIR[subof(r)]+"/Lemmas"
@@ -62,7 +66,7 @@ with open(OUT+"/Bridge/Plan.csv","w",newline="",encoding="utf-8") as f:
     w=csv.writer(f); w.writerow(["unit","source","lines","stage","target","inventory_rows"])
     for u in sorted(selF,key=lambda u:(tgtF[u],modidx(u[0]),u[1])):
         rs=sorted(set(unit_rows.get(u,[]))|({primary[u]} if u in primary else set())|({cited[u]} if u in cited else set()),key=lambda r:(r.split(".")[0],int(r.split(".")[1])))
-        w.writerow([owners_of(u)[0], u[0].replace(".","/")+".lean:%d"%u[1], UBY[u]["e"]-UBY[u]["s"]+1, 1 if u in S1SEL else 2, tgtF[u], ";".join(rs)])
+        w.writerow([owners_of(u)[0], u[0].replace(".","/")+".lean:%d"%u[1], UBY[u]["e"]-UBY[u]["s"]+1, 1 if u in S1SEL else 2 if u in PLACED else "planned", tgtF[u], ";".join(rs)])
 c=collections.Counter(); cl=collections.Counter()
 for u in selF: c[tgtF[u].split("/")[0]+"/"+tgtF[u].split("/")[1] if "/" in tgtF[u] else tgtF[u]]+=1; cl[tgtF[u].split("/")[0]+"/"+tgtF[u].split("/")[1]]+=UBY[u]["e"]-UBY[u]["s"]+1
 for k in sorted(c): print(f"{c[k]:5d} {cl[k]:6d} {k}")

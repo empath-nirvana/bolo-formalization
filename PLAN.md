@@ -185,9 +185,18 @@ Checks, all passing:
 
 ## Stage 2 — proposed
 
-1. **Remaining definitions' remarks**: the eight deferred theorem rows and
-   row 5.67, into `Paper/S4_LogicalRelation/Remarks.lean` and
-   `Paper/S5_Model/Remarks.lean`, ordered after the §6 files they use.
+1. **Remaining definitions' remarks — done (2a).**  `tools/extract/stage2.py`
+   carries the eight deferred theorem rows and row 5.67's theorems:
+   `Paper/S4_LogicalRelation/Remarks.lean` (4.16's two directions, 4.18's
+   `sem_iff`), `Paper/S5_Model/Remarks.lean` (5.62's `wp_eq_wpU`, 5.67's
+   theorems, the record of 5.56), `Paper/S6_2_NonStandardLemmas/Remarks.lean`
+   (Definition 6.2's `Sim.trans` and `upd_iff_sim`, and 5.56's `BigComp.perm`,
+   which `upd_iff_sim` uses), and 4.17's `MutImmGap.inRel_same` into
+   `Paper/LiteralReadings/S4_LogicalRelation.lean`, which now comes last.  The
+   Remarks files follow the §6 files in import order (`cfg.json` `order2`), and
+   what they need that the paper does not print is in `Support/Model/*` by topic.
+   A row's theorem that an earlier file needs is declared there under a heading
+   saying so, and the row's record says where.
 2. **§6.1–§6.2** (lemmas 6.1–6.63; `Fig16.lean` §20–§20e, `Reborrow.lean`,
    `Ancestor.lean`), with `Support/Model/*` for the walks, the functional-walk
    apparatus and the reborrow surgery.  This is the largest block (≈ 2,500 lines

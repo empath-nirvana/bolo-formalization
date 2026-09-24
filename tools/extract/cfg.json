@@ -204,7 +204,254 @@
   ]
  ],
  "support_names": {
-  "Support/Lifetimes/Terms@AfterS1": "Support/Lifetimes/Terms",
-  "Support/Lifetimes/Terms@AfterS2": "Support/Lifetimes/Interpretation"
- }
+  "Support/Lifetimes/Terms@After:Paper/S1_Syntax/Definitions": "Support/Lifetimes/Terms",
+  "Support/Lifetimes/Terms@After:Paper/S2_Statics/Definitions": "Support/Lifetimes/Interpretation",
+  "Support/Model/Algebra@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/Algebra",
+  "Support/Model/Algebra@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/AlgebraInstances",
+  "Support/Model/Compatibility@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/Compatibility",
+  "Support/Model/Compatibility@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/FlatteningCells",
+  "Support/Model/Walks@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/Walks",
+  "Support/Model/Walks@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/RelaxedWalks"
+ },
+ "order2": [
+  "Paper/S1_Syntax/Definitions",
+  "Paper/S3_Dynamics/Definitions",
+  "Paper/S2_Statics/Definitions",
+  "Paper/S5_Model/Definitions",
+  "Paper/S6_2_NonStandardLemmas/Definitions",
+  "Paper/S4_LogicalRelation/Definitions",
+  "Paper/S6_1_StandardLemmas/Lemmas",
+  "Paper/S6_2_NonStandardLemmas/Remarks",
+  "Paper/S6_2_NonStandardLemmas/Lemmas",
+  "Paper/S4_LogicalRelation/Remarks",
+  "Paper/S5_Model/Remarks",
+  "Paper/LiteralReadings/S4_LogicalRelation"
+ ],
+ "sections": {
+  "S6_1": {
+   "file": "Paper/S6_1_StandardLemmas/Lemmas",
+   "title": "§6.1 Standard Lemmas",
+   "pages": "pp. 6–8",
+   "range": [
+    1,
+    15
+   ]
+  },
+  "S6_2": {
+   "file": "Paper/S6_2_NonStandardLemmas/Lemmas",
+   "title": "§6.2 Non-standard Lemmas",
+   "pages": "pp. 8–22",
+   "range": [
+    16,
+    63
+   ]
+  }
+ },
+ "stage2_sections": [],
+ "remark_rows": [
+  "5.67"
+ ],
+ "remark_target": {
+  "4.16": "Paper/S4_LogicalRelation/Remarks",
+  "4.17": "Paper/LiteralReadings/S4_LogicalRelation",
+  "4.18": "Paper/S4_LogicalRelation/Remarks",
+  "5.56": "Paper/S5_Model/Remarks",
+  "5.62": "Paper/S5_Model/Remarks",
+  "5.65": "Paper/S6_2_NonStandardLemmas/Remarks",
+  "5.67": "Paper/S5_Model/Remarks"
+ },
+ "stage2_topic_ranges": [
+  [
+   "BoCa.Fig16",
+   130,
+   407,
+   "Model/Lifetimes"
+  ],
+  [
+   "BoCa.Fig16",
+   408,
+   1389,
+   "Model/CellFacts"
+  ],
+  [
+   "BoCa.Fig16",
+   1390,
+   2367,
+   "Model/Composition"
+  ],
+  [
+   "BoCa.Fig16",
+   2368,
+   2535,
+   "Model/Singletons"
+  ],
+  [
+   "BoCa.Fig16",
+   2536,
+   2833,
+   "Model/Walks"
+  ],
+  [
+   "BoCa.Fig16",
+   2834,
+   3055,
+   "Model/Subtraction"
+  ],
+  [
+   "BoCa.Fig16",
+   3056,
+   4042,
+   "Model/Algebra"
+  ],
+  [
+   "BoCa.Fig16",
+   4043,
+   4589,
+   "Model/Walks"
+  ],
+  [
+   "BoCa.Fig16",
+   4590,
+   6153,
+   "Model/WalkSplitting"
+  ],
+  [
+   "BoCa.Fig16",
+   6154,
+   6748,
+   "Model/Flattening"
+  ],
+  [
+   "BoCa.Fig16",
+   6749,
+   7662,
+   "Model/Compatibility"
+  ],
+  [
+   "BoCa.Fig16",
+   7663,
+   8793,
+   "Model/Update"
+  ],
+  [
+   "BoCa.Fig16",
+   8794,
+   9740,
+   "Model/Singletons"
+  ],
+  [
+   "BoCa.Fig16",
+   9741,
+   999999,
+   "Model/Propositions"
+  ],
+  [
+   "BoCa.Fig16Wp",
+   1,
+   866,
+   "Model/Propositions"
+  ],
+  [
+   "BoCa.Fig16Wp",
+   867,
+   1166,
+   "Model/Outlives"
+  ],
+  [
+   "BoCa.Fig16Wp",
+   1167,
+   999999,
+   "Model/UpdateFrame"
+  ],
+  [
+   "BoCa.Reborrow",
+   1,
+   466,
+   "Model/Reborrow"
+  ],
+  [
+   "BoCa.Reborrow",
+   467,
+   1758,
+   "Model/ReborrowFrame"
+  ],
+  [
+   "BoCa.Reborrow",
+   1759,
+   1840,
+   "Model/Restriction"
+  ],
+  [
+   "BoCa.Reborrow",
+   1841,
+   2630,
+   "Model/ReborrowLowering"
+  ],
+  [
+   "BoCa.Reborrow",
+   2631,
+   3100,
+   "Model/Surgery"
+  ],
+  [
+   "BoCa.Reborrow",
+   3101,
+   3493,
+   "Model/Subtraction"
+  ],
+  [
+   "BoCa.Reborrow",
+   3494,
+   4264,
+   "Model/Outlives"
+  ],
+  [
+   "BoCa.Reborrow",
+   4265,
+   5057,
+   "Model/ClosingSentence"
+  ],
+  [
+   "BoCa.Reborrow",
+   5058,
+   5534,
+   "Model/Update"
+  ],
+  [
+   "BoCa.Reborrow",
+   5535,
+   5919,
+   "Model/Surgery"
+  ],
+  [
+   "BoCa.Reborrow",
+   5920,
+   8127,
+   "Model/ClosingSentence"
+  ],
+  [
+   "BoCa.Reborrow",
+   8128,
+   8164,
+   "Model/Reborrow"
+  ],
+  [
+   "BoCa.Reborrow",
+   8165,
+   999999,
+   "Model/Surgery"
+  ],
+  [
+   "BoCa.Ancestor",
+   1,
+   999999,
+   "Model/Ancestors"
+  ],
+  [
+   "BoCa.Fig16LogRel",
+   1,
+   999999,
+   "LogicalRelation/Facts"
+  ]
+ ]
 }

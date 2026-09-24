@@ -4,10 +4,13 @@ import Paper.S1_Syntax.Definitions
 import Paper.S2_Statics.Definitions
 import Paper.S3_Dynamics.Definitions
 import Paper.S4_LogicalRelation.Definitions
+import Paper.S4_LogicalRelation.Remarks
 import Paper.S5_Model.Definitions
+import Paper.S5_Model.Remarks
 import Paper.S6_1_StandardLemmas.Lemmas
 import Paper.S6_2_NonStandardLemmas.Definitions
 import Paper.S6_2_NonStandardLemmas.Lemmas
+import Paper.S6_2_NonStandardLemmas.Remarks
 import Paper.S6_3_FrameAndAntiFrame.Lemmas
 import Paper.S6_4_StandardEntailments.Lemmas
 import Paper.S6_5_NonStandardEntailments.Lemmas

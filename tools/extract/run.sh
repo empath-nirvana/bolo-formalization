@@ -17,7 +17,7 @@ fi
 python3 roots.py > /dev/null
 python3 closure.py > /dev/null
 rm -rf "$ROOT/Paper" "$ROOT/Support"
-python3 stage1.py | grep -E "PROB|CLASH|^files|^bridge" || true
+python3 stage2.py | grep -E "PROB|CLASH|^files|^bridge" || true
 python3 plan.py > plan.out
 python3 skeleton.py > /dev/null
 cd "$ROOT"

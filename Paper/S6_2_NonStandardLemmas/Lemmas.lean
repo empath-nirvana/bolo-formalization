@@ -10,11 +10,11 @@ declaration `Bridge/Plan.csv` assigns to each:
 
 * **Lemma 6.16** — `proved`; planned: `Fig16.ResU.CompatS.of_flat`
 * **Lemma 6.17** — `proved`; planned: `Fig16.ResU.compatS_of_hash_mut`
-* **Lemma 6.18** — `proved`; planned: `Fig16.ExS.split`
+* **Lemma 6.18** — `proved`; planned: —
 * **Lemma 6.19** — `proved`; planned: `Fig16.ResU.flatR_idem`
-* **Lemma 6.20** — `proved`; planned: `Fig16.AgW.split`
+* **Lemma 6.20** — `proved`; planned: —
 * **Lemma 6.21** — `proved`; planned: `Fig16.ResU.compatS_single_own`, `Fig16.ResU.six21`
-* **Lemma 6.22** — `proved`; planned: `Fig16.ResU.compS_defined_iff`, `Fig16.ExS.split`, `Fig16.AgW.split`
+* **Lemma 6.22** — `proved`; planned: `Fig16.ResU.compatS_of_hash_mut`, `Fig16.ResU.six22`
 * **Lemma 6.23** — `proved`; planned: `Fig16.ResU.six23`
 * **Lemma 6.24** — `proved`; planned: `Fig16.ResU.six24`
 * **Lemma 6.25** — `proved`; planned: `Fig16.ResU.six25`
@@ -22,15 +22,15 @@ declaration `Bridge/Plan.csv` assigns to each:
 * **Lemma 6.27** — `proved`; planned: `Fig16.ResU.six27`
 * **Lemma 6.28** — `proved`; planned: `Fig16.ResU.six28`
 * **Lemma 6.29** — `proved`; planned: `Fig16.ExS.toExR`, `Fig16.ResU.six29`
-* **Lemma 6.30** — `proved`; planned: `Fig16.ResU.CompatS.of_compR_left`
-* **Lemma 6.31** — `proved`; planned: `Fig16.ResU.compR_iff_compS`
+* **Lemma 6.30** — `proved`; planned: —
+* **Lemma 6.31** — `proved`; planned: —
 * **Lemma 6.32** — `proved`; planned: `Fig16.ExS.toExR`
 * **Lemma 6.33** — `proved`; planned: `Fig16.ResU.six33`
-* **Lemma 6.34** — `proved`; planned: `Fig16.ResU.Hash.split`, `Fig16.ResU.compR_iff_compS`, `Fig16.ResU.six34`
+* **Lemma 6.34** — `proved`; planned: `Fig16.ResU.six34`
 * **Lemma 6.35** — `proved`; planned: —
-* **Lemma 6.36** — `proved`; planned: `Fig16.ExW.immFree`
+* **Lemma 6.36** — `proved`; planned: —
 * **Lemma 6.37** — `proved`; planned: `Fig16.ResU.compatS_of_compR`, `Fig16.ResU.six37`
-* **Lemma 6.38** — `proved`; planned: `Fig16.ResU.CompatS.of_compR_left`, `Fig16.ResU.CompatS.of_flat`, `Fig16.ResU.six37`
+* **Lemma 6.38** — `proved`; planned: `Fig16.ResU.CompatS.of_flat`, `Fig16.ResU.six37`, `Fig16.ResU.six29`
 * **Lemma 6.39** — `proved`; planned: `Fig16.ResU.six39`
 * **Lemma 6.40** — `variant`; planned: —
 * **Lemma 6.41** — `proved`; planned: `Fig16.ResU.compatS_single_own`

@@ -1,0 +1,191 @@
+@@ 6.16 | Lemma | p. 8 | BoCa.Fig16.ResU.CompatS.of_flat
+> TODO
+Proof. TODO
+
+@@ 6.17 | Lemma | p. 8 | BoCa.Fig16.ResU.compatS_of_hash_mut
+> TODO
+Proof. TODO
+
+@@ 6.18 | Lemma | p. 8 | BoCa.Fig16.ExS.split
+> TODO
+Proof. TODO
+
+@@ 6.19 | Lemma | p. 9 | BoCa.Fig16.ResU.flatR_idem
+> TODO
+Proof. TODO
+
+@@ 6.20 | Lemma | p. 9 | BoCa.Fig16.AgW.split
+> TODO
+Proof. TODO
+
+@@ 6.21 | Lemma | p. 10 | BoCa.Fig16.ResU.six21
+> TODO
+Proof. TODO
+
+@@ 6.22 | Lemma | p. 10 | BoCa.Fig16.ResU.six22
+> TODO
+Proof. TODO
+
+@@ 6.23 | Lemma | p. 10 | BoCa.Fig16.ResU.six23
+> TODO
+Proof. TODO
+
+@@ 6.24 | Lemma | p. 10 | BoCa.Fig16.ResU.six24
+> TODO
+Proof. TODO
+
+@@ 6.25 | Lemma | p. 10 | BoCa.Fig16.ResU.six25
+> TODO
+Proof. TODO
+
+@@ 6.26 | Lemma | p. 10 | BoCa.Fig16.ResU.six26
+> TODO
+Proof. TODO
+
+@@ 6.27 | Lemma | p. 10 | BoCa.Fig16.ResU.six27
+> TODO
+Proof. TODO
+
+@@ 6.28 | Lemma | p. 11 | BoCa.Fig16.ResU.six28
+> TODO
+Proof. TODO
+
+@@ 6.29 | Lemma | p. 11 | BoCa.Fig16.ResU.six29
+> TODO
+Proof. TODO
+
+@@ 6.30 | Lemma | p. 11 | BoCa.Fig16.ResU.CompatS.of_compR_left
+> TODO
+Proof. TODO
+
+@@ 6.31 | Lemma | p. 11 | BoCa.Fig16.ResU.compR_iff_compS
+> TODO
+Proof. TODO
+
+@@ 6.32 | Lemma | p. 11 | BoCa.Fig16.ExS.toExR
+> TODO
+Proof. TODO
+
+@@ 6.33 | Lemma | p. 11 | BoCa.Fig16.ResU.six33
+> TODO
+Proof. TODO
+
+@@ 6.34 | Lemma | p. 11 | BoCa.Fig16.ResU.six34
+> TODO
+Proof. TODO
+
+@@ 6.35 | Lemma | p. 12 | BoCa.Fig16.ResU.Valid.split
+> TODO
+Proof. TODO
+
+@@ 6.36 | Lemma | p. 12 | BoCa.Fig16.ExW.immFree
+> TODO
+Proof. TODO
+
+@@ 6.37 | Lemma | p. 12 | BoCa.Fig16.ResU.six37
+> TODO
+Proof. TODO
+
+@@ 6.38 | Lemma | p. 12 | BoCa.Fig16.ResU.six38
+> TODO
+Proof. TODO
+
+@@ 6.39 | Lemma | p. 13 | BoCa.Fig16.ResU.six39
+> TODO
+Proof. TODO
+
+@@ 6.40 | Lemma | p. 15 | 
+> TODO
+Proof. TODO
+
+@@ 6.41 | Lemma | p. 15 | BoCa.Fig16.ResU.compatS_single_own
+> TODO
+Proof. TODO
+
+@@ 6.42 | Lemma | p. 15 | BoCa.Fig16.ResU.compatS_single_mut
+> TODO
+Proof. TODO
+
+@@ 6.43 | Lemma | p. 15 | BoCa.Fig16.ResU.compS_single_imm
+> TODO
+Proof. TODO
+
+@@ 6.44 | Lemma | p. 16 | BoCa.Fig16.ResU.compatS_single_imm_inv
+> TODO
+Proof. TODO
+
+@@ 6.45 | Lemma | p. 16 | BoCa.Fig16.ResU.atLife_comp_sqsupset
+> TODO
+Proof. TODO
+
+@@ 6.46 | Lemma | p. 16 | BoCa.Fig16.BoLo.hash_shift
+> TODO
+Proof. TODO
+
+@@ 6.47 | Lemma | p. 16 | BoCa.Fig16.ResU.Upd.refl, BoCa.Fig16.ResU.UpdV.refl
+> TODO
+Proof. TODO
+
+@@ 6.48 | Lemma | p. 16 | BoCa.Fig16.BoLo.updV_frame
+> TODO
+Proof. TODO
+
+@@ 6.49 | Lemma | p. 17 | BoCa.Fig16.ResU.UpdV.trans, BoCa.Fig16.ResU.Upd.trans
+> TODO
+Proof. TODO
+
+@@ 6.50 | Lemma | p. 17 | BoCa.Fig16.BoLo.updV_outlives
+> TODO
+Proof. TODO
+
+@@ 6.51 | Lemma | p. 17 | BoCa.Fig16.ResU.six51
+> TODO
+Proof. TODO
+
+@@ 6.52 | Lemma | p. 17 | BoCa.Fig16.ResU.six52
+> TODO
+Proof. TODO
+
+@@ 6.53 | Lemma | p. 18 | BoCa.Fig16.ResU.six53
+> TODO
+Proof. TODO
+
+@@ 6.54 | Lemma | p. 18 | BoCa.Fig16.ResU.six54
+> TODO
+Proof. TODO
+
+@@ 6.55 | Lemma | p. 18 | BoCa.Fig16.ResU.six55
+> TODO
+Proof. TODO
+
+@@ 6.56 | Lemma | p. 19 | BoCa.Fig16.ResU.six56
+> TODO
+Proof. TODO
+
+@@ 6.57 | Lemma | p. 19 | BoCa.Fig16.ResU.six57
+> TODO
+Proof. TODO
+
+@@ 6.58 | Lemma | p. 19 | BoCa.Fig16.ResU.six58_left=TR.lemma_6_58_left, BoCa.Fig16.ResU.six58_right=TR.lemma_6_58_right
+> TODO
+Proof. TODO
+
+@@ 6.59 | Lemma | p. 20 | BoCa.Fig16.ResU.six59
+> TODO
+Proof. TODO
+
+@@ 6.60 | Lemma | p. 21 | BoCa.Fig16.LogRel.vDen_outlives
+> TODO
+Proof. TODO
+
+@@ 6.61 | Lemma | p. 22 | BoCa.Fig16.ResU.six61
+> TODO
+Proof. TODO
+
+@@ 6.62 | Lemma | p. 22 | BoCa.Fig16.LogRel.gDen_box
+> TODO
+Proof. TODO
+
+@@ 6.63 | Lemma | p. 22 | BoCa.Fig16.Life.down_sqsubset
+> TODO
+Proof. TODO

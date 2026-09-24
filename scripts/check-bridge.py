@@ -22,9 +22,10 @@ def norm(s): return HYG.sub("_h", PRIV.sub("", s))
 # Auxiliary declarations Lean generates (matchers, structural-recursion
 # functionals, abstracted proofs, notation macros) are named by position or by
 # module, and Lean shares one matcher between declarations with the same match
-# shape.  They are not compared by name: a reference to one is replaced by a
-# digest of its own type, which is what identifies it.
-AUXREF = re.compile(r"[^\s(){}\[\]:,]+\.(?:match_\d+|_sparseCasesOn_\d+|proof_\d+|_proof_\d+)(?![\w.])")
+# shape.  They are not compared by name: a reference to one (with or without a
+# universe instantiation `.{u}`) is replaced by a digest of its own type, which is
+# what identifies it.
+AUXREF = re.compile(r"[^\s(){}\[\]:,]+\.(?:match_\d+|_sparseCasesOn_\d+|proof_\d+|_proof_\d+)(?![\w])(?!\.[^{])")
 AUXDECL = re.compile(r"(\.(match_\d+(_\d+)?|_sparseCasesOn_\d+|proof_\d+|_proof_\d+|_f|_sunfold|_unsafe_rec|splitter|eq_\d+|eq_def|below|brecOn|binductionOn)$)|_aux_|^_h$")
 def load(p):
     raw = {}

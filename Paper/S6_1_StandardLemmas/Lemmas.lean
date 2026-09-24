@@ -10,16 +10,16 @@ source and a numbered alias.  The results, with the inventory's status and the
 declaration `Bridge/Plan.csv` assigns to each:
 
 * **Lemma 6.1** — `proved`; planned: `Fig16.ResU.compat_comm_iff`
-* **Lemma 6.2** — `proved`; planned: `Fig16.ResU.Comp.comm`
-* **Lemma 6.3** — `proved`; planned: `Fig16.ResU.Comp.assoc`
-* **Lemma 6.4** — `proved`; planned: `Fig16.ResU.comp_empty_right`
+* **Lemma 6.2** — `proved`; planned: —
+* **Lemma 6.3** — `proved`; planned: —
+* **Lemma 6.4** — `proved`; planned: —
 * **Lemma 6.5** — `proved`; planned: `Fig16.ResU.hash_empty_right`
 * **Lemma 6.6** — `proved`; planned: `Fig16.ResU.hash_symm_iff`
 * **Lemma 6.7** — `proved`; planned: `Fig16.ResU.Lower.split`
-* **Lemma 6.8** — `proved`; planned: `Fig16.ResU.Valid.split`, `Fig16.ResU.Lower.congr`
-* **Lemma 6.9** — `proved`; planned: `Fig16.ResU.compS_defined_iff`
-* **Lemma 6.10** — `proved`; planned: `Fig16.ResU.Valid.split`
-* **Lemma 6.11** — `proved`; planned: `Fig16.ResU.Hash.split`
+* **Lemma 6.8** — `proved`; planned: `Fig16.ResU.Lower.congr`
+* **Lemma 6.9** — `proved`; planned: —
+* **Lemma 6.10** — `proved`; planned: —
+* **Lemma 6.11** — `proved`; planned: —
 * **Lemma 6.12** — `proved`; planned: `Fig16.ResU.compatS_of_compR`
 * **Lemma 6.13** — `proved`; planned: `Fig16.ResU.compatS_of_pairwise`
 * **Lemma 6.14** — `proved`; planned: `Fig16.ResU.compatR_of_pairwise`

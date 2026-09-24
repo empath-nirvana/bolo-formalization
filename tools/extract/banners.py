@@ -234,3 +234,114 @@ SUPPORT_WHAT = {
  "Support/TypedWorld/World": "the typed worlds: value shapes `vShape`, the family `TW` of configurations the printed proofs' operations produce, tagging, and `[TR]` p. 6's `wp` over them (`wpTS`, row 5.33's repair)",
  "Support/TypedWorld/Relation": "the repaired logical relation of `[TR]` §4: `vX`, the `Imm`/`Mut` points-to at a record list, the context relation `gDenX` and the judgment `SemX`",
 }
+
+RESULTS_READING = """
+**How this file reads.**  The numbered results of the subsection, in printed order as
+far as Lean's definition-before-use allows.  Each opens with a record:
+
+* the result's number, page and the source inventory's status (`proved`, `proved*`,
+  `variant`; source `docs/paper-inventory.md`);
+* the printed statement, quoted, with the extraction's garbled symbols restored;
+* the printed proof, transcribed compactly and in its own order, citing the lemmas it
+  cites;
+* the Lean declaration, moved from the source with its name, statement and proof
+  unchanged (its docstring carries the source's tag and its account of the proof),
+  and the numbered alias `TR.lemma_6_N` declared after it;
+* the inventory row's note.
+
+A result whose declaration an earlier subsection's printed proof needs is declared
+in that subsection's file, under a heading saying so; its record and alias stay
+here.  A run of declarations the paper does not print, placed in this file only
+because a result below needs it and it needs a result above, is marked
+`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
+are to the source repository (`borrow_lang` at `970a9d0`).
+"""
+
+banners["Paper/S6_1_StandardLemmas/Lemmas"] = """/-!
+# [TR] §6.1 Standard Lemmas  (physical pp. 6–8), Lemmas 6.1–6.15
+
+*"There's no strict definition, but lemmas feel 'standard' when their statement
+doesn't unfold resources or definitions, and don't include any particularly
+unusual/custom operations."*
+
+The algebra of the two compositions (6.1–6.4, 6.9, 6.12–6.14), compatibility
+`#` (6.5, 6.6, 6.11, 6.15), and lowering `⟦−⟧` (6.7, 6.8) and validity `✓` (6.10).
+`[TR]` writes `▸◁` and `◐` for "either of `▸◂`/`▷◁`" and "either of `●`/`○`"; Lean
+states such a lemma once over a schema and discharges it at both.
+
+The printed proofs of 6.7, 6.10 and 6.15 cite §6.2's walk-splitting lemmas 6.18 and
+6.20, and with them 6.30, 6.31 and 6.36; those five are declared in this file,
+ahead of 6.7, and so are the definition-row theorems `BigComp.perm` (row 5.56) and
+two of row 5.67's, which the same proofs use.
+""" + RESULTS_READING + "-/\n"
+
+banners["Paper/S6_2_NonStandardLemmas/Lemmas"] = """/-!
+# [TR] §6.2 Non-standard Lemmas  (physical pp. 8–22), Lemmas 6.16–6.63
+
+The flattening `⦇ρ⦈` and its walks `ex`, `ag` (6.16–6.20, 6.30–6.37), the surgery
+lemmas that trade a `mut` or `imm` cell for `ρ_v ● ℓ ↦ own(v)` (6.21–6.29, 6.34,
+6.38, 6.39), cell-level facts (6.40–6.45), the update relation `↭` (6.46–6.51),
+reborrowing (6.52–6.59, 6.61), and the logical relation's outlives lemmas (6.60,
+6.62, 6.63).  Definitions 6.1–6.3, printed on pp. 9, 13 and 17, are in this
+directory's `Definitions.lean`; the theorems about Definition 6.2's `∼` are in its
+`Remarks.lean`.
+""" + RESULTS_READING + "-/\n"
+
+REMARKS_READING = """
+These are theorems about printed definitions — rows of the source's
+`docs/definition-inventory.md` whose Lean is a theorem — whose proofs use results
+of `[TR]` §6, so they cannot sit with the definitions.  Each carries the row's
+number, printed form, page, tag and note.  A row's theorem that a §6 result's Lean
+needs is declared in that result's file, and the row here says where.
+"""
+
+banners["Paper/S4_LogicalRelation/Remarks"] = """/-!
+# [TR] §4 Logical Relation — remarks on the definitions
+
+Row 4.16's two directions between the `Mut` clause and `Supported`, and row
+4.18's `sem_iff` (the judgment at `∅` is the judgment).
+""" + REMARKS_READING + "-/\n"
+
+banners["Paper/S5_Model/Remarks"] = """/-!
+# [TR] §5 Model — remarks on the definitions
+
+Row 5.62's `wp_eq_wpU` (the two printed readings of `↭` give the same `wp`),
+row 5.56's `BigComp.perm` (`⨀` is order-independent), and row 5.67's theorems
+(`[CONF]`'s prose characterisation of `✓`).
+""" + REMARKS_READING + "-/\n"
+
+banners["Paper/S6_2_NonStandardLemmas/Remarks"] = """/-!
+# [TR] §6.2 — remarks on Definition 6.2
+
+`ψ ∼ ψ′` (row 5.65): transitivity, and `upd_iff_sim`, the theorem that `[CONF]`
+Fig. 18b's two clauses of `↭` and `[TR]` §6's "same domain, `∼` pointwise" form are
+the same relation.  Lemmas 6.39 and 6.59 read `↭` through it.
+""" + REMARKS_READING + "-/\n"
+
+SUPPORT_WHAT.update({
+ "Support/Model/Lifetimes": "facts about lifetimes and nonempty lifetime sets: commutativity, idempotence and associativity of `⊓` and `∪`, extensionality, extremal members and monotonicity of the meet",
+ "Support/Model/CellFacts": "facts about the cell constructors: injectivity and distinctness of `own`/`imm`/`mut`, the lifetime of a `mut` cell, and the stored predicate",
+ "Support/Model/Composition": "the cell- and resource-level compositions `●` and `○` and compatibilities `▶◀` and `⋈` as graphs: functionality, symmetry, the specification of each clause, erasure and witnesses",
+ "Support/Model/Singletons": "restriction `ρ∣ι`, singleton resources `ℓ ↦ ψ`, the order `ρ ≤ ρ′`, and the walks and restrictions of singletons",
+ "Support/Model/Walks": "the exclusive walk `ex(ρ)_◐` and `imm`-free resources, and the functionality of the walks `ex`, `ag` and of `⦇−⦈`, `⟦−⟧` (the witness families they range over)",
+ "Support/Model/RelaxedWalks": "`ex(ρ)_○` has no `imm` cell, `⦇ρ⦈_○` is functional, and `○` never makes an `imm` cell from two non-`imm` ones",
+ "Support/Model/Subtraction": "Definition 6.3's `⊟`: lifetime-set difference, and `⊟` inhabited, total and a term at `SubKeep`",
+ "Support/Model/Algebra": "the associativity and commutativity machinery behind Lemmas 6.1–6.4: cell-level associativity of `○` clause by clause, the laws of the schema `◐`, and the iterated composition `⨀` up to permutation",
+ "Support/Model/AlgebraInstances": "Lemmas 6.2 and 6.3 at `○`, Lemmas 6.41 and 6.42 as one statement, and the lifetime of a `●` composite",
+ "Support/Model/WalkSplitting": "the pieces of Lemmas 6.18 and 6.20: the sites of a composite, the witness families of each walk and how they split across `●`, and inclusion–exclusion over shared `imm` cells",
+ "Support/Model/Flattening": "validity and lowering: the pointwise facts behind Lemmas 6.7, 6.10 and 6.30, and the union of two memories",
+ "Support/Model/Compatibility": "cell-level compatibility read off tags, values and witnesses, and `○` at an `imm` cell",
+ "Support/Model/FlatteningCells": "the cells of a flattening: a cell of `ρ` reappears in `⦇ρ⦈`, the walks' witnesses lie beneath their cells, and the order `≤` on resources",
+ "Support/Model/Update": "the update relation `↭` at both printed readings, `reb_α` read at one location, and the form `[TR]` §6 unfolds `↭` to",
+ "Support/Model/UpdateFrame": "the pointwise route through Lemma 6.48: `⦇−⦈` of a `○`-composite and the cell-level update",
+ "Support/Model/Propositions": "the propositions of `[TR]` p. 6 as used by §6.2: entailment, `emp`, the outlives relation `@ρ ⊐ α` and the `wp` row at the unguarded `↭`",
+ "Support/Model/Outlives": "`@ρ ⊐ α` across `⦇−⦈`, the walks and `↭` (the steps Lemma 6.50's one sentence elides), and *“there are no borrows at any lifetime shorter than `α`”*",
+ "Support/Model/Ancestors": "the immutable ancestor of a cell of the aliasable walk: every cell of `ag(ρ)` sits beneath an `imm` cell, carried across `↭` — the step of Lemma 6.48's printed proof that 6.59 reaches for",
+ "Support/Model/Reborrow": "`reb_α` at one location, the frame read from `✓` alone, and the cells of a reborrow",
+ "Support/Model/ReborrowFrame": "the steps of Lemmas 6.53–6.55 and 6.61 that the printed proofs name",
+ "Support/Model/Restriction": "`ρ∣dom(σ)` and `ρ/dom(σ)`, the restriction `[TR]` §6 uses and neither document defines",
+ "Support/Model/ReborrowLowering": "the steps of Lemmas 6.56–6.58: absorption at `○` and the domains of reborrows",
+ "Support/Model/Surgery": "the steps of the surgery lemmas 6.21–6.29, 6.34, 6.38 and 6.39: the normal forms of `⦇ρ ● ℓ ↦ own(v) ● ρ_v⦈` and `⦇ρ ● ℓ ↦ imm(α, v, ρ_v)⦈`, and the `mut` cell against `ρ_v ● ℓ ↦ own(v)`",
+ "Support/Model/ClosingSentence": "Lemma 6.59's closing sentence, clause by clause: the reborrowed location, the attribution of cells to `ρᵢ`, and the case off `dom(ρ_reb)`",
+ "Support/LogicalRelation/Facts": "`⌜p⌝ ⋆ P` and the context relation read pointwise",
+})

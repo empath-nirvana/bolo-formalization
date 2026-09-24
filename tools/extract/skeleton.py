@@ -22,7 +22,9 @@ def ln(r):
     c=o["cells"]; kind=c[2].strip(); name=c[3].strip(); st=c[4].strip()
     tgt=", ".join("`%s`"%u.replace("BoCa.","") for u in plan.get(r,[])[:3]) or "—"
     return "* **%s %s**%s — %s; planned: %s" % (kind, r, (" (%s)"%name) if name else "", st, tgt)
+BUILT=set(json.load(open("cfg.json"))["stage2_sections"])
 for key,d,title,pages,(a,b),intro in SUBS:
+    if d.split("_")[0]+"_"+d.split("_")[1] in BUILT: continue
     items=[ln("6.%d"%n) for n in range(a,b+1)]
     items=[x for x in items if x]
     txt="/-!\n# [TR] §%s %s  (%s)\n\n%s%s\n\n**Stage 2.**  This file will hold the numbered results of the subsection, in printed order,\neach under its printed statement and proof, with the Lean declaration moved from the\nsource and a numbered alias.  The results, with the inventory's status and the\ndeclaration `Bridge/Plan.csv` assigns to each:\n\n%s\n-/\n" % (key,title,pages,intro,"\n" if intro else "", "\n".join(items))

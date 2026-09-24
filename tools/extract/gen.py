@@ -166,7 +166,11 @@ def paper_target(uid):
     if ov: return ov
     return SECDIR[r.split(".")[0]] + "/Definitions"
 
+STAGE2_TOPICS = False
 def support_topic(uid):
+    if STAGE2_TOPICS:
+        for m, a, b, t in CFG.get("stage2_topic_ranges", []):
+            if uid[0] == m and a <= uid[1] <= b: return t
     for m, rx, t in CFG.get("topic_rules", []):
         if uid[0] == m and any(re.fullmatch(rx, o) for o in owners_of(uid)): return t
     for m, a, b, t in CFG.get("topic_ranges", []):
@@ -186,10 +190,12 @@ SHORT["Paper/LiteralReadings/S4_LogicalRelation"] = "Literal"
 for f in ORDER:
     if f.endswith("/Remarks"): SHORT[f] = SHORT.get(f, "") + "R"
 
-def assign(sel):
+def assign(sel, pre=None, pin=None, latest=False):
+    """pin: units whose target is given and kept (stage 1's placement, when stage 2 runs)"""
+    pinned = pin or {}
     tgt = {}
     for u in sel:
-        tgt[u] = paper_target(u)
+        tgt[u] = pre[u] if pre is not None else paper_target(u)
         if tgt[u] and tgt[u] not in ORDER and not tgt[u].startswith("Support/"):
             raise Exception("no order for " + tgt[u])
     # fixed support targets (e.g. Interpreter) are treated as support with a given file
@@ -218,7 +224,7 @@ def assign(sel):
     inline = {}
     probs = []
     for u in sel:
-        if tgt[u] is None:
+        if tgt[u] is None and u not in pinned:
             l, h = lo(u), hi(u)
             if l >= h:
                 if l > h: probs.append(("sandwich>", u, l, h))
@@ -233,8 +239,21 @@ def assign(sel):
     # support files
     bytopic = collections.defaultdict(list)
     for u in sel:
-        if tgt[u] is None: bytopic[support_topic(u)].append(u)
+        if tgt[u] is None and u not in pinned: bytopic[support_topic(u)].append(u)
     for t, us in bytopic.items():
+        if latest:
+            # as few layers as the intervals allow, each unit in the latest layer it fits
+            pts = []
+            for u in sorted(us, key=hi):
+                if not any(lo(u) <= p < hi(u) for p in pts): pts.append(hi(u) - 1)
+            layer = {u: max(p for p in pts if lo(u) <= p < hi(u)) for u in us}
+            for p in sorted(set(layer.values())):
+                name = "Support/" + t if len(pts) == 1 else "Support/" + t + "@After:" + ORDER[p]
+                name = CFG.get("support_names", {}).get(name, name)
+                if "@" in name: probs.append(("unnamed support layer", name))
+                for u in us:
+                    if layer[u] == p: tgt[u] = name
+            continue
         # greedy: group units (by increasing lo) while max lo < min hi
         us.sort(key=lambda u: (lo(u), hi(u)))
         groups = []; cur = []; clo = -1; chi = 99
@@ -246,15 +265,16 @@ def assign(sel):
         groups.append((cur, clo))
         for us2, L in groups:
             name = "Support/" + t if len(groups) == 1 else \
-                "Support/" + t + "@" + ("Base" if L < 0 else "After" + SHORT[ORDER[L]])
+                "Support/" + t + "@" + ("Base" if L < 0 else "After:" + ORDER[L])
             name = CFG.get("support_names", {}).get(name, name)
             if "@" in name: probs.append(("unnamed support layer", name))
             for u in us2: tgt[u] = name
+    for u, t in pinned.items(): tgt[u] = t
     # an attribute-only lemma (simp) goes with its latest dependency, emitted as early as it can be
     g = file_graph([u for u in sel if not (u in SIMPSET and not rev[u])], tgt)
     fo = topo_files(sorted(set(tgt[u] for u in sel)), g)
     for u in sel:
-        if u in SIMPSET and not rev[u] and dep[u]:
+        if u in SIMPSET and not rev[u] and dep[u] and u not in pinned:
             tgt[u] = max((tgt[d] for d in dep[u]), key=fo.index)
     return tgt, inline, probs
 
@@ -301,7 +321,7 @@ def var_names(cmd):
             if re.match(r"^[\w'₀-₉]+$", w): ns.add(w)
     return ns
 
-def unit_sort(sel_file, tgt, f, row_of):
+def unit_sort(sel_file, tgt, f, row_of, inherit_all=False, keys_out=None):
     """topological order of the units of file f, printed rows first where possible"""
     us = [u for u in sel_file]
     S = set(us)
@@ -320,7 +340,7 @@ def unit_sort(sel_file, tgt, f, row_of):
     while changed:
         changed = False
         for u in us:
-            if row_of(u) is None:
+            if inherit_all or row_of(u) is None:
                 for x in rev[u]:
                     if key[x] < key[u]:
                         key[u] = key[x]; changed = True
@@ -334,6 +354,7 @@ def unit_sort(sel_file, tgt, f, row_of):
             indeg[x] -= 1
             if indeg[x] == 0: heapq.heappush(h, (key[x], modidx(x[0]), x[1], x))
     assert len(out) == len(us), (f, len(out), len(us))
+    if keys_out is not None: keys_out.update(key)
     return out
 
 owned = collections.defaultdict(set)
@@ -411,7 +432,7 @@ def support_row_comment(rs, sel, tgt, seenrows):
             out.append("### %s · %s · %s · `%s`\n\n%s" % (r, info["printed"], info["page"], tag, dehistory(info["note"])))
     return "/-!\n" + "\n\n".join(out) + "\n-/"
 
-def emit(sel, tgt, banners, header_of=None, extra_files=()):
+def emit(sel, tgt, banners, header_of=None, extra_files=(), hook=None):
     SUPPORT_BANNER = banners["__support__"]; SUPPORT_WHAT = banners["__what__"]
     files = sorted(set(tgt[u] for u in sel))
     g = file_graph(sel, tgt)
@@ -435,14 +456,20 @@ def emit(sel, tgt, banners, header_of=None, extra_files=()):
         ans, ac = set(), set()
         for i in imps:
             ans |= provided[i][0]; ac |= provided[i][1]
+        default_row_of = lambda u: (sorted([r for r in unit_rows.get(u, []) if DEFROWS[r]["status"] != "plumbing"], key=rowkey) or [None])[0] if tgt[u].startswith("Paper") and paper_target(u) == tgt[u] else None
         us = unit_sort([u for u in sel if tgt[u] == f], tgt, f,
-                       lambda u: (sorted([r for r in unit_rows.get(u, []) if DEFROWS[r]["status"] != "plumbing"], key=rowkey) or [None])[0] if tgt[u].startswith("Paper") and paper_target(u) == tgt[u] else None)
+                       (lambda u: hook.row_of(u, f, default_row_of)) if hook else default_row_of,
+                       inherit_all=bool(hook and hook.inherit_all(f)), keys_out=hook.keys if hook else None)
         body = []; curkey = None; seenrows = set(); prev_inline = False
         def close_group():
             if curkey is not None:
                 body.append("end %s" % ".".join(curkey[0]) if curkey[0] else "end")
                 body.append("")
         for u in us:
+            if hook:
+                for txt in hook.pseudo_before(u, f):
+                    close_group(); curkey = None
+                    body.append(txt); body.append("")
             U = UBY[u]; ctx = U["ctx"]
             text = utext(u)
             if u in strip:
@@ -472,7 +499,11 @@ def emit(sel, tgt, banners, header_of=None, extra_files=()):
                     pre.extend(l + " in" for l in ls)
                 else: pre.append(cmd)
             # comments
-            if f.startswith("Paper") and paper_target(u) == f:
+            hc = hook.before(u, f) if hook else None
+            if hc is not None:
+                if hc: body.append(hc)
+                prev_inline = hc.startswith("/-! `[about ours]`")
+            elif f.startswith("Paper") and paper_target(u) == f:
                 rs = sorted([r for r in unit_rows.get(u, []) if DEFROWS[r]["status"] != "plumbing"], key=rowkey)
                 if rs:
                     body.append(unit_comment(rs, seenrows)); seenrows.update(rs)
@@ -490,6 +521,14 @@ def emit(sel, tgt, banners, header_of=None, extra_files=()):
                 ac.add(n)
                 p = n.split(".")
                 for k in range(1, len(p)): ans.add(".".join(p[:k]))
+            ha = hook.after(u, f) if hook else None
+            if ha:
+                close_group(); curkey = None
+                body.append(ha); body.append("")
+        if hook:
+            for txt in hook.pseudo_end(f):
+                close_group(); curkey = None
+                body.append(txt); body.append("")
         close_group()
         provided[f] = (ans, ac)
         needs_mathlib = any(UBY[u]["mod"] not in CFG["no_mathlib"] for u in us)
@@ -506,7 +545,7 @@ def emit(sel, tgt, banners, header_of=None, extra_files=()):
     return order, g, written, strip
 
 AUXNAME = re.compile(r"(\.(match_\d+(_\d+)?|_sparseCasesOn_\d+|proof_\d+|_proof_\d+|_f|_sunfold|_unsafe_rec|splitter|eq_\d+|eq_def|below|brecOn|binductionOn|casesOn|recOn|rec|noConfusion|noConfusionType|ctorIdx|ctorElim|ctorElimType|sizeOf_spec|_sizeOf_\d+|_sizeOf_inst|inj|injEq)$)|_aux_|\.«|\._|^_h$")
-def write_bridge(sel, tgt, strip, path):
+def write_bridge(sel, tgt, strip, path, extra=(), rows_of=None):
     import csv
     rows = []
     for u in sel:
@@ -517,12 +556,30 @@ def write_bridge(sel, tgt, strip, path):
             newname = base
             priv = "yes" if (m and u not in strip) else "no"
             o = own[n]
-            rs = ";".join(sorted(unit_rows.get(u, []), key=rowkey))
+            rs = rows_of(u) if rows_of else ";".join(sorted(unit_rows.get(u, []), key=rowkey))
             rows.append(dict(name=newname, source_name=base, private=priv, kind=D[n]["kind"],
                              target=tgt[u] + ".lean", source=u[0].replace(".", "/") + ".lean:" + D[o]["s"].split(":")[0],
                              rows=rs))
+    rows.extend(extra)
     rows.sort(key=lambda r: (r["target"], r["name"]))
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["name", "source_name", "private", "kind", "target", "source", "rows"])
         w.writeheader(); w.writerows(rows)
     return rows
+
+
+# ---------------------------------------------------------------- stage 1's selection
+def stage1_selection():
+    """the §§1–5 definitions and what they need; theorem-valued rows whose proofs cost
+    more than 60 further lines are deferred"""
+    skip = set(CFG["stage1_skip_rows"])
+    isthm = lambda u: D[owners_of(u)[0]]["kind"] == "thm"
+    roots = set(uid for uid, rs in unit_rows.items() if any(r not in skip for r in rs) and not isthm(uid))
+    sel = select(roots)
+    deferred = []
+    for u, rs in sorted(unit_rows.items()):
+        if isthm(u) and u not in sel and any(r not in skip for r in rs):
+            new = close(sel | {u}) - sel
+            if sum(UBY[x]["e"] - UBY[x]["s"] + 1 for x in new) <= 60: sel = select(sel | {u})
+            else: deferred.append(u)
+    return sel, deferred

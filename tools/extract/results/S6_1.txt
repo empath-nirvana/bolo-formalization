@@ -1,0 +1,59 @@
+@@ 6.1 | Lemma | p. 6 | BoCa.Fig16.ResU.compat_comm_iff
+> TODO
+Proof. TODO
+
+@@ 6.2 | Lemma | p. 6 | BoCa.Fig16.ResU.Comp.comm
+> TODO
+Proof. TODO
+
+@@ 6.3 | Lemma | p. 6 | BoCa.Fig16.ResU.Comp.assoc
+> TODO
+Proof. TODO
+
+@@ 6.4 | Lemma | p. 7 | BoCa.Fig16.ResU.comp_empty_right
+> TODO
+Proof. TODO
+
+@@ 6.5 | Lemma | p. 7 | BoCa.Fig16.ResU.hash_empty_right
+> TODO
+Proof. TODO
+
+@@ 6.6 | Lemma | p. 7 | BoCa.Fig16.ResU.hash_symm_iff
+> TODO
+Proof. TODO
+
+@@ 6.7 | Lemma | p. 7 | BoCa.Fig16.ResU.Lower.split
+> TODO
+Proof. TODO
+
+@@ 6.8 | Lemma | p. 7 | BoCa.Fig16.ResU.Lower.congr
+> TODO
+Proof. TODO
+
+@@ 6.9 | Lemma | p. 7 | BoCa.Fig16.ResU.compS_defined_iff
+> TODO
+Proof. TODO
+
+@@ 6.10 | Lemma | p. 7 | BoCa.Fig16.ResU.Valid.split
+> TODO
+Proof. TODO
+
+@@ 6.11 | Lemma | p. 7 | BoCa.Fig16.ResU.Hash.split
+> TODO
+Proof. TODO
+
+@@ 6.12 | Lemma | p. 7 | BoCa.Fig16.ResU.compatS_of_compR
+> TODO
+Proof. TODO
+
+@@ 6.13 | Lemma | p. 7 | BoCa.Fig16.ResU.compatS_of_pairwise
+> TODO
+Proof. TODO
+
+@@ 6.14 | Lemma | p. 8 | BoCa.Fig16.ResU.compatR_of_pairwise
+> TODO
+Proof. TODO
+
+@@ 6.15 | Lemma | p. 8 | BoCa.Fig16.ResU.hash_of_pairwise
+> TODO
+Proof. TODO
