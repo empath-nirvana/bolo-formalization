@@ -397,7 +397,7 @@ variable {Loc Val : Type}
 /-!
 ## Lemma 6.25 · `[TR]` p. 10 · `proved`
 
-> Assuming all resources and composition are defined, ⟦ℓ ↦ mut(α, v, ρ_v, P̂)⟧ = ⟦ρ_v ● ℓ ↦ own(v)⟧
+> Assuming all resources and composition are defined, ⟦ℓ ↦ mut(n, v, ρ_v, P̂)⟧ = ⟦ρ_v ● ℓ ↦ own(v)⟧
 
 **Printed proof, transcribed.** By unfolding.
 
@@ -592,10 +592,11 @@ namespace BoCa.Fig16
 
 **Printed proof, transcribed.** Unfolding `↓`, `↓α = α + 1`, and `α < α + 1`, so `α ⊐ α + 1`.
 
-**Lean.** `BoCa.Fig16.Life.down_sqsubset`, alias `TR.lemma_6_63`.
+**Lean.** `BoCa.Fig16.Life.down_sqsubset`, alias `TR.lemma_6_63`, tag `[as printed]`.
 
 **Note.** `Life` is `ℕᵒᵈ`, so `↓a = a + 1`, and `(↓a) ⊏ a` is `a ⊐ ↓a`.
 -/
+/-- `[TR]` Lemma 6.63 (p. 22).  `[as printed]` -/
 theorem Life.down_sqsubset (a : Life) : (↓a) ⊏ a := Nat.lt_succ_self _
 
 end BoCa.Fig16
@@ -1775,7 +1776,7 @@ end BoCa.Fig16
 alias TR.lemma_6_39 := BoCa.Fig16.ResU.six39
 
 /-!
-## Lemma 6.40 · `[TR]` p. 15 · `variant`
+## Lemma 6.40 · `[TR]` p. 15 · `untranscribed`
 
 > ℓ ↦ own(v₁) # ρ if and only if ℓ ↦ own(v₂) # ρ
 
@@ -2655,17 +2656,18 @@ theorem ResU.six52_sub_inStratum {α : Life}
     exact ⟨s, LSet.singleton α, v, w, hs, hw, hpl, hζeq, rfl⟩
 
 /-!
-## Lemma 6.52 · `[TR]` p. 17 · `proved`
+## Lemma 6.52 · `[TR]` p. 17 · `variant`
 
 > Let ρ_reb = ρ∣dom(ρ′ᵢ∣mut,own). If ρ ∈ reb_α(ρ′ᵢ) and ρ ● ρₑ ↭ ρ′ ● ρ⁺ and @ρₑ ⊐ α and @ρ′ ⊐ α then ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb and @(ρ⁺ ⊟ ρ_reb) ⊐ α
 
 **Printed proof, transcribed.** Unfolding `reb`: `ρ∣own,mut = ∅`, `ρ′ᵢ ⊐ α`, and each `ℓ ∈ dom(ρ′ᵢ∣mut,own) ∩ dom(ρ)` has `ρ(ℓ) = imm({α}, ρ_ℓ, v_ℓ)`.  At such an `ℓ`, the update gives `β_ℓ` with `⦇ρ ● ρₑ⦈(ℓ) = ⦇ρ′ ● ρ⁺⦈(ℓ) = imm(β_ℓ, ρ_ℓ, v_ℓ)` and `α ∈ β_ℓ`; since `ρ′ ⊐ α` there is `β_ℓ⁺ ⊆ β_ℓ` with `⦇ρ⁺⦈(ℓ) = imm(β_ℓ⁺, ρ_ℓ, v_ℓ)` and `α ∈ β_ℓ⁺`; and since `ρ′ᵢ, ρₑ ⊐ α` there are no borrows at any lifetime shorter than `α`, so no borrow contains `ρ(ℓ)`.  Hence (H1) `ρ⁺ = (ρ⁺ ⊟ ℓ ↦ imm({α}, ρ_ℓ, v_ℓ)) ● ℓ ↦ imm({α}, ρ_ℓ, v_ℓ)`.  Noting `ρ_reb = ⨀_{ℓ ∈ dom(ρ′ᵢ∣mut,own) ∩ dom(ρ)} ρ(ℓ)`, rewriting with H1 at every such `ℓ` gives `ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb`.  The outlives constraint: every part of the resource outlives `α` except the locations of `ρ` that are `mut` or `own` in `ρ′ᵢ`.
 
-**Lean.** `BoCa.Fig16.ResU.six52`, alias `TR.lemma_6_52`, tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.six52`, alias `TR.lemma_6_52`, tag `[variant: `ρ⁺ ⊟ ρ_reb` as some `ψ` with `ResU.Sub`, stated existentially]`.
 
-**Note.** `@ρ ⊐ α` is read as `Fig16.ResU.InStratum` (`docs/adjudications.md` §C.25).
+**Note.** `@ρ ⊐ α` is read as `Fig16.ResU.InStratum` (`docs/adjudications.md` §C.25).  `ResU.Sub` admits more than one value (§12.38); at `ResU.SubKeep`, the reading of Definition 6.3 used from §12.64 on, the same conclusion is `Fig16.ResU.six52_keep`, and `ResU.SubKeep.functional` makes `ρ⁺ ⊟ ρ_reb` single-valued under 6.52's H1.
 -/
-/-- `[TR]` Lemma 6.52 (p. 17).  `[as printed]` -/
+/-- `[TR]` Lemma 6.52 (p. 17).  `[variant: `ρ⁺ ⊟ ρ_reb` as some `ψ` with `ResU.Sub`;
+the `ResU.SubKeep` form is `ResU.six52_keep`]` -/
 theorem ResU.six52 {α : Life}
     {ρ'i ρ ρe ρ'' ρp ρρe ρ'p : ResU BoCa.Loc BoCa.Val}
     (hreb : ResU.Reb α ρ'i ρ)
@@ -3010,8 +3012,9 @@ variable {Loc Val : Type}
 **Lean.** `BoCa.Fig16.ResU.six58_left`, alias `TR.lemma_6_58_left`; `BoCa.Fig16.ResU.six58_right`, alias `TR.lemma_6_58_right`; tag `[restricted: each to one of the two printed conclusions; as 6.55; `six58_right` also to `[TR]` 6.52's equation, as a hypothesis]`.
 -/
 /-- `[TR]` Lemma 6.58's first conclusion (p. 19). `[restricted: to the first of the two
-printed conclusions, and as 6.55; the three printed hypotheses this half does not
-use are dropped]` -/
+printed conclusions, and as 6.55; the four printed hypotheses this half does not use
+(`ρ ● ρ_b ↭ ρ′ ● ρ⁺`, `@ρ_b ⊐ β`, `@ρ′ ⊐ β`, `ρ′ ● ρ⁺ # ρᵢ`) are dropped, and `ρ # ρ_b`
+(`hρb`) is added]` -/
 theorem ResU.six58_left {β : Life} {ρ'i ρ ρb A ρρb X Y : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -3552,16 +3555,19 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.59 · `[TR]` p. 20 · `proved`
+## Lemma 6.59 · `[TR]` p. 20 · `proved*`
 
 > Let ρᵢ = ℓ ↦ imm(α, ρ′ᵢ, v). If ρ ∈ reb_β(ρ′ᵢ), ρ ● ρ_b ↭ ρ′ ● ρ⁺, @ρ_b ⊐ β, @ρ′ ⊐ β, ρ_b # ρᵢ, and ρ′ ● ρ⁺ # ρᵢ, then ρᵢ ● ρ_b ↭ ρ′ ● (ρ⁺ ⊟ ρ∣dom(ρ′ᵢ∣mut,own)) ● ρᵢ
 
 **Printed proof, transcribed.** Let `ρ_reb = ρ∣dom(ρ′ᵢ∣mut,own)`.  By Lemma 6.52, `ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb` and `@(ρ⁺ ⊟ ρ_reb) ⊐ β`; unfolding `reb`, `ρ = ρ∣dom(ρ′ᵢ∣imm) ● ρ_reb`.  Rewriting the update hypothesis with both: `ρ∣dom(ρ′ᵢ∣imm) ● ρ_reb ● ρ_b ↭ ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρ_reb`.  By Lemma 6.57, `⦇ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ⦈ = ⦇ρᵢ⦈`, which also gives `ag(ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ) = ag(ρᵢ)`.  `⦇ρ_b ● ρᵢ⦈` is defined by hypothesis, and unfolding `⦇−⦈` and `ex` with Lemmas 6.18 and 6.20: `⦇ρᵢ ● ρ_b⦈ = ex(ρᵢ)_● ● ex(ρ_b)_● ● ag(ρᵢ) ○ ag(ρ_b) = ex(ρ_b)_● ● ag(ρᵢ) ○ ag(ρ_b) = ex(ρ_b)_● ● ag(ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ) ○ ag(ρ_b) = ex(ρ_b)_● ● ag(ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ ● ρ_b) = ⦇ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ ● ρ_b⦈`.  Rewriting with this, it suffices that `ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ ● ρ_b ↭ ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρᵢ`: the same `imm`/`mut` domain, and `∼` at every `ℓ` of it.  The rewritten hypothesis gives `⦇ρ∣dom(ρ′ᵢ∣imm) ● ρ_reb ● ρ_b⦈(ℓ) ∼ ⦇ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρ_reb⦈(ℓ)`.  If `ℓ ∉ dom(ρ_reb)`, the goal is immediate by the hypothesis and unfolding `reb`.  If `ℓ ∈ dom(ρ_reb)`, then since all components of the composition besides `ρ_reb` outlive `β`, neither side has the immutable borrow at `β` from `ρ_reb`, and both get the borrow from `ρᵢ`.
 
-**Lean.** `BoCa.Fig16.ResU.six59`, alias `TR.lemma_6_59`, tag `[restricted: to `ResU.SubKeep` — Definition 6.3 with its third bullet read through the paragraph printed below it]` (`docs/adjudications.md` §12.58, §12.64).
+**Lean.** `BoCa.Fig16.ResU.six59`, alias `TR.lemma_6_59`, tag `[restricted: to `ResU.SubKeep` — Definition 6.3 with its third bullet read through the paragraph printed below it; the ✓ halves of `↭` as hypotheses]` (`docs/adjudications.md` §12.58, §12.64).
+
+**Note.** The conclusion is `ResU.Upd`, `↭` without its `✓ρ₁ ∧ ✓ρ₂` conjuncts ([CONF] Fig. 18b's form, D3).  Those conjuncts are the hypotheses `hfX : Flat Xi σX` (`⦇ρᵢ ● ρ_b⦈` defined) and `hfY : Flat Y σY` (`⦇ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρᵢ⦈` defined); with them the conclusion is p. 5's guarded `↭` (`ResU.UpdV`).  The printed statement does not list them.
 -/
 /-- `[TR]` Lemma 6.59 (p. 20). `[restricted: to `ResU.SubKeep` — Definition 6.3 with its
-third bullet read through the paragraph printed below it (§12.58)]` -/
+third bullet read through the paragraph printed below it (§12.58); the ✓ halves of `↭` as
+hypotheses `hfX`, `hfY`]` -/
 theorem ResU.six59
     {β : Life} {ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val}
     {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}

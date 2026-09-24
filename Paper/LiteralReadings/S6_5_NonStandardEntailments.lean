@@ -27,8 +27,8 @@ The record is in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`.
 -/
 /-- At an empty index type the left side holds of every resource; the witness
 is any `ρ` outside `Res_⊤`, which the right side's `[⊤]` refuses.
-`[about ours: the printed 6.102 at the index type and lifetime where its `⊨`
-direction is false]` -/
+`[about ours: the printed 6.102 at an empty index type and `⊤`, which the printed
+proof's "Suppose X ≠ ∅" excludes]` -/
 theorem box_all_needs_nonempty {ρ : ResU Loc Val} (hρ : ¬ ρ.InStratum ⊤) :
     ¬ (all (fun _ : Empty => box ⊤ (top : SPropU Loc Val)) ⊨
         box ⊤ (all (fun _ : Empty => (top : SPropU Loc Val)))) :=

@@ -656,11 +656,11 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-### 5.32 · `[α] P  (ρ) ≜ P(ρ) ∧ @ρ ⊐ α` · [TR] p. 6, proposition row 4 · `[as printed]`
+### 5.32 · `[α] P  (ρ) ≜ P(ρ) ∧ @ρ ⊐ α` · [TR] p. 6, proposition row 4 · `[repair]`
 
-`@ρ ⊐ α` is universal over the borrow cells of `ρ`, as [TR] Lemma 6.121 (p. 32) reads it: *"it suffices if `@(ℓ ↦ own(v)) ⊐ α`, which holds by definition"* (`docs/adjudications.md` §C.25).
+`@ρ ⊐ α` is universal over the borrow cells of `ρ`, as [TR] Lemma 6.121 (p. 32) reads it: *"it suffices if `@(ℓ ↦ own(v)) ⊐ α`, which holds by definition"* (`docs/adjudications.md` §C.25).  Read as a single strict comparison of the meet, it differs at `α = ⊤` on borrow-free resources.
 -/
-/-- `@ρ ⊐ α`: membership in `Res_α`.  `[as printed]` (`[TR]` p. 5, as pp. 32–33 use it) -/
+/-- `@ρ ⊐ α`: membership in `Res_α`.  `[repair]` (`[TR]` p. 5, as pp. 32–33 use it; §C.25) -/
 def Outlives (ρ : ResU Loc Val) (α : Life) : Prop := ρ.InStratum α
 
 /-- `[α]P`.  `[as printed]` -/
@@ -1244,7 +1244,7 @@ variable {Loc Val : Type}
 /-- `ρ ≤ ρ′`; the operands of `▶◀` are transposed (Lemma 6.1).  `[as printed]` -/
 def ResU.Le (ρ σ : ResU Loc Val) : Prop := ∃ τ, ResU.CompS ρ τ σ
 
-/-- `ρ′ ∈ reb_α(ρ)`: `@ρ ⊐ α` (via `ResU.AtLife`), `π` as a list of pairs over
+/-- `ρ′ ∈ reb_α(ρ)`: `@ρ ⊐ α` (as `ResU.InStratum`, §C.25), `π` as a list of pairs over
 `dom(ρ′)`, `ρ ≥ ⨀_● π(ℓ)`, and `ResU.RebAt` at each member.  `[as printed]` -/
 def ResU.Reb (α : Life) (ρ ρ' : ResU Loc Val) : Prop :=
   ρ.InStratum α ∧

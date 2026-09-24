@@ -23,7 +23,7 @@ import Support.Syntax.Terms
 
 * 6.135 (`wp-bind`) over `[TR]` §3's printed machine (§12.42, D6): the closed,
   well-typed terms `inj₁ (free (alloc ()))` and `free (alloc ()); ()` are stuck
-  there, `TR3.wp` is false at such a term, and `TR3.wp` is strictly below the
+  there, `TR3.wp` does not hold at such a term, and `TR3.wp` is strictly below the
   library's `wp`;
 * 6.150 (`↺ rule`): the entailment without the hypothesis `RebEscrow`, measured at
   the configuration `DeepReborrow`, and that configuration outside `RebEscrow`
@@ -63,7 +63,7 @@ theorem stuck_wSeq (μ : Heap) :
    fun _ _ => steps_seq_ne_val (by simp [wFreeAlloc])⟩
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- `wp(inj₁ e)` is false whenever `e` is not a value.
+/-- `wp(inj₁ e)` does not hold whenever `e` is not a value.
 `[about ours: `[TR]` p. 6's row over the printed machine, at p. 1's
 `inj₁ e`]` -/
 theorem wp_inj₁_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) (e : Expr)
@@ -74,7 +74,7 @@ theorem wp_inj₁_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) (e : Expr)
   exact he (IsVal.inj₁_inv (hv ▸ Val.isVal _))
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- `wp(e₁; e₂)` is false whenever `e₁` is not literally `()`.
+/-- `wp(e₁; e₂)` does not hold whenever `e₁` is not literally `()`.
 `[about ours: `[TR]` p. 6's row over the printed machine, at p. 1's
 `e₁;e₂`]` -/
 theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂ : Expr)
@@ -84,7 +84,7 @@ theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂
   exact steps_seq_ne_val h₁ h₈
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- An owned cell, with `∅` as an admissible frame, at which `wp wSeq` is false.
+/-- An owned cell, with `∅` as an admissible frame, at which `wp wSeq` does not hold.
 `[about ours: an inhabited instance of the refutations]` -/
 theorem wp_stuck_false_nonvacuous (l : BoCa.Loc) (w : Val) (Q : Val → WProp) :
     ¬ wp wSeq Q (ResU.single l (CellU.ownOf w)) := by

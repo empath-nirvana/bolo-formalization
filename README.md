@@ -24,15 +24,19 @@ def FundamentalProperty : Prop :=
     DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemX Δ Γ e T
 ```
 
-`DerivesWf` is `[TR]` p. 2's typing rules, with p. 2's well-formedness judgment
-`Δ ⊢ T` consulted at binders and eliminated types.  The two further hypotheses are
+`DerivesWf` is `[TR]` p. 2's typing rules, with the scoping half of p. 2's
+well-formedness judgment `Δ ⊢ T` (`Ty.scopedB`, which also admits `Unk`) consulted at
+binders and eliminated types, and `∀I` carrying the Barendregt premise that its
+binder is free in no live type of `Γ` (C14).  The two further hypotheses are
 `⊧ Δ`, carried as `Δ.Ok` (sufficient, `LifeCtx.sat_of_ok`), and `Δ ⊢ Γ`, carried as
 `Ctx.ScopedB`.  p. 2's typing box prints no presupposition; p. 2 prints
 `Presumes ⊧ Δ` only on the boxes of `Δ ⊢ T` and `Δ ⊢ T ⊐ @a`
 (`docs/adjudications.md` §C.26).  The conclusion `SemX` is `[TR]` p. 4's
-`Δ; Γ ⊨ e : T` at the repaired definitions described below.  The proof is the
-printed one: induction on the derivation, each case closed by its compatibility
-lemma, `[TR]` Lemmas 6.152–6.176.
+`Δ; Γ ⊨ e : T` at the repaired definitions described below; it is a different
+relation from the literal `Sem`, and the result is a statement about `SemX`.  The
+proof is the printed one: induction on the derivation, each case closed by the
+typed-world version (`*_compatX`, `Support/TypedWorld/Compatibility.lean`) of its
+compatibility lemma, `[TR]` Lemmas 6.152–6.176.
 
 **Adequacy, from a typing derivation alone** — `Fig16.LogRel.Typed.adequacy`, in
 `Paper/CONF/Results.lean`:
@@ -42,8 +46,10 @@ theorem adequacy (e : Expr) (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.uni
     BoCa.BoLo.Steps Adequacy.emptyMem e Adequacy.emptyMem (.val .unit)
 ```
 
-Every closed program that `[TR]` p. 2 types at `1` runs, from the empty memory, to
-`()` and the empty memory: it terminates and frees everything it allocates.  At the
+Every closed program that `DerivesWf` types at `1` has a run, from the empty
+memory, to `()` and the empty memory: some run terminates and frees everything it
+allocates.  (`alloc` chooses its fresh location, so `BoLo.Steps` is a statement about
+some run; this is the form of `[CONF]` Corollary 3.3.)  At the
 empty contexts `Δ.Ok` and `Ctx.ScopedB` hold, so this is `[CONF]` Corollary 3.3 at
 `SemX` (`Fig16.LogRel.Typed.corollary33`, from Theorem 3.2,
 `Fig16.LogRel.Typed.theorem32`) composed with the Fundamental Property.  Neither
@@ -123,7 +129,8 @@ diff -r /tmp/challenge-check/Challenge comparator/Challenge
 ```
 
 Step 3 compiles the development itself (not Mathlib); it takes some minutes.
-`scripts/check-hygiene.sh` scans every Lean file outside comments for the forbidden
+`scripts/check-hygiene.sh` scans every Lean file of `Paper/`, `Support/` and
+`comparator/` outside comments for the forbidden
 keywords (allowing exactly the one `sorry` that is the body of the challenge
 statement in `comparator/Challenge.lean`, which is comparator's convention) and then
 walks every constant of `Paper` and `Support` and fails unless its axioms are among
@@ -215,21 +222,17 @@ the reading adopted and what the literal reading admits.  `Paper/INDEX.md`
   its observable view (§12.69); borrow payloads stratified by a record list
   (§12.70); the `Imm` clause carrying the recorded type (§12.71); `⊸`/`∀` Kripke over
   the record list, and `wp` over the typed worlds the printed proofs' operations
-  produce (§12.72).  At the literal logical relation the Fundamental Property is
-  proved from an added hypothesis, `WithloadEscrow`
-  (`Fig16.LogRel.fundamentalProperty`, at `Sem`).
+  produce (§12.72).
 
-**What the literal readings admit.**  `Paper/LiteralReadings/` builds, for each
-repaired reading that matters to a result, the configuration at which the literal
-reading and the printed step cannot be reconciled on this carrier, with every
-hypothesis discharged in Lean.  Among them: over the printed machine, the closed
-terms `inj₁ (free (alloc ()))` and `free (alloc ()); ()`, both typed by p. 2, take no
-step (`TR3.stuck_wInj`, `TR3.stuck_wSeq`, `TR3.corThree_unreachable`); under
-`α ⊑ ⊔β̄`, `𝒱⟦Mut @a (Imm @b 1)⟧` is empty at the cell `Fig16.LogRel.MutImmCell`
-builds; and at the literal logical relation, a `withload` node at which the
-Fundamental Property at `Sem` is refused without `WithloadEscrow`
-(`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`), a configuration that is
-not a typed world (`ViewWitness.excluded`).  Nothing else depends on them.
+**The literal readings.**  `Paper/LiteralReadings/` keeps, for several repaired
+readings, the configuration that motivated the repair, built in Lean.  Among them:
+over the printed machine, the closed terms `inj₁ (free (alloc ()))` and
+`free (alloc ()); ()` take no step (`TR3.stuck_wInj`, `TR3.stuck_wSeq`); the cell
+`Fig16.LogRel.MutImmCell` at `Mut @a (Imm @b 1)`, whose `⊓β̄` bound §12.66 discusses
+(the corresponding statement under `⊔β̄` is argued there, not derived in Lean); and a
+`withload` configuration at the literal logical relation
+(`Fig16.LogRel.ViewWitness`), which is not a typed world (`ViewWitness.excluded`).
+Nothing else depends on them.
 
 ## What is not done
 

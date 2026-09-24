@@ -225,7 +225,7 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** By definition.
 
-**Lean.** `BoCa.Fig16.ResU.compS_defined_iff`, alias `TR.lemma_6_9`, tag `[as printed]` `[variant: …]`.
+**Lean.** `BoCa.Fig16.ResU.compS_defined_iff`, alias `TR.lemma_6_9`, tag `[as printed]`.
 -/
 /-- `[TR]` Lemma 6.9 (p. 7).  The forward direction is `ResU.Comp`'s first
 conjunct; the converse builds the composite (`ResU.compS_spec`).  Stated on the

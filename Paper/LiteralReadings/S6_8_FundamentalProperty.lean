@@ -40,9 +40,9 @@ import Support.TypedWorld.World
 /-!
 # Literal readings — [TR] §6.8
 
-* 6.151 at `Sem` (§12.68, §12.73): `ViewWitness.fundamentalProperty_refused`, the
-  statement without `WithloadEscrow` refused at a `withloadAx` node, and
-  `ViewWitness.excluded`, that configuration is not a typed world;
+* 6.151 at `Sem` (§12.68, §12.73): `ViewWitness`, the statement at a `withloadAx`
+  node (`ViewWitness.fundamentalProperty_refused`), and `ViewWitness.excluded`, that
+  configuration is not a typed world;
 * 6.151 with the antecedent over `Derives` instead of `DerivesWf` (§C.26):
   `FundamentalPropertyOverRules`, `not_everyDerivationWf`, the route through
   `DerivesIn` and `not_everyDerivationInRegime`;

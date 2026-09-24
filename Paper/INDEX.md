@@ -8,9 +8,12 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 |---|---|
 | `proved` | a Lean theorem whose statement is the printed one, tagged `[as printed]` (or `[encoding]`, a representation choice that changes nothing) |
 | `proved*` | proved at a restriction stated in the theorem, tagged `[restricted: …]`; the record names the restriction |
-| `variant` | a Lean theorem whose statement differs from the print in a way particular to that result (an added hypothesis, a direction, two results fused), tagged `[variant: …]`; the record says how |
+| `variant` | a Lean theorem whose statement differs from the print in a way particular to that result (an added hypothesis, a direction, two results fused, a repaired relation), tagged `[variant: …]`; the record says how |
+| `untranscribed` | no declaration; the record says so |
 
 **Tags of a definition row.** `[as printed]`, `[encoding]`, `[repair]` (the Lean reads the print differently; the row's comment cites the `docs/adjudications.md` entry that argues the reading), `[about ours]` (not printed; needed by Lean).
+
+**Rows 6.64–6.66 and 6.131–6.176.**  The `declaration` column and the `TR.lemma_*` alias name the lemma over the literal definitions of rows 4.4–4.14 and 5.33, and the status scores it.  The Fundamental Property (`Fig16.LogRel.Typed.fundamentalProperty`) is proved from the typed-world versions named in parentheses (`*_compatX`, `wpTS_*`, in `Support/TypedWorld/`), each stated at `SemX`/`wpTS`.
 
 `[TR]` numbers Definitions and Lemmas in two sequences: Definitions 6.1, 6.2 and 6.3 are definition rows 5.61, 5.65 and 5.66, listed under *Definitions* below.
 
@@ -57,7 +60,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | Lemma 6.37 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six37` | `TR.lemma_6_37` |
 | Lemma 6.38 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six38` | `TR.lemma_6_38` |
 | Lemma 6.39 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six39` | `TR.lemma_6_39` |
-| Lemma 6.40 |  | `variant` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | **none — untranscribed** | — |
+| Lemma 6.40 |  | `untranscribed` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | **none — untranscribed** | — |
 | Lemma 6.41 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.compatS_single_own` | `TR.lemma_6_41` |
 | Lemma 6.42 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.compatS_single_mut` | `TR.lemma_6_42` |
 | Lemma 6.43 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.compS_single_imm` | `TR.lemma_6_43` |
@@ -69,14 +72,14 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | Lemma 6.49 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.UpdV.trans`, `Fig16.ResU.Upd.trans` | `TR.lemma_6_49` |
 | Lemma 6.50 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.BoLo.updV_outlives` | `TR.lemma_6_50` |
 | Lemma 6.51 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six51` | `TR.lemma_6_51` |
-| Lemma 6.52 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six52` | `TR.lemma_6_52` |
+| Lemma 6.52 |  | `variant` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six52` | `TR.lemma_6_52` |
 | Lemma 6.53 |  | `proved*` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six53` | `TR.lemma_6_53` |
 | Lemma 6.54 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six54` | `TR.lemma_6_54` |
 | Lemma 6.55 |  | `proved*` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six55` | `TR.lemma_6_55` |
 | Lemma 6.56 |  | `proved*` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six56` | `TR.lemma_6_56` |
 | Lemma 6.57 |  | `proved*` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six57` | `TR.lemma_6_57` |
 | Lemma 6.58 |  | `proved*` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six58_left`, `Fig16.ResU.six58_right` | `TR.lemma_6_58_left`, `TR.lemma_6_58_right` |
-| Lemma 6.59 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six59` | `TR.lemma_6_59` |
+| Lemma 6.59 |  | `proved*` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six59` | `TR.lemma_6_59` |
 | Lemma 6.60 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.LogRel.vDen_outlives` | `TR.lemma_6_60` |
 | Lemma 6.61 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.ResU.six61` | `TR.lemma_6_61` |
 | Lemma 6.62 |  | `proved` | `Paper/S6_2_NonStandardLemmas/Lemmas.lean` | `Fig16.LogRel.gDen_box` | `TR.lemma_6_62` |
@@ -168,7 +171,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | Lemma 6.148 | wp-M-forget | `proved` | `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` | `Fig16.BoLo.wp_M_forget` (typed world: `Fig16.LogRel.Typed.wpTS_frame_noOwn`, `Fig16.LogRel.Typed.wpTS_M_forget`) | `TR.lemma_6_148`, `TR.«wp-M-forget»` |
 | Lemma 6.149 | wp-I-forget | `proved` | `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` | `Fig16.BoLo.wp_I_forget` (typed world: `Fig16.LogRel.Typed.wpTS_I_forget`) | `TR.lemma_6_149`, `TR.«wp-I-forget»` |
 | Theorem 6.150 | ↺ rule | `proved*` | `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` | `Fig16.BoLo.wp_reborrow` (typed world: `Fig16.LogRel.Typed.wpTS_reborrow`) | `TR.lemma_6_150`, `TR.«↺ rule»` |
-| Lemma 6.151 | Fundamental Property | `proved*` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.Typed.fundamentalProperty` | `TR.lemma_6_151`, `TR.«Fundamental Property»` |
+| Lemma 6.151 | Fundamental Property | `variant` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.Typed.fundamentalProperty` | `TR.lemma_6_151`, `TR.«Fundamental Property»` |
 | Lemma 6.152 | id-compat | `proved` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.id_compat` (typed world: `Fig16.LogRel.Typed.id_compatX`) | `TR.lemma_6_152`, `TR.«id-compat»` |
 | Lemma 6.153 | 1I-compat | `proved` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.unitI_compat` (typed world: `Fig16.LogRel.Typed.unitI_compatX`) | `TR.lemma_6_153`, `TR.«1I-compat»` |
 | Lemma 6.154 | 1E-compat | `proved` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.unitE_compat` (typed world: `Fig16.LogRel.Typed.unitE_compatX`) | `TR.lemma_6_154`, `TR.«1E-compat»` |
@@ -194,7 +197,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | Lemma 6.174 | withbor-compat3 | `variant` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.withbor3_compat` (typed world: `Fig16.LogRel.Typed.withbor3_compatX`) | `TR.lemma_6_174`, `TR.«withbor-compat3»` |
 | Lemma 6.175 | withload-compat | `proved*` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.withload_compat` (typed world: `Fig16.LogRel.Typed.withload_compatX`) | `TR.lemma_6_175`, `TR.«withload-compat»` |
 | Lemma 6.176 | withswap-compat | `proved` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.withswap_compat` (typed world: `Fig16.LogRel.Typed.withswap_compatX`) | `TR.lemma_6_176`, `TR.«withswap-compat»` |
-| `[CONF]` Lemma 3.1 | Fundamental Property | `proved*` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.Typed.fundamentalProperty` | `CONF.lemma_3_1` |
+| `[CONF]` Lemma 3.1 | Fundamental Property | `variant` | `Paper/S6_8_FundamentalProperty/Lemmas.lean` | `Fig16.LogRel.Typed.fundamentalProperty` | `CONF.lemma_3_1` |
 | `[CONF]` Theorem 3.2 | Adequacy | `proved` | `Paper/CONF/Results.lean` | `Adequacy.theorem32` | `CONF.theorem_3_2` |
 | `[CONF]` Corollary 3.3 | Adequacy at 1 | `proved` | `Paper/CONF/Results.lean` | `Adequacy.corollary33` | `CONF.corollary_3_3` |
 
@@ -386,7 +389,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | 5.29 | `ℓ ↦ v  (ρ) ≜ ρ = ℓ ↦ own(v)` | `[as printed]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.ptoOwn` |
 | 5.30 | `ℓ ↦ Imm α P̂  (ρ) ≜ ∃β̄,v,ρ′. ρ = ℓ ↦ imm(β̄,v,ρ′) ∧ P̂(v)(ρ′) ∧ α ⊑ ⊔β̄` | `[repair]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.ptoImm` |
 | 5.31 | `ℓ ↦ Mut α P̂  (ρ) ≜ ∃β ⊒ α, v, ρ′. ρ = ℓ ↦ mut(β,v,ρ′,P̂)` | `[repair]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.ptoMut` |
-| 5.32 | `[α] P  (ρ) ≜ P(ρ) ∧ @ρ ⊐ α` | `[as printed]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.Outlives`, `Fig16.BoLo.box` |
+| 5.32 | `[α] P  (ρ) ≜ P(ρ) ∧ @ρ ⊐ α` | `[repair]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.Outlives`, `Fig16.BoLo.box` |
 | 5.33 | `wp (e) {Q̂} (ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v. (⟦ρ_f ● ρ⟧,e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧,v) ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺∣own = ∅ ∧ Q̂(v)(ρ′)` | `[repair]` | `Paper/S5_Model/Definitions.lean`, `Support/TypedWorld/World.lean` | `Fig16.BoLo.wp`, `Fig16.LogRel.Typed.TW`, `Fig16.LogRel.Typed.Tagged`, `Fig16.LogRel.Typed.wpTS` |
 | 5.34 | `⌜P_Meta⌝ (ρ) ≜ ρ = ∅ ∧ P_Meta` | `[as printed]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.pure` |
 | 5.35 | `P₁ ⋆ P₂ (ρ) ≜ ∃ρ₁,ρ₂. ρ = ρ₁ ● ρ₂ ∧ P₁(ρ₁) ∧ P₂(ρ₂)` | `[as printed]` | `Paper/S5_Model/Definitions.lean` | `Fig16.BoLo.sep` |
@@ -468,6 +471,7 @@ Every definition row tagged `[repair]`, with the printed text it reads different
 * **5.28** `reb_α(ρ) ≜ {ρ′ ∣ @ρ ⊐ α ∧ ∃π : dom(ρ′) → Res. ρ ≥ ⨀_● π(ℓ) ∧ …}` — `Paper/S5_Model/Definitions.lean`
 * **5.30** `ℓ ↦ Imm α P̂  (ρ) ≜ ∃β̄,v,ρ′. ρ = ℓ ↦ imm(β̄,v,ρ′) ∧ P̂(v)(ρ′) ∧ α ⊑ ⊔β̄` — `Paper/S5_Model/Definitions.lean`
 * **5.31** `ℓ ↦ Mut α P̂  (ρ) ≜ ∃β ⊒ α, v, ρ′. ρ = ℓ ↦ mut(β,v,ρ′,P̂)` — `Paper/S5_Model/Definitions.lean`
+* **5.32** `[α] P  (ρ) ≜ P(ρ) ∧ @ρ ⊐ α` — `Paper/S5_Model/Definitions.lean`
 * **5.33** `wp (e) {Q̂} (ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v. (⟦ρ_f ● ρ⟧,e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧,v) ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺∣own = ∅ ∧ Q̂(v)(ρ′)` — `Paper/S5_Model/Definitions.lean`, `Support/TypedWorld/World.lean`
 * **5.48** — presupposed, never written — — `Paper/S5_Model/Definitions.lean`
 * **5.51** — `ρ∣own,mut` is used from [TR] Def. 6.3 on with no defining row — — `Paper/S5_Model/Definitions.lean`

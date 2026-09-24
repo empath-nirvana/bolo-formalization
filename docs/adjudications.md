@@ -912,15 +912,19 @@ under `∅`, `reb_α` and `●` (`Fig16.LogRel.lifeMembers_empty`, `Fig16.LogRel
 
 At the literal `⊔β̄` (definition row 5.30), 6.60's `Imm` step asks that every recorded
 lifetime be outstanding, a condition like `✓` absent from `Res`'s grammar;
-`Fig16.LogRel.MutImmCell.cell` and `Fig16.LogRel.MutImmCell.lset` are where, under
-`α ⊑ ⊔β̄`, `𝒱⟦Mut @a (Imm @b 1)⟧` is empty.  At `⊓β̄` (§12.67(a)) no licence is needed.
+`Fig16.LogRel.MutImmCell.cell` and `Fig16.LogRel.MutImmCell.lset` build the cell this
+concerns, at `𝒱⟦Mut @a (Imm @b 1)⟧`.  That under `α ⊑ ⊔β̄` this type has no member is
+argued here and not derived in Lean; an argument for it passes through row 4.16's
+`Supported`.  At `⊓β̄` (§12.67(a)) no licence is needed.
 
 ### §12.67 `ℓ ↦ Imm α P̂` bounded by `⊓β̄`, and a subset in `reb_α`'s `imm` clause
 
-Two definitions read through the prose that defines their objects (§12.64).
+Two definition rows changed so that printed proofs go through as printed (§12.64).  Each
+entry quotes the prose that supports the change and, under *Literal reading*, the prose
+that describes the printed form.
 
 (a) `Fig16.BoLo.ptoImm`: `α ⊑ ⊓β̄`, where [TR] p. 6 prints `α ⊑ ⊔β̄`.  Definition row
-5.30.
+5.30, changed so that 6.60's `Imm` step goes through as printed.
 
 * [TR] Definition 6.3 and the sentence after it (p. 17): *"since immutable
   borrows can alias at the same location, 'without' means removing the lifetimes
@@ -945,13 +949,17 @@ index bounds every member: `α ⊑ ⊓β̄` (`Fig16.LSet.meet_mem`, `Fig16.LSet.
 added hypothesis for the `Imm` case.
 
 Literal reading: [CONF] 415:19 says *"the borrow connective will bound its lifetime index `α`
-by the longest among them"*, and [TR] p. 6 prints `⊔`.  Then 6.60's `Imm` step does not
-follow, since `⊔β̄` and `@ρ = ⊓β̄` bound different members, and `𝒱⟦Mut @a T⟧δ` is empty
-whenever `T` has a top-level `Imm` (`Fig16.LogRel.MutImmCell.cell`,
+by the longest among them"*, and [TR] p. 6 prints `⊔`.  [CONF] 415:20 gives the two bounds of
+an `imm` cell separately: *"For an imm cell, the shortest among its lifetimes `β̃` must still
+be longer than the stratification index `α`, and the witness `ρ` sits in the stratification at
+the longest among its lifetimes `β̃`."*  At `⊔β̄` we cannot reconcile 6.60's `Imm` step with
+`@ρ = ⊓β̄`, since the two bound different members (`Fig16.LogRel.MutImmCell.cell`,
 `Fig16.LogRel.MutImmCell.lset_meet`; `Fig16.LogRel.MutImmCell.inRel_same` is the case
-`β = α₀` under `⊓β̄`).
+`β = α₀` under `⊓β̄`).  §12.66 argues that `𝒱⟦Mut @a T⟧δ` then has no member whenever `T`
+has a top-level `Imm`; that is not derived in Lean.
 
-Cost of `⊓β̄`: [TR] 6.115 (`I-ag`) concludes at `α ⊔ β`; cells at `{1}` and `{2}` compose to
+Cost of `⊓β̄`: [TR] 6.115 (`I-ag`) concludes at `α ⊔ β`, and its printed proof goes through
+at the printed `⊔β̄`; cells at `{1}` and `{2}` compose to
 `{1, 2}`, whose meet is not `⊒ 1 ⊔ 2` (`Fig16.BoLo.not_iAgreeAtJoin`).
 `Fig16.BoLo.ptoImm_agree` is 6.115 at `α ⊓ β` and `Fig16.BoLo.ptoImm_agree_eq` at equal
 indices; [CONF] 415:13 describes `I Agree` as aliases that "all agree on the lifetime".  6.115
@@ -959,34 +967,43 @@ is a variant.
 
 (b) `Fig16.ResU.RebAt`'s `imm` clause: `ρ′(ℓ) = imm(t̄, v, χ)` for a nonempty
 `t̄ ⊆ s̄`, where [TR] p. 5 prints `ρ′(ℓ) = ρ(ℓ)` at `ρ(ℓ) = imm(s̄, v, χ)`.  Definition row
-5.28.
+5.28, changed so that 6.61, 6.125 and 6.127 follow their printed proofs.
 
 * [CONF] 415:24: *"`ρ′` must be just like a subresource of the original
   resource `ρ` … its imm locations are preserved at their original
   lifetimes"*.  A subresource of an `imm` cell is that cell over fewer outstanding borrows
   (Definition 6.3).
-* [TR] 6.57's proof (p. 18) prints *"`ρ|dom(ρ′ᵢ|imm) ≤ ρ′ᵢ|imm`"*, with `≤` and not `=`.
+* [TR] 6.57's proof (p. 19) prints *"`ρ|dom(ρ′ᵢ|imm) ≤ ρ′ᵢ|imm`"*, with `≤` and not `=`.
 * [TR] 6.61's proof (p. 22) opens with *"the only interesting cases are locations
   `ℓ` that are in both `ρ′₁` and `ρ′₂`"*, which holds under the subset reading
   (`Fig16.ResU.six61_imm_at`).
 
-`t̄` is nonempty because `Fig16.LSet` is (G2).  Literal reading: a `●`-factor of an image is
-not an image, and 6.61, 6.125 and 6.127 each need an added hypothesis (§12.41, §12.57,
+`t̄` is nonempty because `Fig16.LSet` is (G2).  Literal reading: the printed equation is
+described three times.
+
+* [CONF] 415:24, in the paragraph quoted above: *"If the cell was immutable in `ρ` (Case 2),
+  then it will be preserved as is in the reborrowed resource `ρ′`."*
+* [TR] p. 18, in 6.55's proof: *"`ρ` and `ρ′` differ only by potentially changing from own or
+  mut to imm, but witnesses and values always stay the same"*.
+* [TR] 6.61's proof (p. 22) ends *"`(ρ′₁ ● ρ′₂)(ℓ) = (ρ₁ ● ρ₂)(ℓ)`"*, which
+  `Fig16.ResU.six61_imm_at` states as a subset.
+
+At the printed equation a `●`-factor of an image is not an image, and 6.61, 6.125 and 6.127 each need an added hypothesis (§12.41, §12.57,
 §12.63).  At the subset reading they are `Fig16.ResU.six61`, `Fig16.BoLo.reborrow_star` and
 `Fig16.BoLo.reborrow_weak` (through `Fig16.ResU.RebAt.factor`), as printed; 6.131–6.133 and
 6.175 carry no such hypothesis.  Consumers of the printed equation (6.52–6.59, 6.150) read it
 through `Fig16.ResU.reb_imm_cell_kw`: the image cell is `imm`, at the source's value and
 witness, in every stratum the source cell is in.
 
-### §12.68 A configuration of our carrier at which `WithloadEscrow` is refused
+### §12.68 A `withload` configuration of our carrier
 
 `Fig16.LogRel.ViewWitness` has an argument `ℓ₂ ↦ imm({1}, ℓ₀, ρ″)`, whose witness owns `ℓ₀`,
 and a callback resource holding the view `ℓ₀ ↦ imm({1}, (ℓ₁,()), ∅)`.  `ρ₁ ● ρ₂` is `✓`
 (`DeepReborrow.Valid_composite`), the callback is in its type
 (`Fig16.LogRel.ViewWitness.f_den`), and it gets stuck when `withload` hands it `ℓ₀`
-(`Fig16.LogRel.ViewWitness.run_stuck`).  Refused there: `Sem` at that `withload` node
-(`Fig16.LogRel.ViewWitness.withloadSem_refused`), `FundamentalProperty`
-(`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`), and `Fig16.LogRel.WithloadEscrow`.
+(`Fig16.LogRel.ViewWitness.run_stuck`).  On our carrier, the literal `Sem` at that
+`withload` node does not hold there (`Fig16.LogRel.ViewWitness.withloadSem_refused`), nor
+does `FundamentalProperty` at `Sem` (`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`).
 
 We cannot reconcile this configuration with [TR] 6.150's H19 (p. 39): *"by lemma 6.55 with
 H16, `ρ_P̂(v′) # ρ_b`"*.  The step runs through p. 5's `▶◀` between `imm` and `own`, which
@@ -1053,6 +1070,13 @@ along it (`Fig16.LogRel.Typed.vX_local`).  Reading gives the content at the curr
 below every record stores the whole list (`Fig16.LogRel.Typed.ptoMutX_create`), 6.65's
 *"α ⊏ γ ⊓ β"* taken below every tag.
 
+The last conjunct of `ptoMutS`, `P̂ : Val → SProp_b`, asks that every resource the payload
+predicate holds of lie in stratum `b`.  At a `Mut @a T` whose `T` has a `⊸` or `∀`
+position, [TR] p. 47 supplies this *"by well-formedness of the type `Mut @a T₁`"*
+(`Δ ⊢ T₁ ⊐ @a`), which definition row 2.28 does not carry.  Where the conjunct fails,
+`𝒱X⟦Mut @a T⟧` has no member and `SemX` holds at any context with such a live slot; this is
+not derived in Lean here.  `adequacy`'s statement does not mention `SemX`, so it is unaffected.
+
 Literal reading: `Fig16.LogRel.vDen` has one list-independent predicate per cell.  One that
 mentions the list is not stable as it grows; one that does not cannot carry `CohE` at its
 `Imm` positions or `wpTS` at its `⊸` positions.  Neither half is machine-checked here.
@@ -1081,8 +1105,8 @@ lets it be chosen from types.  `Fig16.LogRel.Typed.wpTS_reborrow` is
 `Fig16.LogRel.Typed.rebChooseTW_deep`.  `TyEq` is needed because 6.162's `Δ-subst` moves a
 value between syntactically different types (`Fig16.LogRel.Typed.vX_tyEq`).
 
-Literal reading: without `CohE`, 6.175 at `Fig16.LogRel.Sem` needs
-`Fig16.LogRel.WithloadEscrow`, which §12.68 refuses.
+Literal reading: without `CohE`, 6.175 at `Fig16.LogRel.Sem` takes
+`Fig16.LogRel.WithloadEscrow` as a hypothesis (§12.68).
 
 ### §12.72 `⊸`/`∀` Kripke over the record list, and `wp` over tagged typed worlds
 
@@ -1112,9 +1136,9 @@ closure is not credited with records it holds no borrow of; the members are kept
 `Fig16.BoLo.wp_bind` … `Fig16.BoLo.wp_I_forget` with the post-world's `TW` constructor added.
 
 Literal reading: `Fig16.BoLo.wp` quantifies over every `ρ_f # ρ`, including §12.68's
-configuration, where `Sem`, `FundamentalProperty` and `WithloadEscrow` are refused.
-`Fig16.LogRel.fundamentalProperty` is 6.151 at the literal definitions, from
-`WithloadEscrow`.
+configuration.  `Fig16.LogRel.fundamentalProperty` runs 6.151's printed induction at the
+literal definitions with `WithloadEscrow` as a hypothesis at the `withload` case; it is not
+among the results.
 
 ### §12.73 Why the judgment tracks history
 

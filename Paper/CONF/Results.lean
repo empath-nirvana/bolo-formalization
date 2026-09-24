@@ -133,7 +133,7 @@ theorem reclaim : Adequacy.Reclaim := by
 end BoCa.Adequacy
 
 /-!
-## Lemma 3.1 (Fundamental Property) · `[CONF]` p. 415:17 · `proved*`
+## Lemma 3.1 (Fundamental Property) · `[CONF]` p. 415:17 · `variant`
 
 > If Δ; Γ ⊢ e : T then Δ; Γ ⊨ e : T.
 

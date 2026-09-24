@@ -40,7 +40,7 @@ The record is in `Paper/S6_4_StandardEntailments/Lemmas.lean`.
 -/
 /-- At an empty index type the premise is vacuous and the conclusion demands
 `ρ = ∅`; the witness is a resource with a cell.
-`[about ours: the printed 6.88 at the index type where it is false]` -/
+`[about ours: the printed 6.88 at an empty index type, which the printed proof's "Suppose X ≠ ∅" excludes]` -/
 theorem bang_all_needs_nonempty (l : Loc) (v : Val) :
     ¬ (all (fun _ : Empty => !ₛ(top : SPropU Loc Val)) ⊨
         !ₛ(all (fun _ : Empty => (top : SPropU Loc Val)))) := by

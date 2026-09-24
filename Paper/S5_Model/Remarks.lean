@@ -39,7 +39,7 @@ end BoCa.Fig16.BoLo
 /-!
 ### 5.67 · — [CONF] §4.3's characterisation of `✓`: *"in a valid resource, every pair of aliases map to the same object and each has an immutable ancestor"*, and *"aliasing of exclusive locations … not guarded by immutable cells … violates the mutability-xor-aliasing restriction"* — · [CONF] p. 415:21, not in [TR] §5 · `[as printed]`
 
-Prose characterising `✓ρ ≜ ⦇ρ⦈ defined` (row 5.59); [CONF] p. 415:21: *"the
+Prose characterising `✓ρ ≜ ⦇ρ⦈ defined` (row 5.23); [CONF] p. 415:21: *"the
 advantage of reusing composition is that it already rules out all of the
 inconsistent aliasing cases"*.  The clauses are theorems: *same object* is
 `CellU.compatR_iff` (with `CellU.CompatS.imm_imm` at `●`); *an immutable ancestor*
