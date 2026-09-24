@@ -71,7 +71,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ### 4.6 · `𝒱⟦[@a] T⟧δ(v) ≜ [@aδ] 𝒱⟦T⟧δ(v)` · [TR] p. 4 · `[encoding]`
@@ -132,7 +132,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 Row 4.15, continued.
@@ -186,7 +186,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 variable (δ : LSub) (v : Val)
 
 /-!
@@ -283,7 +283,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ### 4.11 · `ℰ⟦T⟧δ(v) ≜ wp (e) {𝒱⟦T⟧δ}` · [TR] p. 4 · `[repair]`

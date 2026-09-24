@@ -9,6 +9,7 @@ import Support.LogicalRelation.ClosingSubstitutions
 import Support.Model.Notation
 import Support.Model.Propositions
 import Support.Statics.Contexts
+import Support.Statics.Presupposed
 
 /-!
 # Support — LogicalRelation — Facts
@@ -25,7 +26,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 theorem atLife_eq {δ : LSub} {a : Lifetime.Life} {α : Life} (h : a.interp δ = some α)
     (F : Life → WProp) : atLife δ a F = F α := by
@@ -52,7 +53,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 variable (δ : LSub) (v : Val) (b : Lifetime.Life)
 
 /-- `Imm̲ 'b 1 ≜ 1` — clause (1). -/
@@ -133,7 +134,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 theorem gDen_iff {δ : LSub} {Γ : Ctx Ty} {γ : List Val} {ρ : WRes} :
     gDen δ Γ γ ρ ↔ (Ctx.LiveWithin Γ γ ∧ gSep δ Γ γ ρ) := pure_sep_iff

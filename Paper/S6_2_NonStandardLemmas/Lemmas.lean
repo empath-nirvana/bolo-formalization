@@ -4362,7 +4362,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ## Lemma 6.60 · `[TR]` p. 21 · inventory `proved`
@@ -4611,7 +4611,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-! `[about ours]` — what the Lean of Lemma 6.62 needs; the paper prints nothing here. -/
 /-- 6.62's fold over `⊛_{x∈dom(Γ)}`: `[]⋆` at each live slot and 6.60 at its

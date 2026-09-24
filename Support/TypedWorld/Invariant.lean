@@ -47,7 +47,7 @@ namespace BoCa.Fig16.LogRel.Typed
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
 /-- **Any step whose `ag` is contained in the old one keeps `ChainInv`** — every clause of `ChainInv`
@@ -948,11 +948,84 @@ theorem ag_none_of_top {W a : WRes} (hv : ResU.Valid W) (ha : AgW W a) {m : Loc}
       rw [AgW.functional haW ha] at hc
       exact (ex_ag_disjoint ⟨σ, eW, a, heW, ha, hc⟩ heW ha (ExS.get_of_ne_imm heW e hk) e').elim
 
+theorem lfree_immReborrow {x y : LifeVar} (T : Ty) :
+    LFree y (T.immReborrow (.var x)) → y = x ∨ LFree y T := by
+  induction T with
+  | unit => intro h; exact h.elim
+  | unk => intro h; exact h.elim
+  | sum T₁ T₂ ih₁ ih₂ =>
+      intro h
+      rcases h with h | h
+      · rcases ih₁ h with e | h'
+        · exact Or.inl e
+        · exact Or.inr (Or.inl h')
+      · rcases ih₂ h with e | h'
+        · exact Or.inl e
+        · exact Or.inr (Or.inr h')
+  | tensor T₁ T₂ ih₁ ih₂ =>
+      intro h
+      rcases h with h | h
+      · rcases ih₁ h with e | h'
+        · exact Or.inl e
+        · exact Or.inr (Or.inl h')
+      · rcases ih₂ h with e | h'
+        · exact Or.inl e
+        · exact Or.inr (Or.inr h')
+  | lolli _ _ _ _ => intro h; exact h.elim
+  | all _ _ _ _ => intro h; exact h.elim
+  | ref T _ =>
+      intro h
+      rcases h with h | h
+      · left; simpa [Lifetime.Life.mentions] using h
+      · exact Or.inr h
+  | imm a T _ => intro h; exact Or.inr h
+  | «mut» a T _ =>
+      intro h
+      rcases h with h | h
+      · left; simpa [Lifetime.Life.mentions] using h
+      · exact Or.inr (Or.inr h)
+  | box a T ih =>
+      intro h
+      rcases ih h with e | h'
+      · exact Or.inl e
+      · exact Or.inr (Or.inr h')
+
 /-- A position's pointee type has no free variable its outer type lacks. -/
 theorem RefPos.free {T : Ty} {v : Val} {l : Loc} {S : Ty} (h : RefPos T v l S) {y : LifeVar}
     (hy : LFree y S) : LFree y T := by
   by_contra hn
   exact RefPos.not_free h hn hy
+
+/-- At agreeing substitutions, `𝒱⟦Imm̲ 'x T⟧` is one predicate. -/
+theorem vShape_immReb_agree {T : Ty} {δ' δ : LSub} (h : AgreeOn T δ' δ) (x : LifeVar)
+    (β : Life) :
+    vShape (T.immReborrow (.var x)) (δ'.extend x β) = vShape (T.immReborrow (.var x)) (δ.extend x β) := by
+  refine vShape_congr _ (fun y hy => ?_)
+  rcases lfree_immReborrow _ hy with rfl | hy'
+  · rw [find?_extend_self, find?_extend_self]
+  · by_cases hxy : x = y
+    · subst hxy; rw [find?_extend_self, find?_extend_self]
+    · rw [find?_extend_ne _ _ hxy, find?_extend_ne _ _ hxy]; exact h y hy'
+
+/-- **A reborrow's view at a root is coherent**: the type it puts there is `Imm 'x S` at
+`δ[x↦β]`, `S` the root's pointee, and `x ∉ FV(S)`. -/
+theorem coh_root {rs : List FrameRec} {r : FrameRec} (hr : r ∈ rs) {x : LifeVar} {β : Life}
+    (hx : ¬ LFree x r.T) {m : Loc} {S : Ty} {u : Val} (hpos : RefPos r.T r.v m S)
+    (hown : r.R.get m = some (CellU.ownOf u)) : Coh rs m S (r.δ.extend x β) := by
+  refine Or.inr ⟨r, hr, none, u, Chain.one hpos hown, fun y hy => ?_⟩
+  have hxy : x ≠ y := fun e => RefPos.not_free hpos hx (e ▸ hy)
+  exact find?_extend_ne _ _ hxy
+
+/-- **…and at a child of a chain position**, for a reborrow run at a coherent `δ′`. -/
+theorem coh_child {rs : List FrameRec} {r : FrameRec} (hr : r ∈ rs) {p : Option Loc}
+    {l₀ : Loc} {S₀ : Ty} {u₀ : Val} (hch : Chain r.R r.T r.v p l₀ S₀ u₀) {δ' : LSub}
+    (hag : AgreeOn S₀ δ' r.δ) {x : LifeVar} {β : Life} (hx : ¬ LFree x S₀) {m : Loc}
+    {S : Ty} {u : Val} (hpos : RefPos S₀ u₀ m S) (hown : r.R.get m = some (CellU.ownOf u)) :
+    Coh rs m S (δ'.extend x β) := by
+  refine Or.inr ⟨r, hr, some l₀, u, hch.snoc hpos hown, fun y hy => ?_⟩
+  have hxy : x ≠ y := fun e => RefPos.not_free hpos hx (e ▸ hy)
+  rw [find?_extend_ne _ _ hxy]
+  exact hag y (hpos.free hy)
 
 /-- `XPath ρ p σ`: `σ` is `ρ`, or the witness of a `mut` cell of an `XPath` resource; `p`
 lists the `mut` locations passed.  `[about ours: the recursion of `ex`'s third factor, named]` -/
@@ -1723,6 +1796,11 @@ theorem TI.exIn {W : WRes} {ps rs : List FrameRec} (h : TI W ps rs) {r : FrameRe
     (hr : r ∈ rs) : ExIn W r.R := by
   obtain ⟨p, hp, hd⟩ := (h.2.2.2.2.2.2.1 r).mp hr
   exact (lineage_of_leInv h.2.1 hp hd).1
+
+theorem TI.sub {W : WRes} {ps rs : List FrameRec} (h : TI W ps rs) {r d : FrameRec}
+    (hr : r ∈ rs) (hd : SubRec r d) : d ∈ rs := by
+  obtain ⟨p, hp, hpr⟩ := (h.2.2.2.2.2.2.1 r).mp hr
+  exact (h.2.2.2.2.2.2.1 d).mpr ⟨p, hp, hpr.sub hd⟩
 
 /-- The frame's escrow sits in `ex(W)_●` unchanged, and not at `ℓ`. -/
 theorem frame_ex {W X Z R eW : WRes} {l : Loc} {v : Val}
@@ -2629,6 +2707,33 @@ theorem TW.inv {W : WRes} {ps rs : List FrameRec} (h : TW W ps rs) : TI W ps rs 
         rw [w₀', wχ, CellU.wit_immOf] at o
         exact ih.2.2.2.1 r' hr' r hr u (o _ u hu)
       exact ti_endReb hvW hle hreb hW hβ hexcl ih
+
+/-- **The type a reborrow puts at a `Mut` position is coherent**: `Imm̲ 'x (Mut @a S) =
+Imm 'x S` at `δ[x↦β]`, against the sub-record at that position. -/
+theorem coh_mut {W : WRes} {ps rs : List FrameRec} (hTW : TW W ps rs) {r₀ : FrameRec}
+    (hr₀ : r₀ ∈ rs) {x : LifeVar} {β : Life} (hx : ¬ LFree x r₀.T) {m : Loc} {S : Ty}
+    (hS : MutPos r₀.T r₀.v m S) : Coh rs m S (r₀.δ.extend x β) := by
+  have hR₀ := (hTW.inv.1.2.2.2.1 r₀ hr₀).1
+  obtain ⟨ζ, eζ, kζ, -⟩ := mut_split_den hS hR₀
+  have hd : SubRec r₀ ⟨m, ζ.erase, ζ.wit, S, r₀.δ⟩ := ⟨rfl, GPos.here hS, ζ, eζ, kζ, rfl, rfl⟩
+  refine Or.inl ⟨_, hTW.inv.sub hr₀ hd, rfl, rfl, fun y hy => ?_⟩
+  have hxy : x ≠ y := fun e => hx (e ▸ hS.free hy)
+  exact find?_extend_ne _ _ hxy
+
+/-- …and below a chain position, for a reborrow run at a coherent `δ′`. -/
+theorem coh_mut_child {W : WRes} {ps rs : List FrameRec} (hTW : TW W ps rs) {r : FrameRec}
+    (hr : r ∈ rs) {p : Option Loc} {l₀ : Loc} {S₀ : Ty} {u₀ : Val}
+    (hch : Chain r.R r.T r.v p l₀ S₀ u₀) {δ' : LSub} (hag : AgreeOn S₀ δ' r.δ) {x : LifeVar}
+    {β : Life} (hx : ¬ LFree x S₀) {m : Loc} {S : Ty} (hS : MutPos S₀ u₀ m S) :
+    Coh rs m S (δ'.extend x β) := by
+  have hR := (hTW.inv.1.2.2.2.1 r hr).1
+  have hg : GPos r.R r.T r.v m S := GPos.of_chain hch hS
+  obtain ⟨ζ, eζ, kζ, -⟩ := gpos_mut_cell hg hR (fun _ _ e => e)
+  have hd : SubRec r ⟨m, ζ.erase, ζ.wit, S, r.δ⟩ := ⟨rfl, hg, ζ, eζ, kζ, rfl, rfl⟩
+  refine Or.inl ⟨_, hTW.inv.sub hr hd, rfl, rfl, fun y hy => ?_⟩
+  have hxy : x ≠ y := fun e => hx (e ▸ hS.free hy)
+  rw [find?_extend_ne _ _ hxy]
+  exact hag y (hS.free hy)
 
 /-- **A typed record whose escrow has an `ex(R)_●` has a finite lineage.** -/
 theorem lineage_list {r : FrameRec} (hR : vShape r.T r.δ r.v r.R) (hadm : AdmWf r.T r.δ)

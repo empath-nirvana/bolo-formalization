@@ -30,6 +30,8 @@ for key,d,title,pages,(a,b),intro in SUBS:
     txt="/-!\n# [TR] §%s %s  (%s)\n\n%s%s\n\n**Stage 2.**  This file will hold the numbered results of the subsection, in printed order,\neach under its printed statement and proof, with the Lean declaration moved from the\nsource and a numbered alias.  The results, with the inventory's status and the\ndeclaration `Bridge/Plan.csv` assigns to each:\n\n%s\n-/\n" % (key,title,pages,intro,"\n" if intro else "", "\n".join(items))
     os.makedirs(OUT+"/Paper/"+d,exist_ok=True)
     open(OUT+"/Paper/%s/Lemmas.lean"%d,"w").write(txt)
+if "CONF" in json.load(open("cfg.json"))["stage2_sections"]:
+    print("ok"); raise SystemExit
 conf=[o for o in rows if o["doc"].startswith("paper") and o["row"].startswith("3.")]
 items=["* **%s %s** (%s) — %s" % (o["cells"][2].strip(),o["row"],o["cells"][3].strip(),o["cells"][4].strip()) for o in conf]
 txt="""/-!

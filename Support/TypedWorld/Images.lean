@@ -46,7 +46,7 @@ namespace BoCa.Fig16.LogRel.Typed
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {R : CellU Loc Val → CellU Loc Val → Prop}
 
@@ -60,7 +60,7 @@ namespace BoCa.Fig16.LogRel.Typed
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
 theorem single_ne {l l' : Loc} (ψ : CellU Loc Val) (h : l' ≠ l) : (ResU.single l ψ).get l' = none :=
@@ -918,6 +918,141 @@ theorem interp_ext_self (δ : LSub) (x : LifeVar) (β : Life) :
     (Lifetime.Life.var x).interp (δ.extend x β) = some β := by
   rw [Lifetime.Life.interp_var, find?_extend_self]
 
+/-- **…and it is in `reb_β(R)`, by the same `π`.** -/
+theorem relabel_reb {R c₀ : WRes} {β β₀ : Life} (hRβ : R.InStratum β)
+    (hr : ResU.Reb β₀ R c₀) : ResU.Reb β R (relRes R β c₀) := by
+  obtain ⟨-, π, b, hdom, hbig, hle, hbody⟩ := hr
+  refine ⟨hRβ, π, b, ⟨hdom.1, fun m => ?_⟩, hbig, hle, fun m p hp => ?_⟩
+  · rw [hdom.2 m, relRes_get]
+    constructor
+    · rintro ⟨ψ, e⟩; exact ⟨_, by rw [e]; rfl⟩
+    · rintro ⟨ψ, e⟩
+      obtain ⟨ψ₀, e₀, -⟩ := Option.map_eq_some_iff.mp e
+      exact ⟨ψ₀, e₀⟩
+  have hq := hbody m p hp
+  have hmem : p ∈ π.map Prod.snd := List.mem_map.mpr ⟨_, hp, rfl⟩
+  obtain ⟨b', hb', hle'⟩ := BigComp.leS_of_sublist (List.singleton_sublist.mpr hmem) hbig
+  rw [(BigComp.singleton_iff ResU.compLawsS).mp hb'] at hle'
+  have hpR : ResU.Le p R := hle'.trans hle
+  refine ⟨hq.1, fun u hown => ?_, fun b₀ v χ hb P hw hmut => ?_, fun s v χ h himm => ?_⟩
+  · obtain ⟨h₀, e₀⟩ := hq.2.1 u hown
+    have hβ := del_stratum_of_le (l := m) hpR hRβ
+    refine ⟨hβ, ?_⟩
+    rw [relRes_get, e₀]
+    simp only [Option.map_some]
+    rw [relCell_fire hown (by simp) hβ]
+  · obtain ⟨⟨h₀, e₀⟩, hd⟩ := hq.2.2.1 b₀ v χ hb P hw hmut
+    have hcell := hRβ m _ hmut
+    have hβ : χ.InStratum (LSet.singleton β).join :=
+      ResU.InStratum.mono (le_of_lt hcell) hb
+    refine ⟨⟨hβ, ?_⟩, hd⟩
+    rw [relRes_get, e₀]
+    simp only [Option.map_some]
+    rw [relCell_fire hmut (by simp) hβ]
+  · obtain ⟨⟨t, ht, hsub, e₀⟩, hd⟩ := hq.2.2.2 s v χ h himm
+    refine ⟨⟨t, ht, hsub, ?_⟩, hd⟩
+    rw [relRes_get, e₀]
+    simp only [Option.map_some]
+    rw [relCell_keep himm rfl]
+
+/-- `○` against an `imm` cell reads only its value and witness. -/
+theorem compatR_imm_congr' {s' : LSet} {v' : Val} {ρ' : WRes} {hs' : ρ'.InStratum s'.join}
+    {ψ ζ : CellU Loc Val} (k : ψ.kind = Kind.imm) (he : v' = ψ.erase) (hw : ρ' = ψ.wit)
+    (h : CellU.CompatR ψ ζ) : CellU.CompatR (CellU.immOf s' v' ρ' hs') ζ := by
+  obtain ⟨χ, hc⟩ := h
+  cases hc with
+  | same =>
+      exact ⟨_, CellU.CompR.strict (CellU.compatS_iff.mpr ⟨rfl, k, by simpa using he,
+        by simpa using hw⟩)⟩
+  | strict kk =>
+      obtain ⟨-, k₂, e₂, w₂⟩ := CellU.compatS_iff.mp kk
+      exact ⟨_, CellU.CompR.strict (CellU.compatS_iff.mpr ⟨rfl, k₂,
+        by rw [← e₂]; simpa using he, by rw [← w₂]; simpa using hw⟩)⟩
+  | mutMut => exact absurd k (by simp)
+  | mutOwn => exact absurd k (by simp)
+  | ownMut => exact absurd k (by simp)
+  | immOwn s v ρ h =>
+      simp only [CellU.erase_immOf, CellU.wit_immOf] at he hw
+      subst he; subst hw
+      exact ⟨_, CellU.CompR.immOwn s' _ _ hs'⟩
+  | ownImm => exact absurd k (by simp)
+  | immMut s v ρ h b hb P hP =>
+      simp only [CellU.erase_immOf, CellU.wit_immOf] at he hw
+      subst he; subst hw
+      exact ⟨_, CellU.CompR.immMut s' _ _ hs' b hb P hP⟩
+  | mutImm => exact absurd k (by simp)
+
+theorem compatR_imm_congr {ψ ψ' ζ : CellU Loc Val} (k : ψ.kind = Kind.imm)
+    (k' : ψ'.kind = Kind.imm) (he : ψ'.erase = ψ.erase) (hw : ψ'.wit = ψ.wit)
+    (h : CellU.CompatR ψ ζ) : CellU.CompatR ψ' ζ := by
+  obtain ⟨s', hs', e'⟩ := CellU.imm_eta k'
+  rw [e']
+  exact compatR_imm_congr' k he hw h
+
+theorem agWitsI_congr {ρ ρ' : WRes}
+    (hc : ∀ l ψ, ρ.get l = some ψ → ∃ ψ', ρ'.get l = some ψ' ∧ ψ'.kind = ψ.kind ∧
+      ψ'.wit = ψ.wit) :
+    ∀ (wi : List (Loc × WRes)), AgWitsI ρ wi → AgWitsI ρ' wi := by
+  intro wi
+  induction wi with
+  | nil => intro _; exact AgWitsI.nil
+  | cons q wi ih =>
+      intro h
+      cases h with
+      | cons ψ hψ hk e a hex hag hp hw =>
+          obtain ⟨ψ', e', k', w'⟩ := hc _ ψ hψ
+          exact AgWitsI.cons ψ' e' (k'.trans hk) e a (w' ▸ hex) (w' ▸ hag) hp (ih hw)
+
+/-- **`ag` of a re-taken image is defined when the original's is**: every cell is `imm`,
+and the walk reads an `imm` cell only at its value and witness. -/
+theorem agW_relRes {R ρ A : WRes} {β : Life}
+    (hall : ∀ m ψ, ρ.get m = some ψ → ψ.kind = Kind.imm) (h : AgW ρ A) :
+    ∃ A', AgW (relRes R β ρ) A' := by
+  cases h with
+  | mk hsm hsi hwm hwi hbm hbi ha hσ =>
+      rename_i a bm bi wm wi
+      have hwm0 : wm.map Prod.fst = [] :=
+        ResU.sites_nil_of_none hsm (fun l ψ e => by rw [hall l ψ e]; simp)
+      have hwm1 : wm = [] := List.map_eq_nil_iff.mp hwm0
+      subst hwm1
+      have hbm0 : bm = PMap.empty := BigComp.nil_inv hbm
+      subst hbm0
+      have ha0 : a = ρ.restrict Kind.imm := ResU.CompR.functional ha (ResU.comp_empty_right _)
+      subst ha0
+      have hget : ∀ l ψ', (relRes R β ρ).get l = some ψ' →
+          ∃ ψ, ρ.get l = some ψ ∧ ψ' = relCell R β l ψ := by
+        intro l ψ' e
+        rw [relRes_get] at e
+        obtain ⟨ψ, e₀, rfl⟩ := Option.map_eq_some_iff.mp e
+        exact ⟨ψ, e₀, rfl⟩
+      have hkind : ∀ l ψ', (relRes R β ρ).get l = some ψ' → ψ'.kind = Kind.imm := by
+        intro l ψ' e
+        obtain ⟨ψ, e₀, rfl⟩ := hget l ψ' e
+        rw [(relCell_props R β l ψ).2.2]; exact hall l ψ e₀
+      have hsm' : ResU.Sites (relRes R β ρ) Kind.mut (([] : List (Loc × WRes)).map Prod.fst) :=
+        ⟨List.nodup_nil, fun l => ⟨fun h => absurd h (by simp), fun ⟨ψ', e, k⟩ => by
+          rw [hkind l ψ' e] at k; cases k⟩⟩
+      have hsi' : ResU.Sites (relRes R β ρ) Kind.imm (wi.map Prod.fst) := by
+        refine ⟨hsi.1, fun l => (hsi.2 l).trans ⟨fun ⟨ψ, e, k⟩ => ?_, fun ⟨ψ', e, k⟩ => ?_⟩⟩
+        · exact ⟨relCell R β l ψ, by rw [relRes_get, e]; rfl, by
+            rw [(relCell_props R β l ψ).2.2]; exact k⟩
+        · obtain ⟨ψ, e₀, rfl⟩ := hget l ψ' e
+          exact ⟨ψ, e₀, hall l ψ e₀⟩
+      have hwi' : AgWitsI (relRes R β ρ) wi := agWitsI_congr (fun l ψ e =>
+        ⟨relCell R β l ψ, by rw [relRes_get, e]; rfl, (relCell_props R β l ψ).2.2,
+          (relCell_props R β l ψ).2.1⟩) wi hwi
+      obtain ⟨σ', hσ'⟩ := (ResU.compR_defined_iff ((relRes R β ρ).restrict Kind.imm) bi).mpr
+        (by
+          intro l ψ₁ ψ₂ e₁ e₂
+          obtain ⟨e₁', -⟩ := ResU.restrict_eq_some.mp e₁
+          obtain ⟨ψ, e₀, rfl⟩ := hget l ψ₁ e₁'
+          have hk₀ := hall l ψ e₀
+          have hc₀ := hσ.1 l ψ ψ₂ (ResU.restrict_eq_some.mpr ⟨e₀, hk₀⟩) e₂
+          obtain ⟨r₁, w₁, q₁⟩ := relCell_props R β l ψ
+          exact compatR_imm_congr hk₀ (q₁.trans hk₀) r₁ w₁ hc₀)
+      exact ⟨σ', AgW.mk hsm' hsi' AgWitsM.nil hwi' BigComp.nil hbi
+        (ResU.comp_empty_right _) hσ'⟩
+
 /-- **The views at a record's roots come from one typed reborrow.**  If any root of `r` has a
 view in `ag(W)`, there is a typed image `c₀ ∈ reb_β₀(R) ∩ 𝒱⟦Imm̲ 'x₀ T⟧` with `ag(c₀)`
 defined whose cell at every root carries the witness of the view there.  A reborrow of `R`
@@ -1608,6 +1743,245 @@ theorem chainInv_rebDeep {W W' c : WRes} {rs : List FrameRec} {r₀ : FrameRec} 
       · obtain ⟨ψ₂, e₂, k₂, w₂⟩ := back m' S' u' hc' a₁ ha₁ ψ₁ e₁ hk₁
         obtain ⟨ζ, eζ, wζ⟩ := q5 m' S' u' hc' aW haW ψ₂ e₂ k₂
         exact ⟨ζ, eζ, w₂.trans wζ⟩
+
+/-- `ψ` at `x` has a counterpart in `a`: a cell over the same value, non-`own` over the same
+witness when `ψ` is not `own`. -/
+def Cp (a : WRes) (x : Loc) (ψ : CellU Loc Val) : Prop :=
+  ∃ ζ : CellU Loc Val, a.get x = some ζ ∧ ζ.erase = ψ.erase ∧
+    (ψ.kind ≠ Kind.own → ζ.kind ≠ Kind.own ∧ ζ.wit = ψ.wit)
+
+/-- Every cell of `ρ` has a counterpart in `a`. -/
+def AllCp (a ρ : WRes) : Prop := ∀ x ψ, ρ.get x = some ψ → Cp a x ψ
+
+theorem cp_compat {a : WRes} {x : Loc} {ψ₁ ψ₂ : CellU Loc Val} (h₁ : Cp a x ψ₁)
+    (h₂ : Cp a x ψ₂) : CellU.CompatR ψ₁ ψ₂ := by
+  obtain ⟨ζ₁, e₁, r₁, w₁⟩ := h₁
+  obtain ⟨ζ₂, e₂, r₂, w₂⟩ := h₂
+  rw [e₁] at e₂; cases Option.some.inj e₂
+  exact CellU.compatR_iff.mpr ⟨r₁.symm.trans r₂, fun k₁ k₂ => (w₁ k₁).2.symm.trans (w₂ k₂).2⟩
+
+theorem cp_comp {a : WRes} {x : Loc} {ψ₁ ψ₂ ψ : CellU Loc Val} (hC : CellU.CompR ψ₁ ψ₂ ψ)
+    (h₁ : Cp a x ψ₁) (h₂ : Cp a x ψ₂) : Cp a x ψ := by
+  obtain ⟨ζ₁, e₁, r₁, w₁⟩ := h₁
+  refine ⟨ζ₁, e₁, r₁.trans (CellU.CompR.erase hC).2.symm, fun hk => ?_⟩
+  rcases CellU.CompR.back_view hC hk with ⟨k, w⟩ | ⟨k, w⟩
+  · obtain ⟨kz, wz⟩ := w₁ k; exact ⟨kz, wz.trans w.symm⟩
+  · obtain ⟨ζ₂, e₂, r₂, w₂⟩ := h₂
+    rw [e₁] at e₂; cases Option.some.inj e₂
+    obtain ⟨kz, wz⟩ := w₂ k; exact ⟨kz, wz.trans w.symm⟩
+
+theorem comp_allCp {a ρ₁ ρ₂ : WRes} (h₁ : AllCp a ρ₁) (h₂ : AllCp a ρ₂) :
+    ∃ ρ, ResU.CompR ρ₁ ρ₂ ρ ∧ AllCp a ρ := by
+  obtain ⟨ρ, hρ⟩ := (ResU.compR_defined_iff ρ₁ ρ₂).mpr
+    (fun x ψ₁ ψ₂ e₁ e₂ => cp_compat (h₁ x ψ₁ e₁) (h₂ x ψ₂ e₂))
+  refine ⟨ρ, hρ, fun x ψ e => ?_⟩
+  rcases ResU.Comp.get hρ x with ⟨-, -, e'⟩ | ⟨ζ, e₁, -, e'⟩ | ⟨ζ, -, e₂, e'⟩ |
+      ⟨ζ₁, ζ₂, ζ, e₁, e₂, e', hC⟩
+  · rw [e'] at e; cases e
+  · rw [e'] at e; cases e; exact h₁ x _ e₁
+  · rw [e'] at e; cases e; exact h₂ x _ e₂
+  · rw [e'] at e; cases e; exact cp_comp hC (h₁ x _ e₁) (h₂ x _ e₂)
+
+theorem bigComp_allCp {a : WRes} :
+    ∀ (xs : List WRes), (∀ ρ ∈ xs, AllCp a ρ) →
+      ∃ b, BigComp CellU.CompatR CellU.CompR xs b ∧ AllCp a b
+  | [], _ => ⟨PMap.empty, BigComp.nil, fun x ψ e => by cases e⟩
+  | ρ :: xs, h => by
+      obtain ⟨b, hb, hab⟩ := bigComp_allCp xs (fun σ hσ => h σ (List.mem_cons_of_mem _ hσ))
+      obtain ⟨c, hc, hac⟩ := comp_allCp (h ρ List.mem_cons_self) hab
+      exact ⟨c, BigComp.cons hb hc, hac⟩
+
+theorem allCp_left {a₁ a₂ a : WRes} (h : ResU.CompR a₁ a₂ a) : AllCp a a₁ := by
+  intro x ψ e
+  rcases ResU.Comp.get h x with ⟨e₁, -, -⟩ | ⟨ζ, e₁, -, e'⟩ | ⟨ζ, e₁, -, -⟩ |
+      ⟨ζ₁, ζ₂, ζ, e₁, e₂, e', hC⟩
+  · rw [e₁] at e; cases e
+  · rw [e₁] at e; cases e; exact ⟨_, e', rfl, fun k => ⟨k, rfl⟩⟩
+  · rw [e₁] at e; cases e
+  · rw [e₁] at e; cases e
+    refine ⟨ζ, e', (CellU.CompR.erase hC).2, fun hk => ?_⟩
+    obtain ⟨ψ', e'', k', w'⟩ := lift_view h e₁ hk
+    rw [e'] at e''; cases Option.some.inj e''
+    exact ⟨k', w'⟩
+
+theorem allCp_right {a₁ a₂ a : WRes} (h : ResU.CompR a₁ a₂ a) : AllCp a a₂ :=
+  allCp_left (ResU.CompR.comm h)
+
+theorem allCp_trans {a b c : WRes} (h₁ : AllCp b a) (h₂ : AllCp c b) : AllCp c a := by
+  intro x ψ e
+  obtain ⟨ζ, e₁, r₁, w₁⟩ := h₁ x ψ e
+  obtain ⟨ξ, e₂, r₂, w₂⟩ := h₂ x ζ e₁
+  refine ⟨ξ, e₂, r₂.trans r₁, fun hk => ?_⟩
+  obtain ⟨k₁, wz⟩ := w₁ hk
+  obtain ⟨k₂, wx⟩ := w₂ k₁
+  exact ⟨k₂, wx.trans wz⟩
+
+theorem reb_cell_erase {β : Life} {σ c : WRes} (hr : ResU.Reb β σ c) {m : Loc}
+    {ψ : CellU Loc Val} (e : c.get m = some ψ) :
+    ∃ ζ : CellU Loc Val, σ.get m = some ζ ∧ ζ.erase = ψ.erase := by
+  obtain ⟨-, π, b, hdom, hbig, hle, hbody⟩ := hr
+  obtain ⟨⟨l₀, q⟩, hpm, hpl⟩ := List.mem_map.mp ((hdom.2 m).mpr ⟨_, e⟩)
+  simp only at hpl
+  subst hpl
+  have hq := hbody l₀ q hpm
+  have hmem : q ∈ π.map Prod.snd := List.mem_map.mpr ⟨_, hpm, rfl⟩
+  obtain ⟨b', hb', hle'⟩ := BigComp.leS_of_sublist (List.singleton_sublist.mpr hmem) hbig
+  rw [(BigComp.singleton_iff ResU.compLawsS).mp hb'] at hle'
+  obtain ⟨ζq, hζq⟩ := hq.1
+  obtain ⟨τ, hτ⟩ := hle'.trans hle
+  obtain ⟨ζ, hζ⟩ := comp_some hτ hζq
+  refine ⟨ζ, hζ, ?_⟩
+  rcases CellU.rep ζ with ⟨u, rfl⟩ | ⟨s, v, χ, hs, rfl⟩ | ⟨b₀, v, χ, hb₀, P, hw, rfl⟩
+  · obtain ⟨hh, he⟩ := hq.2.1 u hζ
+    rw [e] at he; cases Option.some.inj he; simp
+  · obtain ⟨⟨t, ht, -, he⟩, -⟩ := hq.2.2.2 s v χ hs hζ
+    rw [e] at he; cases Option.some.inj he; simp
+  · obtain ⟨⟨hh, he⟩, -⟩ := hq.2.2.1 b₀ v χ hb₀ P hw hζ
+    rw [e] at he; cases Option.some.inj he; simp
+
+open Classical in
+/-- `ag(W)` with the image's cells put in at the image's `own`-sourced locations. -/
+def plusRes (aW c σ₀ : WRes) : WRes where
+  get x := if (∃ ψ u, c.get x = some ψ ∧ σ₀.get x = some (CellU.ownOf u)) then c.get x
+    else aW.get x
+  finite := by
+    obtain ⟨d₁, h₁⟩ := c.finite
+    obtain ⟨d₂, h₂⟩ := aW.finite
+    refine ⟨d₁ ++ d₂, fun l hl => ?_⟩
+    dsimp only at hl
+    by_cases hc : ∃ ψ u, c.get l = some ψ ∧ σ₀.get l = some (CellU.ownOf u)
+    · rw [if_pos hc] at hl; exact List.mem_append_left _ (h₁ l hl)
+    · rw [if_neg hc] at hl; exact List.mem_append_right _ (h₂ l hl)
+
+open Classical in
+theorem plusRes_own {aW c σ₀ : WRes} {x : Loc} {ψ : CellU Loc Val} {u : Val}
+    (e : c.get x = some ψ) (hu : σ₀.get x = some (CellU.ownOf u)) :
+    (plusRes aW c σ₀).get x = some ψ := by
+  show (if _ then _ else _) = _
+  rw [if_pos ⟨ψ, u, e, hu⟩, e]
+
+open Classical in
+theorem plusRes_other {aW c σ₀ : WRes} {x : Loc}
+    (h : ¬ ∃ ψ u, c.get x = some ψ ∧ σ₀.get x = some (CellU.ownOf u)) :
+    (plusRes aW c σ₀).get x = aW.get x := by
+  show (if _ then _ else _) = _
+  rw [if_neg h]
+
+/-- **`ag` of a reborrow image is defined when none of its `own`-sourced locations carries a
+view in `ag(W)`.**  `c ∈ reb_β(σ₀)`, `σ₀` the escrow of an `imm` cell of `W`. -/
+theorem agW_image_noview {W aW σ₀ c : WRes} {le : Loc} {s : LSet} {v : Val}
+    {hs : σ₀.InStratum s.join} {β : Life} (haW : AgW W aW)
+    (hle : W.get le = some (CellU.immOf s v σ₀ hs)) (hr : ResU.Reb β σ₀ c)
+    (hroot : ∀ x (ψ : CellU Loc Val) (u : Val), c.get x = some ψ →
+      σ₀.get x = some (CellU.ownOf u) → ∀ ζ : CellU Loc Val, aW.get x = some ζ →
+      ζ.kind = Kind.own) :
+    ∃ A, AgW c A := by
+  -- the escrow's walks, and their counterparts in `ag(W)`
+  obtain ⟨a₁, a₂, -, h₂, h12⟩ := (AgW.split (ResU.del_compS hle)).mp haW
+  obtain ⟨e₀, a₀, p₀, he₀, ha₀, hp₀, hcp₀⟩ := AgW.single_imm_inv h₂
+  have cp₀ : AllCp aW p₀ := allCp_trans (allCp_right hcp₀) (allCp_right h12)
+  have cpe : AllCp aW e₀ := allCp_trans (allCp_left hp₀) cp₀
+  have cpa : AllCp aW a₀ := allCp_trans (allCp_right hp₀) cp₀
+  set aP := plusRes aW c σ₀ with haP
+  -- the value `ag(W)` carries at an owned cell of the escrow
+  have ownVal : ∀ x u, σ₀.get x = some (CellU.ownOf u) → ∀ ζ : CellU Loc Val,
+      aW.get x = some ζ → ζ.erase = u := by
+    intro x u hu ζ hζ
+    obtain ⟨χ, eχ, rχ, -⟩ := ExR.get_of_ne_imm he₀ hu (by simp)
+    obtain ⟨ξ, eξ, rξ, -⟩ := cpe x χ eχ
+    rw [hζ] at eξ; cases Option.some.inj eξ
+    rw [rξ, rχ]; rfl
+  -- counterparts in `ag(W)` are counterparts in `aP`
+  have plus : ∀ ρ, AllCp aW ρ → AllCp aP ρ := by
+    intro ρ hρ x ψ e
+    obtain ⟨ζ, eζ, rζ, wζ⟩ := hρ x ψ e
+    by_cases hc : ∃ ψ' u, c.get x = some ψ' ∧ σ₀.get x = some (CellU.ownOf u)
+    · obtain ⟨ψ', u, e', hu⟩ := hc
+      have kζ := hroot x ψ' u e' hu ζ eζ
+      refine ⟨ψ', plusRes_own e' hu, ?_, fun hk => absurd kζ (wζ hk).1⟩
+      obtain ⟨ζ', eζ', rζ'⟩ := reb_cell_erase hr e'
+      rw [hu] at eζ'; cases Option.some.inj eζ'
+      rw [← rζ', ← rζ, ownVal x u hu ζ eζ]; rfl
+    · exact ⟨ζ, (plusRes_other hc).trans eζ, rζ, wζ⟩
+  -- the image's own cells have counterparts in `aP`
+  have cpc : AllCp aP c := by
+    intro x ψ e
+    obtain ⟨-, hcase⟩ := reb_cell hr e
+    obtain ⟨ζ₀, eζ₀, rζ₀⟩ := reb_cell_erase hr e
+    rcases hcase with ⟨u, q, h, hown, rfl, -, -⟩ | ⟨ζ, eζ, kζ, wζ⟩ | ⟨ζ, eζ, kζ, wζ⟩
+    · exact ⟨_, plusRes_own e hown, rfl, fun k => ⟨k, rfl⟩⟩
+    · rw [eζ] at eζ₀; cases Option.some.inj eζ₀
+      obtain ⟨χ, eχ, rχ, hχ⟩ := ExR.get_of_ne_imm he₀ eζ (by rw [kζ]; simp)
+      obtain ⟨wχ, kχ⟩ := hχ (by rw [kζ]; simp)
+      obtain ⟨ξ, eξ, rξ, wξ⟩ := cpe x χ eχ
+      obtain ⟨kξ, wξ'⟩ := wξ kχ
+      refine plus _ (fun y φ ey => ?_) x ψ (ResU.single_get_self x ψ)
+      obtain ⟨rfl, rfl⟩ := ResU.single_get_eq_some ey
+      exact ⟨ξ, eξ, by rw [rξ, rχ, rζ₀], fun _ => ⟨kξ, by rw [wξ', wχ, wζ]⟩⟩
+    · rw [eζ] at eζ₀; cases Option.some.inj eζ₀
+      obtain ⟨χ, eχ, kχ, rχ, wχ⟩ := AgW.get_imm ha₀ eζ kζ
+      obtain ⟨ξ, eξ, rξ, wξ⟩ := cpa x χ eχ
+      obtain ⟨kξ, wξ'⟩ := wξ (by rw [kχ]; simp)
+      refine plus _ (fun y φ ey => ?_) x ψ (ResU.single_get_self x ψ)
+      obtain ⟨rfl, rfl⟩ := ResU.single_get_eq_some ey
+      exact ⟨ξ, eξ, by rw [rξ, rχ, rζ₀], fun _ => ⟨kξ, by rw [wξ', wχ, wζ]⟩⟩
+  -- each witness's `ex(w)_○ ○ ag(w)` is defined, with counterparts in `aP`
+  have piece : ∀ x (ψ : CellU Loc Val), c.get x = some ψ →
+      ∃ e a p, ExR ψ.wit e ∧ AgW ψ.wit a ∧ ResU.CompR e a p ∧ AllCp aP p := by
+    intro x ψ e
+    obtain ⟨-, hcase⟩ := reb_cell hr e
+    rcases hcase with ⟨u, q, h, hown, rfl, hqσ, ζq, hζq⟩ | ⟨ζ, eζ, kζ, wζ⟩ | ⟨ζ, eζ, kζ, wζ⟩
+    · rw [CellU.wit_immOf]
+      obtain ⟨τ, hτ⟩ : ResU.Le (q.del x) σ₀ := ResU.Le.trans ⟨_, ResU.del_compS hζq⟩ hqσ
+      obtain ⟨et, _, het, -, hce⟩ := (ExR.split_of_compS hτ).mp he₀
+      obtain ⟨at', _, hat, -, hca⟩ := (AgW.split hτ).mp ha₀
+      obtain ⟨p, hp, cpp⟩ := comp_allCp (allCp_trans (allCp_left hce) cpe)
+        (allCp_trans (allCp_left hca) cpa)
+      exact ⟨et, at', p, het, hat, hp, plus p cpp⟩
+    · obtain ⟨ev', z, hev', hz⟩ := ExW.wit_le hRR ResU.compLawsR he₀ eζ kζ
+      obtain ⟨av', z', hav', hz'⟩ := AgW.mut_wit_le ha₀ eζ kζ
+      rw [← wζ] at hev' hav'
+      obtain ⟨p, hp, cpp⟩ := comp_allCp (allCp_trans (allCp_left hz) cpe)
+        (allCp_trans (allCp_left hz') cpa)
+      exact ⟨ev', av', p, hev', hav', hp, plus p cpp⟩
+    · obtain ⟨ev', av', p', z, hev', hav', hp', hz⟩ := AgW.imm_wit_le ha₀ eζ kζ
+      rw [← wζ] at hev' hav'
+      exact ⟨ev', av', p', hev', hav', hp', plus p' (allCp_trans (allCp_left hz) cpa)⟩
+  -- the `imm` family, along `c`'s domain
+  have hkind : ∀ x (ψ : CellU Loc Val), c.get x = some ψ → ψ.kind = Kind.imm :=
+    fun x ψ e => (reb_cell hr e).1
+  obtain ⟨-, π, b, hdom, -, -, -⟩ := hr
+  have fam : ∀ d : List Loc, (∀ x ∈ d, ∃ ψ, c.get x = some ψ) →
+      ∃ wi : List (Loc × WRes), wi.map Prod.fst = d ∧ AgWitsI c wi ∧
+        ∀ q ∈ wi, AllCp aP q.2 := by
+    intro d
+    induction d with
+    | nil => intro _; exact ⟨[], rfl, AgWitsI.nil, fun q hq => absurd hq (by simp)⟩
+    | cons x d ih =>
+        intro hd
+        obtain ⟨wi, hwi, hag, hcp⟩ := ih (fun y hy => hd y (List.mem_cons_of_mem _ hy))
+        obtain ⟨ψ, eψ⟩ := hd x List.mem_cons_self
+        obtain ⟨e, a, p, he, ha, hp, cpp⟩ := piece x ψ eψ
+        refine ⟨(x, p) :: wi, by simp [hwi], AgWitsI.cons ψ eψ (hkind x ψ eψ) e a he ha hp hag,
+          fun q hq => ?_⟩
+        rcases List.mem_cons.mp hq with rfl | hq
+        · exact cpp
+        · exact hcp q hq
+  obtain ⟨wi, hwi, hagi, hcpi⟩ :=
+    fam (π.map Prod.fst) (fun x hx => (hdom.2 x).mp hx)
+  obtain ⟨bi, hbi, cpbi⟩ := bigComp_allCp (wi.map Prod.snd) (fun ρ hρ => by
+    obtain ⟨q, hq, rfl⟩ := List.mem_map.mp hρ; exact hcpi q hq)
+  have cpr : AllCp aP (c.restrict Kind.imm) := fun x ψ e =>
+    cpc x ψ (ResU.restrict_eq_some.mp e).1
+  obtain ⟨σ, hσ, -⟩ := comp_allCp cpr cpbi
+  have hsm : ResU.Sites c Kind.mut (([] : List (Loc × WRes)).map Prod.fst) :=
+    ⟨List.nodup_nil, fun l => ⟨fun h => absurd h (by simp), fun ⟨ψ, e, k⟩ => by
+      rw [hkind l ψ e] at k; cases k⟩⟩
+  have hsi : ResU.Sites c Kind.imm (wi.map Prod.fst) := by
+    rw [hwi]
+    exact ⟨hdom.1, fun l => (hdom.2 l).trans ⟨fun ⟨ψ, e⟩ => ⟨ψ, e, hkind l ψ e⟩,
+      fun ⟨ψ, e, _⟩ => ⟨ψ, e⟩⟩⟩
+  exact ⟨σ, AgW.mk hsm hsi AgWitsM.nil hagi BigComp.nil hbi (ResU.comp_empty_right _) hσ⟩
 
 /-- The cell of `W` at `ℓ` when `ℓ ↦ imm(s, v, σ) ● F = W`: an `imm` cell over `v` and `σ`. -/
 theorem cell_of_compS_single {W F σ : WRes} {l : Loc} {s : LSet} {v : Val}

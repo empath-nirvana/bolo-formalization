@@ -41,7 +41,7 @@ namespace BoCa.Fig16.LogRel.MutImmGap
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ### 4.17 · — no printed counterpart — · [TR] p. 4 · `[repair]`
@@ -78,7 +78,7 @@ namespace BoCa.Fig16.LogRel.MutGapClosed
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 Row 4.17, continued.

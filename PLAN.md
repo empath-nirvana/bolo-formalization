@@ -28,14 +28,15 @@ Paper/                                 what the paper prints, in its order
   S6_2_NonStandardLemmas/Definitions.lean   Definitions 6.1, 6.2, 6.3
   S6_2_NonStandardLemmas/Remarks.lean  theorems about Definition 6.2's ∼
   S6_2_NonStandardLemmas/Lemmas.lean   [TR] §6.2, Lemmas 6.16–6.63 (Stage 2b)
-  S6_3_FrameAndAntiFrame/Lemmas.lean   [TR] §6.3 ─┐ skeletons:
-  S6_4_StandardEntailments/Lemmas.lean [TR] §6.4  │ banner + the list of results
-  S6_5_NonStandardEntailments/…        [TR] §6.5  │ and the declaration planned
-  S6_6_ReborrowingEntailments/…        [TR] §6.6  │ for each
-  S6_7_WeakestPreconditionRules/…      [TR] §6.7  │
-  S6_8_FundamentalProperty/Lemmas.lean [TR] §6.8 ─┘
-  CONF/Results.lean                    [CONF] 3.1–3.3 (skeleton)
-  LiteralReadings/                     measurements of printed definitions read literally
+  S6_3_FrameAndAntiFrame/Lemmas.lean   [TR] §6.3, Theorems 6.64–6.66 (Stage 2c)
+  S6_4_StandardEntailments/Lemmas.lean [TR] §6.4, Lemmas 6.67–6.95 (2c)
+  S6_5_NonStandardEntailments/…        [TR] §6.5, Lemmas 6.96–6.119 (2c)
+  S6_6_ReborrowingEntailments/…        [TR] §6.6, Lemmas 6.120–6.134 (2c)
+  S6_7_WeakestPreconditionRules/…      [TR] §6.7, Lemmas 6.135–6.150 (2d)
+  S6_8_FundamentalProperty/Lemmas.lean [TR] §6.8, Lemmas 6.151–6.176 (2e)
+  CONF/Results.lean                    [CONF] 3.1–3.3 (2e)
+  LiteralReadings/                     measurements of printed items read literally, one file per section
+  INDEX.md                             generated: every result and definition row → file and declaration
 Support/                               [about ours]: what makes the paper tree go, by topic
   Syntax/Terms                         value inversion, shifting, substitution, derived-form names
   Lifetimes/Terms, Substitution, Interpretation
@@ -53,6 +54,10 @@ Support/                               [about ours]: what makes the paper tree g
                                        γ(e) and free lifetime variables; ⊨ at ∅; ⌜p⌝ ⋆ P
   TypedWorld/Records, World, Relation  the typed world: records; TW and wpTS (row 5.33's repair);
                                        the repaired relation vX, gDenX, SemX (rows 4.4–4.14's repairs)
+  TypedWorld/Images, Invariant, Wp, RelationFacts, FrameRules, ReborrowShapes, Reborrow, Compatibility
+                                       the rest of the typed world, by source module (stage 2)
+  Statics/Presupposed, Dynamics/PrintedWp, LogicalRelation/Compatibility, LogicalRelation/Adequacy,
+  Model/FrameSurgery, Entailments, ReborrowRule, …   what §6.3–§6.8's results need (stage 2)
 Bridge/Names.csv                       every declaration here → its source declaration
 Bridge/Plan.csv                        every declaration of the closure → its target file (both stages)
 scripts/                               bridge, axiom and hygiene checks
@@ -319,12 +324,58 @@ file sits just before the first paper file that needs it.
    declarations compared, 0 mismatches; `check-hygiene.sh` 0 forbidden keywords,
    3,824 constants within `[propext, Classical.choice, Quot.sound]`.
 
-Still to come:
+5. **§6.8 and [CONF] §3 — done (2e).**  Lemmas 6.151–6.176 (26 records, 58
+   aliases) and `[CONF]` 3.1–3.3 (3 records, 3 aliases, `CONF.lemma_3_1`,
+   `CONF.theorem_3_2`, `CONF.corollary_3_3`).
+   * **6.151 in two forms.**  The record's declaration is the inventory's,
+     `Fig16.LogRel.Typed.fundamentalProperty` at `SemX` with no hypothesis, with its
+     induction `Typed.fundamental` beside it.  The literal reading —
+     `Fig16.LogRel.fundamentalProperty`, the statement at `Sem` from
+     `WithloadEscrow` — is kept beside it under a heading marking it (`+ litbeside`),
+     after the compatibility lemmas it needs.  `ViewWitness.fundamentalProperty_refused`,
+     `ViewWitness.excluded` and the reading of the antecedent as the rule figures alone
+     (`FundamentalPropertyOverRules`, the `DerivesIn` route, `SemArising`) are in
+     `Paper/LiteralReadings/S6_8_…`, and `BoCa/ViewWitness.lean` and
+     `BoCa/TypedViewWitness.lean` move there whole.
+   * **The compatibility lemmas** are declared at `Sem` (the inventory's first name;
+     6.161's row names only the old carrier, so the printed carrier's
+     `Fig16.LogRel.allI_compat` is used, as 6.63 in 2b); their `_compatX` versions at
+     `SemX` are named in each record and sit in `Support/TypedWorld/Compatibility`.
+     The `…Side_unit` inhabitants of the added hypotheses are beside 6.172–6.175; the
+     measurements over `[TR]` §3's printed machine (`…_on_TR3`) and 6.162's
+     `MutGapClosed.gap_closed` are in `Paper/LiteralReadings/S6_8_…`.
+   * **[CONF] §3.**  3.1 is 6.151 printed twice: its record aliases the §6.8
+     declaration.  3.2 and 3.3 carry both machines' statements and proofs
+     (`Adequacy.*`, `…Printed`) and the typed-world `Typed.theorem32`,
+     `Typed.corollary33` and `Typed.adequacy` beside them; `TR3.corThree_unreachable`
+     is in `Paper/LiteralReadings/CONF`.
+   * **Order within a file.**  A declaration a record cites no longer pulls the
+     results it uses up to that record (the literal `fundamental` would otherwise
+     have ordered 6.152–6.176 by source line), and it follows its record's result
+     where Lean allows.
+   * **Support.**  `Support/Statics/Presupposed` (the judgments p. 2 presupposes:
+     `LifeCtx.Ok`, `Ty.scopedB`, `Ctx.ScopedB`, `DerivesWf`; stage 2's units of the
+     source's `Life`, `Ty` and `Derives` modules go there, since stage 1's files for
+     those modules precede §2), `Support/LogicalRelation/Compatibility`,
+     `Support/LogicalRelation/Adequacy`, `Support/TypedWorld/Compatibility`.  A
+     tactic `macro` leaves no trace in the terms that use it, so the generator adds
+     the dependency from the text (`no_head`, `BoCa/ViewWitness.lean`).
+     `scripts/check-bridge.py` treats `_proof_N_M` as an auxiliary too.
+   * **`Paper/INDEX.md`** is generated: every numbered result and definition row →
+     file and declarations, the repaired rows, and the rows with no declaration
+     (Lemma 6.40, untranscribed; row 4.19, which has no printed counterpart and
+     records the legacy carrier's parameters).  `README.md` is the entry point.
 
-5. **§6.8 and [CONF] §3** (6.151–6.176, 3.1–3.3): the compatibility lemmas, the
-   typed world (`Support/TypedWorld/*`, ≈ 8,800 lines), the Fundamental Property
-   at `SemX`, adequacy; `ViewWitness` and `DefectB`'s refutations into
-   `LiteralReadings`.
+   **Not placed.**  109 units (≈ 1,280 lines) of the planned closure — `Bridge/Plan.csv`
+   stage `planned` — are cited only in the inventory notes of §6.1–§6.2 rows (6.1,
+   6.7, 6.9, 6.19, 6.20, 6.24, 6.38, 6.48, 6.53, 6.54, 6.59, 6.60: `SplitExample`,
+   `LowerExample`, `AliasExample`, `AgSplitExample`, the residuals of 6.59, `subEx`,
+   `ImmBound`, `LifeMembers` and their helpers); no result's declaration reaches them.
+   Attaching them to their 2b records with `+ lit`/`+ beside` is the remaining step.
+
+   Checks at the end of 2e: `lake build` clean; `check-bridge.sh` 3,626
+   declarations compared, 0 mismatches; `check-hygiene.sh` 0 forbidden keywords,
+   4,754 constants within `[propext, Classical.choice, Quot.sound]`.
 
 For each result: the printed statement and a compact transcription of the
 printed proof in the comment, the moved declaration, a numbered alias, the

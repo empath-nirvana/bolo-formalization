@@ -68,53 +68,6 @@ declaration itself is in `Support/TypedWorld/`, where a heading points back here
 
 noncomputable section
 
-namespace BoCa.TR3
-open BoCa.Fig16
-open BoCa.BoLo (Heap)
-open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
-
-/-! A declaration the record of Lemma 6.135 (wp-bind) cites. -/
-/-- **`[TR]` Lemma 6.135** (`wp-bind`, p. 35):
-`wp(e){v. wp(K[v]){Q̂}} ⊨ wp(K[e]){Q̂}`, over the seven printed frames.
-`[as printed]` -/
-theorem wp_bind (K : Kont) (e : Expr) (Q : Val → WProp) :
-    Entails (wp e fun v => wp (K.plug (.val v)) Q) (wp (K.plug e) Q) := by
-  intro ρ hw ρf hf
-  obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
-    hA, hB, hC⟩ := hw ρf hf
-  obtain ⟨z, hzp, hz⟩ := (hash_shift ρp ρf ρ').mp ⟨fρ', h₂, h₃⟩
-  have hfz : ResU.CompS ρf ρp z := ResU.CompS.comm hzp
-  obtain ⟨ρ'', ρpp, Y₁, Y'', Y''p, π'', v', ν, ν', k₁, k₂, k₃, k₄, k₅, k₆, k₇, k₈,
-    k₉, kA, kB, kC⟩ := hC z hz
-  obtain ⟨hfρ'', -⟩ := ResU.Hash.split hfz (ResU.hash_symm k₁)
-  obtain ⟨F, hF, hFp⟩ := compS_exch hfz k₂
-  obtain ⟨ZZ, hZZ, hZF⟩ :=
-    (hash_shift ρpp ρp F).mp ⟨Y'', ResU.CompS.comm hFp, k₃⟩
-  have hZZ' : ResU.CompS ρp ρpp ZZ := ResU.CompS.comm hZZ
-  obtain ⟨ZZ₀, hZZ₀, hFZ₀⟩ := compS_reassoc hFp k₆
-  have hFZ : ResU.CompS F ZZ Y''p := by
-    rwa [ResU.CompS.functional hZZ₀ hZZ'] at hFZ₀
-  obtain ⟨z₀, hz₀, hY⟩ := compS_exch h₂ h₆
-  have hzY : ResU.CompS z ρ' fρ'p := by rwa [ResU.CompS.functional hz₀ hfz] at hY
-  have hν : ν = μ' :=
-    ResU.Lower.functional (ResU.CompS.functional k₄ hzY ▸ k₅) h₇
-  obtain ⟨-, hpρ'⟩ := ResU.Hash.split h₂ (ResU.hash_symm h₃)
-  obtain ⟨d, hd, hfd⟩ := compS_reassoc hfz k₂
-  obtain ⟨-, hdp⟩ := ResU.Hash.split hfd (ResU.hash_symm k₃)
-  obtain ⟨π₀, hπ₀, hpπ₀⟩ := (hash_shift ρp ρ'' ρpp).mpr ⟨d, hd, hdp⟩
-  have hpπ : ResU.Hash ρp π'' := by rwa [ResU.CompS.functional hπ₀ k₉] at hpπ₀
-  obtain ⟨Yn, hYn, -⟩ := hpπ.2
-  obtain ⟨ZZ₁, hZZ₁, hρ''Z₀⟩ := compS_lcomm k₉ hYn
-  have hρ''Z : ResU.CompS ρ'' ZZ Yn := by
-    rwa [ResU.CompS.functional hZZ₁ hZZ'] at hρ''Z₀
-  refine ⟨ρ'', ZZ, fρ, F, Y''p, Yn, v', μ, ν', ResU.hash_symm hfρ'', hF, hZF,
-    h₄, h₅, hFZ, k₇, (h₈.plug K).trans (hν ▸ k₈), hρ''Z, ?_,
-    noOwn_compS hZZ' hB kB, kC⟩
-  exact ResU.UpdV.trans hA
-    (updV_frame (ResU.CompS.comm h₉) hYn (ResU.hash_symm hpρ') hpπ kA)
-
-end BoCa.TR3
-
 namespace BoCa.Fig16.BoLo
 open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
@@ -192,20 +145,45 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.136 (wp-val) cites. -/
-/-- **`[TR]` Lemma 6.136** (`wp-val`, p. 36): `Q̂(v) ⊨ wp(v){Q̂}`.  The run is
-empty, so nothing about the machine is used and the proof is `Fig16Wp`'s.  The
-print's `⫤⊨` is a typesetting slip for `⊨`; `BoCa/Fig16Wp.lean`'s `wp_val`
-gives the evidence.  `[as printed]` (`[TR]` p. 36, reading the `⫤⊨` as the `⊨`
-it was meant to be) -/
-theorem wp_val (v : Val) (Q : Val → WProp) : Entails (Q v) (wp (.val v) Q) := by
-  intro ρ hQ ρf hf
-  obtain ⟨σ, μ, hσ, hv, hμ⟩ := hash_lower hf
-  exact ⟨ρ, PMap.empty, σ, σ, σ, ρ, v, μ, μ, ResU.hash_symm hf, hσ,
-    ResU.hash_symm (ResU.hash_empty_right hv), hσ, hμ,
-    ResU.comp_empty_right σ, hμ, Steps.refl _ _, ResU.comp_empty_right ρ,
-    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2,
-    noOwn_empty, hQ⟩
+/-! A declaration the record of Lemma 6.135 (wp-bind) cites. -/
+/-- **`[TR]` Lemma 6.135** (`wp-bind`, p. 35):
+`wp(e){v. wp(K[v]){Q̂}} ⊨ wp(K[e]){Q̂}`, over the seven printed frames.
+`[as printed]` -/
+theorem wp_bind (K : Kont) (e : Expr) (Q : Val → WProp) :
+    Entails (wp e fun v => wp (K.plug (.val v)) Q) (wp (K.plug e) Q) := by
+  intro ρ hw ρf hf
+  obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hC⟩ := hw ρf hf
+  obtain ⟨z, hzp, hz⟩ := (hash_shift ρp ρf ρ').mp ⟨fρ', h₂, h₃⟩
+  have hfz : ResU.CompS ρf ρp z := ResU.CompS.comm hzp
+  obtain ⟨ρ'', ρpp, Y₁, Y'', Y''p, π'', v', ν, ν', k₁, k₂, k₃, k₄, k₅, k₆, k₇, k₈,
+    k₉, kA, kB, kC⟩ := hC z hz
+  obtain ⟨hfρ'', -⟩ := ResU.Hash.split hfz (ResU.hash_symm k₁)
+  obtain ⟨F, hF, hFp⟩ := compS_exch hfz k₂
+  obtain ⟨ZZ, hZZ, hZF⟩ :=
+    (hash_shift ρpp ρp F).mp ⟨Y'', ResU.CompS.comm hFp, k₃⟩
+  have hZZ' : ResU.CompS ρp ρpp ZZ := ResU.CompS.comm hZZ
+  obtain ⟨ZZ₀, hZZ₀, hFZ₀⟩ := compS_reassoc hFp k₆
+  have hFZ : ResU.CompS F ZZ Y''p := by
+    rwa [ResU.CompS.functional hZZ₀ hZZ'] at hFZ₀
+  obtain ⟨z₀, hz₀, hY⟩ := compS_exch h₂ h₆
+  have hzY : ResU.CompS z ρ' fρ'p := by rwa [ResU.CompS.functional hz₀ hfz] at hY
+  have hν : ν = μ' :=
+    ResU.Lower.functional (ResU.CompS.functional k₄ hzY ▸ k₅) h₇
+  obtain ⟨-, hpρ'⟩ := ResU.Hash.split h₂ (ResU.hash_symm h₃)
+  obtain ⟨d, hd, hfd⟩ := compS_reassoc hfz k₂
+  obtain ⟨-, hdp⟩ := ResU.Hash.split hfd (ResU.hash_symm k₃)
+  obtain ⟨π₀, hπ₀, hpπ₀⟩ := (hash_shift ρp ρ'' ρpp).mpr ⟨d, hd, hdp⟩
+  have hpπ : ResU.Hash ρp π'' := by rwa [ResU.CompS.functional hπ₀ k₉] at hpπ₀
+  obtain ⟨Yn, hYn, -⟩ := hpπ.2
+  obtain ⟨ZZ₁, hZZ₁, hρ''Z₀⟩ := compS_lcomm k₉ hYn
+  have hρ''Z : ResU.CompS ρ'' ZZ Yn := by
+    rwa [ResU.CompS.functional hZZ₁ hZZ'] at hρ''Z₀
+  refine ⟨ρ'', ZZ, fρ, F, Y''p, Yn, v', μ, ν', ResU.hash_symm hfρ'', hF, hZF,
+    h₄, h₅, hFZ, k₇, (h₈.plug K).trans (hν ▸ k₈), hρ''Z, ?_,
+    noOwn_compS hZZ' hB kB, kC⟩
+  exact ResU.UpdV.trans hA
+    (updV_frame (ResU.CompS.comm h₉) hYn (ResU.hash_symm hpρ') hpπ kA)
 
 end BoCa.TR3
 
@@ -258,27 +236,20 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.137 (wp1) cites. -/
-/-- **One printed head step in front of a `wp`.**  `[TR]` 6.137–6.140 are this
-at four of the eight rules of the `↦` box.
-`[about ours: the step `[TR]` 6.137–6.140 share; each printed rule is an
-instance]` -/
-theorem wp_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (Q : Val → WProp) :
-    Entails (wp e' Q) (wp e Q) := by
-  intro ρ hw ρf hf
-  obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
-    hA, hB, hC⟩ := hw ρf hf
-  exact ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇,
-    .more (Step1.head (h μ)) h₈, h₉, hA, hB, hC⟩
-
-/-! A declaration the record of Lemma 6.137 (wp1) cites. -/
-/-- **`[TR]` Lemma 6.137** (`wp1`, p. 36): `wp(e){Q̂} ⊨ wp((); e){Q̂}`.  The
-printed `1↦` fires at `()` and at nothing else, so this rule is available at
-`(); e` and — unlike `BoCa/Wp.lean`'s — at no other sequence; `wp_seq_false`
-below is the difference.  `[as printed]` -/
-theorem wp_1 (e : Expr) (Q : Val → WProp) :
-    Entails (wp e Q) (wp (.seq (.val .unit) e) Q) :=
-  wp_head (fun μ => .one μ e) Q
+/-! A declaration the record of Lemma 6.136 (wp-val) cites. -/
+/-- **`[TR]` Lemma 6.136** (`wp-val`, p. 36): `Q̂(v) ⊨ wp(v){Q̂}`.  The run is
+empty, so nothing about the machine is used and the proof is `Fig16Wp`'s.  The
+print's `⫤⊨` is a typesetting slip for `⊨`; `BoCa/Fig16Wp.lean`'s `wp_val`
+gives the evidence.  `[as printed]` (`[TR]` p. 36, reading the `⫤⊨` as the `⊨`
+it was meant to be) -/
+theorem wp_val (v : Val) (Q : Val → WProp) : Entails (Q v) (wp (.val v) Q) := by
+  intro ρ hQ ρf hf
+  obtain ⟨σ, μ, hσ, hv, hμ⟩ := hash_lower hf
+  exact ⟨ρ, PMap.empty, σ, σ, σ, ρ, v, μ, μ, ResU.hash_symm hf, hσ,
+    ResU.hash_symm (ResU.hash_empty_right hv), hσ, hμ,
+    ResU.comp_empty_right σ, hμ, Steps.refl _ _, ResU.comp_empty_right ρ,
+    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2,
+    noOwn_empty, hQ⟩
 
 end BoCa.TR3
 
@@ -331,14 +302,27 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.138 (wp⊗) cites. -/
-/-- **`[TR]` Lemma 6.138** (`wp⊗`, p. 36):
-`wp(e[v₁/x₁, v₂/x₂]){Q̂} ⊨ wp(let (x₁,x₂) = (v₁,v₂); e){Q̂}`.  `(v₁,v₂)` is the
-*value*, which is what `⊗↦` and `𝒱⟦T₁ ⊗ T₂⟧` both mean by it.  `[as printed]` -/
-theorem wp_tensor (v₁ v₂ : Val) (e : Expr) (Q : Val → WProp) :
-    Entails (wp ((e.subst 0 (v₂.shift 1 0)).subst 0 v₁) Q)
-      (wp (.letpair (.val (.pair v₁ v₂)) e) Q) :=
-  wp_head (fun μ => .tensor μ v₁ v₂ e) Q
+/-! A declaration the record of Lemma 6.137 (wp1) cites. -/
+/-- **One printed head step in front of a `wp`.**  `[TR]` 6.137–6.140 are this
+at four of the eight rules of the `↦` box.
+`[about ours: the step `[TR]` 6.137–6.140 share; each printed rule is an
+instance]` -/
+theorem wp_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (Q : Val → WProp) :
+    Entails (wp e' Q) (wp e Q) := by
+  intro ρ hw ρf hf
+  obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hC⟩ := hw ρf hf
+  exact ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇,
+    .more (Step1.head (h μ)) h₈, h₉, hA, hB, hC⟩
+
+/-! A declaration the record of Lemma 6.137 (wp1) cites. -/
+/-- **`[TR]` Lemma 6.137** (`wp1`, p. 36): `wp(e){Q̂} ⊨ wp((); e){Q̂}`.  The
+printed `1↦` fires at `()` and at nothing else, so this rule is available at
+`(); e` and — unlike `BoCa/Wp.lean`'s — at no other sequence; `wp_seq_false`
+below is the difference.  `[as printed]` -/
+theorem wp_1 (e : Expr) (Q : Val → WProp) :
+    Entails (wp e Q) (wp (.seq (.val .unit) e) Q) :=
+  wp_head (fun μ => .one μ e) Q
 
 end BoCa.TR3
 
@@ -379,19 +363,14 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.139 (wp⊕) cites. -/
-/-- **`[TR]` Lemma 6.139** (`wp⊕`, p. 36), first summand.  `[TR]` prints one
-rule schematic in `i`; this and `wp_sum₂` are its two instances.
-`[as printed]` -/
-theorem wp_sum₁ (v : Val) (e₁ e₂ : Expr) (Q : Val → WProp) :
-    Entails (wp (e₁.subst 0 v) Q) (wp (.case (.val (.inj₁ v)) e₁ e₂) Q) :=
-  wp_head (fun μ => .sum₁ μ v e₁ e₂) Q
-
-/-! A declaration the record of Lemma 6.139 (wp⊕) cites. -/
-/-- **`[TR]` Lemma 6.139** (`wp⊕`, p. 36), second summand.  `[as printed]` -/
-theorem wp_sum₂ (v : Val) (e₁ e₂ : Expr) (Q : Val → WProp) :
-    Entails (wp (e₂.subst 0 v) Q) (wp (.case (.val (.inj₂ v)) e₁ e₂) Q) :=
-  wp_head (fun μ => .sum₂ μ v e₁ e₂) Q
+/-! A declaration the record of Lemma 6.138 (wp⊗) cites. -/
+/-- **`[TR]` Lemma 6.138** (`wp⊗`, p. 36):
+`wp(e[v₁/x₁, v₂/x₂]){Q̂} ⊨ wp(let (x₁,x₂) = (v₁,v₂); e){Q̂}`.  `(v₁,v₂)` is the
+*value*, which is what `⊗↦` and `𝒱⟦T₁ ⊗ T₂⟧` both mean by it.  `[as printed]` -/
+theorem wp_tensor (v₁ v₂ : Val) (e : Expr) (Q : Val → WProp) :
+    Entails (wp ((e.subst 0 (v₂.shift 1 0)).subst 0 v₁) Q)
+      (wp (.letpair (.val (.pair v₁ v₂)) e) Q) :=
+  wp_head (fun μ => .tensor μ v₁ v₂ e) Q
 
 end BoCa.TR3
 
@@ -449,12 +428,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.140 (wp⊸) cites. -/
-/-- **`[TR]` Lemma 6.140** (`wp⊸`, p. 36): `wp(e[v/x]){Q̂} ⊨ wp((λx.e) v){Q̂}`.
+/-! A declaration the record of Lemma 6.139 (wp⊕) cites. -/
+/-- **`[TR]` Lemma 6.139** (`wp⊕`, p. 36), first summand.  `[TR]` prints one
+rule schematic in `i`; this and `wp_sum₂` are its two instances.
 `[as printed]` -/
-theorem wp_lolli (b : Expr) (v : Val) (Q : Val → WProp) :
-    Entails (wp (b.subst 0 v) Q) (wp (.app (.val (.lam b)) (.val v)) Q) :=
-  wp_head (fun μ => .lolli μ b v) Q
+theorem wp_sum₁ (v : Val) (e₁ e₂ : Expr) (Q : Val → WProp) :
+    Entails (wp (e₁.subst 0 v) Q) (wp (.case (.val (.inj₁ v)) e₁ e₂) Q) :=
+  wp_head (fun μ => .sum₁ μ v e₁ e₂) Q
+
+/-! A declaration the record of Lemma 6.139 (wp⊕) cites. -/
+/-- **`[TR]` Lemma 6.139** (`wp⊕`, p. 36), second summand.  `[as printed]` -/
+theorem wp_sum₂ (v : Val) (e₁ e₂ : Expr) (Q : Val → WProp) :
+    Entails (wp (e₂.subst 0 v) Q) (wp (.case (.val (.inj₂ v)) e₁ e₂) Q) :=
+  wp_head (fun μ => .sum₂ μ v e₁ e₂) Q
 
 end BoCa.TR3
 
@@ -493,32 +479,12 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.141 (wp-alloc) cites. -/
-/-- **`[TR]` Lemma 6.141** (`wp-alloc`, p. 37):
-`(∀ℓ. ℓ ↦ v ─⋆ Q̂(ℓ)) ⊨ wp(alloc v){Q̂}`, at the printed term `alloc v` and the
-printed `alloc↦`.  No hypothesis is added, for `Fig16Wp`'s reason: the printed
-carrier is finite.  `[as printed]` -/
-theorem wp_alloc (v : Val) (Q : Val → WProp) :
-    Entails (all fun l : BoCa.Loc => wand (ptoOwn l v) (Q (.loc l)))
-      (wp (.app (.val (.prim .alloc)) (.val v)) Q) := by
-  intro ρ h ρf hf
-  obtain ⟨σ, μ, hσ, hvσ, hμ⟩ := hash_lower hf
-  obtain ⟨τ, hτ, hval⟩ := id hμ
-  obtain ⟨l, hl⟩ := PMap.exists_fresh loc_infinite τ
-  have hμl : μ l = none := (lower_eq_none_iff hval).mpr hl
-  have hρl : ρ.get l = none :=
-    ((ResU.Comp.eq_none_iff hσ l).mp (get_eq_none_of_flat hτ hl)).2
-  obtain ⟨x, hx⟩ := (ResU.compS_defined_iff ρ (ResU.single l (CellU.ownOf v))).mpr
-    (compatS_single_of_get_none hρl)
-  obtain ⟨σ', hσ'x, hfx, hlow'⟩ := hash_compS_own hσ hμ hμl hx
-  exact ⟨x, PMap.empty, σ, σ', σ', x, .loc l, μ, BoCa.BoLo.Heap.upd μ l v,
-    ResU.hash_symm hfx, hσ'x,
-    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hfx hσ'x)),
-    hσ, hμ, ResU.comp_empty_right σ', hlow',
-    Steps.one (steps_alloc μ v l hμl), ResU.comp_empty_right x,
-    updV_compS_own hx (hash_valid hf).2
-      (hash_valid hfx).2,
-    noOwn_empty, h l _ x rfl hx⟩
+/-! A declaration the record of Lemma 6.140 (wp⊸) cites. -/
+/-- **`[TR]` Lemma 6.140** (`wp⊸`, p. 36): `wp(e[v/x]){Q̂} ⊨ wp((λx.e) v){Q̂}`.
+`[as printed]` -/
+theorem wp_lolli (b : Expr) (v : Val) (Q : Val → WProp) :
+    Entails (wp (b.subst 0 v) Q) (wp (.app (.val (.lam b)) (.val v)) Q) :=
+  wp_head (fun μ => .lolli μ b v) Q
 
 end BoCa.TR3
 
@@ -580,34 +546,32 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.142 (wp-free) cites. -/
-/-- **`[TR]` Lemma 6.142** (`wp-free`, p. 37): `ℓ ↦ v ⋆ Q̂(v) ⊨ wp(free ℓ){Q̂}`.
-`[as printed]` -/
-theorem wp_free (l : BoCa.Loc) (v : Val) (Q : Val → WProp) :
-    Entails (sep (ptoOwn l v) (Q v))
-      (wp (.app (.val (.prim .free)) (.val (.loc l))) Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hQ⟩ ρf hf
+/-! A declaration the record of Lemma 6.141 (wp-alloc) cites. -/
+/-- **`[TR]` Lemma 6.141** (`wp-alloc`, p. 37):
+`(∀ℓ. ℓ ↦ v ─⋆ Q̂(ℓ)) ⊨ wp(alloc v){Q̂}`, at the printed term `alloc v` and the
+printed `alloc↦`.  No hypothesis is added, for `Fig16Wp`'s reason: the printed
+carrier is finite.  `[as printed]` -/
+theorem wp_alloc (v : Val) (Q : Val → WProp) :
+    Entails (all fun l : BoCa.Loc => wand (ptoOwn l v) (Q (.loc l)))
+      (wp (.app (.val (.prim .alloc)) (.val v)) Q) := by
+  intro ρ h ρf hf
   obtain ⟨σ, μ, hσ, hvσ, hμ⟩ := hash_lower hf
-  have h₂ : ResU.Hash ρf ρ₂ :=
-    ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
-  obtain ⟨σ₂, hσ₂, hσ₂σ⟩ :=
-    (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v)) σ).mp
-      ⟨ρ, ResU.CompS.comm hcρ, hσ⟩
-  obtain ⟨hlv, μ₂, hlow₂, hupd, hnone⟩ := lower_compS_own_inv hσ₂σ hμ
-  have hdel : BoCa.BoLo.Heap.del μ l = μ₂ := by
-    funext k
-    by_cases e : k = l
-    · subst e; rw [BoCa.BoLo.Heap.del_same, hnone]
-    · rw [BoCa.BoLo.Heap.del_other e, hupd, BoCa.BoLo.Heap.upd_other e]
-  refine ⟨ρ₂, PMap.empty, σ, σ₂, σ₂, ρ₂, v, μ, μ₂,
-    ResU.hash_symm h₂, hσ₂,
-    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp h₂ hσ₂)),
-    hσ, hμ, ResU.comp_empty_right σ₂, hlow₂, ?_, ResU.comp_empty_right ρ₂,
-    (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2
-      (hash_valid hf).2).symm,
-    noOwn_empty, hQ⟩
-  rw [← hdel]
-  exact Steps.one (Step1.head (Head.free μ l v hlv))
+  obtain ⟨τ, hτ, hval⟩ := id hμ
+  obtain ⟨l, hl⟩ := PMap.exists_fresh loc_infinite τ
+  have hμl : μ l = none := (lower_eq_none_iff hval).mpr hl
+  have hρl : ρ.get l = none :=
+    ((ResU.Comp.eq_none_iff hσ l).mp (get_eq_none_of_flat hτ hl)).2
+  obtain ⟨x, hx⟩ := (ResU.compS_defined_iff ρ (ResU.single l (CellU.ownOf v))).mpr
+    (compatS_single_of_get_none hρl)
+  obtain ⟨σ', hσ'x, hfx, hlow'⟩ := hash_compS_own hσ hμ hμl hx
+  exact ⟨x, PMap.empty, σ, σ', σ', x, .loc l, μ, BoCa.BoLo.Heap.upd μ l v,
+    ResU.hash_symm hfx, hσ'x,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hfx hσ'x)),
+    hσ, hμ, ResU.comp_empty_right σ', hlow',
+    Steps.one (steps_alloc μ v l hμl), ResU.comp_empty_right x,
+    updV_compS_own hx (hash_valid hf).2
+      (hash_valid hfx).2,
+    noOwn_empty, h l _ x rfl hx⟩
 
 end BoCa.TR3
 
@@ -669,29 +633,34 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.143 (wp-load) cites. -/
-/-- **`[TR]` Lemma 6.143** (`wp-load`, p. 37):
-`ℓ ↦ v ⋆ (ℓ ↦ v ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`.  `[as printed]` -/
-theorem wp_load (l : BoCa.Loc) (v : Val) (Q : Val → WProp) :
-    Entails (sep (ptoOwn l v) (wand (ptoOwn l v) (Q v)))
-      (wp (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf hf
+/-! A declaration the record of Lemma 6.142 (wp-free) cites. -/
+/-- **`[TR]` Lemma 6.142** (`wp-free`, p. 37): `ℓ ↦ v ⋆ Q̂(v) ⊨ wp(free ℓ){Q̂}`.
+`[as printed]` -/
+theorem wp_free (l : BoCa.Loc) (v : Val) (Q : Val → WProp) :
+    Entails (sep (ptoOwn l v) (Q v))
+      (wp (.app (.val (.prim .free)) (.val (.loc l))) Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hQ⟩ ρf hf
   obtain ⟨σ, μ, hσ, hvσ, hμ⟩ := hash_lower hf
-  have hρ : ρ.get l = some (CellU.ownOf v) := by
-    rw [ResU.Comp.get_of_right_none hcρ (ResU.compatS_single_own hcρ.1),
-      ResU.single_get_self]
-  have hlv : μ l = some v :=
-    lower_get_own hμ (by
-      rw [ResU.Comp.get_of_left_none hσ (get_eq_none_of_compatS_own
-        (ResU.CompatS.symm hf.1) hρ)]
-      exact hρ)
-  exact ⟨ρ, PMap.empty, σ, σ, σ, ρ, v, μ, μ,
-    ResU.hash_symm hf, hσ,
-    ResU.hash_symm (ResU.hash_empty_right hvσ),
-    hσ, hμ, ResU.comp_empty_right σ, hμ,
-    Steps.one (Step1.head (Head.load μ l v hlv)), ResU.comp_empty_right ρ,
-    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2,
-    noOwn_empty, hwand _ ρ rfl (ResU.CompS.comm hcρ)⟩
+  have h₂ : ResU.Hash ρf ρ₂ :=
+    ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
+  obtain ⟨σ₂, hσ₂, hσ₂σ⟩ :=
+    (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v)) σ).mp
+      ⟨ρ, ResU.CompS.comm hcρ, hσ⟩
+  obtain ⟨hlv, μ₂, hlow₂, hupd, hnone⟩ := lower_compS_own_inv hσ₂σ hμ
+  have hdel : BoCa.BoLo.Heap.del μ l = μ₂ := by
+    funext k
+    by_cases e : k = l
+    · subst e; rw [BoCa.BoLo.Heap.del_same, hnone]
+    · rw [BoCa.BoLo.Heap.del_other e, hupd, BoCa.BoLo.Heap.upd_other e]
+  refine ⟨ρ₂, PMap.empty, σ, σ₂, σ₂, ρ₂, v, μ, μ₂,
+    ResU.hash_symm h₂, hσ₂,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp h₂ hσ₂)),
+    hσ, hμ, ResU.comp_empty_right σ₂, hlow₂, ?_, ResU.comp_empty_right ρ₂,
+    (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2
+      (hash_valid hf).2).symm,
+    noOwn_empty, hQ⟩
+  rw [← hdel]
+  exact Steps.one (Step1.head (Head.free μ l v hlv))
 
 end BoCa.TR3
 
@@ -749,40 +718,29 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.144 (wp-load-I) cites. -/
-/-- **`[TR]` Lemma 6.144** (`wp-load-I`, p. 37):
-`ℓ ↦I_α P̂ ⋆ (∀v. ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v)) ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`,
-over the printed machine.  The proof is `Fig16.BoLo.wp_load_I`'s, at the same
-`load↦` of the p. 4 box, and the two steps that rule elides are the same
-lemmas: `Fig16.BoLo.pure_sep_biEntails` for the family at the cell's own value
-and `Fig16.BoLo.compS_get_erase` with `Fig16.BoLo.lower_get` for the lookup.
-`[as printed]` -/
-theorem wp_load_I (l : BoCa.Loc) (α : Life) (P Q : Val → WProp) :
-    Entails
-      (sep (ptoImm l α P)
-        (all fun v =>
-          wand (ptoImm l α (fun v' => sep (Fig16.BoLo.pure (v = v')) (P v)))
-            (Q v)))
+/-! A declaration the record of Lemma 6.143 (wp-load) cites. -/
+/-- **`[TR]` Lemma 6.143** (`wp-load`, p. 37):
+`ℓ ↦ v ⋆ (ℓ ↦ v ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`.  `[as printed]` -/
+theorem wp_load (l : BoCa.Loc) (v : Val) (Q : Val → WProp) :
+    Entails (sep (ptoOwn l v) (wand (ptoOwn l v) (Q v)))
       (wp (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
-  rintro ρ ⟨ρ₁, ρR, hcρ, ⟨s, v, σ, hs, rfl, hP, hα⟩, hR⟩ ρf hf
-  have hcell : ptoImm l α (fun v' => sep (Fig16.BoLo.pure (v = v')) (P v))
-      (ResU.single l (CellU.immOf s v σ hs)) :=
-    ⟨s, v, σ, hs, rfl, (Fig16.BoLo.pure_sep_biEntails rfl (P v)).2 σ hP, hα⟩
-  have hQ : Q v ρ := hR v _ ρ hcell (ResU.CompS.comm hcρ)
-  obtain ⟨τ, μ, hτ, hvτ, hμ⟩ := hash_lower hf
-  obtain ⟨χ, hχ, heχ⟩ :=
-    Fig16.BoLo.compS_get_erase hcρ (ResU.single_get_self l _)
-  obtain ⟨χ', hχ', heχ'⟩ :=
-    Fig16.BoLo.compS_get_erase (ResU.CompS.comm hτ) hχ
-  have hlv : μ l = some v := by
-    rw [Fig16.BoLo.lower_get hμ hχ', heχ', heχ]
-    rfl
-  exact ⟨ρ, PMap.empty, τ, τ, τ, ρ, v, μ, μ,
-    ResU.hash_symm hf, hτ,
-    ResU.hash_symm (ResU.hash_empty_right hvτ),
-    hτ, hμ, ResU.comp_empty_right τ, hμ,
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf hf
+  obtain ⟨σ, μ, hσ, hvσ, hμ⟩ := hash_lower hf
+  have hρ : ρ.get l = some (CellU.ownOf v) := by
+    rw [ResU.Comp.get_of_right_none hcρ (ResU.compatS_single_own hcρ.1),
+      ResU.single_get_self]
+  have hlv : μ l = some v :=
+    lower_get_own hμ (by
+      rw [ResU.Comp.get_of_left_none hσ (get_eq_none_of_compatS_own
+        (ResU.CompatS.symm hf.1) hρ)]
+      exact hρ)
+  exact ⟨ρ, PMap.empty, σ, σ, σ, ρ, v, μ, μ,
+    ResU.hash_symm hf, hσ,
+    ResU.hash_symm (ResU.hash_empty_right hvσ),
+    hσ, hμ, ResU.comp_empty_right σ, hμ,
     Steps.one (Step1.head (Head.load μ l v hlv)), ResU.comp_empty_right ρ,
-    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hQ⟩
+    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2,
+    noOwn_empty, hwand _ ρ rfl (ResU.CompS.comm hcρ)⟩
 
 end BoCa.TR3
 
@@ -844,6 +802,48 @@ end BoCa.Fig16.BoLo
 alias TR.lemma_6_144 := BoCa.Fig16.BoLo.wp_load_I
 alias TR.«wp-load-I» := BoCa.Fig16.BoLo.wp_load_I
 
+namespace BoCa.TR3
+open BoCa.Fig16
+open BoCa.BoLo (Heap)
+open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
+
+/-! A declaration the record of Lemma 6.144 (wp-load-I) cites. -/
+/-- **`[TR]` Lemma 6.144** (`wp-load-I`, p. 37):
+`ℓ ↦I_α P̂ ⋆ (∀v. ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v)) ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`,
+over the printed machine.  The proof is `Fig16.BoLo.wp_load_I`'s, at the same
+`load↦` of the p. 4 box, and the two steps that rule elides are the same
+lemmas: `Fig16.BoLo.pure_sep_biEntails` for the family at the cell's own value
+and `Fig16.BoLo.compS_get_erase` with `Fig16.BoLo.lower_get` for the lookup.
+`[as printed]` -/
+theorem wp_load_I (l : BoCa.Loc) (α : Life) (P Q : Val → WProp) :
+    Entails
+      (sep (ptoImm l α P)
+        (all fun v =>
+          wand (ptoImm l α (fun v' => sep (Fig16.BoLo.pure (v = v')) (P v)))
+            (Q v)))
+      (wp (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
+  rintro ρ ⟨ρ₁, ρR, hcρ, ⟨s, v, σ, hs, rfl, hP, hα⟩, hR⟩ ρf hf
+  have hcell : ptoImm l α (fun v' => sep (Fig16.BoLo.pure (v = v')) (P v))
+      (ResU.single l (CellU.immOf s v σ hs)) :=
+    ⟨s, v, σ, hs, rfl, (Fig16.BoLo.pure_sep_biEntails rfl (P v)).2 σ hP, hα⟩
+  have hQ : Q v ρ := hR v _ ρ hcell (ResU.CompS.comm hcρ)
+  obtain ⟨τ, μ, hτ, hvτ, hμ⟩ := hash_lower hf
+  obtain ⟨χ, hχ, heχ⟩ :=
+    Fig16.BoLo.compS_get_erase hcρ (ResU.single_get_self l _)
+  obtain ⟨χ', hχ', heχ'⟩ :=
+    Fig16.BoLo.compS_get_erase (ResU.CompS.comm hτ) hχ
+  have hlv : μ l = some v := by
+    rw [Fig16.BoLo.lower_get hμ hχ', heχ', heχ]
+    rfl
+  exact ⟨ρ, PMap.empty, τ, τ, τ, ρ, v, μ, μ,
+    ResU.hash_symm hf, hτ,
+    ResU.hash_symm (ResU.hash_empty_right hvτ),
+    hτ, hμ, ResU.comp_empty_right τ, hμ,
+    Steps.one (Step1.head (Head.load μ l v hlv)), ResU.comp_empty_right ρ,
+    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hQ⟩
+
+end BoCa.TR3
+
 namespace BoCa.Fig16.BoLo
 open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
@@ -901,59 +901,6 @@ theorem wp_load_I_nonvacuous (b : Life) (w : Val) :
       Nat.le_refl _⟩, ?_⟩
   rintro v ρ₁ ρ₂ ⟨s, v₀, σ, hσ, rfl, -, -⟩ hc
   exact ⟨_, eq_of_compS_empty_left hc⟩
-
-end BoCa.Fig16.BoLo
-
-namespace BoCa.TR3
-open BoCa.Fig16
-open BoCa.BoLo (Heap)
-open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
-
-/-! A declaration the record of Lemma 6.145 (wp-store) cites. -/
-/-- **`[TR]` Lemma 6.145** (`wp-store`, p. 37):
-`ℓ ↦ v₁ ⋆ (ℓ ↦ v₂ ─⋆ Q̂(())) ⊨ wp(store ℓ v₂){Q̂}`, at `store ℓ v₂` spelled
-`(store ℓ) v₂`, an application of an application.  `BoCa/Fig16Wp.lean` states
-the same rule at `.app (.val (.storeV (.loc ℓ))) (.val v₂)`, which is the same
-term: `[TR]` p. 1 prints both `store v` and `e₂ e₁` and identifies them, and so
-does `BoCa/Syntax.lean`.  `[as printed]` -/
-theorem wp_store (l : BoCa.Loc) (v₁ v₂ : Val) (Q : Val → WProp) :
-    Entails (sep (ptoOwn l v₁) (wand (ptoOwn l v₂) (Q .unit)))
-      (wp (.app (.app (.val (.prim .store)) (.val (.loc l))) (.val v₂)) Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf hf
-  obtain ⟨σ, μ, hσ, hvσ, hμ⟩ := hash_lower hf
-  have h₂ : ResU.Hash ρf ρ₂ :=
-    ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
-  obtain ⟨σ₂, hσ₂, hσ₂σ⟩ :=
-    (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v₁)) σ).mp
-      ⟨ρ, ResU.CompS.comm hcρ, hσ⟩
-  obtain ⟨hlv, μ₂, hlow₂, hupd, hnone⟩ := lower_compS_own_inv hσ₂σ hμ
-  obtain ⟨x, hx⟩ := (ResU.compS_defined_iff ρ₂ (ResU.single l (CellU.ownOf v₂))).mpr
-    (compatS_single_of_get_none (ResU.compatS_single_own hcρ.1))
-  obtain ⟨σ', hσ'x, hfx, hlow'⟩ := hash_compS_own hσ₂ hlow₂ hnone hx
-  have hstep : BoCa.BoLo.Heap.upd μ l v₂ = BoCa.BoLo.Heap.upd μ₂ l v₂ := by
-    funext k
-    by_cases e : k = l
-    · subst e; rw [BoCa.BoLo.Heap.upd_same, BoCa.BoLo.Heap.upd_same]
-    · rw [BoCa.BoLo.Heap.upd_other e, BoCa.BoLo.Heap.upd_other e, hupd,
-        BoCa.BoLo.Heap.upd_other e]
-  refine ⟨x, PMap.empty, σ, σ', σ', x, .unit, μ, BoCa.BoLo.Heap.upd μ₂ l v₂,
-    ResU.hash_symm hfx, hσ'x,
-    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hfx hσ'x)),
-    hσ, hμ, ResU.comp_empty_right σ', hlow', ?_, ResU.comp_empty_right x, ?_,
-    noOwn_empty, hwand _ x rfl hx⟩
-  · rw [← hstep]
-    exact Steps.one (steps_store μ l v₂ v₁ hlv)
-  · exact ResU.UpdV.trans
-      (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2
-        (hash_valid hf).2).symm
-      (updV_compS_own hx (hash_valid h₂).2
-        (hash_valid hfx).2)
-
-end BoCa.TR3
-
-namespace BoCa.Fig16.BoLo
-open BoCa.Fig16
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
 ## Lemma 6.145 (wp-store) · `[TR]` p. 37 · inventory `proved`
@@ -1017,37 +964,45 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.146 (wp-ramify) cites. -/
-/-- **`[TR]` Lemma 6.146** (`wp-ramify`, p. 38):
-`wp(e){P̂} ⋆ (P̂ ─⋆ Q̂) ⊨ wp(e){Q̂}`.  `[as printed]` (the printed `(P̂ –⋆ Q̂)`
-read as `wandAll`) -/
-theorem wp_ramify (e : Expr) (P Q : Val → WProp) :
-    Entails (sep (wp e P) (wandAll P Q)) (wp e Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, hwp, hwand⟩ ρf hf
-  obtain ⟨y, hy, hy₁⟩ :=
-    (hash_shift ρf ρ₂ ρ₁).mp ⟨ρ, ResU.CompS.comm hcρ, hf⟩
-  obtain ⟨ρ', ρp, Y₁, Y', Y'p, π', v, μ, μ', g₁, g₂, g₃, g₄, g₅, g₆, g₇, g₈, g₉,
-    gA, gB, gC⟩ := hwp y hy₁
-  obtain ⟨W, hW, hfW⟩ := compS_reassoc hy g₂
-  obtain ⟨r, hr, hfr⟩ := compS_reassoc hy g₄
-  have hfρ : ResU.CompS ρf ρ Y₁ := by
-    rwa [ResU.CompS.functional hcρ (ResU.CompS.comm hr)]
-  obtain ⟨W₀, hW₀, hWf₀⟩ :=
-    (hash_shift ρ' ρ₂ ρf).mp ⟨y, ResU.CompS.comm hy, g₁⟩
-  have hWf : ResU.Hash W ρf := by
-    rwa [ResU.CompS.functional (ResU.CompS.comm hW₀) hW] at hWf₀
-  obtain ⟨-, hWp⟩ := ResU.Hash.split hfW (ResU.hash_symm g₃)
-  obtain ⟨πW, hπW, h₂π₀⟩ := (hash_shift ρ₂ ρ' ρp).mpr ⟨W, hW, hWp⟩
-  have h₂π : ResU.Hash ρ₂ π' := by rwa [ResU.CompS.functional hπW g₉] at h₂π₀
-  obtain ⟨πn, hπn, -⟩ := h₂π.2
-  obtain ⟨Wn, hWn, hWπ₀⟩ := compS_reassoc' g₉ hπn
-  have hWπ : ResU.CompS W ρp πn := by
-    rwa [ResU.CompS.functional hWn hW] at hWπ₀
-  refine ⟨W, ρp, Y₁, Y', Y'p, πn, v, μ, μ', hWf, hfW, g₃, hfρ, g₅, g₆, g₇, g₈,
-    hWπ, ?_, gB, hwand v ρ' W gC hW⟩
-  exact updV_frame (ResU.CompS.comm hcρ) hπn
-    ⟨(ResU.CompS.comm hcρ).1, ρ, ResU.CompS.comm hcρ,
-      (hash_valid hf).2⟩ h₂π gA
+/-! A declaration the record of Lemma 6.145 (wp-store) cites. -/
+/-- **`[TR]` Lemma 6.145** (`wp-store`, p. 37):
+`ℓ ↦ v₁ ⋆ (ℓ ↦ v₂ ─⋆ Q̂(())) ⊨ wp(store ℓ v₂){Q̂}`, at `store ℓ v₂` spelled
+`(store ℓ) v₂`, an application of an application.  `BoCa/Fig16Wp.lean` states
+the same rule at `.app (.val (.storeV (.loc ℓ))) (.val v₂)`, which is the same
+term: `[TR]` p. 1 prints both `store v` and `e₂ e₁` and identifies them, and so
+does `BoCa/Syntax.lean`.  `[as printed]` -/
+theorem wp_store (l : BoCa.Loc) (v₁ v₂ : Val) (Q : Val → WProp) :
+    Entails (sep (ptoOwn l v₁) (wand (ptoOwn l v₂) (Q .unit)))
+      (wp (.app (.app (.val (.prim .store)) (.val (.loc l))) (.val v₂)) Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf hf
+  obtain ⟨σ, μ, hσ, hvσ, hμ⟩ := hash_lower hf
+  have h₂ : ResU.Hash ρf ρ₂ :=
+    ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
+  obtain ⟨σ₂, hσ₂, hσ₂σ⟩ :=
+    (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v₁)) σ).mp
+      ⟨ρ, ResU.CompS.comm hcρ, hσ⟩
+  obtain ⟨hlv, μ₂, hlow₂, hupd, hnone⟩ := lower_compS_own_inv hσ₂σ hμ
+  obtain ⟨x, hx⟩ := (ResU.compS_defined_iff ρ₂ (ResU.single l (CellU.ownOf v₂))).mpr
+    (compatS_single_of_get_none (ResU.compatS_single_own hcρ.1))
+  obtain ⟨σ', hσ'x, hfx, hlow'⟩ := hash_compS_own hσ₂ hlow₂ hnone hx
+  have hstep : BoCa.BoLo.Heap.upd μ l v₂ = BoCa.BoLo.Heap.upd μ₂ l v₂ := by
+    funext k
+    by_cases e : k = l
+    · subst e; rw [BoCa.BoLo.Heap.upd_same, BoCa.BoLo.Heap.upd_same]
+    · rw [BoCa.BoLo.Heap.upd_other e, BoCa.BoLo.Heap.upd_other e, hupd,
+        BoCa.BoLo.Heap.upd_other e]
+  refine ⟨x, PMap.empty, σ, σ', σ', x, .unit, μ, BoCa.BoLo.Heap.upd μ₂ l v₂,
+    ResU.hash_symm hfx, hσ'x,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hfx hσ'x)),
+    hσ, hμ, ResU.comp_empty_right σ', hlow', ?_, ResU.comp_empty_right x, ?_,
+    noOwn_empty, hwand _ x rfl hx⟩
+  · rw [← hstep]
+    exact Steps.one (steps_store μ l v₂ v₁ hlv)
+  · exact ResU.UpdV.trans
+      (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2
+        (hash_valid hf).2).symm
+      (updV_compS_own hx (hash_valid h₂).2
+        (hash_valid hfx).2)
 
 end BoCa.TR3
 
@@ -1115,16 +1070,37 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.147 (wp[]) cites. -/
-/-- **`[TR]` Lemma 6.147** (`wp[]`, p. 38): `[α]wp(e){Q̂} ⊨ wp(e){[α]Q̂}`.  No
-well-formedness hypothesis, for `Fig16Wp`'s reason.  `[as printed]` -/
-theorem wp_box (α : Life) (e : Expr) (Q : Val → WProp) :
-    Entails (box α (wp e Q)) (wp e fun v => box α (Q v)) := by
-  rintro ρ ⟨hw, hout⟩ ρf hf
-  obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
-    hA, hB, hC⟩ := hw ρf hf
-  exact ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
-    hA, hB, hC, ((outlives_comp h₉ α).mp (updV_outlives hout hA)).1⟩
+/-! A declaration the record of Lemma 6.146 (wp-ramify) cites. -/
+/-- **`[TR]` Lemma 6.146** (`wp-ramify`, p. 38):
+`wp(e){P̂} ⋆ (P̂ ─⋆ Q̂) ⊨ wp(e){Q̂}`.  `[as printed]` (the printed `(P̂ –⋆ Q̂)`
+read as `wandAll`) -/
+theorem wp_ramify (e : Expr) (P Q : Val → WProp) :
+    Entails (sep (wp e P) (wandAll P Q)) (wp e Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, hwp, hwand⟩ ρf hf
+  obtain ⟨y, hy, hy₁⟩ :=
+    (hash_shift ρf ρ₂ ρ₁).mp ⟨ρ, ResU.CompS.comm hcρ, hf⟩
+  obtain ⟨ρ', ρp, Y₁, Y', Y'p, π', v, μ, μ', g₁, g₂, g₃, g₄, g₅, g₆, g₇, g₈, g₉,
+    gA, gB, gC⟩ := hwp y hy₁
+  obtain ⟨W, hW, hfW⟩ := compS_reassoc hy g₂
+  obtain ⟨r, hr, hfr⟩ := compS_reassoc hy g₄
+  have hfρ : ResU.CompS ρf ρ Y₁ := by
+    rwa [ResU.CompS.functional hcρ (ResU.CompS.comm hr)]
+  obtain ⟨W₀, hW₀, hWf₀⟩ :=
+    (hash_shift ρ' ρ₂ ρf).mp ⟨y, ResU.CompS.comm hy, g₁⟩
+  have hWf : ResU.Hash W ρf := by
+    rwa [ResU.CompS.functional (ResU.CompS.comm hW₀) hW] at hWf₀
+  obtain ⟨-, hWp⟩ := ResU.Hash.split hfW (ResU.hash_symm g₃)
+  obtain ⟨πW, hπW, h₂π₀⟩ := (hash_shift ρ₂ ρ' ρp).mpr ⟨W, hW, hWp⟩
+  have h₂π : ResU.Hash ρ₂ π' := by rwa [ResU.CompS.functional hπW g₉] at h₂π₀
+  obtain ⟨πn, hπn, -⟩ := h₂π.2
+  obtain ⟨Wn, hWn, hWπ₀⟩ := compS_reassoc' g₉ hπn
+  have hWπ : ResU.CompS W ρp πn := by
+    rwa [ResU.CompS.functional hWn hW] at hWπ₀
+  refine ⟨W, ρp, Y₁, Y', Y'p, πn, v, μ, μ', hWf, hfW, g₃, hfρ, g₅, g₆, g₇, g₈,
+    hWπ, ?_, gB, hwand v ρ' W gC hW⟩
+  exact updV_frame (ResU.CompS.comm hcρ) hπn
+    ⟨(ResU.CompS.comm hcρ).1, ρ, ResU.CompS.comm hcρ,
+      (hash_valid hf).2⟩ h₂π gA
 
 end BoCa.TR3
 
@@ -1173,47 +1149,16 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.148 (wp-M-forget) cites. -/
-/-- **A frame with no owned cell passes through a printed run.**
-`[about ours: the argument `[TR]` 6.148 and 6.149 share, at the one property of
-the frame both use]` -/
-theorem wp_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ)
-    (e : Expr) (Q : Val → WProp) : Entails (sep R (wp e Q)) (wp e Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, hR₁, hwp⟩ ρf hf
-  obtain ⟨y, hy, hy₂⟩ := (hash_shift ρf ρ₁ ρ₂).mp ⟨ρ, hcρ, hf⟩
-  obtain ⟨ρ'', ρp, Y₂, Y'', Y''p, π', v', μ, μ', g₁, g₂, g₃, g₄, g₅, g₆, g₇, g₈, g₉,
-    gA, gB, gC⟩ := hwp y hy₂
-  obtain ⟨hfρ'', -⟩ := ResU.Hash.split hy (ResU.hash_symm g₁)
-  obtain ⟨F, hF, hFv⟩ := hfρ''.2
-  obtain ⟨bc, hbc, hfρ⟩ := compS_reassoc hy g₄
-  cases ResU.CompS.functional hbc hcρ
-  obtain ⟨F', hF', hFρ₁⟩ := compS_exch hy g₂
-  cases ResU.CompS.functional hF' hF
-  obtain ⟨Z, hZ, hZF⟩ :=
-    (hash_shift ρp ρ₁ F).mp ⟨Y'', ResU.CompS.comm hFρ₁, g₃⟩
-  obtain ⟨Z', hZ', hFZ⟩ := compS_reassoc hFρ₁ g₆
-  cases ResU.CompS.functional (ResU.CompS.comm hZ') hZ
-  obtain ⟨d, hd, hfd⟩ := compS_reassoc hy g₂
-  obtain ⟨-, hdp⟩ := ResU.Hash.split hfd (ResU.hash_symm g₃)
-  obtain ⟨π'', hπ'', h₁π⟩ := (hash_shift ρ₁ ρ'' ρp).mpr ⟨d, hd, hdp⟩
-  cases ResU.CompS.functional hπ'' g₉
-  obtain ⟨πn, hπn, -⟩ := h₁π.2
-  obtain ⟨ac, hac, hπZ⟩ := compS_lcomm g₉ hπn
-  cases ResU.CompS.functional (ResU.CompS.comm hac) hZ
-  refine ⟨ρ'', Z, Y₂, F, Y''p, πn, v', μ, μ', ResU.hash_symm hfρ'', hF, hZF,
-    hfρ, g₅, hFZ, g₇, g₈, hπZ, ?_,
-    noOwn_compS hZ gB (hR ρ₁ hR₁), gC⟩
-  exact updV_frame hcρ hπn
-    ⟨hcρ.1, ρ, hcρ, (hash_valid hf).2⟩ h₁π gA
-
-/-! A declaration the record of Lemma 6.148 (wp-M-forget) cites. -/
-/-- **`[TR]` Lemma 6.148** (`wp-M-forget`, p. 38):
-`ℓ ↦M_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}`.  `[as printed]` -/
-theorem wp_M_forget (l : BoCa.Loc) (α : Life) (P : Val → WProp) (e : Expr)
-    (Q : Val → WProp) : Entails (sep (ptoMut l α P) (wp e Q)) (wp e Q) := by
-  refine wp_frame_noOwn (fun ρ h => ?_) e Q
-  obtain ⟨b, v, σ, hs, R, hw, hα, rfl, -⟩ := h
-  exact ResU.restrict_single_other (by simp)
+/-! A declaration the record of Lemma 6.147 (wp[]) cites. -/
+/-- **`[TR]` Lemma 6.147** (`wp[]`, p. 38): `[α]wp(e){Q̂} ⊨ wp(e){[α]Q̂}`.  No
+well-formedness hypothesis, for `Fig16Wp`'s reason.  `[as printed]` -/
+theorem wp_box (α : Life) (e : Expr) (Q : Val → WProp) :
+    Entails (box α (wp e Q)) (wp e fun v => box α (Q v)) := by
+  rintro ρ ⟨hw, hout⟩ ρf hf
+  obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hC⟩ := hw ρf hf
+  exact ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hC, ((outlives_comp h₉ α).mp (updV_outlives hout hA)).1⟩
 
 end BoCa.TR3
 
@@ -1297,13 +1242,46 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap)
 open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
 
-/-! A declaration the record of Lemma 6.149 (wp-I-forget) cites. -/
-/-- **`[TR]` Lemma 6.149** (`wp-I-forget`, p. 38):
-`ℓ ↦I_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}`.  `[as printed]` -/
-theorem wp_I_forget (l : BoCa.Loc) (α : Life) (P : Val → WProp) (e : Expr)
-    (Q : Val → WProp) : Entails (sep (ptoImm l α P) (wp e Q)) (wp e Q) := by
+/-! A declaration the record of Lemma 6.148 (wp-M-forget) cites. -/
+/-- **A frame with no owned cell passes through a printed run.**
+`[about ours: the argument `[TR]` 6.148 and 6.149 share, at the one property of
+the frame both use]` -/
+theorem wp_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ)
+    (e : Expr) (Q : Val → WProp) : Entails (sep R (wp e Q)) (wp e Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, hR₁, hwp⟩ ρf hf
+  obtain ⟨y, hy, hy₂⟩ := (hash_shift ρf ρ₁ ρ₂).mp ⟨ρ, hcρ, hf⟩
+  obtain ⟨ρ'', ρp, Y₂, Y'', Y''p, π', v', μ, μ', g₁, g₂, g₃, g₄, g₅, g₆, g₇, g₈, g₉,
+    gA, gB, gC⟩ := hwp y hy₂
+  obtain ⟨hfρ'', -⟩ := ResU.Hash.split hy (ResU.hash_symm g₁)
+  obtain ⟨F, hF, hFv⟩ := hfρ''.2
+  obtain ⟨bc, hbc, hfρ⟩ := compS_reassoc hy g₄
+  cases ResU.CompS.functional hbc hcρ
+  obtain ⟨F', hF', hFρ₁⟩ := compS_exch hy g₂
+  cases ResU.CompS.functional hF' hF
+  obtain ⟨Z, hZ, hZF⟩ :=
+    (hash_shift ρp ρ₁ F).mp ⟨Y'', ResU.CompS.comm hFρ₁, g₃⟩
+  obtain ⟨Z', hZ', hFZ⟩ := compS_reassoc hFρ₁ g₆
+  cases ResU.CompS.functional (ResU.CompS.comm hZ') hZ
+  obtain ⟨d, hd, hfd⟩ := compS_reassoc hy g₂
+  obtain ⟨-, hdp⟩ := ResU.Hash.split hfd (ResU.hash_symm g₃)
+  obtain ⟨π'', hπ'', h₁π⟩ := (hash_shift ρ₁ ρ'' ρp).mpr ⟨d, hd, hdp⟩
+  cases ResU.CompS.functional hπ'' g₉
+  obtain ⟨πn, hπn, -⟩ := h₁π.2
+  obtain ⟨ac, hac, hπZ⟩ := compS_lcomm g₉ hπn
+  cases ResU.CompS.functional (ResU.CompS.comm hac) hZ
+  refine ⟨ρ'', Z, Y₂, F, Y''p, πn, v', μ, μ', ResU.hash_symm hfρ'', hF, hZF,
+    hfρ, g₅, hFZ, g₇, g₈, hπZ, ?_,
+    noOwn_compS hZ gB (hR ρ₁ hR₁), gC⟩
+  exact updV_frame hcρ hπn
+    ⟨hcρ.1, ρ, hcρ, (hash_valid hf).2⟩ h₁π gA
+
+/-! A declaration the record of Lemma 6.148 (wp-M-forget) cites. -/
+/-- **`[TR]` Lemma 6.148** (`wp-M-forget`, p. 38):
+`ℓ ↦M_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}`.  `[as printed]` -/
+theorem wp_M_forget (l : BoCa.Loc) (α : Life) (P : Val → WProp) (e : Expr)
+    (Q : Val → WProp) : Entails (sep (ptoMut l α P) (wp e Q)) (wp e Q) := by
   refine wp_frame_noOwn (fun ρ h => ?_) e Q
-  obtain ⟨s, v, σ, hs, rfl, -, -⟩ := h
+  obtain ⟨b, v, σ, hs, R, hw, hα, rfl, -⟩ := h
   exact ResU.restrict_single_other (by simp)
 
 end BoCa.TR3
@@ -1339,6 +1317,22 @@ end BoCa.Fig16.BoLo
 
 alias TR.lemma_6_149 := BoCa.Fig16.BoLo.wp_I_forget
 alias TR.«wp-I-forget» := BoCa.Fig16.BoLo.wp_I_forget
+
+namespace BoCa.TR3
+open BoCa.Fig16
+open BoCa.BoLo (Heap)
+open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives_comp NoOwn noOwn_empty noOwn_compS hash_lower hash_valid hash_valid_comp hash_shift updV_compS_own hash_compS_own lower_compS_own_inv lower_get_own lower_eq_none_iff get_eq_none_of_flat get_eq_none_of_compatS_own compatS_single_of_get_none loc_infinite compS_reassoc compS_reassoc' compS_exch compS_lcomm updV_frame updV_outlives)
+
+/-! A declaration the record of Lemma 6.149 (wp-I-forget) cites. -/
+/-- **`[TR]` Lemma 6.149** (`wp-I-forget`, p. 38):
+`ℓ ↦I_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}`.  `[as printed]` -/
+theorem wp_I_forget (l : BoCa.Loc) (α : Life) (P : Val → WProp) (e : Expr)
+    (Q : Val → WProp) : Entails (sep (ptoImm l α P) (wp e Q)) (wp e Q) := by
+  refine wp_frame_noOwn (fun ρ h => ?_) e Q
+  obtain ⟨s, v, σ, hs, rfl, -, -⟩ := h
+  exact ResU.restrict_single_other (by simp)
+
+end BoCa.TR3
 
 namespace BoCa.Fig16.BoLo
 open BoCa.Fig16

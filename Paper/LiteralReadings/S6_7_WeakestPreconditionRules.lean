@@ -315,6 +315,24 @@ theorem agW_rho2 : AgW (rho2 v u) (PMap.empty : ResU Nat BoCa.Val) := by
     AgWitsM.nil AgWitsI.nil BigComp.nil BigComp.nil ?_ (ResU.comp_empty_right _)
   rw [rho2_restrict_imm]; exact ResU.comp_empty_right _
 
+theorem comp_restrict_own : ResU.restrict (comp α β v u w) Kind.own = PMap.empty := by
+  refine PMap.ext fun l => ?_
+  rw [PMap.empty_get]
+  by_cases e0 : l = 0
+  · subst e0; exact ResU.restrict_get_ne (comp_0 α β v u w) (by rw [cellF_kind]; decide)
+  · by_cases e2 : l = 2
+    · subst e2; exact ResU.restrict_get_ne (comp_2 α β v u w) (by rw [cellB_kind]; decide)
+    · exact ResU.restrict_get_none (comp_ne α β v u w e0 e2)
+
+theorem comp_restrict_mut : ResU.restrict (comp α β v u w) Kind.mut = PMap.empty := by
+  refine PMap.ext fun l => ?_
+  rw [PMap.empty_get]
+  by_cases e0 : l = 0
+  · subst e0; exact ResU.restrict_get_ne (comp_0 α β v u w) (by rw [cellF_kind]; decide)
+  · by_cases e2 : l = 2
+    · subst e2; exact ResU.restrict_get_ne (comp_2 α β v u w) (by rw [cellB_kind]; decide)
+    · exact ResU.restrict_get_none (comp_ne α β v u w e0 e2)
+
 theorem comp_restrict_imm : ResU.restrict (comp α β v u w) Kind.imm = comp α β v u w := by
   refine PMap.ext fun l => ?_
   by_cases e0 : l = 0
@@ -345,6 +363,12 @@ theorem comp_sites_imm : ResU.Sites (comp α β v u w) Kind.imm [0, 2] := by
     · by_cases e2 : l = 2
       · exact e2 ▸ List.mem_cons.mpr (Or.inr (List.mem_singleton.mpr rfl))
       · rw [comp_ne α β v u w e0 e2] at hg; cases hg
+
+theorem exS_comp : ExS (comp α β v u w) PMap.empty := by
+  refine ExW.mk (w := []) (b := PMap.empty) (nm := PMap.empty)
+    (comp_sites_mut α β v u w) ExWits.nil BigComp.nil ?_ (ResU.comp_empty_right _)
+  rw [comp_restrict_own, comp_restrict_mut]
+  exact ResU.comp_empty_right _
 
 theorem agWitsI_comp : AgWitsI (comp α β v u w) [(0, PMap.empty), (2, rho2 v u)] := by
   refine AgWitsI.cons (cellF β v) (comp_0 α β v u w) (cellF_kind β v)
@@ -399,6 +423,34 @@ theorem agW_comp : AgW (comp α β v u w) (sigma α β v u w) := by
             rw [comp_2, rho2_ne v u (by decide) (by decide), sigma_2]; exact rfl
           · rw [comp_ne α β v u w e0 e2, rho2_ne v u e0 e1, sigma_ne α β v u w e0 e1 e2]
             exact rfl
+
+theorem flat_composite : ResU.Flat (comp α β v u w) (sigma α β v u w) :=
+  ⟨PMap.empty, sigma α β v u w, exS_comp α β v u w, agW_comp α β v u w,
+    ResU.comp_empty_left _⟩
+
+/-- **The counterexample state is valid** (defect B's `Valid_composite`). -/
+theorem Valid_composite : ResU.Valid (comp α β v u w) :=
+  ⟨_, flat_composite α β v u w⟩
+
+/-- `ρ_f ● (borrow cell) = comp`, with the borrow cell FIRST (the order the
+`⋆` in the `↺` rule's LHS needs). -/
+theorem bcell_frame_comp :
+    ResU.CompS (ResU.single 2 (cellB α v u w)) (ResU.single 0 (cellF β v))
+      (comp α β v u w) := by
+  refine ⟨ResU.Compat.of_disjoint (fun l => ?_), fun l => ?_⟩
+  · by_cases e2 : l = 2
+    · subst e2; exact Or.inr (ResU.single_get_ne _ (by decide))
+    · exact Or.inl (ResU.single_get_ne _ e2)
+  · by_cases e0 : l = 0
+    · subst e0
+      rw [ResU.single_get_ne _ (by decide : (0:Nat) ≠ 2), ResU.single_get_self, comp_0]
+      exact rfl
+    · by_cases e2 : l = 2
+      · subst e2
+        rw [ResU.single_get_self, ResU.single_get_ne _ (by decide : (2:Nat) ≠ 0), comp_2]
+        exact rfl
+      · rw [ResU.single_get_ne _ e2, ResU.single_get_ne _ e0, comp_ne α β v u w e0 e2]
+        exact rfl
 
 def witU : ResU Nat BoCa.Val := ResU.single 1 (CellU.ownOf u)
 
@@ -464,58 +516,6 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 variable (α β : Life) (v u w : BoCa.Val)
 
 /-! `[about ours]` — what the Lean of Lemma 6.150 needs; the paper prints nothing here. -/
-theorem comp_restrict_own : ResU.restrict (comp α β v u w) Kind.own = PMap.empty := by
-  refine PMap.ext fun l => ?_
-  rw [PMap.empty_get]
-  by_cases e0 : l = 0
-  · subst e0; exact ResU.restrict_get_ne (comp_0 α β v u w) (by rw [cellF_kind]; decide)
-  · by_cases e2 : l = 2
-    · subst e2; exact ResU.restrict_get_ne (comp_2 α β v u w) (by rw [cellB_kind]; decide)
-    · exact ResU.restrict_get_none (comp_ne α β v u w e0 e2)
-
-theorem comp_restrict_mut : ResU.restrict (comp α β v u w) Kind.mut = PMap.empty := by
-  refine PMap.ext fun l => ?_
-  rw [PMap.empty_get]
-  by_cases e0 : l = 0
-  · subst e0; exact ResU.restrict_get_ne (comp_0 α β v u w) (by rw [cellF_kind]; decide)
-  · by_cases e2 : l = 2
-    · subst e2; exact ResU.restrict_get_ne (comp_2 α β v u w) (by rw [cellB_kind]; decide)
-    · exact ResU.restrict_get_none (comp_ne α β v u w e0 e2)
-
-theorem exS_comp : ExS (comp α β v u w) PMap.empty := by
-  refine ExW.mk (w := []) (b := PMap.empty) (nm := PMap.empty)
-    (comp_sites_mut α β v u w) ExWits.nil BigComp.nil ?_ (ResU.comp_empty_right _)
-  rw [comp_restrict_own, comp_restrict_mut]
-  exact ResU.comp_empty_right _
-
-theorem flat_composite : ResU.Flat (comp α β v u w) (sigma α β v u w) :=
-  ⟨PMap.empty, sigma α β v u w, exS_comp α β v u w, agW_comp α β v u w,
-    ResU.comp_empty_left _⟩
-
-/-- **The counterexample state is valid** (defect B's `Valid_composite`). -/
-theorem Valid_composite : ResU.Valid (comp α β v u w) :=
-  ⟨_, flat_composite α β v u w⟩
-
-/-- `ρ_f ● (borrow cell) = comp`, with the borrow cell FIRST (the order the
-`⋆` in the `↺` rule's LHS needs). -/
-theorem bcell_frame_comp :
-    ResU.CompS (ResU.single 2 (cellB α v u w)) (ResU.single 0 (cellF β v))
-      (comp α β v u w) := by
-  refine ⟨ResU.Compat.of_disjoint (fun l => ?_), fun l => ?_⟩
-  · by_cases e2 : l = 2
-    · subst e2; exact Or.inr (ResU.single_get_ne _ (by decide))
-    · exact Or.inl (ResU.single_get_ne _ e2)
-  · by_cases e0 : l = 0
-    · subst e0
-      rw [ResU.single_get_ne _ (by decide : (0:Nat) ≠ 2), ResU.single_get_self, comp_0]
-      exact rfl
-    · by_cases e2 : l = 2
-      · subst e2
-        rw [ResU.single_get_self, ResU.single_get_ne _ (by decide : (2:Nat) ≠ 0), comp_2]
-        exact rfl
-      · rw [ResU.single_get_ne _ e2, ResU.single_get_ne _ e0, comp_ne α β v u w e0 e2]
-        exact rfl
-
 /-- **Defect B's `conclusion_fails`, generalised over the shallow cell's
 lifetime and value.**  The shallow imm `0↦imm(s, x, ∅)` and the deep reborrow
 `rebA β = 0↦imm({β}, v, 1↦own(u))` are strict-INCOMPATIBLE — their witnesses

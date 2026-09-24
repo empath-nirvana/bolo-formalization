@@ -24,6 +24,32 @@ this file.
 
 noncomputable section
 
+namespace BoCa.Fig16.LogRel
+open BoCa.Fig16
+open BoCa.Fig16.BoLo
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
+
+/-!
+### Lemma 6.131 (↺V₁) — literal reading
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.131 (↺V₁).
+-/
+/-- **What `[TR]` 6.131's `Ref` bullet leaves, followed as printed.**  After
+"Apply IH", "Apply theorem 6.130", "Apply `↺⋆`" and the unit law the antecedent
+is `↺_α (↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′))` and the goal is `↺_α 𝒱⟦Imm 'a T′⟧δ(v)`, with
+`Imm` the constructor (clause (5)).  This is that entailment: the modality is
+doubled and the value is the cell's *contents* `v′` where the goal names the
+*location* `v`.  It is not derived, and no obstruction to it has been verified;
+`reborrow_vDen`'s `Ref` block takes `[TR]` 6.121 (`↺↦`) at this step instead.
+`[about ours: the residual of 6.131's printed `Ref` chain, at our objects]` -/
+def RefPrintedChainResidual (α : Life) (x : LifeVar) (δ : LSub) (T : Ty) (v : Val) : Prop :=
+  ∀ v' : Val,
+    reborrow α (reborrow α (vDen (T.immReborrow (.var x)) δ v'))
+      ⊨ reborrow α (vDen (Ty.imm (.var x) T) δ v)
+
+end BoCa.Fig16.LogRel
+
 namespace BoCa.Fig16.RebExample
 
 /-! `[about ours]` — what the Lean of Lemma 6.130 needs; the paper prints nothing here. -/
@@ -75,31 +101,5 @@ theorem reborrow_emp_outside_stratum (v w : Nat) :
   exact RebExample.not_reb_of_at v w ρ' hr
 
 end BoCa.Fig16.BoLo
-
-namespace BoCa.Fig16.LogRel
-open BoCa.Fig16
-open BoCa.Fig16.BoLo
-open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
-
-/-!
-### Lemma 6.131 (↺V₁) — literal reading
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.131 (↺V₁).
--/
-/-- **What `[TR]` 6.131's `Ref` bullet leaves, followed as printed.**  After
-"Apply IH", "Apply theorem 6.130", "Apply `↺⋆`" and the unit law the antecedent
-is `↺_α (↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′))` and the goal is `↺_α 𝒱⟦Imm 'a T′⟧δ(v)`, with
-`Imm` the constructor (clause (5)).  This is that entailment: the modality is
-doubled and the value is the cell's *contents* `v′` where the goal names the
-*location* `v`.  It is not derived, and no obstruction to it has been verified;
-`reborrow_vDen`'s `Ref` block takes `[TR]` 6.121 (`↺↦`) at this step instead.
-`[about ours: the residual of 6.131's printed `Ref` chain, at our objects]` -/
-def RefPrintedChainResidual (α : Life) (x : LifeVar) (δ : LSub) (T : Ty) (v : Val) : Prop :=
-  ∀ v' : Val,
-    reborrow α (reborrow α (vDen (T.immReborrow (.var x)) δ v'))
-      ⊨ reborrow α (vDen (Ty.imm (.var x) T) δ v)
-
-end BoCa.Fig16.LogRel
 
 end

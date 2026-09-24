@@ -1,6 +1,5 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S2_Statics.Definitions
-import Support.Lifetimes.Terms
 
 /-!
 # Support — Lifetimes — Interpretation
@@ -16,10 +15,6 @@ noncomputable section
 namespace BoCa.Lifetime.LSub
 
 def extend (δ : LSub) (x : LifeVar) (v : Nat) : LSub := ⟨(x, v) :: δ.entries⟩
-
-theorem find?_extend (δ : LSub) (x : LifeVar) (v : Nat) (y : LifeVar) :
-    (δ.extend x v).find? y = if x = y then some v else δ.find? y := by
-  simp [find?, extend, assocFind]
 
 end BoCa.Lifetime.LSub
 

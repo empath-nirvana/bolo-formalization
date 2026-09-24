@@ -491,3 +491,81 @@ SUPPORT_WHAT.update({
  "Support/Model/UpdateSymmetry": "`↭` is symmetric, and `ρ ↭ ρ` read off validity",
  "Support/TypedWorld/Reborrow": "`[TR]` Theorem 6.150 at `wpTS` (source `BoCa/TypedReborrow.lean`): the chooser `RebChooseTW` that replaces `RebEscrow`, and the rule",
 })
+
+banners["Paper/S6_8_FundamentalProperty/Lemmas"] = """/-!
+# [TR] §6.8 Fundamental Property  (physical pp. 40–49), Lemmas 6.151–6.176
+
+The Fundamental Property (6.151) and its compatibility lemmas, one per typing rule
+of `[TR]` p. 2 and per row of its axiom table (6.152–6.176).
+
+**Two judgments.**  Each compatibility lemma is declared at the printed definitions
+read literally — `Sem`, over `𝒱⟦−⟧`, `𝒢⟦−⟧` and the printed `wp` — and its record
+names the same proof at the repaired judgment `SemX` (rows 4.4–4.14 and 5.33's
+repairs) under *Typed-world version*; the `_compatX` declarations are in
+`Support/TypedWorld/Compatibility.lean`.  6.151 is stated at the repaired judgment
+and proved there with no hypothesis beyond p. 2's presuppositions
+(`Fig16.LogRel.Typed.fundamentalProperty`, `TR.lemma_6_151`), by the printed
+induction over the `_compatX` lemmas; the same statement at `Sem`, proved from the
+hypothesis `WithloadEscrow`, is kept beside it and marked as the literal reading,
+and what refuses it without that hypothesis is in
+`Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
+
+Several compatibility lemmas carry added hypotheses the printed proofs name
+(freshness of a binder, 6.150's escrow); each record's source tag says which, and
+the declarations beside it (`…Side_unit`, `withload_hesc_unit`) show them
+inhabited.
+""" + RESULTS_READING + TYPED_NOTE + "-/\n"
+
+banners["Paper/CONF/Results"] = """/-!
+# [CONF] §3 — the conference paper's numbered results  (pp. 415:17–18)
+
+`[CONF]` numbers three results.  **Lemma 3.1** is `[TR]` 6.151, printed twice; its
+declaration is in `Paper/S6_8_FundamentalProperty/Lemmas.lean` and its record here
+aliases it (`CONF.lemma_3_1`).  **Theorem 3.2** (adequacy: termination and memory
+reclamation) and **Corollary 3.3** (adequacy at `1`) are stated in `[CONF]` and
+proved in neither document; the proofs here are the source's.  Each is stated once
+per machine — the library's (`BoLo.Steps`, `[TR]` §3 with rows 3.30 and 3.31's two
+frames) and `[TR]` §3's as printed (`TR3.Steps`) — and once more at the repaired
+judgment (`Fig16.LogRel.Typed.theorem32`, `Fig16.LogRel.Typed.corollary33`).
+
+**The headline.**  `Fig16.LogRel.Typed.adequacy` composes Corollary 3.3 at `SemX`
+with 6.151: `DerivesWf ∅ [] e 1 → (∅, e) →* (∅, ())` — termination and memory
+reclamation for every closed program `[TR]` p. 2 types at `1`, with no semantic
+hypothesis.
+""" + RESULTS_READING + "-/\n"
+
+banners["Paper/LiteralReadings/S6_8_FundamentalProperty"] = """/-!
+# Literal readings — [TR] §6.8
+
+* 6.151: `ViewWitness.fundamentalProperty_refused` — at a `withloadAx` node of our
+  carrier, the statement at `Sem` without `WithloadEscrow` is refused (the
+  configuration and its runs, source `BoCa/ViewWitness.lean`, move here with it);
+  `ViewWitness.excluded` — that configuration is not a typed world with the
+  argument in its type (source `BoCa/TypedViewWitness.lean`);
+* 6.151, the antecedent read as the rule figures alone (`Derives` instead of p. 2's
+  `DerivesWf`): `FundamentalPropertyOverRules`, `not_everyDerivationWf`, the route
+  through `DerivesIn` (`fundamental_of_open`, `fundamental_in`,
+  `fundamentalProperty_of`) and `not_everyDerivationInRegime`; and `SemArising`,
+  which is not a route to the row (`sem_of_semArising` concludes at `gDenB`);
+* 6.154, 6.155, 6.157, 6.169, 6.170: each compatibility lemma's step measured over
+  `[TR]` §3's printed machine (`…_refuted_on_TR3`, `…_step_on_TR3`,
+  `swap_step_blocked_on_TR3`), at the closed terms `[TR]` p. 2 types there;
+* 6.162: `MutGapClosed.gap_closed`, the old carrier's counterexample type run
+  through the printed `mut` cell, which stores the predicate.
+""" + LITERAL_READING + "-/\n"
+
+banners["Paper/LiteralReadings/CONF"] = """/-!
+# Literal readings — [CONF] §3
+
+* Corollary 3.3: `TR3.corThree_unreachable` — the closed term `free (alloc ()); ()`,
+  typed at `1` by `[TR]` p. 2, has no run to `()` on `[TR]` §3's printed machine.
+  Over that machine `TR3.wp_seq_false` refuses the corollary's semantic hypothesis at
+  the same term, so what this measures is the composite with Lemma 3.1.
+""" + LITERAL_READING + "-/\n"
+
+SUPPORT_WHAT.update({
+ "Support/Statics/Presupposed": "the judgments `[TR]` p. 2 presupposes: `⊨ Δ` carried as `Δ.Ok` (sufficient, `sat_of_ok`), `Δ ⊢ T` as `Ty.wfB`/`Ty.scopedB`, `Δ ⊢ Γ` as `Ctx.ScopedB`, and `Δ; Γ ⊢ e : T` under them (`DerivesWf`), with the facts about lifetime interpretation and fresh variables they need",
+ "Support/LogicalRelation/Compatibility": "what the compatibility lemmas share at the literal judgment: `𝒢⟦Γ⟧` split along the context, `wp` monotone and bound with a frame, `𝒱⟦−⟧` under substitution and instantiation, the members of a lifetime, the hypotheses 6.172–6.175 add (`…Side`) and the derivations that carry them (`DerivesIn`)",
+ "Support/LogicalRelation/Adequacy": "the empty memory, and the judgment at `Δ = Γ = ∅` read at `δ = ∅`, `γ = []`, `ρ = ∅`",
+ "Support/TypedWorld/Compatibility": "the compatibility lemmas at `SemX` (source `BoCa/TypedFundamental.lean`): `𝒢X⟦Γ⟧` split along the context, `wpTS` monotone and bound with a frame, the stratified connectives, and 6.152–6.176 as `_compatX`",
+})

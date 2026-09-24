@@ -24,7 +24,7 @@ namespace BoCa.Fig16.LogRel.Typed
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
 /-- **`𝒱⟦T⟧`'s shape**: `vDen` with the `⊸` and `∀` clauses dropped (no `wp`, so no world

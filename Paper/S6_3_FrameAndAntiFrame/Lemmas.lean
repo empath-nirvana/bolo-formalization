@@ -82,7 +82,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ## Theorem 6.64 (Imm Frame) · `[TR]` p. 22 · inventory `proved`
@@ -287,7 +287,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ## Theorem 6.65 (Mut Frame) · `[TR]` p. 24 · inventory `proved`
@@ -521,7 +521,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ## Theorem 6.66 (Anti Frame) · `[TR]` p. 25 · inventory `proved`

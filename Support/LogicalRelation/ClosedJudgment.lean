@@ -18,7 +18,7 @@ namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-- `Δ; Γ ⊨ e : T` as a proposition: a persistent proposition holds exactly when
 it holds of `∅`. -/

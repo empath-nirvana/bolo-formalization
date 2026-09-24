@@ -4,8 +4,10 @@ import Support.Dynamics.PrintedWp
 import Support.Lifetimes.Interpretation
 import Support.Lifetimes.Substitution
 import Support.Lifetimes.Terms
+import Support.LogicalRelation.Adequacy
 import Support.LogicalRelation.ClosedJudgment
 import Support.LogicalRelation.ClosingSubstitutions
+import Support.LogicalRelation.Compatibility
 import Support.LogicalRelation.Facts
 import Support.Model.Algebra
 import Support.Model.AlgebraInstances
@@ -42,7 +44,9 @@ import Support.Model.UpdateSymmetry
 import Support.Model.Walks
 import Support.Model.WalkSplitting
 import Support.Statics.Contexts
+import Support.Statics.Presupposed
 import Support.Syntax.Terms
+import Support.TypedWorld.Compatibility
 import Support.TypedWorld.FrameRules
 import Support.TypedWorld.Images
 import Support.TypedWorld.Invariant

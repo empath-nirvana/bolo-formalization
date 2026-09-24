@@ -1,9 +1,11 @@
 import Paper.CONF.Results
+import Paper.LiteralReadings.CONF
 import Paper.LiteralReadings.S4_LogicalRelation
 import Paper.LiteralReadings.S6_4_StandardEntailments
 import Paper.LiteralReadings.S6_5_NonStandardEntailments
 import Paper.LiteralReadings.S6_6_ReborrowingEntailments
 import Paper.LiteralReadings.S6_7_WeakestPreconditionRules
+import Paper.LiteralReadings.S6_8_FundamentalProperty
 import Paper.S1_Syntax.Definitions
 import Paper.S2_Statics.Definitions
 import Paper.S3_Dynamics.Definitions

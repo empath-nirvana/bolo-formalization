@@ -43,7 +43,7 @@ namespace BoCa.Fig16.LogRel.Typed
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
 theorem Rel.of_compS_left {r : FrameRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
@@ -139,6 +139,9 @@ theorem Ext.right {ls ls' : List SRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS 
 theorem Ext.trans {ls ls' ls'' : List SRec} {ρ : WRes} (h₁ : Ext ls ls' ρ)
     (h₂ : Ext ls' ls'' ρ) : Ext ls ls'' ρ :=
   ⟨h₁.1.trans h₂.1, fun b hb x hx => (h₁.2 b hb x hx).trans (h₂.2 b hb x hx)⟩
+
+theorem Ext.refl (ls : List SRec) (ρ : WRes) : Ext ls ls ρ :=
+  ⟨fun _ h _ => h, fun _ _ _ _ => Iff.rfl⟩
 
 /-- The stored list is `Ext`-below the current one at the cell's content: `σ ∈ Res_b`, so
 every `mut` cell of `σ` is longer-lived than `b`, and `ls₀` and `ls` agree above `b`. -/
@@ -450,6 +453,74 @@ theorem ext_of_same {ls ls' : List SRec} (h : ∀ x, x ∈ ls' ↔ x ∈ ls) (ρ
       exact mem_rsOf.mpr ⟨t, (h _).mpr ht⟩,
     fun _ _ x _ => (h x).symm⟩
 
+/-- `(P̂ ─⋆ Q̂)` at every list with the same members.  `[about ours: 6.146's wand at the lists
+a run can return]` -/
+def wandAllTS (ls : List SRec) (P Q : List SRec → Val → WProp) : WProp :=
+  fun ρ => ∀ ls', (∀ x, x ∈ ls' ↔ x ∈ ls) → ∀ v, wand (P ls' v) (Q ls' v) ρ
+
+/-- **`ls′` is `ls` with records at `α` added.**  `[about ours]` -/
+def AddAt (ls ls' : List SRec) (α : Life) : Prop :=
+  (∀ x ∈ ls, x ∈ ls') ∧ ∀ x ∈ ls', x ∉ ls → x.2 = α
+
+/-- **Adding records at `α` is `Ext` at a resource in `Res_α`** (6.64's entry). -/
+theorem ext_add {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
+    (hρ : ρ.InStratum α) : Ext ls ls' ρ := by
+  refine ⟨fun r hr _ => ?_, fun b hb x hx => ⟨h.1 x, fun h' => ?_⟩⟩
+  · obtain ⟨t, ht⟩ := mem_rsOf.mp hr
+    exact mem_rsOf.mpr ⟨t, h.1 _ ht⟩
+  · by_contra hn
+    have e := h.2 x h' hn
+    rw [e] at hx
+    exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
+
+/-- **Dropping records at `α` is `Ext` at a resource in `Res_α` none of whose relevant records
+is dropped** (6.64's exit). -/
+theorem ext_drop {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
+    (hρ : ρ.InStratum α) (hk : ∀ r ∈ rsOf ls', Rel r ρ → r ∈ rsOf ls) : Ext ls' ls ρ := by
+  refine ⟨hk, fun b hb x hx => ⟨fun h' => ?_, h.1 x⟩⟩
+  by_contra hn
+  have e := h.2 x h' hn
+  rw [e] at hx
+  exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
+
+/-- **A resource in `Res_α`, whose `imm` cells are in `ag(W)` and none at `p.le`, holds no view
+at `p`'s lineage** — `[TR]` 6.52's *"there are no borrows … at any lifetime shorter than α"*
+read through `FrameLife`. -/
+theorem not_rel_lineage {W : WRes} {p : FrameRec} {α : Life} (hFL : FrameLife W p α)
+    {aW : WRes} (haW : AgW W aW) {ρ : WRes} (hicp : ∀ m, ICpAt aW ρ m)
+    (hα : ρ.InStratum α) (hl : ∀ ψ : CellU Loc Val, ρ.get p.le = some ψ → ψ.kind ≠ Kind.imm)
+    {x : FrameRec} (hpx : DescR p x) : ¬ Rel x ρ := by
+  rintro ⟨m, ψ, e, k, hm⟩
+  obtain ⟨s, hs⟩ := lsOf_of_imm k
+  have hlow : s.meet ⊐ α := CellU.sqsupset_of_lsOf hs (hα m ψ e)
+  obtain ⟨ζ, t, eζ, ht, hmt⟩ := (hicp m ψ e).ls hs s.meet_mem
+  rcases linLoc_of_rel hpx hm with ⟨-, rfl⟩ | hL
+  · exact hl ψ e k
+  · exact lt_asymm hlow (hFL.2 aW haW m hL ζ t eζ ht s.meet hmt)
+
+/-- `FrameLife` names the lifetime of a record's cell. -/
+theorem frameLife_eq {W : WRes} {p : FrameRec} {α β : Life} (hFL : FrameLife W p α)
+    {aW : WRes} (haW : AgW W aW) {ζ : CellU Loc Val} {t : LSet} (e : aW.get p.le = some ζ)
+    (ht : ζ.lsOf = some t) (hβ : t.mem β) : β = α :=
+  hFL.1 aW haW ζ t e ht β hβ
+
+/-- The tagged list after `immFrame`. -/
+def frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) : List SRec :=
+  (p, α) :: (ds.map (fun d => (d, α)) ++ ls)
+
+theorem rsOf_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) :
+    rsOf (frameList p ds α ls) = p :: (ds ++ rsOf ls) := by
+  simp [frameList, rsOf, Function.comp_def]
+
+theorem addAt_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) :
+    AddAt ls (frameList p ds α ls) α := by
+  refine ⟨fun x hx => by simp [frameList, hx], fun x hx hn => ?_⟩
+  simp only [frameList, List.mem_cons, List.mem_append, List.mem_map] at hx
+  rcases hx with rfl | ⟨d, -, rfl⟩ | hx
+  · rfl
+  · rfl
+  · exact absurd hx hn
+
 /-!
 ### Lemma 6.136 (wp-val) — typed-world version
 
@@ -735,11 +806,6 @@ theorem wpTS_bind (K : Kont) (e : Expr) (ls : List SRec) (Q : List SRec → Val 
   exact ResU.UpdV.trans hA
     (updV_frame (ResU.CompS.comm h₉) hYn (ResU.hash_symm hpρ') hpπ kA)
 
-/-- `(P̂ ─⋆ Q̂)` at every list with the same members.  `[about ours: 6.146's wand at the lists
-a run can return]` -/
-def wandAllTS (ls : List SRec) (P Q : List SRec → Val → WProp) : WProp :=
-  fun ρ => ∀ ls', (∀ x, x ∈ ls' ↔ x ∈ ls) → ∀ v, wand (P ls' v) (Q ls' v) ρ
-
 /-!
 ### Lemma 6.146 (wp-ramify) — typed-world version
 
@@ -838,69 +904,6 @@ theorem wpTS_I_forget (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → W
   refine wpTS_frame_noOwn (fun ρ h => ?_) ls e Q
   obtain ⟨s, v, σ, hs, rfl, -, -⟩ := h
   exact ResU.restrict_single_other (by simp)
-
-/-- **`ls′` is `ls` with records at `α` added.**  `[about ours]` -/
-def AddAt (ls ls' : List SRec) (α : Life) : Prop :=
-  (∀ x ∈ ls, x ∈ ls') ∧ ∀ x ∈ ls', x ∉ ls → x.2 = α
-
-/-- **Adding records at `α` is `Ext` at a resource in `Res_α`** (6.64's entry). -/
-theorem ext_add {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
-    (hρ : ρ.InStratum α) : Ext ls ls' ρ := by
-  refine ⟨fun r hr _ => ?_, fun b hb x hx => ⟨h.1 x, fun h' => ?_⟩⟩
-  · obtain ⟨t, ht⟩ := mem_rsOf.mp hr
-    exact mem_rsOf.mpr ⟨t, h.1 _ ht⟩
-  · by_contra hn
-    have e := h.2 x h' hn
-    rw [e] at hx
-    exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
-
-/-- **Dropping records at `α` is `Ext` at a resource in `Res_α` none of whose relevant records
-is dropped** (6.64's exit). -/
-theorem ext_drop {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
-    (hρ : ρ.InStratum α) (hk : ∀ r ∈ rsOf ls', Rel r ρ → r ∈ rsOf ls) : Ext ls' ls ρ := by
-  refine ⟨hk, fun b hb x hx => ⟨fun h' => ?_, h.1 x⟩⟩
-  by_contra hn
-  have e := h.2 x h' hn
-  rw [e] at hx
-  exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
-
-/-- **A resource in `Res_α`, whose `imm` cells are in `ag(W)` and none at `p.le`, holds no view
-at `p`'s lineage** — `[TR]` 6.52's *"there are no borrows … at any lifetime shorter than α"*
-read through `FrameLife`. -/
-theorem not_rel_lineage {W : WRes} {p : FrameRec} {α : Life} (hFL : FrameLife W p α)
-    {aW : WRes} (haW : AgW W aW) {ρ : WRes} (hicp : ∀ m, ICpAt aW ρ m)
-    (hα : ρ.InStratum α) (hl : ∀ ψ : CellU Loc Val, ρ.get p.le = some ψ → ψ.kind ≠ Kind.imm)
-    {x : FrameRec} (hpx : DescR p x) : ¬ Rel x ρ := by
-  rintro ⟨m, ψ, e, k, hm⟩
-  obtain ⟨s, hs⟩ := lsOf_of_imm k
-  have hlow : s.meet ⊐ α := CellU.sqsupset_of_lsOf hs (hα m ψ e)
-  obtain ⟨ζ, t, eζ, ht, hmt⟩ := (hicp m ψ e).ls hs s.meet_mem
-  rcases linLoc_of_rel hpx hm with ⟨-, rfl⟩ | hL
-  · exact hl ψ e k
-  · exact lt_asymm hlow (hFL.2 aW haW m hL ζ t eζ ht s.meet hmt)
-
-/-- `FrameLife` names the lifetime of a record's cell. -/
-theorem frameLife_eq {W : WRes} {p : FrameRec} {α β : Life} (hFL : FrameLife W p α)
-    {aW : WRes} (haW : AgW W aW) {ζ : CellU Loc Val} {t : LSet} (e : aW.get p.le = some ζ)
-    (ht : ζ.lsOf = some t) (hβ : t.mem β) : β = α :=
-  hFL.1 aW haW ζ t e ht β hβ
-
-/-- The tagged list after `immFrame`. -/
-def frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) : List SRec :=
-  (p, α) :: (ds.map (fun d => (d, α)) ++ ls)
-
-theorem rsOf_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) :
-    rsOf (frameList p ds α ls) = p :: (ds ++ rsOf ls) := by
-  simp [frameList, rsOf, Function.comp_def]
-
-theorem addAt_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) :
-    AddAt ls (frameList p ds α ls) α := by
-  refine ⟨fun x hx => by simp [frameList, hx], fun x hx hn => ?_⟩
-  simp only [frameList, List.mem_cons, List.mem_append, List.mem_map] at hx
-  rcases hx with rfl | ⟨d, -, rfl⟩ | hx
-  · rfl
-  · rfl
-  · exact absurd hx hn
 
 end BoCa.Fig16.LogRel.Typed
 

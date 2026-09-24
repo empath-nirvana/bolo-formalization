@@ -25,8 +25,8 @@ def norm(s): return HYG.sub("_h", PRIV.sub("", s))
 # shape.  They are not compared by name: a reference to one (with or without a
 # universe instantiation `.{u}`) is replaced by a digest of its own type, which is
 # what identifies it.
-AUXREF = re.compile(r"[^\s(){}\[\]:,]+\.(?:match_\d+|_sparseCasesOn_\d+|proof_\d+|_proof_\d+)(?![\w])(?!\.[^{])")
-AUXDECL = re.compile(r"(\.(match_\d+(_\d+)?|_sparseCasesOn_\d+|proof_\d+|_proof_\d+|_simp_\d+(_\d+)*|_f|_sunfold|_unsafe_rec|splitter|eq_\d+|eq_def|below|brecOn|binductionOn)$)|_aux_|^_h$")
+AUXREF = re.compile(r"[^\s(){}\[\]:,]+\.(?:match_\d+|_sparseCasesOn_\d+|proof_\d+|_proof_\d+(?:_\d+)*)(?![\w])(?!\.[^{])")
+AUXDECL = re.compile(r"(\.(match_\d+(_\d+)?|_sparseCasesOn_\d+|proof_\d+|_proof_\d+(_\d+)*|_simp_\d+(_\d+)*|_f|_sunfold|_unsafe_rec|splitter|eq_\d+|eq_def|below|brecOn|binductionOn)$)|_aux_|^_h$")
 def load(p):
     raw = {}
     for line in open(p, encoding="utf-8"):

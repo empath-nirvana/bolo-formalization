@@ -1,13 +1,20 @@
 import Paper.S1_Syntax.Definitions
+import Paper.S2_Statics.Definitions
 import Paper.S3_Dynamics.Definitions
 import Paper.S5_Model.Definitions
 import Paper.S6_1_StandardLemmas.Lemmas
 import Paper.S6_2_NonStandardLemmas.Definitions
 import Paper.S6_2_NonStandardLemmas.Lemmas
 import Support.Dynamics.Machine
+import Support.Lifetimes.Interpretation
+import Support.LogicalRelation.ClosingSubstitutions
+import Support.LogicalRelation.Facts
+import Support.Model.Cells
 import Support.Model.Composition
+import Support.Model.FlatteningCells
 import Support.Model.Notation
 import Support.Model.Outlives
+import Support.Model.Prelude
 import Support.Model.Propositions
 import Support.Model.ReborrowFrame
 import Support.Model.ReborrowRule
@@ -16,8 +23,12 @@ import Support.Model.Subtraction
 import Support.Model.SubtractionKeep
 import Support.Model.UpdateFrame
 import Support.TypedWorld.Images
+import Support.TypedWorld.Invariant
 import Support.TypedWorld.Records
+import Support.TypedWorld.Relation
+import Support.TypedWorld.RelationFacts
 import Support.TypedWorld.World
+import Support.TypedWorld.Wp
 
 /-!
 # Support — TypedWorld — Reborrow
@@ -34,8 +45,63 @@ namespace BoCa.Fig16.LogRel.Typed
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
+
+/-- **A reborrow keeps `Tagged`** — `TW.linLife`'s `reb` case at the tag's lifetime. -/
+theorem tagged_reb {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} {r : FrameRec}
+    {le : Loc} {s : LSet} {β : Life} {hs : r.R.InStratum s.join}
+    (hW₀ : TW W ps rs) (hr : r ∈ rs) (hle : W.get le = some (CellU.immOf s r.v r.R hs))
+    (hreb : ResU.Reb β r.R c) (hβ : W.InStratum β) (hW : ResU.CompS W c W')
+    (htag : Tagged W ps ls) : Tagged W' ps ls := by
+  have hTI := hW₀.inv
+  intro y hy
+  obtain ⟨p, hp, hd, hα⟩ := htag y hy
+  have hpR : p ∈ rs := (hTI.2.2.2.2.2.2.1 p).mpr ⟨p, hp, DescR.refl p⟩
+  refine ⟨p, hp, hd, frameLife_reb_like hW₀.valid hle hreb hW hβ (fun ζ e => ?_)
+    (fun a ha => by obtain ⟨ψ, e, k, -⟩ := hTI.2.1 p hp a ha; exact ⟨ψ, e, k⟩) hα⟩
+  rcases CellU.rep ζ with ⟨u, rfl⟩ | ⟨s₁, v₁, χ₁, h₁, rfl⟩ | ⟨b₁, v₁, χ₁, h₁, P, hw, rfl⟩
+  · exact (hTI.2.2.2.1 p hpR r hr u e).elim
+  · exact CellU.kind_immOf _ _ _ _
+  · exact (hTI.2.2.2.2.2.1.1 p hp (mutAt_of_cell hle (MutAt.top e (by simp)))).elim
+
+/-- **…and a reborrow at a chain view** — `TW.linLife`'s `rebDeep` case. -/
+theorem tagged_rebDeep {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} {r : FrameRec}
+    {p₀ : Option Loc} {l₁ : Loc} {S₀ : Ty} {u₀ : Val} {s : LSet} {w₀ : WRes}
+    {hs : w₀.InStratum s.join} {β : Life}
+    (hW₀ : TW W ps rs) (hr : r ∈ rs) (hch : Chain r.R r.T r.v p₀ l₁ S₀ u₀)
+    (hcell : W.get l₁ = some (CellU.immOf s u₀ w₀ hs))
+    (hreb : ResU.Reb β w₀ c) (hβ : W.InStratum β) (hW : ResU.CompS W c W')
+    (htag : Tagged W ps ls) : Tagged W' ps ls := by
+  have hTI := hW₀.inv
+  have hvW := hW₀.valid
+  obtain ⟨aW, haW⟩ := agW_of_valid hvW
+  obtain ⟨χ, eχ, kχ, -, wχ⟩ := AgW.get_imm haW hcell (CellU.kind_immOf _ _ _ _)
+  rw [CellU.wit_immOf] at wχ
+  obtain ⟨-, -, hw₀own, -, -⟩ :=
+    hTI.1.1 r hr p₀ l₁ S₀ u₀ hch aW haW χ eχ (by rw [kχ]; simp)
+  rw [wχ] at hw₀own
+  intro y hy
+  obtain ⟨p, hp, hd, hα⟩ := htag y hy
+  have hpR : p ∈ rs := (hTI.2.2.2.2.2.2.1 p).mpr ⟨p, hp, DescR.refl p⟩
+  refine ⟨p, hp, hd, frameLife_reb_like hvW hcell hreb hW hβ (fun ζ e => ?_)
+    (fun a ha => by obtain ⟨ψ, e, k, -⟩ := hTI.2.1 p hp a ha; exact ⟨ψ, e, k⟩) hα⟩
+  rcases CellU.rep ζ with ⟨u, rfl⟩ | ⟨s₁, v₁, χ₁, h₁, rfl⟩ | ⟨b₁, v₁, χ₁, h₁, P, hw, rfl⟩
+  · exact (hTI.2.2.2.1 p hpR r hr u (hw₀own _ u e)).elim
+  · exact CellU.kind_immOf _ _ _ _
+  · exact (hTI.2.2.2.2.2.1.1 p hp (mutAt_of_cell hcell (MutAt.top e (by simp)))).elim
+
+/-- **A reborrow's end keeps `Tagged`** — `TW.linLife`'s `rebEnd` case: `ag` only loses
+lifetimes. -/
+theorem tagged_rebEnd {W W' D : WRes} {ps rs : List FrameRec} {ls : List SRec}
+    (hW₀ : TW W ps rs) (hW : ResU.CompS W' D W) (htag : Tagged W ps ls) : Tagged W' ps ls := by
+  obtain ⟨aW, haW⟩ := agW_of_valid hW₀.valid
+  intro y hy
+  obtain ⟨p, hp, hd, hα⟩ := htag y hy
+  refine ⟨p, hp, hd, frameLife_back hα (fun a' ha' => ?_)⟩
+  obtain ⟨a'', acr, ha'', -, hcomp⟩ := (AgW.split hW).mp haW
+  rw [AgW.functional ha'' ha'] at hcomp
+  exact ⟨aW, haW, icpAt_left hcomp _, fun m _ => icpAt_left hcomp m⟩
 
 /-- **6.150's reborrow, chosen at the tagged world.**  Given the handed `χ₀ ∈ reb_β(ρ′)` with
 `P̂₀(β)(w)(χ₀)` (H16/H17), a world `W` holding the cell `ℓ ↦ imm(s̄, w, ρ′)` with frame `F`,
@@ -60,6 +126,97 @@ def RebChooseTW (ls : List SRec) (l : Loc) (R : Val → WRes → Prop)
         (∃ (s' : LSet) (hs' : σ.InStratum s'.join), W''.get l = some (CellU.immOf s' w σ hs')) →
         ResU.CompS W'' (χ.restrictDom σ.exclPart) Wp → W''.InStratum β →
         TW W'' ps' (rsOf ls') ∧ Tagged W'' ps' ls')
+
+/-- **`RebChooseTW` at a record's cell, at `𝒱X`.**  The cell's value and escrow are the
+record's (`LeInvW`); the handed shaped image is typed at `𝒱X` by `image_vX_of_shape` (6.131 at
+`𝒱X`) from the world's `WitLB`, the tag bound and `Coh`; `rebChooseO_top_tw` chooses;
+entry is `TW.reb`, exit `TW.rebEnd`.  The payload input `R` is the program's own: the escrow
+observable at the record's type.  `[about ours: our chooser, at the program's relation]` -/
+theorem rebChooseTW_top {ls : List SRec} {r : FrameRec} {x : LifeVar} {δ' : LSub}
+    (hr : r ∈ rsOf ls) (hag : AgreeOn r.T δ' r.δ) (hx : ¬ LFree x r.T) :
+    RebChooseTW ls r.le (fun w σ => vX wpTS false r.T ls δ' w σ)
+      (fun β w χ => vShape (r.T.immReborrow (.var x)) (δ'.extend x β) w χ)
+      (fun β w χ => vX wpTS true (r.T.immReborrow (.var x)) ls (δ'.extend x β) w χ) := by
+  intro W F χ₀ σ ps β w s hs hT htag hβ hW hR hreb₀ hP₀
+  -- the cell's value and escrow are the record's
+  obtain ⟨s', hs', hle⟩ := cell_of_compS_single hW
+  obtain ⟨aW, haW⟩ := agW_of_valid hT.valid
+  obtain ⟨φ₁, eφ₁, -, rφ₁, wφ₁⟩ := AgW.get_imm haW hle (CellU.kind_immOf _ _ _ _)
+  obtain ⟨φ, eφ, -, rφ, wφ⟩ := hT.inv.leInvW r hr aW haW
+  rw [eφ₁] at eφ; cases Option.some.inj eφ
+  simp only [CellU.erase_immOf, CellU.wit_immOf] at rφ₁ wφ₁
+  have hw : w = r.v := rφ₁.symm.trans rφ
+  have hσ : σ = r.R := wφ₁.symm.trans wφ
+  subst hw; subst hσ
+  -- 6.131 at `𝒱X`: the handed image, typed from the world
+  have agreeCoh : ∀ {S : Ty}, (∀ y, LFree y S → LFree y r.T) → ∀ m,
+      Coh (rsOf ls) m S (r.δ.extend x β) → Coh (rsOf ls) m S (δ'.extend x β) := by
+    intro S hfree m h
+    refine (coh_congr (fun y hy => ?_)).mp h
+    by_cases hxy : x = y
+    · subst hxy; rw [find?_extend_self, find?_extend_self]
+    · rw [find?_extend_ne _ _ hxy, find?_extend_ne _ _ hxy]
+      exact (hag y (hfree y hy)).symm
+  have hP₀' : vX wpTS true (r.T.immReborrow (.var x)) ls (δ'.extend x β) r.v χ₀ :=
+    image_vX_of_shape (witLB_of hT.valid htag hle) (tags_above hT htag hβ) r.T hx hreb₀ hP₀ hR
+      (fun m S u hpos hown => agreeCoh (fun y => hpos.free) m (coh_root hr hx hpos hown))
+      (fun m S hpos => agreeCoh (fun y => hpos.free) m (coh_mut hT hr hx hpos))
+  -- the choice
+  obtain ⟨χ, hreb, hPχ, hagχ, hEF, hEI⟩ :=
+    rebChooseO_top_tw hT htag hβ hr hag hW hx hreb₀ hP₀' hR
+  refine ⟨χ, hreb, hPχ, hagχ, hEF, hEI, fun W' hWc hv' => ?_, ?_⟩
+  · -- entry: `TW.reb`, its shape premise from `vX_vShape`
+    have hsh : vShape (r.T.immReborrow (.var x)) (r.δ.extend x β) r.v χ := by
+      rw [← vShape_immReb_agree hag]; exact vX_vShape true _ hPχ
+    exact ⟨TW.reb r x hT hr hle hx hreb hsh hβ hWc hv',
+      tagged_reb hT hr hle hreb hβ hWc htag⟩
+  · -- exit: `TW.rebEnd`
+    rintro ps' ls' Wp W'' - hls hTp htgp ⟨s'', hs'', hc''⟩ hcomp hβ''
+    have hr' : r ∈ rsOf ls' := by
+      obtain ⟨t, ht⟩ := mem_rsOf.mp hr; exact mem_rsOf.mpr ⟨t, (hls _).mpr ht⟩
+    exact ⟨TW.rebEnd r hTp hr' hc'' hreb hcomp hβ'', tagged_rebEnd hTp hcomp htgp⟩
+
+/-- **`RebChooseTW` at a chain view, at `𝒱X`**: the cell's value is the chain's own (`ExIn`);
+`image_vX_of_shape` with `coh_child`/`coh_mut_child`; `rebChooseO_deep_tw` chooses; entry
+`TW.rebDeep`, exit `TW.rebEndDeep`.  `[about ours: our chooser at a chain view]` -/
+theorem rebChooseTW_deep {ls : List SRec} {r : FrameRec} {p₀ : Option Loc} {l₀ : Loc}
+    {S₀ : Ty} {u₀ : Val} {x : LifeVar} {δ' : LSub}
+    (hr : r ∈ rsOf ls) (hch : Chain r.R r.T r.v p₀ l₀ S₀ u₀) (hag : AgreeOn S₀ δ' r.δ)
+    (hx : ¬ LFree x S₀) :
+    RebChooseTW ls l₀ (fun w σ => vX wpTS false S₀ ls δ' w σ)
+      (fun β w χ => vShape (S₀.immReborrow (.var x)) (δ'.extend x β) w χ)
+      (fun β w χ => vX wpTS true (S₀.immReborrow (.var x)) ls (δ'.extend x β) w χ) := by
+  intro W F χ₀ σ ps β w s hs hT htag hβ hW hR hreb₀ hP₀
+  obtain ⟨s', hs', hle⟩ := cell_of_compS_single hW
+  obtain ⟨aW, haW⟩ := agW_of_valid hT.valid
+  -- the cell's value is the chain's (`ex(R)_○` lifts into `ag(W)`)
+  obtain ⟨φ₁, eφ₁, kφ₁, rφ₁, wφ₁⟩ := AgW.get_imm haW hle (CellU.kind_immOf _ _ _ _)
+  obtain ⟨e₀, he₀, hlift⟩ := hT.inv.exIn hr aW haW
+  obtain ⟨ζ, eζ, rζ, -⟩ := exR_cell he₀ hch.own (by simp)
+  obtain ⟨ζ', eζ', rζ', -⟩ := hlift l₀ ζ eζ
+  rw [eφ₁] at eζ'; cases Option.some.inj eζ'
+  simp only [CellU.erase_immOf, CellU.erase_ownOf, CellU.wit_immOf] at rφ₁ rζ wφ₁
+  have hw : w = u₀ := rφ₁.symm.trans (rζ'.trans rζ)
+  subst hw
+  -- the view's owned cells are the record's (`DeepInv`)
+  obtain ⟨-, -, hw₀own, -, -⟩ :=
+    hT.inv.1.1 r hr p₀ l₀ S₀ w hch aW haW φ₁ eφ₁ (by rw [kφ₁]; simp)
+  rw [wφ₁] at hw₀own
+  have hP₀' : vX wpTS true (S₀.immReborrow (.var x)) ls (δ'.extend x β) w χ₀ :=
+    image_vX_of_shape (witLB_of hT.valid htag hle) (tags_above hT htag hβ) S₀ hx hreb₀ hP₀ hR
+      (fun m S u hpos hown => coh_child hr hch hag hx hpos (hw₀own m u hown))
+      (fun m S hpos => coh_mut_child hT hr hch hag hx hpos)
+  obtain ⟨χ, hreb, hPχ, hagχ, hEF, hEI⟩ :=
+    rebChooseO_deep_tw hT htag hβ hr hch hag hW hx hreb₀ hP₀' hR
+  refine ⟨χ, hreb, hPχ, hagχ, hEF, hEI, fun W' hWc hv' => ?_, ?_⟩
+  · have hsh : vShape (S₀.immReborrow (.var x)) (r.δ.extend x β) w χ := by
+      rw [← vShape_immReb_agree hag]; exact vX_vShape true _ hPχ
+    exact ⟨TW.rebDeep r x hT hr hch hle hx hreb hsh hβ hWc hv',
+      tagged_rebDeep hT hr hch hle hreb hβ hWc htag⟩
+  · rintro ps' ls' Wp W'' - hls hTp htgp ⟨s'', hs'', hc''⟩ hcomp hβ''
+    have hr' : r ∈ rsOf ls' := by
+      obtain ⟨t, ht⟩ := mem_rsOf.mp hr; exact mem_rsOf.mpr ⟨t, (hls _).mpr ht⟩
+    exact ⟨TW.rebEndDeep r hTp hr' hch hc'' hreb hcomp hβ'', tagged_rebEnd hTp hcomp htgp⟩
 
 /-!
 ### Theorem 6.150 (↺ rule) — typed-world version

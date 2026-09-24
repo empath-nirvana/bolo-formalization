@@ -74,6 +74,18 @@ for u in ALLU:
         if sym in code and n != u["id"] and NOTATION[n] != u["id"]:
             udeps[u["id"]].add(n)
 
+# a tactic macro leaves no trace in the terms that use it: a unit whose text names it needs it
+TACMACRO = {}
+for u in ALLU:
+    if u["mod"] in LEGACY: continue
+    m = re.match(r'\s*(?:@\[[^\]]*\]\s*)?(?:local |scoped )?macro\s+"([^"]+)"[^\n]*:\s*tactic', ucode(u["id"]))
+    if m: TACMACRO[u["id"]] = re.compile(r"(?<![\w.])" + re.escape(m.group(1)) + r"(?![\w'])")
+for u in ALLU:
+    if u["mod"] in LEGACY or u["id"] in TACMACRO: continue
+    code = ucode(u["id"])
+    for t, rx in TACMACRO.items():
+        if rx.search(code): udeps[u["id"]].add(t)
+
 SIMP = [u["id"] for u in ALLU if re.search(r"@\[[^\]]*\bsimp\b", ucode(u["id"]).split(":=")[0])
         and u["mod"] not in LEGACY]
 
@@ -323,7 +335,7 @@ def var_names(cmd):
             if re.match(r"^[\w'₀-₉]+$", w): ns.add(w)
     return ns
 
-def unit_sort(sel_file, tgt, f, row_of, inherit_all=False, keys_out=None):
+def unit_sort(sel_file, tgt, f, row_of, inherit_all=False, keys_out=None, passes=None, subkey=None):
     """topological order of the units of file f, printed rows first where possible"""
     us = [u for u in sel_file]
     S = set(us)
@@ -334,8 +346,8 @@ def unit_sort(sel_file, tgt, f, row_of, inherit_all=False, keys_out=None):
     base = {}
     for u in us:
         r = row_of(u)
-        base[u] = (rowkey(r) if r else (999, 999), modidx(u[0]), u[1])
-        if u in SIMPSET: base[u] = ((-1, -1), modidx(u[0]), u[1])
+        base[u] = (rowkey(r) if r else (999, 999), subkey(u) if subkey else 0, modidx(u[0]), u[1])
+        if u in SIMPSET: base[u] = ((-1, -1), 0, modidx(u[0]), u[1])
     # a support unit inherits the smallest key among its dependents
     key = dict(base)
     changed = True
@@ -344,7 +356,7 @@ def unit_sort(sel_file, tgt, f, row_of, inherit_all=False, keys_out=None):
         for u in us:
             if inherit_all or row_of(u) is None:
                 for x in rev[u]:
-                    if key[x] < key[u]:
+                    if key[x] < key[u] and (passes is None or passes(x)):
                         key[u] = key[x]; changed = True
     import heapq
     indeg = {u: len(dep[u]) for u in us}
@@ -464,7 +476,8 @@ def emit(sel, tgt, banners, header_of=None, extra_files=(), hook=None):
         default_row_of = lambda u: (sorted([r for r in unit_rows.get(u, []) if DEFROWS[r]["status"] != "plumbing"], key=rowkey) or [None])[0] if tgt[u].startswith("Paper") and paper_target(u) == tgt[u] else None
         us = unit_sort([u for u in sel if tgt[u] == f], tgt, f,
                        (lambda u: hook.row_of(u, f, default_row_of)) if hook else default_row_of,
-                       inherit_all=bool(hook and hook.inherit_all(f)), keys_out=hook.keys if hook else None)
+                       inherit_all=bool(hook and hook.inherit_all(f)), keys_out=hook.keys if hook else None,
+                       passes=getattr(hook, "passes_key", None), subkey=getattr(hook, "subkey", None))
         body = []; curkey = None; seenrows = set(); prev_inline = False
         def close_group():
             if curkey is not None:

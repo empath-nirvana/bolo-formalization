@@ -31,6 +31,33 @@ theorem agW_empty : AgW (PMap.empty : WRes) PMap.empty := by
     BigComp.nil BigComp.nil ?_ (ResU.comp_empty_right _)
   rw [hre]; exact ResU.comp_empty_right _
 
+/-- `ex(∅)_◐ = ∅`, at either operator: no `mut` site, so no witness walk, and
+`∅|own ◐ ∅|mut` is `∅`.  The `ex` counterpart of `agW_empty`.
+`[about ours: `[TR]` p. 5's `ex` row at the empty resource]` -/
+theorem exW_empty {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
+    {C : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop} :
+    ExW R C (PMap.empty : WRes) PMap.empty := by
+  have hre : ∀ k, ResU.restrict (PMap.empty : WRes) k = PMap.empty := fun k =>
+    PMap.ext fun l => ResU.restrict_get_none (PMap.empty_get l)
+  have hsites : ∀ k, ResU.Sites (PMap.empty : WRes) k ([] : List BoCa.Loc) :=
+    fun _ => ⟨List.nodup_nil, fun _ =>
+      ⟨fun h => absurd h (by simp), by rintro ⟨ψ, e, -⟩; cases e⟩⟩
+  refine ExW.mk (w := []) (b := PMap.empty) (nm := PMap.empty)
+    (hsites _) ExWits.nil BigComp.nil ?_ (ResU.comp_empty_right _)
+  rw [hre, hre]; exact ResU.comp_empty_right _
+
+/-- `⦇∅⦈ = ∅`.  `Fig16.LogRel.valid_empty` is `✓∅` and reaches it by splitting
+an owned singleton; this names the flattening, which is what a `wp` unfolded at
+the empty frame reads.
+`[about ours: `⦇−⦈` at the empty resource]` -/
+theorem flat_empty : ResU.Flat (PMap.empty : WRes) PMap.empty :=
+  ⟨PMap.empty, PMap.empty, exW_empty, agW_empty, ResU.comp_empty_right _⟩
+
+/-- `⟦∅⟧ = ∅` — `[TR]` p. 6's `⟦ρ⟧` at the empty resource is the empty memory.
+`[about ours: `[TR]` p. 6's `⟦ρ⟧` at the empty resource]` -/
+theorem lower_empty : ResU.Lower (PMap.empty : WRes) (fun _ => none) :=
+  ⟨PMap.empty, flat_empty, fun l => by rw [PMap.empty_get]; rfl⟩
+
 end BoCa.Fig16.BoLo
 
 namespace BoCa.DefectB

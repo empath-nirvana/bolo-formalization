@@ -17,8 +17,8 @@ noncomputable section
 namespace BoCa.Fig16.LogRel.MutImmGap
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.Lifetime (LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 theorem empty_inStratum (b : Life) :
     ResU.InStratum (Loc := BoCa.Loc) (Val := BoCa.Val) b PMap.empty :=
@@ -29,8 +29,8 @@ end BoCa.Fig16.LogRel.MutImmGap
 namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.Lifetime (LifeCtx LifeVar)
-open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
+open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-- `γ(e)` — `BoCa/Subst.lean`'s parallel substitution, for the reason
 `BoCa/LogRel.lean` convention L5 gives: a fold of `Expr.subst 0` is the closing
