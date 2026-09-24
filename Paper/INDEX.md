@@ -484,6 +484,23 @@ Every definition row tagged `[repair]`: the library's reading departs from the p
 * **5.64** `ρ∣dom(ρ′)` — a domain restriction, used from [TR] Lemma 6.56 on with no defining row — `Paper/S5_Model/Definitions.lean`
 * **5.66** `ρ ⊟ ρ′ ≜ ρ∣own,mut ● ρ″ where …` — [TR] Definition 6.3, not a p. 5 row — `Paper/S6_2_NonStandardLemmas/Definitions.lean`
 
+## Examples
+
+Not rows of the paper: derivations and runs that show the hypotheses of the
+headline results are inhabited.
+
+* `Paper/Examples/Derivations.lean` — `[TR]` p. 2's rules and p. 3's axiom table at
+  concrete instances in `DerivesWf` (`Programs.d_*`).
+* `Paper/Examples/Programs.lean` — closed programs typed at `DerivesWf ∅ [] e 1`,
+  with `Fig16.LogRel.Typed.adequacy` applied (`Programs.allocFree_runs`,
+  `Programs.fig2c_runs`, `Programs.immBorrow_runs`, `Programs.mutBorrow_runs`,
+  `Programs.loadClosure_runs`, `Programs.aliasLoad_runs`, `Programs.swapTwo_runs`,
+  `Programs.greetProg_runs`) and interpreter runs (`Programs.*_eval`).
+* `Paper/Examples/Model.lean` — Lemmas 6.7 and 6.20 at a shared `imm` location
+  (`Fig16.LowerExample.split_overlap`, `Fig16.SplitExample.overlap`) and
+  inhabitants of §6.2 hypotheses (`Fig16.ResU.flatR_single_own`,
+  `Fig16.ResU.hash_empty_single_mut`, `Fig16.escrowAgree_self`).
+
 ## Rows with no declaration
 
 * Lemma 6.40 — none on the printed carrier: untranscribed (see its record in `Paper/S6_2_NonStandardLemmas/Lemmas.lean`).

@@ -62,6 +62,31 @@ Every declaration's `#print axioms` is within `[propext, Classical.choice,
 Quot.sound]`.  `Paper/` and `Support/` contain no `sorry`, `axiom`, `native_decide`,
 `implemented_by`, `opaque`, `partial` or `unsafe`.
 
+## Examples
+
+`Paper/Examples/` shows that the typing judgment `adequacy` takes as hypothesis types
+real programs, and that adequacy is a statement about their runs.
+
+* `Derivations.lean` — every rule of `[TR]` p. 2 and every line of the axiom table
+  of p. 3, derived at a concrete instance in `DerivesWf`.
+* `Programs.lean` — closed programs, each derived at `DerivesWf ∅ [] e 1`, with its
+  adequacy instance `BoLo.Steps ∅ e ∅ ()` obtained from
+  `Fig16.LogRel.Typed.adequacy` (`BoCa.Programs.*_runs`), and a kernel-checked run
+  of the executable interpreter of `Support/Dynamics/Interpreter.lean` ending at
+  `()` with no cell left (`BoCa.Programs.*_eval`, by `decide`).  Together they use
+  every borrowing construct: `withbor` in all three forms, `withload` (at a
+  function payload too, where the loader sees `Unk`), `withswap`, `copy`,
+  `forget` at `Imm`, `Mut` and `Unk`, `swap`, the `[a]` modality, `∀I` and `∀E`.
+  Among them are `[CONF]`'s own examples — Fig. 2c (`fig2c`), the aliasing program
+  of p. 415:9 (`aliasLoad`), the nested `withswap` of p. 415:10 (`swapTwo`) and
+  `greet` of Fig. 10b (`greetProg`) — each closed off by allocating the
+  references it borrows.  `allocFree_steps` gives one run step by step on
+  `BoLo.Steps` itself.  The interpreter allocates deterministically and is not
+  proved to agree with `BoLo.Steps` (`docs/adjudications.md` D8); its runs
+  illustrate, and the adequacy instances are the theorems.
+* `Model.lean` — `[TR]` Lemmas 6.7 and 6.20 run at two resources that share an
+  `imm` location, and inhabitants of hypotheses that rows of §6.2 bind or add.
+
 ## Building and checking
 
 You need [elan](https://github.com/leanprover/elan) (the Lean toolchain manager),
@@ -130,6 +155,7 @@ Paper/                        what the paper prints, in its order
   S6_2_NonStandardLemmas/Definitions.lean   Definitions 6.1–6.3
   CONF/Results.lean           [CONF] Lemma 3.1, Theorem 3.2, Corollary 3.3
   LiteralReadings/            printed items read literally, measured; nothing depends on them
+  Examples/                   typing derivations and runs of closed programs; model instances
   INDEX.md                    every result and definition row → file and declaration
 Support/                      what the paper leaves implicit, by topic; all [about ours]
 docs/adjudications.md         every departure from the printed text, argued

@@ -1,4 +1,7 @@
 import Paper.CONF.Results
+import Paper.Examples.Derivations
+import Paper.Examples.Model
+import Paper.Examples.Programs
 import Paper.LiteralReadings.CONF
 import Paper.LiteralReadings.S4_LogicalRelation
 import Paper.LiteralReadings.S6_4_StandardEntailments

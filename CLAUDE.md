@@ -20,6 +20,9 @@ theorem.
   status or tag, file and declarations.
 - `Paper/LiteralReadings/` — measurements of printed items read literally, where
   the library uses a repaired reading. Nothing else depends on them.
+- `Paper/Examples/` — typing derivations, adequacy instances and interpreter runs
+  of closed programs, and model instances that inhabit hypotheses. Nothing else
+  depends on them.
 - `Support/` — what the paper never prints, by topic (`Syntax/`, `Lifetimes/`,
   `Statics/`, `Dynamics/`, `Model/`, `LogicalRelation/`, `TypedWorld/`). Every file
   there is `[about ours]`.
