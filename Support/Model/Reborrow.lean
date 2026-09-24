@@ -13,9 +13,7 @@ import Support.Model.WalkSplitting
 /-!
 # Support — Model — Reborrow
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`reb_α` at one location, the frame read from `✓` alone, and the cells of a reborrow.
+`[about ours]`.  `reb_α` at one location, the frame read from `✓` alone, and the cells of a reborrow.
 -/
 
 noncomputable section
@@ -37,8 +35,7 @@ theorem CellU.CompatS.kind_left {ψ₁ ψ₂ : CellU Loc Val} (h : ψ₁.CompatS
   obtain ⟨s₁, s₂, v, ρ, h₁, h₂, e₁, e₂⟩ := h
   rw [e₁]; rfl
 
-/-- …and between two of them it is exactly agreement of value and witness, so
-`▶◀` is entered from kind, value and witness. -/
+/-- Two `imm` cells with equal value and witness are `▶◀`. -/
 theorem CellU.compatS_of {ψ₁ ψ₂ : CellU Loc Val} (k₁ : ψ₁.kind = Kind.imm)
     (k₂ : ψ₂.kind = Kind.imm) (hv : ψ₁.erase = ψ₂.erase) (hw : ψ₁.wit = ψ₂.wit) :
     ψ₁.CompatS ψ₂ := by
@@ -127,9 +124,8 @@ theorem BigComp.dom {R : CellU Loc Val → CellU Loc Val → Prop}
       · obtain ⟨ζ', hζ'⟩ := ih hm'
         exact hc.dom_right hζ'
 
-/-- **`dom(ρ′) ⊆ dom(ρ)`** — `[TR]`'s own opening note at 6.53 (p. 18), derived
-from `reb_α` rather than assumed.  Every location of the image carries a cell of
-the source: `π` covers `dom(ρ′)`, each `π(ℓ)` is defined at `ℓ`, and `⨀π ≤ ρ`. -/
+/-- `dom(ρ′) ⊆ dom(ρ)` for `ρ′ ∈ reb_α(ρ)`: `[TR]`'s opening note at 6.53
+(p. 18). -/
 theorem ResU.reb_dom_subset {α : Life} {ρ ρ' : ResU Loc Val}
     (h : ResU.Reb α ρ ρ') {l : Loc} {ψ : CellU Loc Val}
     (hg : ρ'.get l = some ψ) : ∃ φ, ρ.get l = some φ := by
@@ -141,10 +137,9 @@ theorem ResU.reb_dom_subset {α : Life} {ρ ρ' : ResU Loc Val}
   obtain ⟨τ, hτ⟩ := hle
   exact hτ.dom_left hζ'
 
-/-- **The `imm` clause of `reb_α`**: over an `imm` source cell the image cell is
-`imm` over a nonempty subset of its lifetime set, at the same value and witness.
-`[TR]` p. 5's third implication, at one location, read as `Fig16.ResU.RebAt`
-reads it (`docs/adjudications.md` §12.67).
+/-- The `imm` clause of `reb_α` at one location: over an `imm` source cell the
+image cell is `imm` over a nonempty subset of its lifetime set, at the same value
+and witness (`docs/adjudications.md` §12.67).
 `[about ours: the `imm` clause of our `Fig16.ResU.RebAt`, at one location]` -/
 theorem ResU.reb_imm_cell_sub {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
     {l : Loc} {ψ : CellU Loc Val} (hg : ρ'.get l = some ψ)
@@ -160,9 +155,8 @@ theorem ResU.reb_imm_cell_sub {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb 
   rw [hg] at he
   exact ⟨t, ht, hts, Option.some.inj he⟩
 
-/-- `ResU.reb_imm_cell_sub` in the shape its consumers read it: over an `imm`
-source cell the image cell is `imm`, at the same value and witness, and in every
-stratum the source cell is in — a subset has the longer meet. -/
+/-- Over an `imm` source cell the `reb_α` image cell is `imm`, at the same value
+and witness, and in every stratum the source cell is in. -/
 theorem ResU.reb_imm_cell_kw {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
     {l : Loc} {ψ φ : CellU Loc Val} (hg : ρ'.get l = some ψ)
     (hφ : ρ.get l = some φ) (hk : φ.kind = Kind.imm) :
@@ -174,11 +168,9 @@ theorem ResU.reb_imm_cell_kw {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb �
   rw [he] at hx
   exact lt_of_lt_of_le hx (LSet.meet_mono_of_subset hts)
 
-/-- **The `own` and `mut` clauses of `reb_α`**: over a non-`imm` cell of the
-source the image carries `imm({α}, v, χ)` at the source's value, and its witness
-is the source's own except at an `own` cell, where `reb_α` fabricates it from
-`π(ℓ)/ℓ` and the definition pins nothing.  That last disjunct is where 6.53's
-printed proof needs more than the definition gives. -/
+/-- The `own` and `mut` clauses of `reb_α`: over a non-`imm` cell of the source
+the image carries `imm({α}, v, χ)` at the source's value, and its witness is the
+source's own except at an `own` cell, where it is built from `π(ℓ)/ℓ`. -/
 theorem ResU.reb_src {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
     {l : Loc} {ψ : CellU Loc Val} (hg : ρ'.get l = some ψ)
     {φ : CellU Loc Val} (hφ : ρ.get l = some φ) (hk : φ.kind ≠ Kind.imm) :
@@ -255,9 +247,7 @@ theorem ExR.get_of_ne_imm {ρ e : ResU Loc Val} (h : ExR ρ e) {l : Loc}
           fun hno => ⟨(CellU.CompR.nonown_left hcr hno).2,
                       (CellU.CompR.nonown_left hcr hno).1⟩⟩
 
-/-- **`ag` at a singleton `imm` cell, read backwards.**  `[TR]` p. 5's row has
-three factors there: `ρ|imm` is the cell, the `mut` family is empty, and the
-`imm` family has one member — `ex(χ)_○ ○ ag(χ)` of the witness. -/
+/-- `ag` at a singleton `imm` cell, read backwards. -/
 theorem AgW.single_imm_inv {l : Loc} {s : LSet} {v : Val} {χ : ResU Loc Val}
     {hstr : χ.InStratum s.join} {σ : ResU Loc Val}
     (h : AgW (ResU.single l (CellU.immOf s v χ hstr)) σ) :
@@ -343,10 +333,9 @@ theorem ResU.witFlat_cell {ρ' ev av p : ResU Loc Val}
         · exact ⟨(CellU.CompR.nonown_left hcr (hχn hno).2).2.trans (hχn hno).1,
             (CellU.CompR.nonown_left hcr (hχn hno).2).1⟩
 
-/-- **The printed step, hypothesis-free.**  From `✓(ρf ● ℓ ↦ imm(α, ρ′, v))`
-alone: a frame cell over `dom(ρ′)` is `imm`, carries `ρ′`'s value, and carries
-`ρ′`'s witness wherever `ρ′`'s cell is not `own`.  No coherence hypothesis, no
-added conjunct, and `ℓ` is not required to lie outside `dom(ρ′)`. -/
+/-- From `✓(ρf ● ℓ ↦ imm(α, ρ′, v))`: a frame cell over `dom(ρ′)` is `imm`,
+carries `ρ′`'s value, and carries `ρ′`'s witness wherever `ρ′`'s cell is not
+`own`. -/
 theorem ResU.frame_cell {ρf ρ' ρc : ResU Loc Val} {l₀ : Loc} {s : LSet} {v : Val}
     {hs : ρ'.InStratum s.join}
     (hcomp : ResU.CompS ρf (ResU.single l₀ (CellU.immOf s v ρ' hs)) ρc)

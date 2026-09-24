@@ -3,9 +3,7 @@ import Mathlib
 /-!
 # Support — Model — Prelude
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the carrier's prelude: `min`/`max` arithmetic, the finite-domain predicate, casts, bundled bijections, and the index `ι ∈ {own, imm, mut}` of `ρ∣ι`.
+`[about ours]`.  The carrier's prelude: `min`/`max` arithmetic, the finite-domain predicate, casts, bundled bijections, and the index `ι ∈ {own, imm, mut}` of `ρ∣ι`.
 -/
 
 noncomputable section
@@ -30,25 +28,18 @@ theorem cast_left {A B : Type} (h : A = B) (x : A) : cast h.symm (cast h x) = x 
 theorem cast_right {A B : Type} (h : A = B) (y : B) : cast h (cast h.symm y) = y := by
   cases h; rfl
 
-/-- Ours: a bijection, bundled.  Proof apparatus, not the paper's. -/
+/-- A bundled bijection. -/
 structure Equiv (A B : Type) where
-  /-- The forward map. -/
-  toFun : A → B
-  /-- The inverse. -/
-  invFun : B → A
-  /-- `invFun ∘ toFun = id`. -/
-  leftInv : ∀ a, invFun (toFun a) = a
-  /-- `toFun ∘ invFun = id`. -/
-  rightInv : ∀ b, toFun (invFun b) = b
+    toFun : A → B
+    invFun : B → A
+    leftInv : ∀ a, invFun (toFun a) = a
+    rightInv : ∀ b, toFun (invFun b) = b
 
 /-- `ι ∈ {own, mut, imm}` (`[TR]` p. 5, in `ρ|ι`). -/
 inductive Kind where
-  /-- `own`. -/
-  | own
-  /-- `imm`. -/
-  | imm
-  /-- `mut`. -/
-  | mut
+    | own
+    | imm
+    | mut
   deriving DecidableEq
 
 end BoCa.Fig16

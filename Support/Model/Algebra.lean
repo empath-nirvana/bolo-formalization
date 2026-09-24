@@ -7,17 +7,15 @@ import Support.Model.Prelude
 /-!
 # Support — Model — Algebra
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the associativity and commutativity machinery behind Lemmas 6.1–6.4: cell-level associativity of `○` clause by clause, the laws of the schema `◐`, and the iterated composition `⨀` up to permutation.
+`[about ours]`.  The associativity and commutativity machinery behind Lemmas 6.1–6.4: cell-level associativity of `○` clause by clause, the laws of the schema `◐`, and the iterated composition `⨀` up to permutation.
 -/
 
 noncomputable section
 
 namespace BoCa.Fig16
 
-/-- Proof apparatus: an option is `none` or a `some`, without rewriting the
-goal the way `cases e : o` does. -/
+/-- An option is `none` or a `some`, without rewriting the goal as `cases e : o`
+does. -/
 theorem optSplit {A : Type} (o : Option A) : o = none ∨ ∃ a, o = some a := by
   cases o
   · exact Or.inl rfl
@@ -28,8 +26,7 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- The four shapes a location can take in a composite.  Proof apparatus for the
-lemmas below that unfold `◐`. -/
+/-- The four shapes a location can take in a composite. -/
 theorem ResU.Comp.get {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.Comp R C ρ₁ ρ₂ ρ) (l : Loc) :
@@ -47,8 +44,7 @@ theorem ResU.Comp.get {R : CellU Loc Val → CellU Loc Val → Prop}
   · obtain ⟨χ, hχ, hC⟩ := hp
     exact Or.inr (Or.inr (Or.inr ⟨ψ₁, ψ₂, χ, e₁, e₂, hχ, hC⟩))
 
-/-- `●` is commutative on cells — the cell half of `[TR]` Lemma 6.2 at `●`,
-by commutativity of `∪` on lifetime sets, which is what its proof says.
+/-- `●` is commutative on cells.
 `[about ours: the cell-level fact the resource-level 6.2 is proved from]` -/
 theorem CellU.CompS.comm {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁ ψ₂ ψ) :
     CellU.CompS ψ₂ ψ₁ ψ := by
@@ -58,11 +54,8 @@ theorem CellU.CompS.comm {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁
   rw [e₃]
   exact CellU.immOf_congr hu rfl rfl h₃ _
 
-/-- `●` is associative on cells.  Both sides compose three `imm` cells over one
-`v` and one `ρ`, and the lifetime set of the result is the three-fold union
-either way, so this is `LSet.union_assoc` and nothing else — which is what
-`[TR]` Lemma 6.3's `●` case says: "associativity follows from the associativity
-of `∪`".
+/-- `●` is associative on cells: `[TR]` Lemma 6.3's `●` case, "associativity
+follows from the associativity of `∪`".
 `[about ours: the cell-level fact the resource-level 6.3 is proved from]` -/
 theorem CellU.compS_assoc (ψ₁ ψ₂ ψ₃ ω : CellU Loc Val) :
     (∃ χ, CellU.CompS ψ₂ ψ₃ χ ∧ CellU.CompS ψ₁ χ ω) ↔
@@ -99,9 +92,8 @@ theorem CellU.compS_assoc (ψ₁ ψ₂ ψ₃ ω : CellU Loc Val) :
     · rw [fω]
       exact CellU.immOf_congr (LSet.union_assoc s₁ t₂ t₃) rfl rfl m'' _
 
-/-- Clause (2) of `○` in the shape the case analysis below needs it: at two
-`imm` cells over one `v` and one `ρ`, `○` is `●`, whose value is the `imm` cell
-on the union of the two lifetime sets. -/
+/-- Clause (2) of `○`: two `imm` cells over one `v` and `ρ` compose to the `imm`
+cell on the union of the lifetime sets. -/
 theorem CellU.compR_immImm (s t : LSet) (v : Val) (ρ : ResU Loc Val)
     (hs : ρ.InStratum s.join) (ht : ρ.InStratum t.join)
     (hst : ρ.InStratum (s ∪ t).join) :
@@ -111,8 +103,7 @@ theorem CellU.compR_immImm (s t : LSet) (v : Val) (ρ : ResU Loc Val)
     ⟨s, t, v, ρ, hs, ht, rfl, rfl⟩
   exact (CellU.compS_immOf k hst) ▸ CellU.CompR.strict k
 
-/-- `own` is a left unit of `○`: clauses (1), (4) and (5) between them return the
-other operand whenever the first is `own(v)`. -/
+/-- `own` is a left unit of `○`. -/
 theorem CellU.compR_own_left {v : Val} {ψ ω : CellU Loc Val}
     (h : CellU.CompR (CellU.ownOf v) ψ ω) : ω = ψ := by
   cases h with
@@ -130,8 +121,7 @@ theorem CellU.compR_own_right {v : Val} {ψ ω : CellU Loc Val}
   | mutOwn => rfl
   | immOwn => rfl
 
-/-- …and it is a left unit exactly on the cells carrying its value: clause (1)
-for an `own` cell, clause (5) for an `imm`, clause (4) for a `mut`. -/
+/-- `own(v)` is a left unit of `○` on the cells carrying `v`. -/
 theorem CellU.compR_own_left_of_erase {v : Val} {ψ : CellU Loc Val}
     (h : ψ.erase = v) : CellU.CompR (CellU.ownOf v) ψ ψ := by
   rcases CellU.rep ψ with ⟨w, rfl⟩ | ⟨s, w, ρ, hs, rfl⟩ | ⟨b, w, ρ, hb, P, hP, rfl⟩ <;>
@@ -140,7 +130,7 @@ theorem CellU.compR_own_left_of_erase {v : Val} {ψ : CellU Loc Val}
   · exact CellU.CompR.ownImm _ _ _ _
   · exact CellU.CompR.ownMut _ _ _ _ _ _
 
-/-- …and a right unit on the same cells. -/
+/-- `own(v)` is a right unit of `○` on the cells carrying `v`. -/
 theorem CellU.compR_own_right_of_erase {v : Val} {ψ : CellU Loc Val}
     (h : ψ.erase = v) : CellU.CompR ψ (CellU.ownOf v) ψ := by
   rcases CellU.rep ψ with ⟨w, rfl⟩ | ⟨s, w, ρ, hs, rfl⟩ | ⟨b, w, ρ, hb, P, hP, rfl⟩ <;>
@@ -150,8 +140,7 @@ theorem CellU.compR_own_right_of_erase {v : Val} {ψ : CellU Loc Val}
   · exact CellU.CompR.mutOwn _ _ _ _ _ _
 
 /-- `[TR]` p. 7, the `○` case at `ψ₁ = own(v)`: "if `ρ₁(ℓ)` is owned, then the
-`mut`/`imm` is the result" — and, in clause (1), the `own` itself.  Either way
-`ψ₁ ○ (ψ₂ ○ ψ₃) = ψ₂ ○ ψ₃`, so `ψ₁ ○ ψ₂ = ψ₂` is the intermediate. -/
+`mut`/`imm` is the result". -/
 theorem CellU.compR_assoc_own_left {v : Val} {ψ₂ ψ₃ χ ω : CellU Loc Val}
     (h₂₃ : CellU.CompR ψ₂ ψ₃ χ) (h₁χ : CellU.CompR (CellU.ownOf v) χ ω) :
     ∃ υ, CellU.CompR (CellU.ownOf v) ψ₂ υ ∧ CellU.CompR υ ψ₃ ω := by
@@ -163,8 +152,7 @@ theorem CellU.compR_assoc_own_left {v : Val} {ψ₂ ψ₃ χ ω : CellU Loc Val}
   simp only [CellU.erase_ownOf] at e₁
   exact (e₂.symm.trans e₁.symm)
 
-/-- `[TR]` p. 7, the `○` case at `ψ₂ = own(v)`: the middle operand drops out on
-both sides. -/
+/-- `[TR]` p. 7, the `○` case at `ψ₂ = own(v)`. -/
 theorem CellU.compR_assoc_own_mid {v : Val} {ψ₁ ψ₃ χ ω : CellU Loc Val}
     (h₂₃ : CellU.CompR (CellU.ownOf v) ψ₃ χ) (h₁χ : CellU.CompR ψ₁ χ ω) :
     ∃ υ, CellU.CompR ψ₁ (CellU.ownOf v) υ ∧ CellU.CompR υ ψ₃ ω := by
@@ -176,9 +164,7 @@ theorem CellU.compR_assoc_own_mid {v : Val} {ψ₁ ψ₃ χ ω : CellU Loc Val}
   simp only [CellU.erase_ownOf] at e₂
   exact e₁.trans e₂.symm
 
-/-- `[TR]` p. 7, the `○` case at `ψ₃ = own(v)`: the last operand drops out on
-both sides, so the result of the left-hand composite is itself the
-intermediate. -/
+/-- `[TR]` p. 7, the `○` case at `ψ₃ = own(v)`. -/
 theorem CellU.compR_assoc_own_right {v : Val} {ψ₁ ψ₂ χ ω : CellU Loc Val}
     (h₂₃ : CellU.CompR ψ₂ (CellU.ownOf v) χ) (h₁χ : CellU.CompR ψ₁ χ ω) :
     ∃ υ, CellU.CompR ψ₁ ψ₂ υ ∧ CellU.CompR υ (CellU.ownOf v) ω := by
@@ -195,8 +181,8 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- `(α ⊓ β) ⊓ γ = α ⊓ (β ⊓ γ)` — the "associativity of `⊓`" `[TR]` Lemma 6.3's
-`○` case appeals to (p. 7), at `⊓ ≜ max`.
+/-- `(α ⊓ β) ⊓ γ = α ⊓ (β ⊓ γ)`: the "associativity of `⊓`" `[TR]` Lemma 6.3's
+`○` case appeals to (p. 7).
 `[about ours: an arithmetic fact the print cites by name]` -/
 theorem Life.meet_assoc (a b c : Life) : (a ⊓ b) ⊓ c = a ⊓ (b ⊓ c) :=
   Nat.max_assoc a b c
@@ -206,11 +192,8 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- `(P̂ ∧ Q̂) ∧ R̂` and `P̂ ∧ (Q̂ ∧ R̂)` are the same subset of `Res` — the
-"associativity of `∧`" the same case appeals to.  The two are stated at the two
-strata `(α ⊓ β) ⊓ γ` and `α ⊓ (β ⊓ γ)`, which `Life.meet_assoc` identifies, and
-each conjunct carries its own stratum-membership proof, so the equivalence is
-just reassociation. -/
+/-- `(P̂ ∧ Q̂) ∧ R̂` and `P̂ ∧ (Q̂ ∧ R̂)` are the same subset of `Res`: the
+"associativity of `∧`" the same case appeals to. -/
 theorem SPropS.conj_assoc {a b c : Life} (P : Val → SPropS Loc Val a)
     (Q : Val → SPropS Loc Val b) (T : Val → SPropS Loc Val c) (r : ResU Loc Val)
     (hr : r.InStratum ((a ⊓ b) ⊓ c)) (hr' : r.InStratum (a ⊓ (b ⊓ c))) (w : Val) :
@@ -231,12 +214,12 @@ theorem SPropS.conj_assoc {a b c : Life} (P : Val → SPropS Loc Val a)
       · rw [inf_eq_right.mpr hle]; exact h₂
     exact ⟨⟨hab, ⟨h₁, hp⟩, ⟨h₂, hq⟩⟩, ⟨h₃, ht⟩⟩
 
-/-- An `imm` cell is not an `own` cell — a side condition `CompR.wit` takes. -/
+/-- An `imm` cell is not an `own` cell. -/
 theorem CellU.kind_immOf_ne_own {s : LSet} {v : Val} {ρ : ResU Loc Val}
     {h : ρ.InStratum s.join} : (CellU.immOf s v ρ h).kind ≠ Kind.own :=
   fun hk => Kind.noConfusion hk
 
-/-- A `mut` cell is not an `own` cell — the other side condition. -/
+/-- A `mut` cell is not an `own` cell. -/
 theorem CellU.kind_mutOf_ne_own {b : Life} {v : Val} {ρ : ResU Loc Val} {h : ρ.InStratum b}
     {P : Val → SPropS Loc Val b} {hw : P v ⟨ρ, h⟩} :
     (CellU.mutOf b v ρ h P hw).kind ≠ Kind.own :=
@@ -466,10 +449,7 @@ theorem CellU.compR_assoc_forward {ψ₁ ψ₂ ψ₃ χ ω : CellU Loc Val}
           (SPropS.conj (SPropS.conj P Q) T) (SPropS.conj P (SPropS.conj Q T)) hPQT' hPQT
           (fun r hr hr' w => SPropS.conj_assoc P Q T r hr hr' w)] at h
 
-/-- **`○` is associative on cells** — the `○` half of `[TR]` Lemma 6.3, as the
-Kleene equality between the two partial expressions.  The right-to-left half is
-the left-to-right one read through `[TR]` Lemma 6.2: `○` is commutative, and the
-printed equation is its own mirror image.
+/-- `○` is associative on cells, as a Kleene equality.
 `[about ours: the cell-level fact the resource-level 6.3 is proved from]` -/
 theorem CellU.compR_assoc (ψ₁ ψ₂ ψ₃ ω : CellU Loc Val) :
     (∃ χ, CellU.CompR ψ₂ ψ₃ χ ∧ CellU.CompR ψ₁ χ ω) ↔
@@ -481,9 +461,7 @@ theorem CellU.compR_assoc (ψ₁ ψ₂ ψ₃ ω : CellU Loc Val) :
     obtain ⟨χ, hχ, hω⟩ := CellU.compR_assoc_forward h₁₂.comm hυ₃.comm
     exact ⟨χ, hχ.comm, hω.comm⟩
 
-/-- `[TR]` Lemma 6.3 at one location, left to right.  Seven of the eight
-patterns of definedness carry the composite through unchanged; the eighth is the
-print's "only interesting case", and there the cell-level hypothesis is used. 
+/-- `[TR]` Lemma 6.3 at one location, left to right.
 `[about ours: 6.3 read at a single location, which is how the print proves it]` -/
 theorem OptComp.assoc_left {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     (hC : ∀ ψ₁ ψ₂ ψ₃ ω, (∃ χ, C ψ₂ ψ₃ χ ∧ C ψ₁ χ ω) → (∃ υ, C ψ₁ ψ₂ υ ∧ C υ ψ₃ ω))
@@ -553,10 +531,7 @@ theorem OptComp.assoc_left {C : CellU Loc Val → CellU Loc Val → CellU Loc Va
               obtain ⟨υ, k₁, k₂⟩ := hC ψ₁ ψ₂ ψ₃ ω' ⟨χ, hc₁, hc₂⟩
               exact ⟨some υ, ⟨υ, rfl, k₁⟩, ⟨ω', rfl, k₂⟩⟩
 
-/-- `[TR]` Lemma 6.3 at the resource level, left to right.  The intermediate
-`ρ₁ ◐ ρ₂` is built location by location from `OptComp.assoc_left`; it is finite
-because its domain is inside `dom(ρ₁) ∪ dom(ρ₂)`, and both printed guards are
-read back off the cellwise composition through `hR`. 
+/-- `[TR]` Lemma 6.3 at the resource level, left to right.
 `[about ours: one direction of 6.3; the printed Kleene equality is `ResU.Comp.assoc`]` -/
 theorem ResU.Comp.assoc_left {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
@@ -599,18 +574,14 @@ theorem ResU.Comp.assoc_left {R : CellU Loc Val → CellU Loc Val → Prop}
     obtain ⟨ω, -, hc⟩ : ∃ ω, w.get l = some ω ∧ C ψ ψ₃ ω := h
     exact hR _ _ _ hc
 
-/-- `◐` with its two arguments swapped is again an instance of `[TR]` p. 5's
-schema — the guard and the cellwise composition are parameters, and swapping
-them is a choice of parameter, not a new definition.  This is what makes the
-right-to-left half of Lemma 6.3 the left-to-right half of its mirror. 
-`[about ours: the schema at swapped parameters, proof apparatus]` -/
+/-- `◐` with its two arguments swapped is an instance of `[TR]` p. 5's schema.
+`[about ours: the schema at swapped parameters]` -/
 theorem OptComp.swap {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     (o₁ o₂ o : Option (CellU Loc Val)) :
     OptComp (fun a b c => C b a c) o₁ o₂ o ↔ OptComp C o₂ o₁ o := by
   cases o₁ <;> cases o₂ <;> exact Iff.rfl
 
-/-- The same, lifted: swapping `▶◁` and `◐` swaps the two operands of `ρ₁ ◐ ρ₂`
-and leaves everything else alone. -/
+/-- The same at the resource level. -/
 theorem ResU.Comp.swap {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     (ρ₁ ρ₂ ρ : ResU Loc Val) :
@@ -622,8 +593,7 @@ theorem ResU.Comp.swap {R : CellU Loc Val → CellU Loc Val → Prop}
   · exact fun h => ⟨fun l ψ₁ ψ₂ e₁ e₂ => h.1 l ψ₂ ψ₁ e₂ e₁,
       fun l => (OptComp.swap _ _ _).mpr (h.2 l)⟩
 
-/-- `ρ ○ ρ = ρ` — clause (1) of `○` read pointwise.  Stronger than the instance
-`[TR]` Lemma 6.19 needs, which is at `⦇ρ⦈_○` alone.
+/-- `ρ ○ ρ = ρ`, clause (1) of `○` read pointwise.
 `[about ours: an unconditional resource-level fact; 6.19 is its instance]` -/
 theorem ResU.compR_self (ρ : ResU Loc Val) : ResU.CompR ρ ρ ρ := by
   refine ⟨fun l ψ₁ ψ₂ e₁ e₂ => ?_, fun l => ?_⟩

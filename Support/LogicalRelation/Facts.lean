@@ -14,9 +14,7 @@ import Support.Statics.Presupposed
 /-!
 # Support — LogicalRelation — Facts
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`⌜p⌝ ⋆ P` and the context relation read pointwise.
+`[about ours]`.  `⌜p⌝ ⋆ P` and the context relation read pointwise.
 -/
 
 noncomputable section
@@ -75,7 +73,7 @@ theorem vDen_immReborrow_tensor (T₁ T₂ : Ty) :
 theorem vDen_immReborrow_lolli (T₁ T₂ : Ty) :
     vDen ((Ty.lolli T₁ T₂).immReborrow b) δ v = emp := rfl
 
-/-- `Imm̲ 'b (Ref T) ≜ Imm 'b T`, the CONSTRUCTOR — clause (5). -/
+/-- `Imm̲ 'b (Ref T) ≜ Imm 'b T`, the constructor — clause (5). -/
 theorem vDen_immReborrow_ref (T : Ty) :
     vDen ((Ty.ref T).immReborrow b) δ v =
       atLife δ b (fun β => ex fun ℓ => ⌜v = .loc ℓ⌝ ⋆ ptoImm ℓ β (vDen T δ)) := rfl
@@ -95,8 +93,7 @@ theorem vDen_immReborrow_all (x : LifeVar) (c : Lifetime.Life) (T : Ty) :
     vDen ((Ty.all x c T).immReborrow b) δ v = emp := rfl
 
 /-- `Imm̲ 'b (Mut @a T) ≜ Imm 'b T` — clause (9), [CONF] Fig. 9's.  The index
-is the LOAD's `'b`, not the borrow's `@a`, which is why 6.131's `Mut` bullet
-writes its goal `↺_α 𝒱⟦Imm α T′⟧δ(v)` and not `↺_α 𝒱⟦Imm @b T′⟧δ(v)`.
+is the load's `'b`, as in 6.131's `Mut` bullet's goal `↺_α 𝒱⟦Imm α T′⟧δ(v)`.
 `[about ours: clause (9) of `Ty.immReborrow` read through `𝒱⟦−⟧`]` -/
 theorem vDen_immReborrow_mut (a : Lifetime.Life) (T : Ty) :
     vDen ((Ty.mut a T).immReborrow b) δ v =
@@ -105,21 +102,21 @@ theorem vDen_immReborrow_mut (a : Lifetime.Life) (T : Ty) :
 /-- `Imm̲ 'b Unk ≜ Unk` — §12.11's clause, ours. -/
 theorem vDen_immReborrow_unk : vDen (Ty.unk.immReborrow b) δ v = emp := rfl
 
-/-- **Clause (5) with `@bδ` eliminated** — "fold the definition of
+/-- Clause (5) with `@bδ` eliminated — "fold the definition of
 `𝒱⟦Imm α T′⟧`" at a lifetime variable whose `δ`-image is `β`. -/
 theorem vDen_immReborrow_ref_at {β : Life} (h : b.interp δ = some β) (T : Ty) :
     vDen ((Ty.ref T).immReborrow b) δ v =
       ex (fun ℓ => ⌜v = .loc ℓ⌝ ⋆ ptoImm ℓ β (vDen T δ)) := by
   rw [vDen_immReborrow_ref, atLife_eq h]
 
-/-- **Clause (9) with `@bδ` eliminated** — the `Mut` bullet's last line. -/
+/-- Clause (9) with `@bδ` eliminated — the `Mut` bullet's last line. -/
 theorem vDen_immReborrow_mut_at {β : Life} (h : b.interp δ = some β)
     (a : Lifetime.Life) (T : Ty) :
     vDen ((Ty.mut a T).immReborrow b) δ v =
       ex (fun ℓ => ⌜v = .loc ℓ⌝ ⋆ ptoImm ℓ β (vDen T δ)) := by
   rw [vDen_immReborrow_mut, atLife_eq h]
 
-/-- **Clause (6) with `@aδ` eliminated** — the `Imm` bullet's last line, where
+/-- Clause (6) with `@aδ` eliminated — the `Imm` bullet's last line, where
 the index that survives is the borrow's own `@a`. -/
 theorem vDen_immReborrow_imm_at {γ : Life} (a : Lifetime.Life) (h : a.interp δ = some γ)
     (T : Ty) :
@@ -384,7 +381,7 @@ theorem applyLSub_all_not_captures {σ : Lifetime.LSubst} {y : LifeVar}
       = Ty.all y (b.applySub σ) (S.applyLSub (lsubDrop σ y)) := by
   simp [Ty.applyLSub, h]
 
-/-- **`𝒱⟦T[σ]⟧δ = 𝒱⟦T⟧δ′`**, whenever `δ′` reads each variable free in `T` the
+/-- `𝒱⟦T[σ]⟧δ = 𝒱⟦T⟧δ′`, whenever `δ′` reads each variable free in `T` the
 way `δ` reads what `σ` sends it to.
 `[variant: `[TR]` names `Δ-subst` at 6.162 and states no lemma for it; this is
 the equality that step uses, generalised from `[@a/'a]` to a simultaneous `σ` so
@@ -521,7 +518,7 @@ theorem vDen_applyLSub : ∀ (T : Ty) (σ : Lifetime.LSubst) (δ δ' : LSub),
                 find?_extend_ne δ' α (Ne.symm hwy)]
           simp only [hbody]
 
-/-- **`𝒱⟦T⟧δ` depends on `δ` only at the variables free in `T`.**
+/-- `𝒱⟦T⟧δ` depends on `δ` only at the variables free in `T`.
 `[about ours: `vDen_applyLSub` at the empty substitution]` -/
 theorem vDen_congr (T : Ty) {δ₁ δ₂ : LSub}
     (h : ∀ y, LFree y T → δ₁.find? y = δ₂.find? y) :
@@ -536,7 +533,7 @@ theorem vDen_congr (T : Ty) {δ₁ δ₂ : LSub}
     vDen_applyLSub T [] δ₁ δ₂ (fun y hy => (hid y).trans (h y hy))
   exact h₁.symm.trans h₂
 
-/-- **`δ['x↦α]` is invisible to a type `'x` is not free in.**  Two printed
+/-- `δ['x↦α]` is invisible to a type `'x` is not free in.  Two printed
 steps are this equation: `[TR]` p. 46's "Fold and simplify, using that `'b` does
 not occur free in `T₁` or `T₂`" — the bound variable of `∀'a ⊏ ⊓Δ. …`, which the
 axiom-table constructors take as a schematic `x` — and the third row of the
@@ -548,11 +545,8 @@ theorem vDen_extend_of_not_free {x : LifeVar} {T : Ty} (h : ¬ LFree x T)
 
 /-- `⨅δ` — the meet of the lifetimes `δ` assigns, as a right fold of
 `Fig16.Life.meet` with `⨅∅ = ⊤`.  `[TR]` p. 35 writes it in the first row of
-the `↺V₂` table, "fix `α ⊏ ⨅δ` arbitrary", and defines it nowhere.  Unlike
-`⊓Δ` (`docs/adjudications.md` §12.15) there is nothing to decide about its range:
-a substitution's values already *are* lifetimes, so the fold is over `cod(δ)`
-and lands in the carrier rather than in `Lifetime.Life`'s grammar, whose meets
-are binary.
+the `↺V₂` table, "fix `α ⊏ ⨅δ` arbitrary".  The fold is over `cod(δ)` and lands
+in the carrier.
 `[about ours: a realisation of `[TR]` p. 35's `⨅δ` for a finite `δ`]` -/
 def meetOfCod (δ : LSub) : Life :=
   δ.entries.foldr (fun e a => Life.meet e.2 a) Life.top

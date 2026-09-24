@@ -34,9 +34,7 @@ import Support.TypedWorld.World
 /-!
 # Support — TypedWorld — Images
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the typed world's first layer: composition read cell by cell, walks through an escrow, the `immFrame` and `alloc` steps, roots and `Ref` chains, and typed reborrow images.
+`[about ours]`.  The typed world's first layer: composition read cell by cell, walks through an escrow, the `immFrame` and `alloc` steps, roots and `Ref` chains, and typed reborrow images.
 -/
 
 noncomputable section
@@ -166,7 +164,7 @@ theorem comp_some_r {R : CellU Loc Val → CellU Loc Val → Prop}
   · exact ⟨_, e'⟩
   · exact ⟨_, e'⟩
 
-/-- **At a valid resource, the exclusive and aliasable walks have disjoint domains**:
+/-- At a valid resource, the exclusive and aliasable walks have disjoint domains:
 `⦇ρ⦈ = ex(ρ)_● ● ag(ρ)` is strict, `●` relates `imm` cells only, and `ex(ρ)_●` has
 none (`ExS.immFree`, `[TR]` 6.36). -/
 theorem ex_ag_disjoint {W e a : WRes} (hv : ResU.Valid W) (he : ExS W e) (ha : AgW W a)
@@ -269,7 +267,7 @@ theorem frame_walks {W X Z R W' a' : WRes} {l : Loc} {v : Val} {α : Life}
       obtain ⟨s₁, s₂, v', ρ, k₁, k₂, k₃, h₁, -, -⟩ := hC
       exact absurd h₁ CellU.ownOf_ne_immOf
 
-/-- **`immFrame` transfers every view at a supported location.** -/
+/-- `immFrame` transfers every view at a supported location. -/
 theorem frame_transfer {W X Z R W' a' : WRes} {l : Loc} {v : Val} {α : Life}
     {h : R.InStratum (LSet.singleton α).join}
     (hX : ResU.CompS (ResU.single l (CellU.ownOf v)) R X) (hW : ResU.CompS X Z W)
@@ -421,7 +419,7 @@ theorem compS_get_right' {ρ₁ ρ₂ ρ : WRes} (h : ResU.CompS ρ₁ ρ₂ ρ)
     ∃ ψ, ρ.get l = some ψ ∧ ψ.kind = ψ₂.kind ∧ ψ.wit = ψ₂.wit ∧ ψ.erase = ψ₂.erase :=
   compS_get_left' (ResU.CompS.comm h) e₂
 
-/-- **The typed reborrow's cell at every root.**  At a `RefPos T v ℓ S`, a resource
+/-- The typed reborrow's cell at every root.  At a `RefPos T v ℓ S`, a resource
 `c ∈ 𝒱⟦Imm̲ 'x T⟧_{δ['x↦β]}(v)` has an `imm` cell at `ℓ` whose witness is
 `𝒱⟦S⟧δ`-typed at its value — `[TR]` 6.131's `Ref T′` case (*"`↺α 𝒱⟦Imm 'a T′⟧δ(v)`"*),
 carried up through the `⊗`/`⊕`/`[@a]` cases the induction passes. -/
@@ -475,7 +473,7 @@ theorem image_at_pos {T : Ty} {v : Val} {l : Loc} {S : Ty} (hp : RefPos T v l S)
       intro c hc
       exact ih (fun h => hx (Or.inr h)) hc
 
-/-- **`typed_image_pos`: 6.131's `Ref T′` case against `reb_β`'s `own` clause.**  At a root
+/-- `typed_image_pos`: 6.131's `Ref T′` case against `reb_β`'s `own` clause.  At a root
 `ℓ ↦ own(u)` of `σ` (`RefPos T v ℓ S`), a typed reborrow `c ∈ reb_β(σ) ∩ 𝒱⟦Imm̲ 'x T⟧` has
 `c(ℓ) = imm({β}, u, q/ℓ)` for a piece `q ≤ σ` holding `ℓ` (`[TR]` p. 5, `reb_α`'s `own`
 clause), and `q/ℓ ∈ 𝒱⟦S⟧δ(u)`. -/
@@ -514,7 +512,7 @@ theorem bigComp_back {xs : List WRes} {b : WRes}
       · obtain ⟨x, hx, ψ', e', k', w'⟩ := ih e₁ k₁
         exact ⟨x, List.mem_cons_of_mem _ hx, ψ', e', k', w₁.trans w'⟩
 
-/-- **`[TR]` p. 5's `ag` row read backwards at a view.**  A non-`own` cell of `ag(ρ)` at `ℓ`
+/-- `[TR]` p. 5's `ag` row read backwards at a view.  A non-`own` cell of `ag(ρ)` at `ℓ`
 comes from one of the row's three factors, over the same witness: `ρ|imm` (then `ρ(ℓ)` is
 `imm`), the `mut` family `{ag(ρ′) | ρ(m) = mut(_,_,ρ′,_)}`, or the `imm` family
 `{ex(ρ′)_○ ○ ag(ρ′) | ρ(m) = imm(_,_,ρ′)}`. -/
@@ -548,7 +546,7 @@ theorem agW_source {ρ σ : WRes} (h : AgW ρ σ) {l : Loc} {ψ : CellU Loc Val}
         exact Or.inr (Or.inr ⟨p.1, χ, ev, av, p.2, hχ, kχ', hex, hag, hc, ψ', e', k',
           w₁.trans w'⟩)
 
-/-- **Every cell of `c ∈ reb_β(σ)` is `imm`, and is `reb_β`'s image of `σ`'s cell there**
+/-- Every cell of `c ∈ reb_β(σ)` is `imm`, and is `reb_β`'s image of `σ`'s cell there
 (`[TR]` p. 5's three clauses): an `own` cell becomes `imm({β}, u, q/ℓ)` for a piece `q ≤ σ`
 holding `ℓ`; a `mut` cell's witness is kept; an `imm` cell's witness is kept. -/
 theorem reb_cell {β : Life} {σ c : WRes} (hr : ResU.Reb β σ c) {m : Loc}
@@ -604,7 +602,7 @@ theorem lift_escrow {W σ₀ aW e₀ a₀ p₀ : WRes} {le : Loc} {s : LSet} {v 
 theorem hRR : ∀ ψ₁ ψ₂ ψ : CellU Loc Val, CellU.CompR ψ₁ ψ₂ ψ → CellU.CompatR ψ₁ ψ₂ :=
   fun _ _ ψ hc => ⟨ψ, hc⟩
 
-/-- **The `reb` step's view transfer, at every root.**  At `W′ = W ● c` with
+/-- The `reb` step's view transfer, at every root.  At `W′ = W ● c` with
 `c ∈ reb_β(σ₀)` and `σ₀` the escrow of an `imm` cell of `W`: every non-`own` cell of
 `ag(W′)` either carries the witness of a non-`own` cell of `ag(W)` at the same location, or
 sits at an owned cell `ℓ ↦ own(u)` of `σ₀` where `c(ℓ) = imm({β}, u, q/ℓ)` and carries
@@ -723,8 +721,8 @@ def Root (r : FrameRec) (S : Ty) (l : Loc) (u : Val) : Prop :=
 
 theorem empty_of_pure {p : Prop} {ρ : WRes} (h : (⌜p⌝ : WProp) ρ) : ρ = PMap.empty := h.1
 
-/-- **Every cell of a typed reborrow sits over a cell of the typed escrow, and over an
-`own` cell only at a root.**  By induction on `T`, the clauses of `𝒱⟦Imm̲ 'x T⟧` against
+/-- Every cell of a typed reborrow sits over a cell of the typed escrow, and over an
+`own` cell only at a root.  By induction on `T`, the clauses of `𝒱⟦Imm̲ 'x T⟧` against
 those of `𝒱⟦T⟧`: `⊸`, `∀` and `Unk` give `emp`; `Ref S` a single cell over `ℓ ↦ own(u)`;
 `Imm @a S` a single cell over the `imm` cell; `Mut @a S` a single cell over the `mut` cell. -/
 theorem image_dom {x : LifeVar} {δ δ' : LSub} :
@@ -917,7 +915,7 @@ theorem interp_ext_self (δ : LSub) (x : LifeVar) (β : Life) :
     (Lifetime.Life.var x).interp (δ.extend x β) = some β := by
   rw [Lifetime.Life.interp_var, find?_extend_self]
 
-/-- **…and it is in `reb_β(R)`, by the same `π`.** -/
+/-- …and it is in `reb_β(R)`, by the same `π`. -/
 theorem relabel_reb {R c₀ : WRes} {β β₀ : Life} (hRβ : R.InStratum β)
     (hr : ResU.Reb β₀ R c₀) : ResU.Reb β R (relRes R β c₀) := by
   obtain ⟨-, π, b, hdom, hbig, hle, hbody⟩ := hr
@@ -1002,7 +1000,7 @@ theorem agWitsI_congr {ρ ρ' : WRes}
           obtain ⟨ψ', e', k', w'⟩ := hc _ ψ hψ
           exact AgWitsI.cons ψ' e' (k'.trans hk) e a (w' ▸ hex) (w' ▸ hag) hp (ih hw)
 
-/-- **`ag` of a re-taken image is defined when the original's is**: every cell is `imm`,
+/-- `ag` of a re-taken image is defined when the original's is: every cell is `imm`,
 and the walk reads an `imm` cell only at its value and witness. -/
 theorem agW_relRes {R ρ A : WRes} {β : Life}
     (hall : ∀ m ψ, ρ.get m = some ψ → ψ.kind = Kind.imm) (h : AgW ρ A) :
@@ -1052,13 +1050,13 @@ theorem agW_relRes {R ρ A : WRes} {β : Life}
       exact ⟨σ', AgW.mk hsm' hsi' AgWitsM.nil hwi' BigComp.nil hbi
         (ResU.comp_empty_right _) hσ'⟩
 
-/-- **The views at a record's roots come from one typed reborrow.**  If any root of `r` has a
+/-- The views at a record's roots come from one typed reborrow.  If any root of `r` has a
 view in `ag(W)`, there is a typed image `c₀ ∈ reb_β₀(R) ∩ 𝒱⟦Imm̲ 'x₀ T⟧` with `ag(c₀)`
 defined whose cell at every root carries the witness of the view there.  A reborrow of `R`
 puts a view at every root at once (`image_at_pos`), and `✓` makes later views agree with it
 (*"immutable cells ψ₁, ψ₂ at the same location must all have the same witness"*, `[CONF]`
 415:19), so the most recent image realises them all.
-`[about ours: an invariant of the typed world; not printed]` -/
+`[about ours: an invariant of the typed world]` -/
 def JointAt (W : WRes) (r : FrameRec) : Prop :=
   (∃ S l u, Root r S l u ∧ ∃ a, AgW W a ∧ ∃ ψ, a.get l = some ψ ∧ ψ.kind ≠ Kind.own) →
   ∃ (β₀ : Life) (x₀ : LifeVar) (c₀ : WRes), ¬ LFree x₀ r.T ∧ ResU.Reb β₀ r.R c₀ ∧
@@ -1132,7 +1130,7 @@ theorem le_of_compS_left {a b c : WRes} (h : ResU.CompS a b c) : ResU.Le a c := 
 theorem le_of_compS_right {a b c : WRes} (h : ResU.CompS a b c) : ResU.Le b c :=
   ⟨a, ResU.CompS.comm h⟩
 
-/-- **At a root, a typed escrow holds `ℓ ↦ own(u′) ● P` with `P ∈ 𝒱⟦S⟧δ(u′)`** — the `Ref`
+/-- At a root, a typed escrow holds `ℓ ↦ own(u′) ● P` with `P ∈ 𝒱⟦S⟧δ(u′)` — the `Ref`
 clause of `[TR]` p. 4 (`∃ℓ,v′. ⌜v = ℓ⌝ ⋆ ℓ ↦ v′ ⋆ 𝒱⟦T⟧δ(v′)`), reached through the `⊗`,
 `⊕` and `[@a]` clauses. -/
 theorem own_split {δ : LSub} :
@@ -1186,7 +1184,7 @@ theorem own_split {δ : LSub} :
   | all _ _ _ _ => intro v R l S _ hp; cases hp
   | unk => intro v R l S _ hp; cases hp
 
-/-- **Two roots of a typed escrow are one position, or their blocks compose strictly.**
+/-- Two roots of a typed escrow are one position, or their blocks compose strictly.
 The `⊗` clause's `⋆` is `●` (`[TR]` p. 6), and `●` composes no two `own` cells. -/
 theorem refPos_blocks {δ : LSub} :
     ∀ (T : Ty) {v : Val} {R : WRes} {l₁ l₂ : Loc} {S₁ S₂ : Ty}, vShape T δ v R →
@@ -1274,7 +1272,7 @@ theorem Chain.snoc {R : WRes} {T : Ty} {v : Val} {p : Option Loc} {l₀ : Loc} {
   | one h₁ e₁ => exact Chain.step h₁ e₁ (Chain.one hp e)
   | step h₁ e₁ _ ih => exact Chain.step h₁ e₁ (ih hp)
 
-/-- **A chain stays inside every typed piece of its source.**  If `P ∈ 𝒱⟦T⟧δ(v)` and `P`'s
+/-- A chain stays inside every typed piece of its source.  If `P ∈ 𝒱⟦T⟧δ(v)` and `P`'s
 owned cells are `R`'s, every location a chain from `(T, v)` reaches is an owned cell of `P`. -/
 theorem chain_own {δ : LSub} {R : WRes} {T : Ty} {v : Val} {p : Option Loc} {l : Loc}
     {S : Ty} {u : Val} (h : Chain R T v p l S u) :
@@ -1300,7 +1298,7 @@ theorem chain_own {δ : LSub} {R : WRes} {T : Ty} {v : Val} {p : Option Loc} {l 
       have hle₁ : ResU.Le P₁ P := (le_of_compS_right hB).trans hle
       exact own_of_le hle₁ (ih hP₁ (fun m w e => hag m w (own_of_le hle₁ e)))
 
-/-- **A location is reached by at most one chain**: one parent, one pointee type.  Two first
+/-- A location is reached by at most one chain: one parent, one pointee type.  Two first
 steps are one position or have strictly composable blocks (`refPos_blocks`), and a chain
 through a first step stays inside that step's block (`chain_own`). -/
 theorem chain_unique {δ : LSub} {R : WRes} {T : Ty} {v : Val} {p₁ : Option Loc} {l : Loc}
@@ -1425,12 +1423,12 @@ theorem frame_fwd {W X Z R W' a' : WRes} {l : Loc} {v : Val} {α : Life}
   · obtain ⟨ψ₄, e₄, k₄, w₄⟩ := lift_view_r hcz e₁ k₁
     exact ⟨ψ₄, e₄, k₄, w₄.trans w₁.symm⟩
 
-/-- **The invariant at every chain position of a frame.**  Every non-`own` cell of `ag(W)` at
+/-- The invariant at every chain position of a frame.  Every non-`own` cell of `ag(W)` at
 a chain position `ℓ` (pointee `S`, value `u`, parent `p`) is an `imm` view, `𝒱⟦S⟧δ(u)`-typed,
 whose owned cells are the frame escrow's, and whose witness is `q/ℓ` for a piece `q` of the
 parent's escrow: the frame's `R` at a first step, the parent view's witness otherwise — the
 escrow a `withload` at the parent reborrows.
-`[about ours: an invariant of the typed world; not printed]` -/
+`[about ours: an invariant of the typed world]` -/
 def DeepInv (W : WRes) (r : FrameRec) : Prop :=
   ∀ p l S u, Chain r.R r.T r.v p l S u → ∀ a, AgW W a → ∀ ψ : CellU Loc Val,
     a.get l = some ψ → ψ.kind ≠ Kind.own →
@@ -1440,9 +1438,9 @@ def DeepInv (W : WRes) (r : FrameRec) : Prop :=
     (∀ l₀, p = some l₀ → ∃ ψ₀ : CellU Loc Val, a.get l₀ = some ψ₀ ∧ ψ₀.kind ≠ Kind.own ∧
        ∃ q, ResU.Le q ψ₀.wit ∧ (∃ ζ, q.get l = some ζ) ∧ ψ.wit = q.del l)
 
-/-- **The joint clause at a chain position**: the views at `ℓ₀`'s children come from one
+/-- The joint clause at a chain position: the views at `ℓ₀`'s children come from one
 typed reborrow of the view at `ℓ₀`.
-`[about ours: an invariant of the typed world; not printed]` -/
+`[about ours: an invariant of the typed world]` -/
 def JointDeep (W : WRes) (r : FrameRec) : Prop :=
   ∀ p₀ l₀ S₀ u₀, Chain r.R r.T r.v p₀ l₀ S₀ u₀ →
   (∃ l S u, Chain r.R r.T r.v (some l₀) l S u ∧ ∃ a, AgW W a ∧ ∃ ψ : CellU Loc Val,
@@ -1455,7 +1453,7 @@ def JointDeep (W : WRes) (r : FrameRec) : Prop :=
         a.get l = some ψ → ψ.kind ≠ Kind.own → ∃ ζ, c₀.get l = some ζ ∧ ψ.wit = ζ.wit
 
 /-- The invariant of the nested typed world.
-`[about ours: an invariant of the typed world; not printed]` -/
+`[about ours: an invariant of the typed world]` -/
 def ChainInv (W : WRes) (rs : List FrameRec) : Prop :=
   (∀ r ∈ rs, DeepInv W r) ∧
   (∀ r ∈ rs, ∀ l u, r.R.get l = some (CellU.ownOf u) → ∀ a, AgW W a → ∃ ζ, a.get l = some ζ) ∧
@@ -1866,8 +1864,8 @@ theorem plusRes_other {aW c σ₀ : WRes} {x : Loc}
   show (if _ then _ else _) = _
   rw [if_neg h]
 
-/-- **`ag` of a reborrow image is defined when none of its `own`-sourced locations carries a
-view in `ag(W)`.**  `c ∈ reb_β(σ₀)`, `σ₀` the escrow of an `imm` cell of `W`. -/
+/-- `ag` of a reborrow image is defined when none of its `own`-sourced locations carries a
+view in `ag(W)`.  `c ∈ reb_β(σ₀)`, `σ₀` the escrow of an `imm` cell of `W`. -/
 theorem agW_image_noview {W aW σ₀ c : WRes} {le : Loc} {s : LSet} {v : Val}
     {hs : σ₀.InStratum s.join} {β : Life} (haW : AgW W aW)
     (hle : W.get le = some (CellU.immOf s v σ₀ hs)) (hr : ResU.Reb β σ₀ c)

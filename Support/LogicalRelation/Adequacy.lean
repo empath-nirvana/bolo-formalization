@@ -12,9 +12,7 @@ import Support.Syntax.Terms
 /-!
 # Support — LogicalRelation — Adequacy
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the empty memory, and the judgment at `Δ = Γ = ∅` read at `δ = ∅`, `γ = []`, `ρ = ∅`.
+`[about ours]`.  The empty memory, and the judgment at `Δ = Γ = ∅` read at `δ = ∅`, `γ = []`, `ρ = ∅`.
 -/
 
 noncomputable section
@@ -30,9 +28,7 @@ open BoCa.Lifetime (LifeCtx LSub)
 `[about ours: the empty `μ` of `[TR]` p. 3's `Mem` row]` -/
 def emptyMem : Heap := fun _ => none
 
-/-- `γ(e) = e` at the empty substitution, under any cutoff: every constructor
-is structural and `var i` falls to `[][i - k]? = none`, whose branch renumbers
-by `[].length = 0`.
+/-- `γ(e) = e` at the empty substitution, under any cutoff.
 `[about ours: `[TR]` p. 4's `γ(e)` at `γ = []`]` -/
 theorem psub_nil (k : Nat) (e : Expr) : Expr.psub k [] e = e := by
   induction e generalizing k with
@@ -44,8 +40,7 @@ theorem psub_nil (k : Nat) (e : Expr) : Expr.psub k [] e = e := by
       split <;> simp
   | _ => simp [Expr.psub, *]
 
-/-- `δ ∈ ⟦∅⟧` at the empty substitution: `⟦Δ⟧`'s condition is read off `Δ`'s
-entries and there are none.
+/-- `δ ∈ ⟦∅⟧` at the empty substitution.
 `[about ours: `[TR]` p. 4's `δ ∈ ⟦Δ⟧` at `Δ = ∅`]` -/
 theorem models_empty : Lifetime.LifeCtx.Models Lifetime.LifeCtx.empty Lifetime.LSub.empty := by
   intro x u h
@@ -58,8 +53,8 @@ theorem gDen_empty (δ : Lifetime.LSub) :
   Fig16.LogRel.gDen_iff.mpr
     ⟨by simp [Ctx.LiveWithin], by simp only [Fig16.LogRel.gSep]; exact ⟨rfl, trivial⟩⟩
 
-/-- `𝒱⟦1⟧δ = fun v => ⌜v = ()⌝`, pointwise, which is the shape 3.2's `⌜P̂⌝`
-asks for.  `[about ours: `[TR]` p. 4's `𝒱⟦1⟧δ` as a pure predicate]` -/
+/-- `𝒱⟦1⟧δ = fun v => ⌜v = ()⌝`, pointwise.
+`[about ours: `[TR]` p. 4's `𝒱⟦1⟧δ` as a pure predicate]` -/
 theorem vDen_unit_eq (δ : Lifetime.LSub) :
     Fig16.LogRel.vDen Ty.unit δ = fun v => Fig16.BoLo.pure (v = Val.unit) := by
   funext v; exact Fig16.LogRel.vDen_unit δ v

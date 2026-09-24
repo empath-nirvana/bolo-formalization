@@ -7,9 +7,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — WalkSplitting
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the pieces of Lemmas 6.18 and 6.20: the sites of a composite, the witness families of each walk and how they split across `●`, and inclusion–exclusion over shared `imm` cells.
+`[about ours]`.  The pieces of Lemmas 6.18 and 6.20: the sites of a composite, the witness families of each walk and how they split across `●`, and inclusion–exclusion over shared `imm` cells.
 -/
 
 noncomputable section
@@ -17,18 +15,15 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- `●` returns an `imm` cell.  With `CellU.CompatS.kinds` this says `●` never
-moves a cell across tags, which is why restriction distributes over it at every
-tag (`ResU.CompS.restrict`). -/
+/-- `●` returns an `imm` cell. -/
 theorem CellU.CompS.kind {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁ ψ₂ ψ) :
     ψ.kind = Kind.imm := by
   obtain ⟨s₁, s₂, v, ρ, k₁, k₂, k₃, e₁, e₂, e₃⟩ := h
   rw [e₃]
   rfl
 
-/-- `●` composes over a common witness and hands it on unchanged — the print's
-`imm(ᾱ₁, ρ, v) ● imm(ᾱ₂, ρ, v) = imm(ᾱ₁ ∪ ᾱ₂, ρ, v)`, in which only the
-lifetime set moves. -/
+/-- `●` keeps the common witness:
+`imm(ᾱ₁, ρ, v) ● imm(ᾱ₂, ρ, v) = imm(ᾱ₁ ∪ ᾱ₂, ρ, v)`. -/
 theorem CellU.CompS.wit {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁ ψ₂ ψ) :
     ψ.wit = ψ₁.wit ∧ ψ.wit = ψ₂.wit := by
   obtain ⟨s₁, s₂, v, ρ, k₁, k₂, k₃, e₁, e₂, e₃⟩ := h
@@ -40,10 +35,6 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- `Kind.mut` is not `Kind.imm` — the side condition the index-set lemmas below
-take, and the only tag disjointness either printed proof is actually spent on
-here.  The `own` tag needs no such side condition, because `ResU.CompS.restrict`
-holds at every tag (`ResU.CompS.restrict`). -/
 theorem Kind.mut_ne_imm : Kind.mut ≠ Kind.imm := by decide
 
 end BoCa.Fig16
@@ -51,8 +42,7 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **The own-or-mut cells are disjoint.**  A cell of `ρ₁` whose tag is not
-`imm` has no partner in `ρ₂`, since `▶◀` would force both to be `imm`. -/
+/-- A non-`imm` cell of `ρ₁` has no partner in `ρ₂`. -/
 theorem ResU.CompatS.right_eq_none {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.CompatS ρ₁ ρ₂)
     {l : Loc} {ψ₁ : CellU Loc Val} (e₁ : ρ₁.get l = some ψ₁)
     (hk : ψ₁.kind ≠ Kind.imm) : ρ₂.get l = none := by
@@ -61,9 +51,7 @@ theorem ResU.CompatS.right_eq_none {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.Compat
   | some ψ₂ => exact absurd (CellU.CompatS.kinds (h l ψ₁ ψ₂ e₁ e₂)).1 hk
 
 /-- Where `ρ₁` is defined, the composite carries a cell of the same tag over the
-same witness: off the overlap it is `ρ₁`'s own cell, and on it `●` merges two
-`imm` cells over one witness.  This is all that either printed proof's family
-transfers look at. -/
+same witness. -/
 theorem ResU.CompS.kind_wit_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {l : Loc} {ψ₁ ψ : CellU Loc Val} (e₁ : ρ₁.get l = some ψ₁) (e : ρ.get l = some ψ) :
     ψ.kind = ψ₁.kind ∧ ψ.wit = ψ₁.wit := by
@@ -85,11 +73,8 @@ theorem ResU.CompS.kind_wit_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS
       (CellU.CompS.wit hC).1⟩
 
 /-- Where `ρ₁` is defined the composite is too, with a cell of the same tag over
-the same witness.  This is the form the `imm` families need in [TR] 6.20, where
-the two operands' cells at an overlap are *not* equal — only their tags and
-witnesses are.
-`[about ours: `CellU.wit` is this file's projection, not the print's; the
-statement is about `ResU.CompS`, whose graph is the printed `●`]` -/
+the same witness: the form the `imm` families of [TR] 6.20 need.
+`[about ours: `CellU.wit` is a projection of ours]` -/
 theorem ResU.CompS.get_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {l : Loc} {ψ₁ : CellU Loc Val} (e₁ : ρ₁.get l = some ψ₁) :
     ∃ ψ, ρ.get l = some ψ ∧ ψ.kind = ψ₁.kind ∧ ψ.wit = ψ₁.wit := by
@@ -103,7 +88,7 @@ theorem ResU.CompS.get_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ�
   · exact ⟨ψ, e, ResU.CompS.kind_wit_left h e₁ e⟩
 
 /-- A non-`imm` cell of `ρ₁` survives into the composite unchanged, and `ρ₂` is
-silent at that location. -/
+undefined there. -/
 theorem ResU.CompS.get_left_of_ne_imm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {l : Loc} {ψ : CellU Loc Val} (e₁ : ρ₁.get l = some ψ) (hk : ψ.kind ≠ Kind.imm) :
     ρ₂.get l = none ∧ ρ.get l = some ψ := by
@@ -112,9 +97,7 @@ theorem ResU.CompS.get_left_of_ne_imm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.
   rw [e₁, e₂] at hp
   exact ⟨e₂, hp⟩
 
-/-- **A non-`imm` cell of the composite comes from exactly one side.**  This is
-the converse half of "disjoint own-or-mut cells": the `own` and `mut` locations
-of `ρ₁ ● ρ₂` are partitioned by which operand supplies them. -/
+/-- A non-`imm` cell of the composite comes from exactly one side. -/
 theorem ResU.CompS.get_split_of_ne_imm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {l : Loc} {ψ : CellU Loc Val} (e : ρ.get l = some ψ) (hk : ψ.kind ≠ Kind.imm) :
     (ρ₁.get l = some ψ ∧ ρ₂.get l = none) ∨ (ρ₁.get l = none ∧ ρ₂.get l = some ψ) := by
@@ -152,10 +135,8 @@ theorem ResU.restrict_get_ne {ρ : ResU Loc Val} {k : Kind} {l : Loc}
   rw [e]
   exact if_neg hk
 
-/-- **`(ρ₁ ● ρ₂)|ι = ρ₁|ι ● ρ₂|ι`**, as a graph, at every tag.  This is the
-second line of both printed proofs.
-`[about ours: the printed `ρ|ι` and `●`; the equation has no printed row of its
-own, being a step inside 6.18's and 6.20's proofs]` -/
+/-- `(ρ₁ ● ρ₂)|ι = ρ₁|ι ● ρ₂|ι`, as a graph, at every tag.
+`[about ours: a step inside 6.18's and 6.20's proofs]` -/
 theorem ResU.CompS.restrict {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     (k : Kind) :
     ResU.CompS (ρ₁.restrict k) (ρ₂.restrict k) (ρ.restrict k) := by
@@ -197,8 +178,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- A list is a permutation of its `p`-part followed by its non-`p`-part.  Only
-the transposition is at issue, and `List.perm_middle` supplies it. -/
+/-- A list is a permutation of its `p`-part followed by its non-`p`-part. -/
 theorem List.filter_perm_append {α : Type} (p : α → Bool) (l : List α) :
     l.Perm (l.filter p ++ l.filter (fun a => !(p a))) := by
   induction l with
@@ -220,10 +200,8 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- The split of a key-indexed list by a predicate on the key.  The two pieces
-are characterised by membership in both directions, which is what turns them
-into `ResU.Sites` lists below.  `Classical` decides the predicate, which is
-convention G8's standing entry point: `Loc` is abstract. -/
+/-- The split of a key-indexed list by a predicate on the key, characterised by
+membership.  The predicate is decided classically (G8). -/
 theorem List.split_by_key {α β : Type} (q : α → Prop) (w : List (α × β)) :
     ∃ w₁ w₂ : List (α × β), w.Perm (w₁ ++ w₂) ∧
       (∀ p, p ∈ w₁ ↔ (p ∈ w ∧ q p.1)) ∧ (∀ p, p ∈ w₂ ↔ (p ∈ w ∧ ¬ q p.1)) := by
@@ -245,11 +223,7 @@ variable {Loc Val : Type}
 variable {R : CellU Loc Val → CellU Loc Val → Prop}
 variable {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
 
-/-- **The exclusive family, entry by entry.**  `ExWits.mem` is the
-forward half without the tag; this adds the tag and the converse, fixing the
-relation by its entries, which makes cutting and concatenating it one-liners.
-Proved by induction on the list rather than on the derivation, which avoids the
-mutual recursor. -/
+/-- The exclusive family, entry by entry. -/
 theorem ExWits.iff_mem {ρ : ResU Loc Val} {w : List (Loc × ResU Loc Val)} :
     ExWits R C ρ w ↔
       ∀ p ∈ w, ∃ ψ, ρ.get p.1 = some ψ ∧ ψ.kind = Kind.mut ∧ ExW R C ψ.wit p.2 := by
@@ -275,8 +249,7 @@ theorem ExWits.append {ρ : ResU Loc Val} {w₁ w₂ : List (Loc × ResU Loc Val
     · exact ExWits.iff_mem.mp h₁ p hp
     · exact ExWits.iff_mem.mp h₂ p hp
 
-/-- **`ρ₁`'s exclusive family is one of `ρ₁ ● ρ₂`'s**: at a `mut` location of
-`ρ₁` the composite carries the very same cell, so the entry is unchanged. -/
+/-- `ρ₁`'s exclusive family is one of `ρ₁ ● ρ₂`'s. -/
 theorem ExWits.of_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w : List (Loc × ResU Loc Val)} (hw : ExWits R C ρ₁ w) : ExWits R C ρ w :=
   ExWits.iff_mem.mpr fun p hp => by
@@ -285,13 +258,9 @@ theorem ExWits.of_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ�
       (ResU.CompS.get_left_of_ne_imm h hψ (fun e => Kind.mut_ne_imm (hk.symm.trans e))).2,
       hk, he⟩
 
-/-- **The entries of `ρ₁ ● ρ₂`'s exclusive family that lie over `ρ₁` are `ρ₁`'s
-exclusive family.**  With `ResU.Sites.split_pairs` this is the cut [TR] 6.18's
-forward direction makes.  Nothing has to be re-derived: the composite's cell at
-such a location *is* `ρ₁`'s cell, so the walk paired with it is already a walk
-of `ρ₁`'s witness.
-`[about ours: `ExWits` is the family relation, convention G6's reading of the
-printed comprehension]` -/
+/-- The entries of `ρ₁ ● ρ₂`'s exclusive family that lie over `ρ₁` are `ρ₁`'s
+exclusive family: the cut [TR] 6.18's forward direction makes.
+`[about ours: `ExWits` is the family relation of convention G6]` -/
 theorem ExWits.to_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w w₁ : List (Loc × ResU Loc Val)} (hw : ExWits R C ρ w)
     (hsub : ∀ p ∈ w₁, p ∈ w) (hs₁ : ρ₁.Sites Kind.mut (w₁.map Prod.fst)) :
@@ -310,7 +279,7 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **The `mut` half of the aliasable family, entry by entry.** -/
+/-- The `mut` half of the aliasable family, entry by entry. -/
 theorem AgWitsM.iff_mem {ρ : ResU Loc Val} {w : List (Loc × ResU Loc Val)} :
     AgWitsM ρ w ↔
       ∀ p ∈ w, ∃ ψ, ρ.get p.1 = some ψ ∧ ψ.kind = Kind.mut ∧ AgW ψ.wit p.2 := by
@@ -328,7 +297,7 @@ theorem AgWitsM.iff_mem {ρ : ResU Loc Val} {w : List (Loc × ResU Loc Val)} :
         obtain ⟨ψ, hψ, hk, he⟩ := h q (by simp)
         exact AgWitsM.cons ψ hψ hk he (ih.mpr fun p hp => h p (by simp [hp]))
 
-/-- **The `imm` half of the aliasable family, entry by entry.** -/
+/-- The `imm` half of the aliasable family, entry by entry. -/
 theorem AgWitsI.iff_mem {ρ : ResU Loc Val} {w : List (Loc × ResU Loc Val)} :
     AgWitsI ρ w ↔
       ∀ p ∈ w, ∃ ψ, ρ.get p.1 = some ψ ∧ ψ.kind = Kind.imm ∧
@@ -368,7 +337,7 @@ theorem AgWitsI.subset {ρ : ResU Loc Val} {w w' : List (Loc × ResU Loc Val)}
     (h : AgWitsI ρ w) (hsub : ∀ p ∈ w', p ∈ w) : AgWitsI ρ w' :=
   AgWitsI.iff_mem.mpr fun p hp => AgWitsI.iff_mem.mp h p (hsub p hp)
 
-/-- `ρ₁`'s `mut` half is one of `ρ₁ ● ρ₂`'s: the cell is unchanged. -/
+/-- `ρ₁`'s `mut` half is one of `ρ₁ ● ρ₂`'s. -/
 theorem AgWitsM.of_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w : List (Loc × ResU Loc Val)} (hw : AgWitsM ρ₁ w) : AgWitsM ρ w :=
   AgWitsM.iff_mem.mpr fun p hp => by
@@ -377,9 +346,7 @@ theorem AgWitsM.of_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ
       (ResU.CompS.get_left_of_ne_imm h hψ (fun e => Kind.mut_ne_imm (hk.symm.trans e))).2,
       hk, he⟩
 
-/-- **`ρ₁`'s `imm` half is one of `ρ₁ ● ρ₂`'s**, overlaps included.  Here the
-composite's cell is *not* `ρ₁`'s — the lifetime sets have been unioned — but the
-tag and the witness are, and an entry reads nothing else. -/
+/-- `ρ₁`'s `imm` half is one of `ρ₁ ● ρ₂`'s, overlaps included. -/
 theorem AgWitsI.of_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w : List (Loc × ResU Loc Val)} (hw : AgWitsI ρ₁ w) : AgWitsI ρ w :=
   AgWitsI.iff_mem.mpr fun p hp => by
@@ -401,9 +368,7 @@ theorem AgWitsM.to_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ
   obtain rfl := Option.some.inj hg
   exact ⟨_, g₁, gk₁, hwalk⟩
 
-/-- **The entries of `ρ₁ ● ρ₂`'s `imm` half that lie over `ρ₁` are `ρ₁`'s.**  No
-disjointness is asked for: an entry over an `imm` location shared with `ρ₂` is
-`ρ₁`'s entry too, because the witness is shared. -/
+/-- The entries of `ρ₁ ● ρ₂`'s `imm` half that lie over `ρ₁` are `ρ₁`'s. -/
 theorem AgWitsI.to_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w w₁ : List (Loc × ResU Loc Val)} (hw : AgWitsI ρ w)
     (hsub : ∀ p ∈ w₁, p ∈ w) (hs₁ : ρ₁.Sites Kind.imm (w₁.map Prod.fst)) :
@@ -416,16 +381,13 @@ theorem AgWitsI.to_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ
   obtain rfl := Option.some.inj g
   exact ⟨ψ₁, g₁, gk₁, e, a, by rw [← gw]; exact hex, by rw [← gw]; exact hag, hc⟩
 
-/-- Two `▶◀`-compatible cells carry the same witness — `CellU.CompatS`'s single
-bound `ρ`, read off the relation.  It is the other half of "agree up to
-lifetimes", `CellU.CompatS.kinds` being the first. -/
+/-- Two `▶◀`-compatible cells carry the same witness. -/
 theorem CellU.CompatS.wit {ψ₁ ψ₂ : CellU Loc Val} (h : CellU.CompatS ψ₁ ψ₂) :
     ψ₁.wit = ψ₂.wit := by
   obtain ⟨s₁, s₂, v, ρ, k₁, k₂, e₁, e₂⟩ := h
   rw [e₁, e₂, CellU.wit_immOf, CellU.wit_immOf]
 
-/-- At an overlap the two operands' cells share their witness, so the two `imm`
-families pair the *same* value with that location. -/
+/-- At an overlap the two operands' cells share their witness. -/
 theorem ResU.CompatS.wit_of_overlap {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.CompatS ρ₁ ρ₂)
     {l : Loc} {ψ₁ ψ₂ : CellU Loc Val}
     (e₁ : ρ₁.get l = some ψ₁) (e₂ : ρ₂.get l = some ψ₂) : ψ₁.wit = ψ₂.wit :=
@@ -435,10 +397,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- `BoCa.Fig16.List.perm_of_keys` with the permutation of the key lists
-replaced by same-membership, which is the form `ResU.Sites` hands over.
-`[about ours: a restatement of the list lemma; it is about `List`, not about
-any printed row]` -/
+/-- `BoCa.Fig16.List.perm_of_keys` with same-membership of the key lists. -/
 theorem List.perm_of_keys_mem {α β : Type} {w w' : List (α × β)}
     (hk : (w.map Prod.fst).Nodup) (hk' : (w'.map Prod.fst).Nodup)
     (hmem : ∀ l, l ∈ w.map Prod.fst ↔ l ∈ w'.map Prod.fst)

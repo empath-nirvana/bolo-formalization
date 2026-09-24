@@ -20,9 +20,7 @@ import Support.Model.Update
 /-!
 # Support — Model — Entailments
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-what §6.5–§6.6's entailments need beyond the propositions: `⫤⊨` reflexive and extensional, a `●`-factor of a reborrowed `imm` cell and the clauses that admit it, `reb_α` at `∅` and its outlives bound, and the join-indexed conclusion 6.115's literal reading measures.
+`[about ours]`.  What §6.5–§6.6's entailments need beyond the propositions: `⫤⊨` reflexive and extensional, a `●`-factor of a reborrowed `imm` cell and the clauses that admit it, `reb_α` at `∅` and its outlives bound, and the join-indexed conclusion 6.115's literal reading measures.
 -/
 
 noncomputable section
@@ -31,7 +29,7 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-- A `●`-factor of an `imm` cell is `imm` over a subset of its lifetime set, at
-the same value and witness.  Clause (2) of `●` unions the sets.
+the same value and witness.
 `[about ours: the cell-level content of `[TR]` 6.43, read at one factor]` -/
 theorem ResU.factor_imm_sub {ρ₁ ρ₂ ρ : ResU Loc Val} (hc : ResU.CompS ρ₁ ρ₂ ρ)
     {l : Loc} {ψ₁ : CellU Loc Val} (h₁ : ρ₁.get l = some ψ₁)
@@ -64,11 +62,8 @@ theorem immOf_sub_singleton {α : Life} {t : LSet} {v : Val} {χ : ResU Loc Val}
       rw [show x = α from hx, ← hj]; exact t.join_mem⟩
   subst e; rfl
 
-/-- **`reb_α`'s body survives passing to a `●`-factor of the image**, at every
-location that factor defines.  At the `own` and `mut` clauses the image cell is
-`imm({α}, …)` and a factor of it is the same cell (`immOf_sub_singleton`); at
-the `imm` clause a factor is `imm` over a subset of a subset.  This is `[TR]`
-6.127's closing substitution `ρ′ → ρ′₁` inside `F`.
+/-- `reb_α`'s body survives passing to a `●`-factor of the image, at every
+location that factor defines: `[TR]` 6.127's closing substitution `ρ′ → ρ′₁`.
 `[about ours: the `ρ′` half of `[TR]` 6.127's closing sentence, at our `reb_α`]` -/
 theorem ResU.RebAt.factor {α : Life} {ρ ρ' ρ'₁ ρ'₂ : ResU Loc Val} {l : Loc}
     {p : ResU Loc Val} (h : ResU.RebAt α ρ ρ' l p) (hc : ResU.CompS ρ'₁ ρ'₂ ρ')
@@ -91,8 +86,7 @@ variable {Loc Val : Type}
 
 theorem BiEntails.refl (P : SPropU Loc Val) : P ⫤⊨ P := ⟨Entails.refl P, Entails.refl P⟩
 
-/-- Two propositions that entail each other are equal — `propext` and `funext`.
-Used by `ptoMut_inv`, where the cell stores the invariant itself. -/
+/-- Two propositions that entail each other are equal. -/
 theorem eq_of_biEntails {P Q : SPropU Loc Val} (h : P ⫤⊨ Q) : P = Q :=
   funext fun ρ => propext ⟨fun k => h.1 ρ k, fun k => h.2 ρ k⟩
 
@@ -133,9 +127,7 @@ end BoCa.Fig16.BoLo
 namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
-/-- `∅ ∈ reb_α(∅)`, at every `α` — `π` is empty, so none of `reb_α`'s three
-implications is exercised, and its leading `@∅ ⊐ α` is the one `[TR]` 6.124
-(p. 33) closes "by definition": `∅` carries no borrow cell. -/
+/-- `∅ ∈ reb_α(∅)`, at every `α`. -/
 theorem reb_empty (α : Life) :
     ResU.Reb α (PMap.empty : ResU Loc Val) PMap.empty := by
   refine ⟨fun l ψ e => absurd e (by simp), [], PMap.empty, ⟨by simp, fun l => ?_⟩,
@@ -154,17 +146,15 @@ theorem noOwn_empty : NoOwn (PMap.empty : WRes) := by
     if CellU.kind ψ = Kind.own then some ψ else none) = none
   rfl
 
-/-- `ρ₁ # ρ₂` names the composite and its lowering: `✓` is `⦇−⦈ defined`
-(`[TR]` p. 5) and `⟦−⟧` is defined exactly where `⦇−⦈` is.
+/-- `ρ₁ # ρ₂` names the composite and its lowering.
 `[about ours: the two applications of a printed `#` that §6.7 makes]` -/
 theorem hash_lower {ρ₁ ρ₂ : WRes} (h : ResU.Hash ρ₁ ρ₂) :
     ∃ σ μ, ResU.CompS ρ₁ ρ₂ σ ∧ ResU.Valid σ ∧ ResU.Lower σ μ := by
   obtain ⟨-, σ, hσ, τ, hτ⟩ := h
   exact ⟨σ, fun l => (τ.get l).map CellU.erase, hσ, ⟨τ, hτ⟩, τ, hτ, fun _ => rfl⟩
 
-/-- The source memory may be taken as given rather than produced: `#` makes
-`⟦ρ_f ● ρ⟧` defined and `ResU.Lower.functional` makes it unique, so the
-existential the definition binds it under is the universal one.
+/-- `wp`'s source memory may be taken as given: `⟦ρ_f ● ρ⟧` is defined and
+unique.
 `[about ours: the reading of `wp`'s own source memory]` -/
 theorem wp_lower {e : Expr} {Q : Val → WProp} {ρ ρf fρ : WRes} {μ : Heap}
     (h : wp e Q ρ) (hf : ResU.Hash ρf ρ) (hc : ResU.CompS ρf ρ fρ)
@@ -183,10 +173,7 @@ theorem wp_lower {e : Expr} {Q : Val → WProp} {ρ ρf fρ : WRes} {μ : Heap}
   cases ResU.Lower.functional h₅ hl
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ', h₁, h₂, h₃, h₆, h₇, h₈, h₉, hA, hB, hC⟩
 
-/-- The walks of a single owned cell are `[TR]`-side
-folklore: the exclusive walk is the cell, the aliasable walk is `∅`.  So
-`⦇ρ ● ℓ↦own(v)⦈ = ⦇ρ⦈ ● ℓ↦own(v)` as a Kleene equality, which is what the
-`alloc`, `free`, `load` and `store` proofs each spend one sentence on.
+/-- `⦇ρ ● ℓ↦own(v)⦈ = ⦇ρ⦈ ● ℓ↦own(v)`, as a Kleene equality.
 `[about ours: the sentence `[TR]` 6.141–6.145 share, at the walks]` -/
 theorem flat_compS_own {ρ ρ' τ : WRes} {l : BoCa.Loc} {v : Val}
     (hc : ResU.CompS ρ (ResU.single l (CellU.ownOf v)) ρ') :
@@ -215,11 +202,8 @@ theorem flat_compS_own {ρ ρ' τ : WRes} {l : BoCa.Loc} {v : Val}
       ⟨e₁, _, e, a₁, PMap.empty, a₁, he₁, ExW.single_own l v, hec, ha₁,
         AgW.single_own l v, ResU.comp_empty_right a₁, hcτ⟩
 
-/-- A location held in `ρ` reads its value in every memory `ρ` lowers to: the
-cell survives the walk at its own location, with its value (`ResU.Flat.get`),
-and `⟦−⟧` is `CellU.erase` at the surviving cell.  The cell's *tag* plays no
-part, which is why the `imm` cell of `[TR]` 6.144 reads the same way the `own`
-cell of 6.143 does.  `[about ours: the lookup the operational steps of `[TR]`
+/-- A location held in `ρ`, at any tag, reads its value in every memory `ρ`
+lowers to.  `[about ours: the lookup the operational steps of `[TR]`
 6.143, 6.144 and 6.145 need]` -/
 theorem lower_get {ρ : WRes} {μ : Heap} {l : BoCa.Loc}
     {ψ : CellU BoCa.Loc BoCa.Val} (h : ResU.Lower ρ μ)
@@ -229,25 +213,22 @@ theorem lower_get {ρ : WRes} {μ : Heap} {l : BoCa.Loc}
   rw [hval l, hχ]
   exact congrArg some hv
 
-/-- A location owned in `ρ` reads its value in every memory `ρ` lowers to: the
-cell survives the walk at its own location, with its value
-(`ResU.Flat.get`).  `[about ours: the lookup `[TR]` 6.143's and 6.145's
+/-- A location owned in `ρ` reads its value in every memory `ρ` lowers to.
+`[about ours: the lookup `[TR]` 6.143's and 6.145's
 operational steps need]` -/
 theorem lower_get_own {ρ : WRes} {μ : Heap} {l : BoCa.Loc} {v : Val}
     (h : ResU.Lower ρ μ) (e : ρ.get l = some (CellU.ownOf v)) : μ l = some v :=
   lower_get h e
 
-/-- `⟦−⟧` is silent exactly where its flattening is. -/
+/-- `⟦−⟧` is undefined exactly where its flattening is. -/
 theorem lower_eq_none_iff {μ : Heap} {τ : WRes} {l : BoCa.Loc}
     (hval : ∀ k, μ k = (τ.get k).map CellU.erase) :
     μ l = none ↔ τ.get l = none := by
   rw [hval l]
   cases τ.get l <;> simp
 
-/-- A location `⦇ρ⦈` misses is a location `ρ` misses: the cells of `ρ` are among
-those of `⦇ρ⦈` (`ResU.Flat.get`).
-`[about ours: the freshness `[TR]` 6.141's proof takes in one unjustified step,
-at the strength its own `alloc` reduction needs]` -/
+/-- A location `⦇ρ⦈` misses is a location `ρ` misses.
+`[about ours: the freshness `[TR]` 6.141's proof uses]` -/
 theorem get_eq_none_of_flat {ρ τ : WRes} {l : BoCa.Loc}
     (hτ : ResU.Flat ρ τ) (hl : τ.get l = none) : ρ.get l = none := by
   cases f : ρ.get l with
@@ -256,7 +237,7 @@ theorem get_eq_none_of_flat {ρ τ : WRes} {l : BoCa.Loc}
       obtain ⟨χ, hχ, -⟩ := hτ.get f
       exact absurd (hχ.symm.trans hl) (by simp)
 
-/-- `ρ ▶◀ ℓ↦ψ` at a location `ρ` misses — disjointness is compatibility. -/
+/-- `ρ ▶◀ ℓ↦ψ` at a location `ρ` misses. -/
 theorem compatS_single_of_get_none {ρ : WRes} {l : BoCa.Loc}
     {ψ : CellU BoCa.Loc BoCa.Val} (hl : ρ.get l = none) :
     ResU.CompatS ρ (ResU.single l ψ) := by
@@ -266,8 +247,7 @@ theorem compatS_single_of_get_none {ρ : WRes} {l : BoCa.Loc}
   · exact Or.inl (e ▸ hl)
   · exact Or.inr (ResU.single_get_ne _ e)
 
-/-- An owned cell excludes every other cell at its location — `[TR]` Lemma 6.41
-read on the resource that carries the cell rather than on a singleton.
+/-- An owned cell excludes every other cell at its location.
 `[about ours: `[TR]` Lemma 6.41 with the singleton replaced by any resource
 carrying an `own` cell at `ℓ`]` -/
 theorem get_eq_none_of_compatS_own {ρ σ : WRes} {l : BoCa.Loc} {v : Val}
@@ -276,7 +256,7 @@ theorem get_eq_none_of_compatS_own {ρ σ : WRes} {l : BoCa.Loc} {v : Val}
   | none => rfl
   | some χ => exact absurd (CellU.CompatS.kinds (h l _ χ e f)).1 (by simp)
 
-/-- **`⟦ρ ● ℓ↦own(v)⟧ = ⟦ρ⟧ ⊎ ℓ↦v`**, at a location the memory misses.
+/-- `⟦ρ ● ℓ↦own(v)⟧ = ⟦ρ⟧ ⊎ ℓ↦v`, at a location the memory misses.
 `[about ours: 6.141's "By definition, `⟦ρ_f ● ρ⟧ ⊎ ℓ↦v = ⟦ρ_f ● ρ ● ℓ↦own(v)⟧`"
 at the walks]` -/
 theorem lower_compS_own {ρ ρ' : WRes} {μ : Heap} {l : BoCa.Loc} {v : Val}
@@ -299,8 +279,7 @@ theorem lower_compS_own {ρ ρ' : WRes} {μ : Heap} {l : BoCa.Loc} {v : Val}
       BoCa.BoLo.Heap.upd_other e]
     exact hval k
 
-/-- **`⟦ρ ● ℓ↦own(v)⟧ = ⟦ρ⟧ ⊎ ℓ↦v`**, read the other way: from a memory the
-composite lowers to, `ℓ` holds `v` and the rest is what `ρ` lowers to.
+/-- `⟦ρ ● ℓ↦own(v)⟧ = ⟦ρ⟧ ⊎ ℓ↦v`, read the other way.
 `[about ours: 6.142's and 6.143's "By definition,
 `⟦ρ_f ● ℓ↦own(v) ● ρ₂⟧ = ⟦ρ_f ● ρ₂⟧ ⊎ ℓ↦v`" at the walks]` -/
 theorem lower_compS_own_inv {ρ ρ' : WRes} {μ' : Heap} {l : BoCa.Loc} {v : Val}
@@ -324,9 +303,7 @@ theorem lower_compS_own_inv {ρ ρ' : WRes} {μ' : Heap} {l : BoCa.Loc} {v : Val
   · rw [hval k, BoCa.BoLo.Heap.upd_other e,
       ResU.Comp.get_of_right_none hστ (ResU.single_get_ne _ e)]
 
-/-- **`ρ ↭ ρ ● ℓ↦own(v)`** — 6.141's "since `↭` ignores own cells", and the
-same step in 6.142 and 6.145.  At `[TR]` p. 5's guarded row the two validity
-conjuncts are hypotheses, and both are supplied by the printed `#`s.
+/-- `ρ ↭ ρ ● ℓ↦own(v)`: 6.141's "since `↭` ignores own cells".
 `[about ours: the step "`↭` ignores own cells" that 6.141, 6.142 and 6.145
 each take in one line]` -/
 theorem updV_compS_own {ρ ρ' : WRes} {l : BoCa.Loc} {v : Val}
@@ -378,9 +355,7 @@ theorem hash_compS_own {ρf ρ ρ' σ : WRes} {μ : Heap} {l : BoCa.Loc} {v : Va
   obtain ⟨t, ht, -⟩ := id hlow
   exact ⟨σ', hxσ', ⟨hxσ'.1, σ', hxσ', ⟨t, ht⟩⟩, hlow⟩
 
-/-- `Loc ≜ ℕ` is infinite.  **Ours**: neither document says `Loc` is infinite,
-and it is kept a hypothesis for that reason; at `[TR]` §3's concrete
-`Loc` it is a theorem.
+/-- `Loc ≜ ℕ` is infinite.
 `[about ours: the infinitude of `Loc`, which neither document states]` -/
 theorem loc_infinite : PMap.Infinite BoCa.Loc := by
   have hub : ∀ (t : List BoCa.Loc) (l : BoCa.Loc), l ∈ t → l ≤ t.foldr max 0 := by
@@ -395,15 +370,13 @@ theorem loc_infinite : PMap.Infinite BoCa.Loc := by
   intro d
   exact ⟨d.foldr max 0 + 1, fun hmem => Nat.not_succ_le_self _ (hub d _ hmem)⟩
 
-/-- `∅ ∈ Res_β` — the empty resource has no cell to constrain. -/
+/-- `∅ ∈ Res_β`. -/
 theorem stratum_empty (b : Life) :
     ResU.InStratum (Loc := BoCa.Loc) (Val := BoCa.Val) b PMap.empty :=
   fun _ _ e => absurd e (by simp)
 
-/-- **"`⌜v = v′⌝ ⋆ P̂(v)` is equivalent to `P̂(v)`"** — the sentence `[TR]`
-6.144's proof opens with (p. 37), at a pure proposition that holds.  `⌜p⌝` is
-`[TR]` p. 6's row `ρ = ∅ ∧ p`, so the left factor is `∅` and `[TR]` Lemma 6.4
-returns the right one.
+/-- "`⌜v = v′⌝ ⋆ P̂(v)` is equivalent to `P̂(v)`" (`[TR]` 6.144's proof, p. 37),
+at a pure proposition that holds.
 `[about ours: 6.144's own sentence, stated as the printed `⫤⊨`]` -/
 theorem pure_sep_biEntails {p : Prop} (hp : p) (P : WProp) :
     BiEntails (sep (pure p) P) P := by
@@ -412,13 +385,7 @@ theorem pure_sep_biEntails {p : Prop} (hp : p) (P : WProp) :
     rwa [eq_of_compS_empty_left hc]
   · exact fun ρ hP => ⟨PMap.empty, ρ, compS_empty_left ρ, ⟨rfl, hp⟩, hP⟩
 
-/-- **A cell of one operand fixes the composite's value at its location.**  `●`
-is defined on two `imm` cells only when they carry the same value
-(`CellU.CompatS.imm_imm`) and merges them over it (`CellU.CompS.erase`), so the
-composite's cell at `ℓ` erases to the operand's whether or not the other
-operand is silent there.  6.143 needs no such step, because an `own` cell
-excludes every other cell at its location (`get_eq_none_of_compatS_own`) and so
-survives `●` unchanged; an `imm` cell does not.
+/-- A cell of one operand fixes the composite's value at its location.
 `[about ours: the lookup `[TR]` 6.144's closing run performs without comment]` -/
 theorem compS_get_erase {ρ₁ ρ₂ ρ : WRes} {l : BoCa.Loc}
     {ψ₁ : CellU BoCa.Loc BoCa.Val} (h : ResU.CompS ρ₁ ρ₂ ρ)

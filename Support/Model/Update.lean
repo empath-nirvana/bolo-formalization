@@ -12,9 +12,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — Update
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the update relation `↭` at both printed readings, `reb_α` read at one location, and the form `[TR]` §6 unfolds `↭` to.
+`[about ours]`.  The update relation `↭` at both printed readings, `reb_α` read at one location, and the form `[TR]` §6 unfolds `↭` to.
 -/
 
 noncomputable section
@@ -27,8 +25,7 @@ theorem ResU.flatAt_iff {ρ σ : ResU Loc Val} (h : ρ.Flat σ) (l : Loc)
     (ψ : CellU Loc Val) : ρ.FlatAt l ψ ↔ σ.get l = some ψ :=
   ⟨fun ⟨_, hf, hg⟩ => by cases ResU.Flat.functional hf h; exact hg, fun hg => ⟨σ, h, hg⟩⟩
 
-/-- `↭` read off a pair of flattenings, which is how the witnesses below
-establish it. -/
+/-- `↭` read off a pair of flattenings. -/
 theorem ResU.upd_of_flat {ρ₁ ρ₂ σ₁ σ₂ : ResU Loc Val} (h₁ : ρ₁.Flat σ₁)
     (h₂ : ρ₂.Flat σ₂)
     (himm : ∀ (l : Loc) (s : LSet) (v : Val) (χ : ResU Loc Val) (h : χ.InStratum s.join),
@@ -66,22 +63,20 @@ open Classical in
 theorem ResU.del_get_ne (ρ : ResU Loc Val) {l l' : Loc} (h : l' ≠ l) :
     (ρ.del l).get l' = ρ.get l' := if_neg h
 
-/-- `ρ ≤ ρ` — take the empty frame in `[CONF]` p. 415:24's footnote.
+/-- `ρ ≤ ρ`.
 `[about ours: reflexivity of the printed order]` -/
 theorem ResU.Le.refl (ρ : ResU Loc Val) : ResU.Le ρ ρ :=
   ⟨PMap.empty, ResU.comp_empty_right ρ⟩
 
-/-- `≤` is transitive — the two frames compose by `[TR]` Lemma 6.3.  `[TR]`
-6.127's second bullet (p. 33) chains it: *"`ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥
-⨀_{ℓ∈dom(π′)} π′(ℓ)`."*
+/-- `≤` is transitive, as `[TR]` 6.127's second bullet (p. 33) chains it:
+*"`ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`."*
 `[about ours: transitivity of the printed order]` -/
 theorem ResU.Le.trans {ρ σ τ : ResU Loc Val} (h₁ : ResU.Le ρ σ) (h₂ : ResU.Le σ τ) :
     ResU.Le ρ τ :=
   ResU.Comp.factor_trans (fun _ _ _ hc => CellU.CompS.compat hc) ResU.compLawsS
     h₁.choose_spec h₂.choose_spec
 
-/-- `∅ ≤ ρ` — the empty resource is a `●`-part of every resource, `ρ` itself
-being the frame.
+/-- `∅ ≤ ρ`.
 `[about ours: the least element of the printed order]` -/
 theorem ResU.Le.empty (ρ : ResU Loc Val) : ResU.Le (PMap.empty : ResU Loc Val) ρ := by
   refine ⟨ρ, ResU.Compat.of_disjoint (fun _ => Or.inl rfl), fun l => ?_⟩
@@ -90,9 +85,8 @@ theorem ResU.Le.empty (ρ : ResU Loc Val) : ResU.Le (PMap.empty : ResU Loc Val) 
   | none => rfl
   | some ψ => rfl
 
-/-- `⨀{ρ} = ρ`, by `[TR]` Lemma 6.4.
-`[about ours: the one-element instance of the fold behind the printed iterated
-operator]` -/
+/-- `⨀{ρ} = ρ`.
+`[about ours: the fold at one element]` -/
 theorem BigComp.single {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} (ρ : ResU Loc Val) :
     BigComp R C [ρ] ρ := BigComp.cons BigComp.nil (ResU.comp_empty_right ρ)
@@ -125,8 +119,7 @@ theorem ResU.sim_of_upd {ρ₁ ρ₂ σ₁ σ₂ : ResU Loc Val} (h : ResU.Upd �
     exact ⟨CellU.mutOf b v' χ' h' P hw', (ResU.flatAt_iff h₂ l _).mp hfa,
       Or.inl ⟨b, P, ⟨v, χ, hh, hw, rfl⟩, ⟨v', χ', h', hw', rfl⟩⟩⟩
 
-/-- An `imm` cell composed at `○` with a non-`imm` one is itself: clauses (5)
-are the only ones that apply, and both return the `imm` operand. -/
+/-- An `imm` cell composed at `○` with a non-`imm` one is itself. -/
 theorem CellU.CompR.imm_nonimm_left {ψ φ ζ : CellU Loc Val}
     (h : CellU.CompR ψ φ ζ) (hk : ψ.kind = Kind.imm) (hf : φ.kind ≠ Kind.imm) :
     ζ = ψ := by
@@ -141,15 +134,8 @@ theorem CellU.CompR.imm_nonimm_left {ψ φ ζ : CellU Loc Val}
   | immMut s v ρ hh b hb P hP => rfl
   | mutImm s v ρ hh b hb P hP => exact absurd hk (by simp)
 
-/-- **`ResU.SimForm` at one location** — the printed step's two obligations read
-at `ℓ`: the domain clause and `∼`, the latter **guarded by `−∣imm,mut`** as
-`[TR]` p. 20 guards it.  The guard is not decoration: an `own` cell is `∼`-related
-to nothing, so an unguarded pointwise `∼` asks for the impossible wherever a
-flattening carries one.
-
-`ResU.simForm_iff_at` ties this to `ResU.SimForm`, which `ResU.upd_iff_sim`
-proves is `↭` itself; a residual stated through it cannot drift from the printed
-relation. -/
+/-- `ResU.SimForm` at one location: the domain clause and `∼`, guarded by
+`−∣imm,mut` as `[TR]` p. 20 guards it (an `own` cell is `∼`-related to nothing). -/
 def ResU.SimFormAt (σL σR : ResU BoCa.Loc BoCa.Val) (l : BoCa.Loc) : Prop :=
   ((∃ ψ, σL.borrowPart.get l = some ψ) ↔ (∃ ψ, σR.borrowPart.get l = some ψ)) ∧
   (∀ ψ, σL.borrowPart.get l = some ψ →

@@ -37,9 +37,7 @@ import Support.TypedWorld.Wp
 /-!
 # Support — TypedWorld — Compatibility
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the compatibility lemmas at `SemX`: `𝒢X⟦Γ⟧` split along the context, `wpTS` monotone and bound with a frame, the stratified connectives, and 6.152–6.176 as `_compatX`.
+`[about ours]`.  The compatibility lemmas at `SemX`: `𝒢X⟦Γ⟧` split along the context, `wpTS` monotone and bound with a frame, the stratified connectives, and 6.152–6.176 as `_compatX`.
 -/
 
 noncomputable section
@@ -155,7 +153,7 @@ theorem gDenX_split {ls : List SRec} {δ : LSub} {Γ Γ₁ Γ₂ : Ctx Ty} (hsp 
   obtain ⟨ρ₁, ρ₂, hc, h₁, h₂⟩ := gSepX_split hsp hs
   exact ⟨ρ₁, ρ₂, hc, gDenX_mk (hsp.liveWithin hlen).1 h₁, gDenX_mk (hsp.liveWithin hlen).2 h₂⟩
 
-/-- **`wpTS` is monotone in its postcondition.** -/
+/-- `wpTS` is monotone in its postcondition. -/
 theorem wpTS_mono {ls : List SRec} {e : Expr} {P Q : List SRec → Val → WProp}
     (h : ∀ ls' v, Entails (P ls' v) (Q ls' v)) : Entails (wpTS ls e P) (wpTS ls e Q) := by
   intro ρ hw ρf fρ ps hf hc hT htg
@@ -164,7 +162,7 @@ theorem wpTS_mono {ls : List SRec} {e : Expr} {P Q : List SRec → Val → WProp
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉, hA, hB,
     hT', htg', hps, hls, h ls' v ρ' hC⟩
 
-/-- **Bind on the sub-expression, frame the rest through the run, then weaken** — 6.135 and
+/-- Bind on the sub-expression, frame the rest through the run, then weaken — 6.135 and
 6.146 at `wpTS`, the move `[TR]` §6.8 makes at every rule with a context split.  The frame is
 carried to the returned list by `hR`. -/
 theorem wpTS_bind_frame (K : Kont) (e : Expr) (ls : List SRec) (P : List SRec → Val → WProp)
@@ -188,15 +186,15 @@ theorem gDenX_same {ls ls' : List SRec} {δ : LSub} {Γ : Ctx Ty} {γ : List Val
     (h : ∀ x, x ∈ ls' ↔ x ∈ ls) (hg : gDenX ls δ Γ γ ρ) : gDenX ls' δ Γ γ ρ :=
   gDenX_local (ext_of_same h ρ) hg
 
-/-- **An `imm` cell at the observable view is an `imm` cell whose payload is observable at the
-current list** (`ptoImmO_read`). -/
+/-- An `imm` cell at the observable view is an `imm` cell whose payload is observable at the
+current list (`ptoImmO_read`). -/
 theorem ptoImmO_toImm {l : Loc} {α : Life} {ls : List SRec} {S : Ty} {δ : LSub} {ρ : WRes}
     (h : ptoImmS l α ls (fun ls₀ => vX wpTS false S ls₀ δ) ρ) :
     ptoImm l α (fun u => vX wpTS false S ls δ u) ρ := by
   obtain ⟨s, u, σ, hs, hρ, hαs, hP⟩ := ptoImmO_read h
   exact ⟨s, u, σ, hs, hρ, hP, hαs⟩
 
-/-- **The chooser with the loaded value pinned** — 6.134's `⌜x = y⌝` carried through the
+/-- The chooser with the loaded value pinned — 6.134's `⌜x = y⌝` carried through the
 chooser. -/
 theorem rebChooseTW_pin {ls : List SRec} {l : Loc} {R : Val → WRes → Prop}
     {P₀ P : Life → Val → WProp} (c : Val) (h : RebChooseTW ls l R P₀ P) :
@@ -206,19 +204,19 @@ theorem rebChooseTW_pin {ls : List SRec} {l : Loc} {R : Val → WRes → Prop}
   obtain ⟨χ, hreb, hPχ, hag, hEF, hEI, hen, hex⟩ := h W F χ₀ σ ps β w s hs hT htag hβ hW hR' hreb₀ hP₀
   exact ⟨χ, hreb, pure_sep_mk hwc.symm hPχ, hag, hEF, hEI, hen, hex⟩
 
-/-- **`[TR]` 6.114** (`I ⊒`) at `ptoImmS`. -/
+/-- `[TR]` 6.114 (`I ⊒`) at `ptoImmS`. -/
 theorem ptoImmS_antitone {l : Loc} {α β : Life} (h : β ⊑ α) {ls : List SRec}
     {P : List SRec → Val → WProp} {ρ : WRes} (hp : ptoImmS l α ls P ρ) : ptoImmS l β ls P ρ := by
   obtain ⟨s, u, σ, hs, ls₀, hρ, hP, hα, hls₀⟩ := hp
   exact ⟨s, u, σ, hs, ls₀, hρ, hP, le_trans h hα, hls₀⟩
 
-/-- **`[TR]` 6.118** (`M ⊒`) at `ptoMutS`. -/
+/-- `[TR]` 6.118 (`M ⊒`) at `ptoMutS`. -/
 theorem ptoMutS_antitone {l : Loc} {α β : Life} (h : β ⊑ α) {ls : List SRec}
     {P : List SRec → Val → WProp} {ρ : WRes} (hp : ptoMutS l α ls P ρ) : ptoMutS l β ls P ρ := by
   obtain ⟨b, u, σ, hσ, Q, hw, ls₀, hab, hρ, hQ, hls₀, hunif⟩ := hp
   exact ⟨b, u, σ, hσ, Q, hw, ls₀, le_trans h hab, hρ, hQ, hls₀, hunif⟩
 
-/-- **`[TR]` 6.116** (`I-dup`) at `ptoImmS`: the composite is the same cell (6.43), so each
+/-- `[TR]` 6.116 (`I-dup`) at `ptoImmS`: the composite is the same cell (6.43), so each
 copy carries the same stratified payload. -/
 theorem ptoImmS_dup {l : Loc} {α : Life} {ls : List SRec} {P : List SRec → Val → WProp}
     {ρ : WRes} (hp : ptoImmS l α ls P ρ) :
@@ -290,7 +288,7 @@ theorem gSepX_outlives {Δ : LifeCtx} {δ : LSub} {a : Lifetime.Life} {α : Life
           · rw [gSepX, if_neg hl] at hg
             exact ih hT' hg
 
-/-- **`Δ ⊢ T` gives `AdmWf T δ` at `δ ⊨ Δ`**: every variable free in a scoped type is in
+/-- `Δ ⊢ T` gives `AdmWf T δ` at `δ ⊨ Δ`: every variable free in a scoped type is in
 `dom(Δ)`, and `δ ⊨ Δ` interprets it.  `[about ours: [TR] p. 2's `Δ ⊢ T` at the record
 premise `TW.immFrame` reads]` -/
 theorem admWf_of_scopedB {Δ : LifeCtx} {δ : LSub} {T : Ty} (hsc : T.scopedB Δ = true)
@@ -309,12 +307,8 @@ theorem gDenX_nil (ls : List SRec) (δ : LSub) : gDenX ls δ [] [] (PMap.empty :
 /-- `∅` is well scoped. -/
 theorem ok_empty : LifeCtx.empty.Ok := rfl
 
-/-!
-### Lemma 6.175 (withload-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.175 (withload-compat).
--/
-/-- **`[TR]` Lemma 6.175** (`withload-compat`, pp. 47–48) at the stratified judgment:
+/-! ### Lemma 6.175 (withload-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.175 (`withload-compat`, pp. 47–48) at the stratified judgment:
 
         Δ ⊨X withload : Imm @a T₁ ⊸ (∀'b ⊏ ⊓Δ. Imm̲ 'b T₁ ⊸ ['b] T₂) ⊸ T₂
 
@@ -429,12 +423,8 @@ theorem withload_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T₁ 
   rw [vX_extend_of_not_free hfree₂] at hbox
   exact hbox
 
-/-!
-### Lemma 6.152 (id-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.152 (id-compat).
--/
-/-- **`[TR]` Lemma 6.152** (`id-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.152 (id-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.152 (`id-compat`) at `SemX`.  `[as printed]`. -/
 theorem id_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {i : Nat} {T : Ty}
     (h : Ctx.Solo Γ i T) : SemX Δ Γ (.var i) T := by
   intro δ γ ls ρ _ hg
@@ -446,12 +436,8 @@ theorem id_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {i : Nat} {T : Ty}
   rw [he]
   exact wpTS_val ls v _ ρ hval
 
-/-!
-### Lemma 6.153 (1I-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.153 (1I-compat).
--/
-/-- **`[TR]` Lemma 6.153** (`1I-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.153 (1I-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.153 (`1I-compat`) at `SemX`.  `[as printed]`. -/
 theorem unitI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} (h : Ctx.Dead Γ) :
     SemX Δ Γ (.val .unit) .unit := by
   intro δ γ ls ρ _ hg
@@ -459,12 +445,8 @@ theorem unitI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} (h : Ctx.Dead Γ) :
   rw [gSepX_dead h hs]
   exact wpTS_val ls Val.unit _ _ ⟨rfl, rfl⟩
 
-/-!
-### Lemma 6.154 (1E-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.154 (1E-compat).
--/
-/-- **`[TR]` Lemma 6.154** (`1E-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.154 (1E-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.154 (`1E-compat`) at `SemX`.  `[as printed]`. -/
 theorem unitE_compatX {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {e₁ e₂ : Expr} {T : Ty}
     (hsp : Ctx.Split Γ Γ₁ Γ₂) (h₁ : SemX Δ Γ₁ e₁ .unit) (h₂ : SemX Δ Γ₂ e₂ T) :
     SemX Δ Γ (.seq e₁ e₂) T := by
@@ -477,12 +459,8 @@ theorem unitE_compatX {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {e₁ e₂ : Expr
   rw [eq_of_compS_empty_left hcσ]
   exact wpTS_1 ls' _ _ σ₂ (h₂ δ γ ls' σ₂ hδ hg₂')
 
-/-!
-### Lemma 6.155 (⊗I-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.155 (⊗I-compat).
--/
-/-- **`[TR]` Lemma 6.155** (`⊗I-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.155 (⊗I-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.155 (`⊗I-compat`) at `SemX`.  `[as printed]`. -/
 theorem tensorI_compatX {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {e₁ e₂ : Expr} {T₁ T₂ : Ty}
     (hsp : Ctx.Split Γ Γ₁ Γ₂) (h₁ : SemX Δ Γ₁ e₁ T₁) (h₂ : SemX Δ Γ₂ e₂ T₂) :
     SemX Δ Γ (.pair e₁ e₂) (.tensor T₁ T₂) := by
@@ -500,12 +478,8 @@ theorem tensorI_compatX {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {e₁ e₂ : Ex
   exact wpTS_val ls'' (.pair v₁ v₂) _ τ
     ⟨v₁, v₂, pure_sep_mk rfl ⟨τ₂, τ₁, ResU.CompS.comm hcτ, hv₁', hv₂⟩⟩
 
-/-!
-### Lemma 6.156 (⊗E-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.156 (⊗E-compat).
--/
-/-- **`[TR]` Lemma 6.156** (`⊗E-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.156 (⊗E-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.156 (`⊗E-compat`) at `SemX`.  `[as printed]`. -/
 theorem tensorE_compatX {Δ : LifeCtx} {Γ Γp Γb : Ctx Ty} {ep eb : Expr}
     {T₁ T₂ T : Ty} (hsp : Ctx.Split Γ Γp Γb)
     (h₁ : SemX Δ Γp ep (.tensor T₁ T₂))
@@ -532,12 +506,8 @@ theorem tensorE_compatX {Δ : LifeCtx} {Γ Γp Γb : Ctx Ty} {ep eb : Expr}
     simpa using this
   · exact ⟨b₂, y, hyσ, hw₂, ⟨b₁, σ₂, hy, hw₁, (gDenX_iff.mp hg₂').2⟩⟩
 
-/-!
-### Lemma 6.157 (⊕I-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.157 (⊕I-compat).
--/
-/-- **`[TR]` Lemma 6.157** (`⊕I-compat`) at `SemX`, `i = 1`.  `[as printed]`. -/
+/-! ### Lemma 6.157 (⊕I-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.157 (`⊕I-compat`) at `SemX`, `i = 1`.  `[as printed]`. -/
 theorem sumI₁_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T₁ T₂ : Ty}
     (h : SemX Δ Γ e T₁) : SemX Δ Γ (.inj₁ e) (.sum T₁ T₂) := by
   intro δ γ ls ρ hδ hg
@@ -545,8 +515,7 @@ theorem sumI₁_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T₁ T₂ : Ty}
     (wpTS_mono (fun ls' v σ hv => ?_) ρ (h δ γ ls ρ hδ hg))
   exact wpTS_val ls' (.inj₁ v) _ σ (Or.inl ⟨v, pure_sep_mk rfl hv⟩)
 
-/-! Lemma 6.157 (⊕I-compat), typed-world version, continued. -/
-/-- **`[TR]` Lemma 6.157** (`⊕I-compat`) at `SemX`, `i = 2`.  `[as printed]`. -/
+/-- `[TR]` Lemma 6.157 (`⊕I-compat`) at `SemX`, `i = 2`.  `[as printed]`. -/
 theorem sumI₂_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T₁ T₂ : Ty}
     (h : SemX Δ Γ e T₂) : SemX Δ Γ (.inj₂ e) (.sum T₁ T₂) := by
   intro δ γ ls ρ hδ hg
@@ -554,12 +523,8 @@ theorem sumI₂_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T₁ T₂ : Ty}
     (wpTS_mono (fun ls' v σ hv => ?_) ρ (h δ γ ls ρ hδ hg))
   exact wpTS_val ls' (.inj₂ v) _ σ (Or.inr ⟨v, pure_sep_mk rfl hv⟩)
 
-/-!
-### Lemma 6.158 (⊕E-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.158 (⊕E-compat).
--/
-/-- **`[TR]` Lemma 6.158** (`⊕E-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.158 (⊕E-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.158 (`⊕E-compat`) at `SemX`.  `[as printed]`. -/
 theorem sumE_compatX {Δ : LifeCtx} {Γ Γs Γb : Ctx Ty} {es e₁ e₂ : Expr}
     {T₁ T₂ T : Ty} (hsp : Ctx.Split Γ Γs Γb)
     (h₀ : SemX Δ Γs es (.sum T₁ T₂))
@@ -590,12 +555,8 @@ theorem sumE_compatX {Δ : LifeCtx} {Γ Γs Γb : Ctx Ty} {es e₁ e₂ : Expr}
     rw [← hsub]
     exact hb₂ δ (w :: γ) ls' _ hδ (gDenX_mk (by simpa using hlen) ⟨σ₁, σ₂, hcσ, hw, hgs⟩)
 
-/-!
-### Lemma 6.159 (⊸I-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.159 (⊸I-compat).
--/
-/-- **`[TR]` Lemma 6.159** (`⊸I-compat`) at `SemX`: the closure runs at any list `Ext`-above
+/-! ### Lemma 6.159 (⊸I-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.159 (`⊸I-compat`) at `SemX`: the closure runs at any list `Ext`-above
 the one it was made at, and its environment moves there by `gSepX_local`.  `[as printed]`. -/
 theorem lolliI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {body : Expr} {T₁ T₂ : Ty}
     (h : SemX Δ (⟨T₁, true⟩ :: Γ) body T₂) :
@@ -613,12 +574,8 @@ theorem lolliI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {body : Expr} {T₁ T₂ : T
   exact h δ (v' :: γ) ls' _ hδ
     (gDenX_mk (by simpa using hlen) ⟨ρ₁, ρ, ResU.CompS.comm hcomp, hv', gSepX_local hext hgs⟩)
 
-/-!
-### Lemma 6.160 (⊸E-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.160 (⊸E-compat).
--/
-/-- **`[TR]` Lemma 6.160** (`⊸E-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.160 (⊸E-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.160 (`⊸E-compat`) at `SemX`.  `[as printed]`. -/
 theorem lolliE_compatX {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {f arg : Expr} {T₁ T₂ : Ty}
     (hsp : Ctx.Split Γ Γ₁ Γ₂) (ha : SemX Δ Γ₁ arg T₁) (hf : SemX Δ Γ₂ f (.lolli T₁ T₂)) :
     SemX Δ Γ (.app f arg) T₂ := by
@@ -635,12 +592,8 @@ theorem lolliE_compatX {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {f arg : Expr} {
   rintro ls'' - v₂ τ ⟨τ₁, τ₂, hcτ, hv₂, hv₁'⟩
   exact hv₂ ls'' (Ext.refl _ _) v₁ τ₂ τ hv₁' hcτ
 
-/-!
-### Lemma 6.164 ([]E-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.164 ([]E-compat).
--/
-/-- **`[TR]` Lemma 6.164** (`[]E-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.164 ([]E-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.164 (`[]E-compat`) at `SemX`.  `[as printed]`. -/
 theorem boxE_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {a : Lifetime.Life} {T : Ty}
     (h : SemX Δ Γ e (.box a T)) : SemX Δ Γ e T := by
   intro δ γ ls ρ hδ hg
@@ -648,12 +601,8 @@ theorem boxE_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {a : Lifetime.Life}
   rintro σ ⟨-, -, hP, -⟩
   exact hP
 
-/-!
-### Lemma 6.166 (free-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.166 (free-compat).
--/
-/-- **`[TR]` Lemma 6.166** (`free-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.166 (free-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.166 (`free-compat`) at `SemX`.  `[as printed]`. -/
 theorem free_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T : Ty} (hΓ : Ctx.Dead Γ) :
     SemX Δ Γ (.val (.prim .free)) (.lolli (.ref T) T) := by
   intro δ γ ls ρ _ hg
@@ -666,12 +615,8 @@ theorem free_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T : Ty} (hΓ : Ctx.Dead Γ) :
   rw [eq_of_compS_empty_left hcomp]
   exact wpTS_free ls' ℓ w _ _ hsep
 
-/-!
-### Lemma 6.167 (⊑imm-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.167 (⊑imm-compat).
--/
-/-- **`[TR]` Lemma 6.167** (`⊑imm-compat`) at `SemX`.  `CohE` does not read the index.  `[as printed]`. -/
+/-! ### Lemma 6.167 (⊑imm-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.167 (`⊑imm-compat`) at `SemX`.  `CohE` does not read the index.  `[as printed]`. -/
 theorem immSub_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {a b : Lifetime.Life} {T : Ty}
     (h : SemX Δ Γ e (.imm b T)) (hle : Δ.EntailsLe a b) : SemX Δ Γ e (.imm a T) := by
   intro δ γ ls ρ hδ hg
@@ -683,12 +628,8 @@ theorem immSub_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {a b : Lifetime.L
   obtain ⟨hvl, himm⟩ := pure_sep_iff.mp hs
   exact ⟨α, ha, ℓ, pure_sep_mk hvl (ptoImmS_antitone hle' himm)⟩
 
-/-!
-### Lemma 6.168 (⊑mut-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.168 (⊑mut-compat).
--/
-/-- **`[TR]` Lemma 6.168** (`⊑mut-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.168 (⊑mut-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.168 (`⊑mut-compat`) at `SemX`.  `[as printed]`. -/
 theorem mutSub_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {a b : Lifetime.Life} {T : Ty}
     (h : SemX Δ Γ e (.mut b T)) (hle : Δ.EntailsLe a b) : SemX Δ Γ e (.mut a T) := by
   intro δ γ ls ρ hδ hg
@@ -700,12 +641,8 @@ theorem mutSub_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {a b : Lifetime.L
   obtain ⟨hvl, hmut⟩ := pure_sep_iff.mp hs
   exact ⟨α, ha, ℓ, pure_sep_mk hvl (ptoMutS_antitone hle' hmut)⟩
 
-/-!
-### Lemma 6.165 (alloc-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.165 (alloc-compat).
--/
-/-- **`[TR]` Lemma 6.165** (`alloc-compat`) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.165 (alloc-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.165 (`alloc-compat`) at `SemX`.  `[as printed]`. -/
 theorem alloc_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T : Ty} (hΓ : Ctx.Dead Γ) :
     SemX Δ Γ (.val (.prim .alloc)) (.lolli T (.ref T)) := by
   intro δ γ ls ρ _ hg
@@ -718,12 +655,8 @@ theorem alloc_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T : Ty} (hΓ : Ctx.Dead Γ) 
   intro ℓ σ τ hcell hc
   exact ⟨ℓ, v, pure_sep_mk rfl ⟨σ, ρ₁, ResU.CompS.comm hc, hcell, hv⟩⟩
 
-/-!
-### Lemma 6.169 (swap-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.169 (swap-compat).
--/
-/-- **`[TR]` Lemma 6.169** (`swap-compat`) at `SemX`: the library's `swap_compat`, step for
+/-! ### Lemma 6.169 (swap-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.169 (`swap-compat`) at `SemX`: the library's `swap_compat`, step for
 step.  `[as printed]`. -/
 theorem swap_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (hΓ : Ctx.Dead Γ) :
     SemX Δ Γ swap (axSwapTy T₁ T₂) := by
@@ -781,12 +714,8 @@ theorem swap_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (hΓ : Ctx.De
     ⟨R, b₂, ResU.CompS.comm hb₂R,
       ⟨ℓ, v₂, pure_sep_mk rfl ⟨_, ρ₂, ResU.CompS.comm hR, rfl, hv₂⟩⟩, hT₁'⟩⟩
 
-/-!
-### Lemma 6.170 (copy-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.170 (copy-compat).
--/
-/-- **`[TR]` Lemma 6.170** (`copy-compat`) at `SemX`: `I-Dup` at the stratified cell, and
+/-! ### Lemma 6.170 (copy-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.170 (`copy-compat`) at `SemX`: `I-Dup` at the stratified cell, and
 `CohE` copied with the value.  `[as printed]`. -/
 theorem copy_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : Ty}
     (hΓ : Ctx.Dead Γ) : SemX Δ Γ copy (axCopyTy a T) := by
@@ -808,12 +737,8 @@ theorem copy_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : Ty}
   exact ⟨v, v, pure_sep_mk rfl
     ⟨τ₁, τ₂, hc, ⟨α, ha, ℓ, pure_sep_mk hvl h₁⟩, ⟨α, ha, ℓ, pure_sep_mk hvl h₂⟩⟩⟩
 
-/-!
-### Lemma 6.171 (forget-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.171 (forget-compat).
--/
-/-- **`[TR]` Lemma 6.171** (`forget-compat`) at `SemX`, `B = Imm @a T`.  `[as printed]`. -/
+/-! ### Lemma 6.171 (forget-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.171 (`forget-compat`) at `SemX`, `B = Imm @a T`.  `[as printed]`. -/
 theorem forgetImm_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : Ty}
     (hΓ : Ctx.Dead Γ) : SemX Δ Γ forget (axForgetImmTy a T) := by
   intro δ γ ls ρ _ hg
@@ -832,8 +757,7 @@ theorem forgetImm_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : 
     ⟨_, PMap.empty, ResU.comp_empty_right _, ptoImmS_ptoImm himm,
       wpTS_val ls' .unit _ _ ⟨rfl, rfl⟩⟩
 
-/-! Lemma 6.171 (forget-compat), typed-world version, continued. -/
-/-- **`[TR]` Lemma 6.171** (`forget-compat`) at `SemX`, `B = Mut @a T`.  `[as printed]`. -/
+/-- `[TR]` Lemma 6.171 (`forget-compat`) at `SemX`, `B = Mut @a T`.  `[as printed]`. -/
 theorem forgetMut_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : Ty}
     (hΓ : Ctx.Dead Γ) : SemX Δ Γ forget (axForgetMutTy a T) := by
   intro δ γ ls ρ _ hg
@@ -852,8 +776,7 @@ theorem forgetMut_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : 
   exact wpTS_M_forget ls' ℓ α P' _ _ _
     ⟨_, PMap.empty, ResU.comp_empty_right _, hmut', wpTS_val ls' .unit _ _ ⟨rfl, rfl⟩⟩
 
-/-! Lemma 6.171 (forget-compat), typed-world version, continued. -/
-/-- **`[TR]` Lemma 6.171** (`forget-compat`) at `SemX`, `B = Unk`.  `[as printed]`. -/
+/-- `[TR]` Lemma 6.171 (`forget-compat`) at `SemX`, `B = Unk`.  `[as printed]`. -/
 theorem forgetUnk_compatX {Δ : LifeCtx} {Γ : Ctx Ty}
     (hΓ : Ctx.Dead Γ) : SemX Δ Γ forget axForgetUnkTy := by
   intro δ γ ls ρ _ hg
@@ -869,12 +792,8 @@ theorem forgetUnk_compatX {Δ : LifeCtx} {Γ : Ctx Ty}
   obtain ⟨rfl, -⟩ := hv
   exact wpTS_val ls' .unit _ _ ⟨rfl, rfl⟩
 
-/-!
-### Lemma 6.162 (∀E-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.162 (∀E-compat).
--/
-/-- **`[TR]` Lemma 6.162** (`∀E-compat`) at `SemX`: `Δ-subst` is `vX_tyEq` at
+/-! ### Lemma 6.162 (∀E-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.162 (`∀E-compat`) at `SemX`: `Δ-subst` is `vX_tyEq` at
 `TyEq.instLife`.  `[as printed]`. -/
 theorem allE_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {x : LifeVar}
     {b : Lifetime.Life} {T : Ty} {a : Lifetime.Life}
@@ -891,12 +810,8 @@ theorem allE_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {x : LifeVar}
   rw [hsub]
   exact hv ls' (Ext.refl _ _) α PMap.empty σ ⟨rfl, β, hb, hab⟩ (ResU.comp_empty_right σ)
 
-/-!
-### Lemma 6.161 (∀I-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.161 (∀I-compat).
--/
-/-- **`[TR]` Lemma 6.161** (`∀I-compat`) at `SemX`, with the library's three freshness
+/-! ### Lemma 6.161 (∀I-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.161 (`∀I-compat`) at `SemX`, with the library's three freshness
 hypotheses (`allI_compat`).
 `[variant: at `SemX`, with `allI_compat`'s added freshness hypotheses]` -/
 theorem allI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {b : Lifetime.Life}
@@ -942,12 +857,8 @@ theorem allI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {b : Lifetime.Li
   rw [← heq]
   exact gSepX_local hext hgs
 
-/-!
-### Lemma 6.163 ([]I-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.163 ([]I-compat).
--/
-/-- **`[TR]` Lemma 6.163** (`[]I-compat`) at `SemX`: 6.62 is `gSepX_outlives` (6.60 at `𝒱X`),
+/-! ### Lemma 6.163 ([]I-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.163 (`[]I-compat`) at `SemX`: 6.62 is `gSepX_outlives` (6.60 at `𝒱X`),
 `wp-[]` is `wpTS_box`.  `[as printed]`. -/
 theorem boxI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty} {a : Lifetime.Life}
     (h : SemX Δ Γ e T) (hΓ : Ctx.Outlives Δ Γ a) :
@@ -961,14 +872,10 @@ theorem boxI_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty} {a : Lifet
   exact wpTS_box ls α _ _ ρ
     ⟨h δ γ ls ρ hδ hg, gSepX_outlives hδ ha hΓ.2 (gDenX_iff.mp hg).2⟩
 
-/-!
-### Lemma 6.172 (withbor-compat1) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.172 (withbor-compat1).
--/
-/-- **`[TR]` Lemma 6.172** (`withbor-compat1`, p. 45) at `SemX`.
-`[restricted: `hfree₁`/`hfree₂`, as `withbor1_compat`; `hsc₁`, `[TR]` p. 2's `Δ ⊢ T₁`
-presupposition, which `TW.immFrame` reads as `AdmWf`]` -/
+/-! ### Lemma 6.172 (withbor-compat1) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.172 (`withbor-compat1`, p. 45) at `SemX`.
+`[restricted: `hfree₁`/`hfree₂`, as `withbor1_compat`; `hsc₁`, `[TR]` p. 2's `Δ ⊢ T₁`,
+which `TW.immFrame` reads as `AdmWf`]` -/
 theorem withbor1_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (x : LifeVar)
     (hΓ : Ctx.Dead Γ) (_hx : Δ.find? x = none) (hsc₁ : T₁.scopedB Δ = true)
     (hfree₁ : ¬ LFree x T₁) (hfree₂ : ¬ LFree x T₂) :
@@ -1048,19 +955,15 @@ theorem withbor1_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (x : Life
   cases Option.some.inj hα'
   have hT₂' : vP T₂ ls''' δ v'' ρ'' := by
     rw [vX_extend_of_not_free hfree₂] at hT₂δ'; exact hT₂δ'
-  -- `wp-ret`, and the cell ImmFrame gets back, at the SAME `vℓ`
+  -- `wp-ret`, and the cell ImmFrame gets back, at the same `vℓ`
   refine wpTS_val ls''' (.pair (.loc ℓ) v'') _ ρ'' ?_
   refine ⟨fun c₁ c₂ hc₁ hcc p₁ p₂ hp hcp => ?_, hout⟩
   obtain ⟨s, hs, hρs⟩ := compS_reassoc hcc hcp
   exact ⟨.loc ℓ, v'', pure_sep_mk rfl
     ⟨s, ρ'', ResU.CompS.comm hρs, ⟨ℓ, vℓ, pure_sep_mk rfl ⟨c₁, p₁, hs, hc₁, hp⟩⟩, hT₂'⟩⟩
 
-/-!
-### Lemma 6.173 (withbor-compat2) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.173 (withbor-compat2).
--/
-/-- **`[TR]` Lemma 6.173** (`withbor-compat2`, p. 46) at `SemX`: `MutFrame`'s premise is 6.60
+/-! ### Lemma 6.173 (withbor-compat2) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.173 (`withbor-compat2`, p. 46) at `SemX`: `MutFrame`'s premise is 6.60
 at `𝒱X` at the side condition's `@bδ`, as printed.
 `[restricted: `hfree₁`/`hfree₂`, as `withbor2_compat`]` -/
 theorem withbor2_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (x : LifeVar)
@@ -1138,12 +1041,8 @@ theorem withbor2_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {T₁ T₂ : Ty} (x : Life
   exact ⟨.loc ℓ, v'', pure_sep_mk rfl
     ⟨s, ρ'', ResU.CompS.comm hρs, ⟨ℓ, w, pure_sep_mk rfl ⟨c₁, p₁, hs, hc₁, hp⟩⟩, hT₂'⟩⟩
 
-/-!
-### Lemma 6.174 (withbor-compat3) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.174 (withbor-compat3).
--/
-/-- **`[TR]` Lemma 6.174** (`withbor-compat3`, p. 47) at `SemX`: `AntiFrame`, then `MutFrame`
+/-! ### Lemma 6.174 (withbor-compat3) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.174 (`withbor-compat3`, p. 47) at `SemX`: `AntiFrame`, then `MutFrame`
 with its premise read off the borrow in hand.
 `[restricted: `hfree₁`/`hfree₂`, as `withbor3_compat`]` -/
 theorem withbor3_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life}
@@ -1229,12 +1128,8 @@ theorem withbor3_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life}
     fun m₁ m₂ hm hcm => ⟨.loc ℓ', v'', pure_sep_mk rfl
       ⟨m₁, ρ'', ResU.CompS.comm hcm, ⟨α₀, ha, ℓ', pure_sep_mk rfl hm⟩, hT₂'⟩⟩⟩
 
-/-!
-### Lemma 6.176 (withswap-compat) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.176 (withswap-compat).
--/
-/-- **`[TR]` Lemma 6.176** (`withswap-compat`, pp. 48–49) at `SemX`.  `[as printed]`. -/
+/-! ### Lemma 6.176 (withswap-compat) at the typed world; record in `Paper/S6_8_FundamentalProperty/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.176 (`withswap-compat`, pp. 48–49) at `SemX`.  `[as printed]`. -/
 theorem withswap_compatX {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life}
     {T₁ T₂ : Ty} (hΓ : Ctx.Dead Γ) :
     SemX Δ Γ withswap (axWithswapTy a T₁ T₂) := by

@@ -3,9 +3,7 @@ import Paper.S5_Model.Definitions
 /-!
 # Support — Model — Lifetimes
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-facts about lifetimes and nonempty lifetime sets: commutativity, idempotence and associativity of `⊓` and `∪`, extensionality, extremal members and monotonicity of the meet.
+`[about ours]`.  Facts about lifetimes and nonempty lifetime sets: commutativity, idempotence and associativity of `⊓` and `∪`, extensionality, extremal members and monotonicity of the meet.
 -/
 
 noncomputable section
@@ -24,13 +22,12 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16.LSet
 
-/-- **A subset has the longer meet.**  `⊓ᾱ₁` is a member of `ᾱ₁` and so of
-`ᾱ`, which `⊓ᾱ` lies below; extra members can only drag a meet down. -/
+/-- A subset has the longer meet. -/
 theorem meet_mono_of_subset {s₁ s : LSet} (h : ∀ x, s₁.mem x → s.mem x) :
     s.meet ⊑ s₁.meet :=
   s.meet_least _ (h _ s₁.meet_mem)
 
-/-- The set determines `join` and `meet`; `LSet` is `℘⁺` with no extra data. -/
+/-- An `LSet` is determined by its members. -/
 theorem ext {s t : LSet} (h : ∀ x, s.mem x ↔ t.mem x) : s = t := by
   have hm : s.mem = t.mem := funext fun x => propext (h x)
   have hlo : s.join = t.join :=
@@ -82,7 +79,7 @@ theorem exists_least (s : Nat → Prop) :
         have h₂ : ¬ a ≤ n := fun e => h ⟨a, ha, e⟩
         omega
 
-/-- Conversely, an `LSet` is a nonempty set of lifetimes. -/
+/-- An `LSet` is nonempty. -/
 theorem nonempty (t : LSet) : ∃ a, t.mem a := ⟨t.join, t.join_mem⟩
 
 end BoCa.Fig16.LSet

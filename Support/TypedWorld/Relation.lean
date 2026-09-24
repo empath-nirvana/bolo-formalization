@@ -12,9 +12,7 @@ import Support.TypedWorld.World
 /-!
 # Support — TypedWorld — Relation
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the repaired logical relation of `[TR]` §4: `vX`, the `Imm`/`Mut` points-to at a record list, the context relation `gDenX` and the judgment `SemX`.
+`[about ours]`.  The repaired logical relation of `[TR]` §4: `vX`, the `Imm`/`Mut` points-to at a record list, the context relation `gDenX` and the judgment `SemX`.
 -/
 
 noncomputable section
@@ -27,9 +25,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
 /-!
-Row 4.9 · `𝒱⟦Mut @a T⟧δ(v) ≜ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦ Mut @aδ 𝒱⟦T⟧δ` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.9 · `𝒱⟦Mut @a T⟧δ(v) ≜ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦ Mut @aδ 𝒱⟦T⟧δ` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 -/
-/-- **`ℓ ↦ M_α 𝒱⟦S⟧(ls|⊐b)δ`**: a `mut` cell at `b ⊒ α` whose stored predicate is
+/-- `ℓ ↦ M_α 𝒱⟦S⟧(ls|⊐b)δ`: a `mut` cell at `b ⊒ α` whose stored predicate is
 `P ls₀`, `ls₀` having the members of `ls` strictly longer-lived than `b`; and `P̂ : Val →
 SProp_b` — the family `P` lies in `Res_b` at every list.  The last conjunct is `[TR]` p. 4's
 `Mut_α ≜ {(β ⊐ α, v, ρ : Res_β, P̂ : Val → SProp_β) | …}`, the type of `P̂`, read of the
@@ -42,9 +40,9 @@ def ptoMutS (l : Loc) (α : Life) (ls : List SRec) (P : List SRec → Val → WP
     (∀ x, x ∈ ls₀ ↔ (x ∈ ls ∧ x.2 ⊐ b)) ∧ ∀ ls' u' σ', P ls' u' σ' → σ'.InStratum b
 
 /-!
-Row 4.8 · `𝒱⟦Imm @a T⟧δ(v) ≜ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦ Imm @aδ 𝒱⟦T⟧δ` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.8 · `𝒱⟦Imm @a T⟧δ(v) ≜ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦ Imm @aδ 𝒱⟦T⟧δ` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 -/
-/-- **`ℓ ↦ I_α 𝒱⟦S⟧(ls|⊐⊓β̄)δ`**: an `imm` cell `imm(β̄, u, σ)` with `α ⊑ ⊓β̄` whose payload
+/-- `ℓ ↦ I_α 𝒱⟦S⟧(ls|⊐⊓β̄)δ`: an `imm` cell `imm(β̄, u, σ)` with `α ⊑ ⊓β̄` whose payload
 holds at `ls₀`, the members of `ls` strictly longer-lived than the cell (`@ψ = ⊓β̄`).  The
 cell stores no predicate; `ls₀` is fixed by the cell's lifetime, which `Ext` keeps.
 `[about ours: [TR] p. 4's Imm clause, the list stratified at the cell's lifetime]` -/
@@ -53,23 +51,18 @@ def ptoImmS (l : Loc) (α : Life) (ls : List SRec) (P : List SRec → Val → WP
     ρ = ResU.single l (CellU.immOf s u σ h) ∧ P ls₀ u σ ∧ α ⊑ s.meet ∧
     ∀ x, x ∈ ls₀ ↔ (x ∈ ls ∧ x.2 ⊐ s.meet)
 
-/-!
-Row 4.8, continued.
--/
-/-- **`Coh` up to `TyEq`.**  `[about ours]` -/
+/-- `Coh` up to `TyEq`.  `[about ours]` -/
 def CohE (rs : List FrameRec) (m : Loc) (S : Ty) (δ : LSub) : Prop :=
   ∃ S₀ δ₀, TyEq S δ S₀ δ₀ ∧ Coh rs m S₀ δ₀
 
 /-!
-Row 4.4 · `𝒱⟦T₁ ⊸ T₂⟧δ(v) ≜ ∀v′. 𝒱⟦T₁⟧δ(v′) ─⋆ ℰ⟦T₂⟧δ(v v′)` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.4 · `𝒱⟦T₁ ⊸ T₂⟧δ(v) ≜ ∀v′. 𝒱⟦T₁⟧δ(v′) ─⋆ ℰ⟦T₂⟧δ(v v′)` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 
-Row 4.5 · `𝒱⟦∀ 'a ⊏ @b. T⟧δ(v) ≜ ∀ α ⊏ @bδ. ℰ⟦T⟧δ(v ())` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.5 · `𝒱⟦∀ 'a ⊏ @b. T⟧δ(v) ≜ ∀ α ⊏ @bδ. ℰ⟦T⟧δ(v ())` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 
-Row 4.8, continued.
-
-Row 4.9, continued.
+Rows 4.8 and 4.9, continued.
 -/
-/-- **`𝒱X full ⟦T⟧(ls)δ(v)`.**  `full = true`: the program's relation.  `full = false`: the
+/-- `𝒱X full ⟦T⟧(ls)δ(v)`.  `full = true`: the program's relation.  `full = false`: the
 observable view an `imm` cell's payload is held at — `⊸`/`∀` positions relaxed to `True`.
 `[about ours: [TR] p. 4's Imm clause with its payload read at the observable view, per
 [CONF] 415:10 and 415:15; docs/adjudications.md §12.69–§12.72]` -/
@@ -105,7 +98,7 @@ def vX (wpX : WpOp) : Bool → Ty → List SRec → LSub → Val → WProp
 abbrev vP : Ty → List SRec → LSub → Val → WProp := vX wpTS true
 
 /-!
-Row 4.13 · `𝒢⟦Γ⟧(γ) ≜ ⌜dom(Γ) ⊆ dom(δ)⌝ ⋆ ⊛_{x∈dom(Γ)} 𝒱⟦Γ(x)⟧δ(γ(x))` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.13 · `𝒢⟦Γ⟧(γ) ≜ ⌜dom(Γ) ⊆ dom(δ)⌝ ⋆ ⊛_{x∈dom(Γ)} 𝒱⟦Γ(x)⟧δ(γ(x))` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 -/
 /-- `⊛_{x ∈ dom(Γ)} 𝒱X⟦Γ(x)⟧(ls)δ(γ(x))`.  `[about ours]` -/
 def gSepX (ls : List SRec) (δ : LSub) : Ctx Ty → List Val → WProp
@@ -113,17 +106,14 @@ def gSepX (ls : List SRec) (δ : LSub) : Ctx Ty → List Val → WProp
   | _ :: _, []     => emp
   | s :: Γ, v :: γ => if s.live then vP s.ty ls δ v ⋆ gSepX ls δ Γ γ else gSepX ls δ Γ γ
 
-/-!
-Row 4.13, continued.
--/
 /-- `𝒢X⟦Γ⟧(ls)δ(γ)`.  `[about ours]` -/
 def gDenX (ls : List SRec) (δ : LSub) (Γ : Ctx Ty) (γ : List Val) : WProp :=
   ⌜Ctx.LiveWithin Γ γ⌝ ⋆ gSepX ls δ Γ γ
 
 /-!
-Row 4.14 · `Δ; Γ ⊨ e : T ≜ !∀ δ,γ. 𝒟⟦Δ⟧(δ) ─⋆ 𝒢⟦Γ⟧δ(γ) ─⋆ ℰ⟦T⟧δ(γ(e))` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.14 · `Δ; Γ ⊨ e : T ≜ !∀ δ,γ. 𝒟⟦Δ⟧(δ) ─⋆ 𝒢⟦Γ⟧δ(γ) ─⋆ ℰ⟦T⟧δ(γ(e))` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 -/
-/-- **`Δ; Γ ⊨ e : T` at the typed world**: `[TR]` p. 4's judgment, `∀δ ∈ 𝒟⟦Δ⟧, γ.
+/-- `Δ; Γ ⊨ e : T` at the typed world: `[TR]` p. 4's judgment, `∀δ ∈ 𝒟⟦Δ⟧, γ.
 𝒢⟦Γ⟧δ(γ) ⊨ ℰ⟦T⟧δ(γ(e))`, read at `𝒱X` and the tagged `wpTS`, at every record list.
 `[about ours: [TR] p. 4's judgment at the definitions docs/adjudications.md §12.69–§12.72 repair]` -/
 def SemX (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=

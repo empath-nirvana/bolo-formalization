@@ -12,9 +12,7 @@ import Support.TypedWorld.Records
 /-!
 # Support — TypedWorld — World
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the typed worlds: value shapes `vShape`, the family `TW` of configurations the printed proofs' operations produce, tagging, and `[TR]` p. 6's `wp` over them (`wpTS`, row 5.33's repair).
+`[about ours]`.  The typed worlds: value shapes `vShape`, the family `TW` of configurations the printed proofs' operations produce, tagging, and `[TR]` p. 6's `wp` over them (`wpTS`, row 5.33's repair).
 -/
 
 noncomputable section
@@ -26,7 +24,7 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- **`𝒱⟦T⟧`'s shape**: `vDen` with the `⊸` and `∀` clauses dropped (no `wp`, so no world
+/-- `𝒱⟦T⟧`'s shape: `vDen` with the `⊸` and `∀` clauses dropped (no `wp`, so no world
 family), and the `Mut` clause asking the stored predicate to be *contained in* the shape
 rather than equal to it.  A record or a `TW` premise at `vShape` mentions no `TW`.
 `[about ours: our wp-free payload predicate]` -/
@@ -47,9 +45,9 @@ def vShape : Ty → LSub → Val → WProp
   | .unk, _, _ => emp
 
 /-!
-Row 5.33 · `wp (e) {Q̂} (ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v. (⟦ρ_f ● ρ⟧,e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧,v) ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺∣own = ∅ ∧ Q̂(v)(ρ′)` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S5_Model/Definitions.lean`.
+Row 5.33 · `wp (e) {Q̂} (ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v. (⟦ρ_f ● ρ⟧,e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧,v) ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺∣own = ∅ ∧ Q̂(v)(ρ′)` · `[repair]`; the printed row is in `Paper/S5_Model/Definitions.lean`.
 -/
-/-- **The typed world.**  `TW W ps rs`: the configuration `W` — every frame together with the
+/-- The typed world.  `TW W ps rs`: the configuration `W` — every frame together with the
 resource a `wp` runs at, `[TR]` p. 6's `ρ_f ● ρ` — is reached from `∅` by the operations the
 printed proofs perform, and `ps` are the frames `[TR]` 6.64 has taken and not ended, `rs` those
 frames with every sub-record of their lineages.  One constructor per operation: `alloc`
@@ -120,20 +118,17 @@ inductive TW : WRes → List FrameRec → List FrameRec → Prop
       W'.get l₀ = some (CellU.immOf s u₀ w₀ hs) → ResU.Reb β w₀ c →
       ResU.CompS W' (c.restrictDom w₀.exclPart) W → W'.InStratum β → TW W' ps rs
 
-/-!
-Row 5.33, continued.
--/
-/-- **A tagged list agrees with the world**: each record's tag is the frame lifetime of a
+/-- A tagged list agrees with the world: each record's tag is the frame lifetime of a
 record proper whose lineage holds it.  `[about ours: our tag discipline]` -/
 def Tagged (W : WRes) (ps : List FrameRec) (ls : List SRec) : Prop :=
   ∀ x ∈ ls, ∃ p ∈ ps, DescR p x.1 ∧ FrameLife W p x.2
 
 /-!
-Row 4.11 · `ℰ⟦T⟧δ(v) ≜ wp (e) {𝒱⟦T⟧δ}` · `[repair]` — the repaired reading; the printed row, its adjudication and the literal reading are in `Paper/S4_LogicalRelation/Definitions.lean`.
+Row 4.11 · `ℰ⟦T⟧δ(v) ≜ wp (e) {𝒱⟦T⟧δ}` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 
 Row 5.33, continued.
 -/
-/-- **`[TR]` p. 6's `wp` at a tagged typed world.**  The frame quantifier ranges over the
+/-- `[TR]` p. 6's `wp` at a tagged typed world.  The frame quantifier ranges over the
 completions `ρ_f ● ρ` that are `TW` worlds at the list's records, tagged, and the
 post-configuration is one too, with the same records proper and the same list members: a
 record 6.64 creates inside a run is ended before the run returns.  Every other conjunct is

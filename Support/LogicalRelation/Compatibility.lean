@@ -29,9 +29,7 @@ import Support.Statics.Presupposed
 /-!
 # Support — LogicalRelation — Compatibility
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-what the compatibility lemmas share at the literal judgment: `𝒢⟦Γ⟧` split along the context, `wp` monotone and bound with a frame, `𝒱⟦−⟧` under substitution and instantiation, the members of a lifetime, the hypotheses 6.172–6.175 add (`…Side`) and the derivations that carry them (`DerivesIn`).
+`[about ours]`.  What the compatibility lemmas share at the literal judgment: `𝒢⟦Γ⟧` split along the context, `wp` monotone and bound with a frame, `𝒱⟦−⟧` under substitution and instantiation, the members of a lifetime, the hypotheses 6.172–6.175 add (`…Side`) and the derivations that carry them (`DerivesIn`).
 -/
 
 noncomputable section
@@ -82,9 +80,8 @@ theorem gSep_solo {δ : LSub} : ∀ {Γ : Ctx Ty} {i : Nat} {T : Ty}, Ctx.Solo �
           obtain ⟨w, hw, hv⟩ := ih (γ := γ') (by simpa using hlen) hg
           exact ⟨w, by simpa using hw, hv⟩
 
-/-- `Γ = Γ₁, Γ₂` splits the resource.  The value list is the SAME on both sides
-— a `Ctx.Split` keeps every position and only turns liveness bits off, so
-`[TR]`'s "split `γ` into `γ₁`, `γ₂`" is, positionally, no split at all. -/
+/-- `Γ = Γ₁, Γ₂` splits the resource.  The value list is the same on both sides:
+a `Ctx.Split` keeps every position and only turns liveness bits off. -/
 theorem gSep_split {δ : LSub} : ∀ {Γ Γ₁ Γ₂ : Ctx Ty}, Ctx.Split Γ Γ₁ Γ₂ →
     ∀ {γ : List Val} {ρ : WRes}, gSep δ Γ γ ρ →
       (gSep δ Γ₁ γ ⋆ gSep δ Γ₂ γ) ρ := by
@@ -128,7 +125,7 @@ theorem gDen_split {δ : LSub} {Γ Γ₁ Γ₂ : Ctx Ty} (hsp : Ctx.Split Γ Γ�
     gDen_mk (hsp.liveWithin hlen).1 h₁,
     gDen_mk (hsp.liveWithin hlen).2 h₂⟩
 
-/-- **`wp` is monotone in its postcondition** — `[TR]` 6.146 at the empty
+/-- `wp` is monotone in its postcondition — `[TR]` 6.146 at the empty
 frame.  `[about ours: 6.146 with `∅` for the framed resource]` -/
 theorem wp_mono {P Q : Val → WProp} (h : ∀ v, Entails (P v) (Q v)) (e : Expr) :
     Entails (wp e P) (wp e Q) := by
@@ -138,8 +135,8 @@ theorem wp_mono {P Q : Val → WProp} (h : ∀ v, Entails (P v) (Q v)) (e : Expr
   rw [eq_of_compS_empty_left hc]
   exact h v ρ₁ hP
 
-/-- **Bind on the sub-expression, frame the rest of the context through the run,
-then weaken** — `[TR]` 6.135 and 6.146 in one, and the move `[TR]` §6.8 makes at
+/-- Bind on the sub-expression, frame the rest of the context through the run,
+then weaken — `[TR]` 6.135 and 6.146 in one, and the move `[TR]` §6.8 makes at
 every rule with a context split.
 `[about ours: 6.135 and 6.146 composed, at the shape §6.8 uses them in]` -/
 theorem wp_bind_frame (K : Kont) (e : Expr) (P : Val → WProp) (R : WProp)
@@ -180,7 +177,7 @@ theorem wp_inj₂ (v : Val) (Q : Val → WProp) :
     Entails (wp (.val (.inj₂ v)) Q) (wp (.inj₂ (.val v)) Q) :=
   Entails.refl _
 
-/-- **`𝒱⟦Mut @a T⟧δ` depends on `T` only through `𝒱⟦T⟧δ`**, because the printed
+/-- `𝒱⟦Mut @a T⟧δ` depends on `T` only through `𝒱⟦T⟧δ`, because the printed
 `mut` cell stores the payload predicate.
 `[about ours: the substitutivity of the printed `mut` clause]` -/
 theorem vDen_mut_congr {δ₁ δ₂ : LSub} {a₁ a₂ : Lifetime.Life} {T₁ T₂ : Ty}
@@ -221,11 +218,8 @@ open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
-/-- **…and scoping alone is what the freshness needs.**  The same induction at
-`Ty.scopedB`, which differs from `Ty.wfB` only at `Unk` — and `LFree x Unk` is
-`False`, so that clause was never carrying the lemma.  This is the form the
-regime can use, `Ty.wfB` being unavailable at `forget`'s `Unk` and inside
-`withload`'s type at a function payload.
+/-- …and at `Ty.scopedB`, which differs from `Ty.wfB` only at `Unk`, where
+`LFree x Unk` is `False`.
 `[about ours: `not_lfree_of_wfB` at the scoping half]` -/
 theorem not_lfree_of_scopedB {x : LifeVar} :
     ∀ {T : Ty} {Δ : LifeCtx}, Δ.find? x = none → T.scopedB Δ = true → ¬ LFree x T := by
@@ -279,7 +273,7 @@ theorem not_lfree_of_scopedB {x : LifeVar} :
         rw [LifeCtx.find?_extend, if_neg (fun e => hne e.symm)]
         exact hx
 
-/-- **`𝒱⟦T[@a/'x]⟧δ = 𝒱⟦T⟧_{δ['x↦@aδ]}`** — `Δ-subst` at the substitution `∀E`
+/-- `𝒱⟦T[@a/'x]⟧δ = 𝒱⟦T⟧_{δ['x↦@aδ]}` — `Δ-subst` at the substitution `∀E`
 performs.
 `[variant: the single-variable instance of `vDen_applyLSub`; `[TR]` states no
 lemma for the step 6.162 calls `Δ-subst`]` -/
@@ -325,16 +319,14 @@ theorem valid_empty : ResU.Valid (Loc := BoCa.Loc) (Val := BoCa.Val) PMap.empty 
     (compS_empty_left (ResU.single (0 : BoCa.Loc) (CellU.ownOf (Val.unit))))
     (ResU.valid_single_own 0 Val.unit)).1
 
-/-- `∅ # ∅`, the frame every statement below is refuted or satisfied at. -/
+/-- `∅ # ∅`. -/
 theorem hash_empty : ResU.Hash (Loc := BoCa.Loc) (Val := BoCa.Val)
     PMap.empty PMap.empty :=
   ResU.hash_empty_right valid_empty
 
-/-- **`ℰ⟦1⟧δ(free (alloc ()))` holds on the printed machine.**  This is the
-premise the two refutations below need: `1E` and `⊕I` are only refuted at an
-`e₁` that is not already a value, and this is one — `[TR]` p. 2's `⊸E` types it
-at `1` (`TR3.derives_wFreeAlloc`) and the printed `alloc↦`, `free↦` and the
-printed frame `e K` run it to `()`.
+/-- `ℰ⟦1⟧δ(free (alloc ()))` holds on the printed machine: `[TR]` p. 2's `⊸E`
+types it at `1` (`TR3.derives_wFreeAlloc`), and the printed `alloc↦`, `free↦`
+and frame `e K` run it to `()`.
 `[about ours: `[TR]` p. 4's `ℰ⟦1⟧` over `TR3.Steps`, the printed machine]` -/
 theorem tr3_eDen_freeAlloc (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty := by
@@ -373,7 +365,7 @@ theorem lifeMembers_compS {L : Life → Prop} {ρ₁ ρ₂ ρ : WRes} (hc : ResU
     · exact h₁ l _ d1 x hx
     · exact h₂ l _ d2 x hx
 
-/-- **`reb_α` establishes it.**  It mints `{α}` at the cells it creates and
+/-- `reb_α` establishes it.  It mints `{α}` at the cells it creates and
 keeps a subset of each source `imm` cell's lifetime set, so a licence holding
 of the source and of `α` holds of the image. -/
 theorem lifeMembers_reb {L : Life → Prop} {α : Life} {src img : WRes}
@@ -394,7 +386,7 @@ theorem lifeMembers_reb {L : Life → Prop} {α : Life} {src img : WRes}
     rw [hls] at hx
     exact hx ▸ hα
 
-/-- **…and it splits.**  At a shared location `●` unions the sets, so an
+/-- …and it splits.  At a shared location `●` unions the sets, so an
 operand's members are among the composite's. -/
 theorem lifeMembers_compS_left {L : Life → Prop} {ρ₁ ρ₂ ρ : WRes}
     (hc : ResU.CompS ρ₁ ρ₂ ρ) (h : LifeMembers L ρ) : LifeMembers L ρ₁ := by
@@ -410,19 +402,15 @@ theorem lifeMembers_compS_left {L : Life → Prop} {ρ₁ ρ₂ ρ : WRes}
     cases Option.some.inj d1
     exact h l _ d3 x (Or.inl hx)
 
-/-- `α ⊑ ⊓β̄` at each `imm` cell — **`LifeMembers` at the licence `(α ⊑ ·)`**,
-so the condition has one carrier and not two.  `⊓β̄` is a member of `β̄`
-(`Fig16.LSet.meet_mem`) and is bounded by every other
-(`Fig16.LSet.meet_least`), so bounding the meet and bounding every member are
-the same ask; `ImmAt` fixes the licence to the index, which is what `reb_α`
-establishes.  At a
-FIXED `α` this is far weaker than asking `⊔β̄ ⊑ ⊓β̄`: the set `{1, 5}` is not
-flat and satisfies it at `7`.
+/-- `α ⊑ ⊓β̄` at each `imm` cell — `LifeMembers` at the licence `(α ⊑ ·)`,
+`⊓β̄` is a member of `β̄` (`Fig16.LSet.meet_mem`) bounded by every other
+(`Fig16.LSet.meet_least`), so bounding the meet and bounding every member
+agree.
 `[about ours: the slot condition, as `LifeMembers` at one licence]` -/
 def ImmAt (α : Life) (ρ : WRes) : Prop := LifeMembers (fun x => α ⊑ x) ρ
 
 /-- The shortest lifetime `T` itself declares, following `OutlivesRules`'
-own clauses: the borrow formers contribute their index and do NOT recurse
+own clauses: the borrow formers contribute their index and do not recurse
 (neither does the judgment), the structural ones take the meet. -/
 def tyLifeMeet (δ : LSub) : Ty → Option Life
   | .unit           => none
@@ -453,7 +441,7 @@ inductive TyLife where
   /-- `Δ ⊢ T ⊐ @a` has no rule for `T`. -/
   | unreached : TyLife
 
-/-- `OutlivesRules.tensor` and `OutlivesRules.sum` need BOTH sides derivable,
+/-- `OutlivesRules.tensor` and `OutlivesRules.sum` need both sides derivable,
 so a side the judgment does not reach makes the whole type unreached; two
 declared lifetimes meet, and a side declaring nothing constrains nothing. -/
 def TyLife.combine : TyLife → TyLife → TyLife
@@ -465,7 +453,7 @@ def TyLife.combine : TyLife → TyLife → TyLife
   | .free,      .free       => .free
 
 /-- The index `OutlivesRules` itself induces: the borrow formers contribute
-their index and do NOT recurse (neither does the judgment), the structural
+their index and do not recurse (neither does the judgment), the structural
 formers combine, and the three formers the judgment has no rule for are
 `unreached`.  A borrow former whose lifetime does not interpret is `unreached`
 too — `Δ.Models δ` makes that case vacuous under the judgment. -/
@@ -487,9 +475,9 @@ def tyLife (δ : LSub) : Ty → TyLife
   | .sum T₁ T₂      => TyLife.combine (tyLife δ T₁) (tyLife δ T₂)
   | .tensor T₁ T₂   => TyLife.combine (tyLife δ T₁) (tyLife δ T₂)
 
-/-- **The non-circular slot condition, at the three-valued index.**  `ImmAt` at
-the lifetime `T` declares — which is what `reb_α` establishes inside its OWN
-definition, with no appeal to 6.60.  A type the judgment reaches and which
+/-- The non-circular slot condition, at the three-valued index.  `ImmAt` at
+the lifetime `T` declares, which `reb_α` establishes inside its own
+definition.  A type the judgment reaches and which
 declares nothing carries no `imm` cell at all.  A type the judgment does not
 reach is asked nothing. -/
 def TyAt (δ : LSub) (T : Ty) (ρ : WRes) : Prop :=
@@ -513,7 +501,7 @@ noncomputable def gSepB (Δ : LifeCtx) (δ : LSub) : Ctx Ty → List Val → WPr
 noncomputable def gDenB (Δ : LifeCtx) (δ : LSub) (Γ : Ctx Ty) (γ : List Val) : WProp :=
   ⌜Ctx.LiveWithin Γ γ⌝ ⋆ gSepB Δ δ Γ γ
 
-/-- **What `∀I` asks beyond `Derives.allI`.**  `[TR]` Lemma 6.161's proof
+/-- What `∀I` asks beyond `Derives.allI`.  `[TR]` Lemma 6.161's proof
 (p. 42) says "By Δ-extend, δ['a↦α] ∈ ⟦Δ, ('a ⊏ @b)⟧" and "Extend 𝒢⟦Γ⟧δ with
 δ['a↦α]"; each holds only if the extension changes no lookup its object makes.
 So: `@b` does not mention `'a` (the first sentence at `'a` itself, where the
@@ -526,7 +514,7 @@ def AllISide (Δ : LifeCtx) (Γ : Ctx Ty) (x : LifeVar) (b : Lifetime.Life) : Pr
     (∀ y u, Δ.find? y = some u → u.mentions x = false) ∧
     (∀ s ∈ Γ, s.live = true → ¬ LFree x s.ty)
 
-/-- **What `withbor`'s first form asks beyond `Derives.withbor1Ax`.**  `[TR]`
+/-- What `withbor`'s first form asks beyond `Derives.withbor1Ax`.  `[TR]`
 Lemma 6.172's proof (pp. 45–46) applies `ImmFrame` where 6.173 applies
 `MutFrame`, and `ImmFrame` (`[TR]` 6.64, p. 22) carries no premise
 `𝒱⟦T₁⟧δ ⊨ [@bδ] 𝒱⟦T₁⟧δ`, so this form asks no side condition on `T₁` — only the
@@ -537,7 +525,7 @@ does not.  `Δ` is not read, so it is no parameter.
 def Withbor1Side (x : LifeVar) (T₁ T₂ : Ty) : Prop :=
   ¬ LFree x T₁ ∧ ¬ LFree x T₂
 
-/-- **What `withbor`'s second form asks beyond `Derives.withbor2Ax`.**  `[TR]`
+/-- What `withbor`'s second form asks beyond `Derives.withbor2Ax`.  `[TR]`
 Lemma 6.173's proof (p. 46) says "Fold and simplify, using that 'b does not
 occur free in T₁ or T₂" — the binder's freshness for both, which the page's
 convention gives and the schematic `x` does not.  Its "Since Δ ⊢ T₁ ⊐ @b,
@@ -547,7 +535,7 @@ theorem 6.60 gives 𝒱⟦T₁⟧δ ⊨ [@bδ] 𝒱⟦T₁⟧δ" is the node's o
 def Withbor2Side (x : LifeVar) (T₁ T₂ : Ty) : Prop :=
   ¬ LFree x T₁ ∧ ¬ LFree x T₂
 
-/-- **What `withbor`'s third form asks beyond `Derives.withbor3Ax`.**  `[TR]`
+/-- What `withbor`'s third form asks beyond `Derives.withbor3Ax`.  `[TR]`
 Lemma 6.174 inherits 6.172's "'b does not occur free in T₁ or T₂", the
 binder's freshness for both, which the page's convention gives and the
 schematic `x` does not.  The entailment `MutFrame` consumes is read off the
@@ -556,17 +544,12 @@ borrow in hand (`withbor3_compat`), so it asks nothing here.
 def Withbor3Side (x : LifeVar) (T₁ T₂ : Ty) : Prop :=
   ¬ LFree x T₁ ∧ ¬ LFree x T₂
 
-/-- **What `withload` asks beyond `Derives.withloadAx`.**  `[TR]` Lemma 6.175's
-proof (p. 48) spends two rows whose transcriptions carry an input the printed
-rows do not, and one sentence the schematic `x` does not give.  Of the two
-inputs only one mentions the node: `hesc` is `Fig16.BoLo.RebEscrow` — what
-`[TR]` 6.150 inherits from 6.55 — at the `P̂` this proof builds, whose shape is
-fixed by `'x` and `T₁`.  The other, `[TR]` 6.125 (`↺⋆`) as printed, mentions
-neither `'x` nor `T₁` nor `T₂` and so is not a condition on the node; it stays
-a parameter of the induction, as the row it comes from leaves it.  The
-sentences are *"because `'b` does not occur free in `T₂`"* (p. 48) and `↺V₂`'s
-own *"if `'a` not free in `T`"* (p. 35) — the binder's freshness for both,
-which the page's convention gives and the schematic `x` does not.
+/-- What `withload` asks beyond `Derives.withloadAx`, from `[TR]` Lemma 6.175's
+proof (p. 48): `hesc`, `Fig16.BoLo.RebEscrow` — what `[TR]` 6.150 inherits from
+6.55 — at the `P̂` this proof builds; and the binder's freshness for `T₁` and
+`T₂`, from *"because `'b` does not occur free in `T₂`"* (p. 48) and `↺V₂`'s
+*"if `'a` not free in `T`"* (p. 35).  `[TR]` 6.125 (`↺⋆`) names no part of the
+node and stays a parameter of the induction.
 `[about ours: the hypotheses `withload_compat` adds that name the node, at one
 `withloadAx` node]` -/
 def WithloadSide (x : LifeVar) (T₁ T₂ : Ty) : Prop :=
@@ -574,13 +557,9 @@ def WithloadSide (x : LifeVar) (T₁ T₂ : Ty) : Prop :=
       (fun β v' => ⌜vℓ = v'⌝ ⋆ vDen (T₁.immReborrow (.var x)) (δ.extend x β) vℓ)) ∧
     ¬ LFree x T₁ ∧ ¬ LFree x T₂
 
-/-- **`Δ; Γ ⊢ e : T` by a derivation in the regime.**  `BoCa.Derives`
-constructor for constructor, with `AllISide` a premise of `allI`,
-`Withbor1Side` a premise of `withbor1Ax`, `Withbor2Side` a premise of
-`withbor2Ax`, `Withbor3Side` a premise of `withbor3Ax` and `WithloadSide` a
-premise of `withloadAx`; every other constructor is as `Derives` has it, so a
-`DerivesIn` derivation is a `Derives` derivation whose
-`∀I`, `withbor1`, `withbor2`, `withbor3` and `withload` nodes meet their side.
+/-- `Δ; Γ ⊢ e : T` by a derivation in the regime: `BoCa.Derives` with
+`AllISide`, `Withbor1Side`, `Withbor2Side`, `Withbor3Side` and `WithloadSide`
+premises of `allI`, `withbor1Ax`, `withbor2Ax`, `withbor3Ax` and `withloadAx`.
 `[about ours: `BoCa.Derives`, with a premise added at five constructors]` -/
 inductive DerivesIn : LifeCtx → Ctx Ty → Expr → Ty → Prop where
   | var {Δ Γ i T} (h : Ctx.Solo Γ i T) : DerivesIn Δ Γ (.var i) T
@@ -690,21 +669,16 @@ theorem withloadSide_of_scopedB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
     WithloadSide x T₁ T₂ :=
   ⟨hesc, not_lfree_of_scopedB hx h₁, not_lfree_of_scopedB hx h₂⟩
 
-/-- **Every derivation is in the regime** — what
-`FundamentalPropertyOverRules` is reduced to, and nothing else.
+/-- Every derivation is in the regime — what `FundamentalPropertyOverRules` is
+reduced to.
 
-Its five sides are of two kinds, and only one of them is about the carrier.
-
-* The **freshness** half — `AllISide`'s three conjuncts and the `¬ LFree`
-  conjuncts of `Withbor1Side`, `Withbor2Side`, `Withbor3Side` and
-  `WithloadSide` — is [TR] p. 2's own `Δ ⊢ T` at a binder outside `dom(Δ)`:
-  `allISide_of_scopedB` and the four beside it derive all of them from
-  `Ty.scopedB` and `Lifetime.LifeCtx.Ok`, and `BoCa.wfTy_of_wfB` ties `Ty.wfB` to
-  the transcribed `BoCa.WfTy`.  `Derives` consumes that judgment at no
-  constructor (definition row 2.19), which is why the
-  sides are not among its premises: `not_everyDerivationWf` is a `Derives.allI`
-  node whose bound mentions its own binder.
-* `WithloadSide`'s escrow is [TR] 6.150's own inheritance from 6.55.
+* The freshness half — `AllISide`'s three conjuncts and the `¬ LFree`
+  conjuncts of the other four sides — is [TR] p. 2's `Δ ⊢ T` at a binder
+  outside `dom(Δ)`: `allISide_of_scopedB` and the four beside it derive them
+  from `Ty.scopedB` and `Lifetime.LifeCtx.Ok`.  `Derives` consumes that judgment
+  at no constructor (definition row 2.19); `not_everyDerivationWf` is a
+  `Derives.allI` node whose bound mentions its own binder.
+* `WithloadSide`'s escrow is [TR] 6.150's inheritance from 6.55.
 
 Not derived here, and no obstruction to it verified.
 `[about ours: the residual of `Fig16.LogRel.FundamentalPropertyOverRules`
@@ -759,15 +733,10 @@ theorem witness : Derives ⟨[]⟩ [] (.val (.lam (.val .unit)))
     (.all 0 (.var 0) .unit) :=
   Derives.allI (S := .unit) rfl (Derives.unitI (.cons .nil))
 
-/-- **What `FundamentalPropertyOverRules` needs beyond `fundamental`.**
-`fundamental` concludes at a `DerivesWf` node under `⊧ Δ` and `Δ ⊢ Γ`;
-`FundamentalPropertyOverRules` quantifies over `Derives` and over every `Δ` and
-`Γ`.  The judgment half of the difference is this bridge; the other half is
-that its quantifier carries neither presupposition, which is [TR] p. 2's boxed
-"Presumes ⊧ ∆" and `Δ ⊢ Γ` and which definition row 2.19
-records `Derives` consuming nowhere.  `FundamentalProperty` — the antecedent
-under those presuppositions — needs neither, and `fundamentalProperty` proves
-it outright.
+/-- What `FundamentalPropertyOverRules` needs beyond `fundamental`, which
+concludes at a `DerivesWf` node under the hypotheses `⊧ Δ` (`Δ.Ok`) and `Δ ⊢ Γ`
+(`Ctx.ScopedB`); `FundamentalPropertyOverRules` quantifies over `Derives` and
+every `Δ` and `Γ` (`docs/adjudications.md` §C.26).
 `[about ours: the residual of `Fig16.LogRel.FundamentalPropertyOverRules` over
 `fundamental`]` -/
 def EveryDerivationWf : Prop :=

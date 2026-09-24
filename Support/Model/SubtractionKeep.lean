@@ -8,9 +8,7 @@ import Support.Model.Subtraction
 /-!
 # Support — Model — SubtractionKeep
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-Lemma 6.52 at `SubKeep`, the form 6.150 spends.
+`[about ours]`.  Lemma 6.52 at `SubKeep`, the form 6.150 spends.
 -/
 
 noncomputable section
@@ -18,11 +16,8 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **6.52's `ρ⁺ ⊟ ρ_reb` is one on Definition 6.3's paragraph too.**  The `ψ`
-6.52 returns is `ResU.sub_of_le`'s, which is `ρ|imm` off `dom(ρ′)` on the nose
-(`ResU.subWitness_of_none`) — the corrected third bullet, not just its glyphs.
-So nothing is lost by reading `⊟` as `ResU.SubKeep`, and by
-`ResU.SubKeep.functional` the `ψ` is then the only one.
+/-- 6.52's `ρ⁺ ⊟ ρ_reb` on Definition 6.3's paragraph reading (§12.58), and the
+only one.
 `[about ours: `[TR]` 6.52's conclusion at `ResU.SubKeep`]` -/
 theorem ResU.six52_keep {α : Life}
     {ρ'i ρ ρe ρ'' ρp ρρe ρ'p : ResU BoCa.Loc BoCa.Val}

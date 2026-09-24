@@ -3,9 +3,7 @@ import Paper.S5_Model.Definitions
 /-!
 # Support — Model — Cells
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-facts about cells: the lifetime set of an `imm` cell, extensionality of `mut` cells, the constructor set of `Cell`, and the difference of lifetime sets.
+`[about ours]`.  Facts about cells: the lifetime set of an `imm` cell, extensionality of `mut` cells, the constructor set of `Cell`, and the difference of lifetime sets.
 -/
 
 noncomputable section
@@ -37,9 +35,7 @@ theorem MutU.ext {m n : MutU Loc Val} (hb : m.β = n.β) (hv : m.v = n.v)
   simp only [heq_eq_eq] at hρ hP
   subst hρ; subst hP; rfl
 
-/-- Every cell of `Cell` is an `own`, an `imm` or a `mut`, in the form §7
-gives them.  With the three distinctness lemmas and the two injectivity lemmas
-above, this is a constructor set for `Cell`. -/
+/-- Every cell of `Cell` is an `own`, an `imm` or a `mut`. -/
 theorem CellU.rep (ψ : CellU Loc Val) :
     (∃ v : Val, ψ = ownOf v) ∨
     (∃ (s : LSet) (v : Val) (ρ : ResU Loc Val) (h : ρ.InStratum s.join),
@@ -72,8 +68,8 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- `ᾱ ∖ β̄ = γ̄`, as a graph: the difference of two lifetime sets need not be
-an `LSet` (it may be empty), so it is not a total operation on `LSet`. -/
+/-- `ᾱ ∖ β̄ = γ̄`, as a graph: the difference may be empty, so it is not an
+operation on `LSet`. -/
 def LSet.Diff (s t u : LSet) : Prop := ∀ x, u.mem x ↔ (s.mem x ∧ ¬ t.mem x)
 
 /-- `ᾱ ∖ β̄ = ∅`. -/

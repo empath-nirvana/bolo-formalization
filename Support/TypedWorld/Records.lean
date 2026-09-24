@@ -9,9 +9,7 @@ import Support.Model.Prelude
 /-!
 # Support — TypedWorld — Records
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the records the typed world keeps: frame records and their lineages, root, chain and `Mut` positions, coherence of a record with the world, tags, and the Kripke order `Ext`.
+`[about ours]`.  The records the typed world keeps: frame records and their lineages, root, chain and `Mut` positions, coherence of a record with the world, tags, and the Kripke order `Ext`.
 -/
 
 noncomputable section
@@ -87,10 +85,10 @@ inductive MutPos : Ty → Val → Loc → Ty → Prop
 /-- `δ′` agrees with `δ` on the free lifetime variables of `T`. -/
 def AgreeOn (T : Ty) (δ' δ : LSub) : Prop := ∀ y, LFree y T → δ'.find? y = δ.find? y
 
-/-- **The program's type `Imm @a S′` at `δ′` is coherent with the view at `m`**: `m` is a
+/-- The program's type `Imm @a S′` at `δ′` is coherent with the view at `m`: `m` is a
 record's cell and `S′` is its type, or `m` is a chain position and `S′` its pointee type; in
 both, `δ′` agrees with the record's `δ` on `S′`.  The index `a` is not mentioned: `⊑Imm`
-changes it and nothing here.  `[about ours: our coherence; not printed]` -/
+changes it and nothing here.  `[about ours: our coherence]` -/
 def Coh (rs : List FrameRec) (m : Loc) (S' : Ty) (δ' : LSub) : Prop :=
   (∃ r ∈ rs, m = r.le ∧ S' = r.T ∧ AgreeOn r.T δ' r.δ) ∨
   (∃ r ∈ rs, ∃ p u, Chain r.R r.T r.v p m S' u ∧ AgreeOn S' δ' r.δ)
@@ -102,7 +100,7 @@ inductive GPos (R : WRes) : Ty → Val → Loc → Ty → Prop
   | step {T : Ty} {v : Val} {l : Loc} {S₀ : Ty} {u₀ : Val} {m : Loc} {S : Ty} :
       RefPos T v l S₀ → R.get l = some (CellU.ownOf u₀) → GPos R S₀ u₀ m S → GPos R T v m S
 
-/-- **`d` is the sub-record of `r` at a `Mut` position**: `d.le` is a `GPos` of `r` at pointee
+/-- `d` is the sub-record of `r` at a `Mut` position: `d.le` is a `GPos` of `r` at pointee
 type `d.T`, `r`'s escrow holds there a `mut` cell whose value and witness are `d`'s, and `d`
 is read at `r`'s `δ`.  `[about ours: our record of 6.122's ↺m position]` -/
 def SubRec (r d : FrameRec) : Prop :=
@@ -121,13 +119,13 @@ def DescR (r d : FrameRec) : Prop := ∃ p, LinPath r p d
 /-- `d` is a proper sub-record in `r`'s lineage.  `[about ours]` -/
 def Desc (r d : FrameRec) : Prop := ∃ p, p ≠ [] ∧ LinPath r p d
 
-/-- **`r` is relevant to `ρ`**: an `imm` cell of `ρ` sits at `r`'s location or at a chain
+/-- `r` is relevant to `ρ`: an `imm` cell of `ρ` sits at `r`'s location or at a chain
 position of `r` — the two places `Coh` looks.  `[about ours]` -/
 def Rel (r : FrameRec) (ρ : WRes) : Prop :=
   ∃ (m : Loc) (ψ : CellU Loc Val), ρ.get m = some ψ ∧ ψ.kind = Kind.imm ∧
     (m = r.le ∨ ∃ p S u, Chain r.R r.T r.v p m S u)
 
-/-- **`rs′` keeps the records of `rs` relevant to `ρ`.**  `[about ours]` -/
+/-- `rs′` keeps the records of `rs` relevant to `ρ`.  `[about ours]` -/
 def Keeps (rs rs' : List FrameRec) (ρ : WRes) : Prop := ∀ r ∈ rs, Rel r ρ → r ∈ rs'
 
 /-- A record with the lifetime of its frame.  `[about ours]` -/
@@ -136,12 +134,12 @@ abbrev SRec := FrameRec × Life
 /-- The records, forgetting their lifetimes.  `[about ours]` -/
 def rsOf (ls : List SRec) : List FrameRec := ls.map Prod.fst
 
-/-- **`ρ` holds a borrow cell no longer-lived than `b`**: a `mut` or `imm` cell with
+/-- `ρ` holds a borrow cell no longer-lived than `b`: a `mut` or `imm` cell with
 `@ψ ⊑ b`.  `[about ours]` -/
 def CellIn (ρ : WRes) (b : Life) : Prop :=
   ∃ (m : Loc) (ψ : CellU Loc Val), ρ.get m = some ψ ∧ ψ.kind ≠ Kind.own ∧ ψ.at ⊑ b
 
-/-- **`ls′` extends `ls` at `ρ`**: the records relevant to `ρ` are kept (`Keeps`), and
+/-- `ls′` extends `ls` at `ρ`: the records relevant to `ρ` are kept (`Keeps`), and
 the records strictly longer-lived than any borrow cell of `ρ` — `mut` or `imm` — are exactly
 the same.  `[about ours: our stratified Kripke order; docs/adjudications.md §12.72]` -/
 def Ext (ls ls' : List SRec) (ρ : WRes) : Prop :=
@@ -152,20 +150,20 @@ def Ext (ls ls' : List SRec) (ρ : WRes) : Prop :=
 lemmas, none of which unfolds `wp`, are stated once.  `[about ours]` -/
 abbrev WpOp := List SRec → Expr → (List SRec → Val → WProp) → WProp
 
-/-- **A lineage location of `p`**: an `own` or `mut` cell of the escrow of a member of `p`'s
+/-- A lineage location of `p`: an `own` or `mut` cell of the escrow of a member of `p`'s
 lineage — a chain position, or a sub-record's location.  `[about ours]` -/
 def LinLoc (p : FrameRec) (m : Loc) : Prop :=
   ∃ d, DescR p d ∧ ∃ ζ : CellU Loc Val, d.R.get m = some ζ ∧ ζ.kind ≠ Kind.imm
 
-/-- **`p`'s frame is at `α`, and its lineage's views are shorter.**  `[about ours: an
-invariant of the typed world, 6.150 H11's choice of `β` read at a record; not printed]` -/
+/-- `p`'s frame is at `α`, and its lineage's views are shorter.  `[about ours: an
+invariant of the typed world, 6.150 H11's choice of `β` read at a record]` -/
 def FrameLife (W : WRes) (p : FrameRec) (α : Life) : Prop :=
   (∀ a, AgW W a → ∀ (ζ : CellU Loc Val) t, a.get p.le = some ζ → ζ.lsOf = some t →
     ∀ y, t.mem y → y = α) ∧
   (∀ a, AgW W a → ∀ m, LinLoc p m → ∀ (ψ : CellU Loc Val) s, a.get m = some ψ →
     ψ.lsOf = some s → ∀ x, s.mem x → x ⊏ α)
 
-/-- **`S` at `δ` and `S′` at `δ′` are one type.**  `[about ours]` -/
+/-- `S` at `δ` and `S′` at `δ′` are one type.  `[about ours]` -/
 def TyEq : Ty → LSub → Ty → LSub → Prop
   | .unit, _, .unit, _ => True
   | .unk, _, .unk, _ => True

@@ -3,9 +3,7 @@ import Paper.S5_Model.Definitions
 /-!
 # Support — Model — Notation
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the notation of the propositions of `[TR]` p. 6 (`⌜−⌝`, `⋆`, `─⋆`, `!`) and of `↓α`.
+`[about ours]`.  The notation of the propositions of `[TR]` p. 6 (`⌜−⌝`, `⋆`, `─⋆`, `!`) and of `↓α`.
 -/
 
 noncomputable section

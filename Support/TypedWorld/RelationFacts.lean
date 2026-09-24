@@ -29,9 +29,7 @@ import Support.TypedWorld.Wp
 /-!
 # Support — TypedWorld — RelationFacts
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the repaired relation `𝒱X` read at substitutions: monotonicity, the `imm` cell at the observable view, reading, writing and making a `mut` cell, 6.60 at `𝒱X`, congruence in `δ`, and the choosers' inputs.
+`[about ours]`.  The repaired relation `𝒱X` read at substitutions: monotonicity, the `imm` cell at the observable view, reading, writing and making a `mut` cell, 6.60 at `𝒱X`, congruence in `δ`, and the choosers' inputs.
 -/
 
 noncomputable section
@@ -170,7 +168,7 @@ theorem TyEq.immReborrow {S S' : Ty} {δ δ' : LSub} {c c' : Lifetime.Life}
       simp only [Ty.immReborrow]
       exact ih h.2
 
-/-- **`Δ-subst` at `TyEq`**: `vDen_applyLSub`'s induction, the `∀` case with its two
+/-- `Δ-subst` at `TyEq`: `vDen_applyLSub`'s induction, the `∀` case with its two
 branches. -/
 theorem TyEq.applyLSub : ∀ (T : Ty) (σ : Lifetime.LSubst) (δ δ' : LSub),
     (∀ y, LFree y T → ((Lifetime.Life.var y).applySub σ).interp δ = δ'.find? y) →
@@ -283,7 +281,7 @@ theorem TyEq.instLife (x : LifeVar) (a : Lifetime.Life) (T : Ty) {δ : LSub} {α
     show δ.find? y = _
     rw [find?_extend_ne δ α hxy]
 
-/-- **`vShape` reads a type only up to `TyEq`.** -/
+/-- `vShape` reads a type only up to `TyEq`. -/
 theorem vShape_tyEq {S S' : Ty} {δ δ' : LSub} (h : TyEq S δ S' δ') : vShape S δ = vShape S' δ' := by
   induction S generalizing S' with
   | unit => cases S' <;> first | rfl | simp_all [TyEq]
@@ -344,7 +342,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {wpX : WpOp}
 
-/-- **`𝒱X` is stable along `Ext`**, in both modes: at a `mut` cell the stored list is kept, so
+/-- `𝒱X` is stable along `Ext`, in both modes: at a `mut` cell the stored list is kept, so
 the predicate stays equal; the `⊸`/`∀` clauses are Kripke in the list, and those of the
 observable view are `True`. -/
 theorem vX_local : ∀ (b : Bool) (T : Ty) {ls ls' : List SRec} {δ : LSub} {v : Val} {ρ : WRes},
@@ -398,8 +396,7 @@ theorem vX_local : ∀ (b : Bool) (T : Ty) {ls ls' : List SRec} {δ : LSub} {v :
              fun ⟨hx, hb⟩ => ⟨(hk₁.2 b hmut x hb).mpr hx, hb⟩⟩
   | _, .unk, _, _, _, _, _, _, h => h
 
-/-- **The program's relation implies the observable view** — the relaxation is a
-weakening. -/
+/-- The program's relation implies the observable view. -/
 theorem vO_obs : ∀ (T : Ty) {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes},
     vX wpX true T ls δ v ρ → vX wpX false T ls δ v ρ
   | .unit, _, _, _, _, h => h
@@ -422,7 +419,7 @@ theorem vO_obs : ∀ (T : Ty) {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes}
   | .mut _ _, _, _, _, _, h => h
   | .unk, _, _, _, _, h => h
 
-/-- **`𝒱X ⊆ vShape`**, both modes. -/
+/-- `𝒱X ⊆ vShape`, both modes. -/
 theorem vX_vShape : ∀ (b : Bool) (T : Ty) {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes},
     vX wpX b T ls δ v ρ → vShape T δ v ρ
   | _, .unit, _, _, _, _, h => h
@@ -454,7 +451,7 @@ theorem vX_vShape : ∀ (b : Bool) (T : Ty) {ls : List SRec} {δ : LSub} {v : Va
       exact vX_vShape true T h'
   | _, .unk, _, _, _, _, h => h
 
-/-- **Reading an `imm` cell at the observable view**: the payload is observable-valid at
+/-- Reading an `imm` cell at the observable view: the payload is observable-valid at
 the current list. -/
 theorem ptoImmO_read {l : Loc} {α : Life} {ls : List SRec} {S : Ty} {δ : LSub} {ρ : WRes}
     (h : ptoImmS l α ls (fun ls₀ => vX wpX false S ls₀ δ) ρ) :
@@ -464,7 +461,7 @@ theorem ptoImmO_read {l : Loc} {α : Life} {ls : List SRec} {S : Ty} {δ : LSub}
   exact ⟨s, u, σ, hs, hρ, hαs,
     vX_local false S (ext_stored_current hs s.meet_le_join hls₀) hP⟩
 
-/-- **Making an `imm` cell at the observable view.** -/
+/-- Making an `imm` cell at the observable view. -/
 theorem ptoImmO_make {l : Loc} {α : Life} {ls : List SRec} {S : Ty} {δ : LSub} {s : LSet}
     {u : Val} {σ : WRes} (hs : σ.InStratum s.join) (hαs : α ⊑ s.meet)
     (hv : vX wpX false S ls δ u σ) (hlb : LifeBound ls σ s.meet) :
@@ -522,7 +519,7 @@ theorem ptoMutX_create {l : Loc} {α b : Life} {ls : List SRec} {S : Ty} {δ : L
     exact this.2
   exact ⟨hw, b, u, σ, hσ, Q, hw, ls, hab, rfl, hQ, strat_fresh hfresh, hunif⟩
 
-/-- **`[TR]` 6.60** at `𝒱X`, both modes: `vDen_outlives`'s induction.  The `Imm` case reads the
+/-- `[TR]` 6.60 at `𝒱X`, both modes: `vDen_outlives`'s induction.  The `Imm` case reads the
 cell's bound only; the payload is not consulted. -/
 theorem vX_outlives {Δ : LifeCtx} {δ : LSub} {a : Lifetime.Life} {α : Life}
     (hδ : Δ.Models δ) (ha : a.interp δ = some α) {T : Ty}
@@ -606,7 +603,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {wpX : WpOp}
 
-/-- **`𝒱X⟦T⟧δ` depends on `δ` only at the variables free in `T`.** -/
+/-- `𝒱X⟦T⟧δ` depends on `δ` only at the variables free in `T`. -/
 theorem vX_congr : ∀ (T : Ty) {δ₁ δ₂ : LSub}, (∀ y, LFree y T → δ₁.find? y = δ₂.find? y) →
     ∀ (b : Bool) (ls : List SRec), vX wpX b T ls δ₁ = vX wpX b T ls δ₂
   | .unit, _, _, _, b, _ => by cases b <;> rfl
@@ -658,7 +655,7 @@ theorem vX_congr : ∀ (T : Ty) {δ₁ δ₂ : LSub}, (∀ y, LFree y T → δ�
       have ih := vX_congr T (fun y hy => h y (Or.inr hy))
       funext v; cases b <;> simp only [vX, ih, atLife_congr' ha]
 
-/-- **`𝒱X` reads a type only up to `TyEq`** — `Δ-subst` (`TyEq.applyLSub`) at the relation:
+/-- `𝒱X` reads a type only up to `TyEq` — `Δ-subst` (`TyEq.applyLSub`) at the relation:
 `CohE` is closed under `TyEq`, and every other clause reads its lifetimes through `@aδ`. -/
 theorem vX_tyEq {S S' : Ty} {δ δ' : LSub} (h : TyEq S δ S' δ') :
     ∀ (b : Bool) (ls : List SRec), vX wpX b S ls δ = vX wpX b S' ls δ' := by
@@ -728,7 +725,7 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- **`B`'s cells are `R`'s**: same kind, witness and value, and a non-`imm` cell equal
+/-- `B`'s cells are `R`'s: same kind, witness and value, and a non-`imm` cell equal
 (an `imm` cell may carry fewer lifetimes).  `[about ours]` -/
 def CellMatch (R B : WRes) : Prop :=
   ∀ m ψ, B.get m = some ψ → ∃ ζ, R.get m = some ζ ∧ ζ.kind = ψ.kind ∧ ζ.wit = ψ.wit ∧
@@ -761,8 +758,8 @@ theorem CellMatch.del {R B : WRes} (h : CellMatch R B) (l : Loc) : CellMatch R (
   · subst hm; rw [ResU.del_get_self] at e; cases e
   · rw [ResU.del_get_ne _ hm] at e; exact h m ψ e
 
-/-- **Every witness of an `imm` cell of `R` is relevant only to records tagged longer-lived
-than any lifetime it lies in.**  `[about ours: `lifeBound_of_tagged` at the witnesses
+/-- Every witness of an `imm` cell of `R` is relevant only to records tagged longer-lived
+than any lifetime it lies in.  `[about ours: `lifeBound_of_tagged` at the witnesses
 of an escrow's `imm` cells; the input the transfer consumes]` -/
 def WitLB (ls : List SRec) (R : WRes) : Prop :=
   ∀ m ζ, R.get m = some ζ → ζ.kind = Kind.imm → ∀ b, ζ.wit.InStratum b → LifeBound ls ζ.wit b
@@ -781,10 +778,10 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {wpX : WpOp}
 
-/-- **The observable view transfers between two pieces of one escrow**: `A` observable at
+/-- The observable view transfers between two pieces of one escrow: `A` observable at
 `T`, `B` shaped at `T`, both cell-matching `R`, gives `B` observable at `T`.  At a `⊸`/`∀`
-position both sides are `True` — the relaxation is exactly what makes this go through; at an
-`Imm` or `Mut` position the cell is `R`'s, and its clause is read off the cell. -/
+position both sides are `True`; at an `Imm` or `Mut` position the clause is read off `R`'s
+cell. -/
 theorem obs_transfer {R : WRes} {ls : List SRec} (hLB : WitLB ls R) :
     ∀ (T : Ty) {δ : LSub} {v : Val} {A B : WRes}, CellMatch R A → CellMatch R B →
       vX wpX false T ls δ v A → vShape T δ v B → vX wpX false T ls δ v B
@@ -905,7 +902,7 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- **A cell of `c ∈ reb_β(σ)` against `σ`'s cell**: same value; a `mut`/`imm` cell keeps
+/-- A cell of `c ∈ reb_β(σ)` against `σ`'s cell: same value; a `mut`/`imm` cell keeps
 its witness; an `own` cell's witness is a piece of `σ` (`[TR]` p. 5's three clauses). -/
 theorem reb_cell_match {β : Life} {σ c : WRes} (hr : ResU.Reb β σ c) {m : Loc}
     {ψ : CellU Loc Val} (e : c.get m = some ψ) :
@@ -967,9 +964,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {wpX : WpOp}
 
-/-- **6.131's image re-taken at `β`, at the program's relation**: `relRes` (`relabel_reb`)
+/-- 6.131's image re-taken at `β`, at the program's relation: `relRes` (`relabel_reb`)
 typed at `𝒱X true⟦Imm̲ 'x T⟧`.  The inputs: the old image's shape (the
-world's `JointAt`), the escrow's **observable** validity (the payload the program holds),
+world's `JointAt`), the escrow's observable validity (the payload the program holds),
 and coherence at the `Ref` and `Mut` positions.  At a `Ref`/`Mut` position the new cell's
 payload is observable because the old image's witness is a piece of the escrow
 (`obs_transfer`) or the `mut` cell's content (its stored predicate); at an `Imm` position
@@ -1137,7 +1134,7 @@ theorem relabel_obs {R : WRes} {ls : List SRec} {β β₀ : Life} {δ : LSub} {x
       exact ⟨β, interp_ext_self δ x β, l'', pure_sep_mk ⟨rfl, cohE_of_coh (hcm l'' S (MutPos.mut a S l''))⟩
         (ptoImmO_make hβ le_rfl hobs' (fun y hy _ => hβls y hy))⟩
 
-/-- **The chooser at a record's cell, at the program's relation**, from the payload the
+/-- The chooser at a record's cell, at the program's relation, from the payload the
 program holds at the cell (`hRobs`, the observable view of the escrow, read by `ptoImmO_read`), `WitLB` at the escrow, and `β` below every tag.  If no root of the escrow
 carries a view, the handed image; otherwise the joint image re-taken at `β`, typed by
 `relabel_obs`.  Types and the program's payload only. -/
@@ -1225,7 +1222,7 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- **Re-taking an image at its own lifetime changes nothing**: `relRes R β c = c` for
+/-- Re-taking an image at its own lifetime changes nothing: `relRes R β c = c` for
 `c ∈ reb_β(R)`. -/
 theorem relRes_self {β : Life} {R c : WRes} (hr : ResU.Reb β R c) : relRes R β c = c := by
   refine PMap.ext fun m => ?_
@@ -1254,7 +1251,7 @@ theorem relRes_self {β : Life} {R c : WRes} (hr : ResU.Reb β R c) : relRes R �
         exact CellU.immOf_congr rfl (by simp) (by simp) _ _
     · rfl
 
-/-- **Every tag is longer-lived than 6.150's `β`** (H11: `W ∈ Res_β`): a tag is the lifetime
+/-- Every tag is longer-lived than 6.150's `β` (H11: `W ∈ Res_β`): a tag is the lifetime
 of a record proper's cell (`Tagged`, `FrameLife`), and that cell is in `ag(W)`. -/
 theorem tags_above {W : WRes} {ps : List FrameRec} {ls : List SRec} {β : Life}
     (hTW : TW W ps (rsOf ls)) (htag : Tagged W ps ls) (hβ : W.InStratum β) :
@@ -1268,7 +1265,7 @@ theorem tags_above {W : WRes} {ps : List FrameRec} {ls : List SRec} {β : Life}
   rw [hFL.1 aW haW ψ t e ht t.meet t.meet_mem] at h₁
   exact h₁
 
-/-- **`WitLB` at a record's escrow**: the witness of an `imm` cell of the escrow held at
+/-- `WitLB` at a record's escrow: the witness of an `imm` cell of the escrow held at
 `W(ℓₑ)` has its `imm` cells in `ag(W)` (`escrow_icp` twice), so `lifeBound_of_tagged`'s
 argument applies to it. -/
 theorem witLB_of {W : WRes} {ps : List FrameRec} {ls : List SRec} {le : Loc} {s : LSet}
@@ -1301,7 +1298,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {wpX : WpOp}
 
-/-- **The chooser at a record's cell, at the program's relation, from the tagged world**:
+/-- The chooser at a record's cell, at the program's relation, from the tagged world:
 `rebChooseO_top` with `WitLB` and the tag bound discharged by the world (`witLB_of`,
 `tags_above`, H11).  The one input not read off the world is the payload the program holds
 at the cell (`hRobs`). -/
@@ -1321,7 +1318,7 @@ theorem rebChooseO_top_tw {W F χ₀ : WRes} {ps : List FrameRec} {ls : List SRe
   exact rebChooseO_top hTW hr hag hW hx hr₀ hP₀ hRobs (witLB_of hTW.valid htag hle)
     (tags_above hTW htag hβ)
 
-/-- **…and at a chain view**, from the tagged world, at the program's relation.  The payload
+/-- …and at a chain view, from the tagged world, at the program's relation.  The payload
 the program holds at the view is `hRobs`. -/
 theorem rebChooseO_deep_tw {W F χ₀ : WRes} {ps : List FrameRec} {ls : List SRec}
     {r : FrameRec} {p₀ : Option Loc} {l₀ : Loc} {S₀ : Ty} {u₀ : Val} {s : LSet} {w₀ : WRes}
@@ -1417,12 +1414,8 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-!
-### Lemma 6.113 (I-mono) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`, under the record of Lemma 6.113 (I-mono).
--/
-/-- **`ptoImmS` is monotone in its payload.**  6.172 (`withbor1`) frames a payload at the
+/-! ### Lemma 6.113 (I-mono) at the typed world; record in `Paper/S6_5_NonStandardEntailments/Lemmas.lean` -/
+/-- `ptoImmS` is monotone in its payload.  6.172 (`withbor1`) frames a payload at the
 program's relation (6.64 at `𝒱X true`); the relation's `Imm` clause asks it at the
 observable view. -/
 theorem ptoImmS_mono {l : Loc} {α : Life} {ls : List SRec} {P P' : List SRec → Val → WProp}
@@ -1441,12 +1434,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 variable {wpX : WpOp}
 
-/-!
-### Lemma 6.131 (↺V₁) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.131 (↺V₁).
--/
-/-- **6.131's conclusion at the program's relation, from a shaped image**: an image
+/-! ### Lemma 6.131 (↺V₁) at the typed world; record in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean` -/
+/-- 6.131's conclusion at the program's relation, from a shaped image: an image
 `c ∈ reb_β(R)` shaped at `Imm̲ 'x T`, over an escrow observable at `T`, is `𝒱X true`-typed at
 `Imm̲ 'x T` — `relabel_obs` at `β₀ = β`, with `relRes_self`.  So `[TR]` 6.131 at `𝒱X` is
 6.131 at the shape relation plus coherence at the roots and `Mut` positions. -/

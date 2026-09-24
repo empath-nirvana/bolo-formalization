@@ -6,9 +6,7 @@ import Support.Model.Prelude
 /-!
 # Support — Model — Composition
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the cell- and resource-level compositions `●` and `○` and compatibilities `▶◀` and `⋈` as graphs: functionality, symmetry, the specification of each clause, erasure and witnesses.
+`[about ours]`.  The cell- and resource-level compositions `●` and `○` and compatibilities `▶◀` and `⋈` as graphs: functionality, symmetry, the specification of each clause, erasure and witnesses.
 -/
 
 noncomputable section
@@ -53,10 +51,7 @@ theorem CellU.compS_self (ψ : CellU Loc Val) (h : ψ.CompatS ψ) : CellU.compS 
   rw [e₃, e₁]
   exact CellU.immOf_congr (LSet.union_self s₁) rfl rfl k₃ k₁
 
-/-- The overlap of clauses (1) and (3): two equal `mut` cells.  Clause (1)
-returns `mut(α, v, ρ, P̂)` and clause (3) returns `mut(α ⊓ α, v, ρ, P̂ ∧ P̂)`, and
-those are the same cell — `α ⊓ α = α`, and `P̂ ∧ P̂` and `P̂` are the same subset
-of `Res_α`. -/
+/-- Clauses (1) and (3) agree at two equal `mut` cells. -/
 theorem CellU.compR_same_mutMut (a : Life) (v : Val) (ρ : ResU Loc Val)
     (ha : ρ.InStratum a) (P : Val → SPropS Loc Val a) (hP : P v ⟨ρ, ha⟩) :
     CellU.mutOf (a ⊓ a) v ρ ha.inf_left (SPropS.conj P P)
@@ -68,14 +63,9 @@ theorem CellU.compR_same_mutMut (a : Life) (v : Val) (ρ : ResU Loc Val)
   · rintro ⟨⟨k, hk⟩, -⟩; exact hk
   · intro hw; exact ⟨⟨hr', hw⟩, ⟨hr', hw⟩⟩
 
-/-- A weakening of inversion for `○`, and only that: the six clauses that
-return one of their arguments are recorded by *which* argument they return
-together with the tags of the two cells.  **It is not an inversion principle.**
-The last four disjuncts discard the shared `v` and the shared `ρ`, so they are
-satisfiable by tags alone and cannot be used to refute a composition.  What
-recovers the sharing is `CompR.erase` and `CompR.wit`, which are proved by
-`cases` on `CompR` directly.  This weakening exists because it is exactly what
-`CompR.functional` needs and no more. -/
+/-- A weak inversion for `○`: which argument each clause returns, with the
+two tags.  The last four disjuncts drop the shared `v` and `ρ`, so they do not
+refute a composition; `CompR.erase` and `CompR.wit` recover the sharing. -/
 theorem CellU.CompR.inv {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ) :
     (ψ₁ = ψ₂ ∧ ψ = ψ₁)
     ∨ (∃ k : ψ₁.CompatS ψ₂, ψ = CellU.compS ψ₁ ψ₂ k)
@@ -146,11 +136,8 @@ theorem CellU.compR_mutMut_det {a b a' b' : Life} {v v' : Val} {ρ ρ' : ResU Lo
   rfl
 
 set_option maxHeartbeats 1000000 in
-/-- **`○` is single-valued.**  Its printed clauses overlap in exactly two
-places — (1) with (2) at two equal `imm` cells, and (1) with (3) at two equal
-`mut` cells — and at both the two clauses return the same cell, by
-`compS_self` and `compR_same_mutMut`.  Every other pair of clauses is excluded
-by the tags of the two operands. -/
+/-- `○` is single-valued: its clauses overlap only at (1)/(2) and (1)/(3), and
+agree there. -/
 theorem CellU.CompR.functional {ψ₁ ψ₂ ψ ψ' : CellU Loc Val}
     (h : CellU.CompR ψ₁ ψ₂ ψ) (h' : CellU.CompR ψ₁ ψ₂ ψ') : ψ = ψ' := by
   have H := h.inv
@@ -248,8 +235,7 @@ theorem CellU.CompS.erase {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ�
   subst e₁; subst e₂; subst e₃
   exact ⟨rfl, rfl⟩
 
-/-- **Every clause of `○` composes cells over a common value.**  The print binds
-one `v` in each of the five clauses; this reads that back off the relation. -/
+/-- Every clause of `○` composes cells over a common value. -/
 theorem CellU.CompR.erase {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ) :
     ψ₁.erase = ψ₂.erase ∧ ψ.erase = ψ₁.erase := by
   cases h with
@@ -265,9 +251,8 @@ theorem CellU.CompR.erase {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ�
   | immMut s v ρ hs b hb P hP => exact ⟨rfl, rfl⟩
   | mutImm s v ρ hs b hb P hP => exact ⟨rfl, rfl⟩
 
-/-- **Every clause of `○` that composes two non-`own` cells composes them over a
-common witness.**  The print binds one `ρ` in clauses (2), (3) and (5); this
-reads that back off the relation. -/
+/-- Every clause of `○` on two non-`own` cells composes them over a common
+witness. -/
 theorem CellU.CompR.wit {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     (k₁ : ψ₁.kind ≠ Kind.own) (k₂ : ψ₂.kind ≠ Kind.own) : ψ₁.wit = ψ₂.wit := by
   cases h with
@@ -311,7 +296,7 @@ theorem SPropS.conj_comm {a b : Life} (P : Val → SPropS Loc Val a)
     SPropS.conj P Q w ⟨r, hr⟩ ↔ SPropS.conj Q P w ⟨r, hr'⟩ :=
   ⟨fun h => ⟨h.2, h.1⟩, fun h => ⟨h.2, h.1⟩⟩
 
-/-- `○` is commutative on cells — the cell half of `[TR]` Lemma 6.2 (p. 6).
+/-- `○` is commutative on cells.
 `[about ours: the cell-level fact the resource-level Lemma 6.2 is proved from;
 6.2 itself is `ResU.Comp.comm`]` -/
 theorem CellU.CompR.comm {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ) :
@@ -365,9 +350,7 @@ theorem ResU.compR_spec (ρ₁ ρ₂ : ResU Loc Val) (h : ResU.CompatR ρ₁ ρ�
     ResU.CompR ρ₁ ρ₂ (ρ₁.compR ρ₂ h) :=
   ⟨h, fun l => optCompR_optComp (ρ₁.get l) (ρ₂.get l) _⟩
 
-/-- `ρ₁ ⋈ ρ₂` iff `ρ₁ ○ ρ₂` is defined — the `○` twin of `[TR]` Lemma 6.9
-(p. 7).  The paper states 6.9 at `●` only and never states this; with the
-reading of `⋈` in `docs/adjudications.md` §12.35 it is the same proof.
+/-- `ρ₁ ⋈ ρ₂` iff `ρ₁ ○ ρ₂` is defined (§12.35).
 `[about ours: the `○` analogue of 6.9, which the paper does not state]` -/
 theorem ResU.compR_defined_iff (ρ₁ ρ₂ : ResU Loc Val) :
     (∃ ρ, ResU.CompR ρ₁ ρ₂ ρ) ↔ ResU.CompatR ρ₁ ρ₂ :=

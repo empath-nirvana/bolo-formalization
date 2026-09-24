@@ -12,9 +12,7 @@ import Support.Model.Notation
 /-!
 # Support — Model — Propositions
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the propositions of `[TR]` p. 6 as used by §6.2: entailment, `emp`, the outlives relation `@ρ ⊐ α` and the `wp` row at the unguarded `↭`.
+`[about ours]`.  The propositions of `[TR]` p. 6 as used by §6.2: entailment, `emp`, the outlives relation `@ρ ⊐ α` and the `wp` row at the unguarded `↭`.
 -/
 
 noncomputable section
@@ -52,18 +50,15 @@ theorem eq_of_compS_empty_left {ρ₂ ρ : ResU Loc Val} (h : ResU.CompS PMap.em
     ρ = ρ₂ :=
   ResU.CompS.functional h (compS_empty_left ρ₂)
 
-/-- The direction 6.91 does not print: `P ⋆ (Q ⋆ R) ⊨ (P ⋆ Q) ⋆ R`.  `[TR]`
-6.65's proof needs it to read `ℓ ↦ v ⋆ P̂(v) ⋆ (Nα. …)` as `(ℓ ↦ v ⋆ P̂(v)) ⋆
-(Nα. …)` before 6.112 applies to it.  `[about ours: the converse of `[TR]`
+/-- `P ⋆ (Q ⋆ R) ⊨ (P ⋆ Q) ⋆ R`, used by `[TR]` 6.65's proof before 6.112.
+`[about ours: the converse of `[TR]`
 6.91, which prints one direction]` -/
 theorem sep_assoc' (P Q R : SPropU Loc Val) : (P ⋆ (Q ⋆ R)) ⊨ (P ⋆ Q) ⋆ R := by
   rintro ρ ⟨ρ₁, ρ₂, hc, hp, ρ₃, ρ₄, hc₂, hq, hr⟩
   obtain ⟨y, hy₁, hy₂⟩ := (ResU.CompS.assoc ρ₁ ρ₃ ρ₄ ρ).mp ⟨ρ₂, hc₂, hc⟩
   exact ⟨y, ρ₄, hy₂, ⟨ρ₁, ρ₃, hy₁, hp, hq⟩, hr⟩
 
-/-- A bound on the meet bounds the borrow cells in particular, so the
-meet-compare implies the relation at every `α`.  `@ψ = ⊤` on an `own` cell, and
-`Res_α` asks nothing of it. -/
+/-- A bound on `@ρ` gives `@ρ ⊐ α`. -/
 theorem outlives_of_atLife {ρ : ResU Loc Val} {a α : Life} (ha : ρ.AtLife a)
     (h : a ⊐ α) : Outlives ρ α := ResU.inStratum_of_atLife ha h
 
@@ -104,10 +99,8 @@ theorem outlives_comp {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ�
 
 theorem ptoAny_of_own (l : Loc) (v : Val) : ptoOwn l v ⊨ ptoAny l := fun _ h => ⟨_, h⟩
 
-/-- **`ℓ ↦M_α P̂` is inhabited exactly where the cell is.**  The printed
-equation `ρ = ℓ ↦ mut(β, v, ρ′, P̂)` pins the cell's own invariant, so the `P̂` a
-`mut` cell can be seen through is `ofS Q̂` for the cell's own
-`Q̂ : Val → SProp_β`, and every such cell exhibits one. -/
+/-- `ℓ ↦M_α P̂` holds of a `mut` cell at `ofS Q̂` for the cell's own invariant
+`Q̂`. -/
 theorem ptoMut_of_cell (l : Loc) (α b : Life) (hb : α ⊑ b) (v : Val)
     (σ : ResU Loc Val) (h : σ.InStratum b) (Q : Val → SPropS Loc Val b)
     (hw : Q v ⟨σ, h⟩) :
@@ -136,11 +129,8 @@ theorem hash_valid {ρ₁ ρ₂ : WRes} (h : ResU.Hash ρ₁ ρ₂) :
   obtain ⟨σ, hσ, hv⟩ := h.2
   exact ResU.Valid.split hσ hv
 
-/-- **The two readings of `↭` agree inside the row.**  `ResU.UpdV` is
-`ResU.Upd` with `✓` on each side, and the row already asserts both: `✓ρ` is the
-printed `ρ_f # ρ` through `[TR]` Lemma 6.10, and `✓(ρ′ ● ρ⁺)` is the printed
-`ρ⁺ # (ρ_f ● ρ′)` through `[TR]` Lemma 6.11.  So `docs/adjudications.md` D3 does not separate the two
-documents here.  `[about ours: the two printed `↭`s, read inside the printed
+/-- The two readings of `↭` agree inside the `wp` row (`docs/adjudications.md`
+D3).  `[about ours: the two printed `↭`s, read inside the printed
 row]` -/
 theorem wp_updV_iff_upd (e : Expr) (Q : Val → WProp) (ρ : WRes) :
     wp e Q ρ ↔ wpU e Q ρ := by

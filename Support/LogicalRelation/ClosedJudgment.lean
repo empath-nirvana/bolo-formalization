@@ -6,9 +6,7 @@ import Support.Statics.Contexts
 /-!
 # Support — LogicalRelation — ClosedJudgment
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the judgment `Δ; Γ ⊨ e : T` at the empty resource.
+`[about ours]`.  The judgment `Δ; Γ ⊨ e : T` at the empty resource.
 -/
 
 noncomputable section

@@ -13,9 +13,7 @@ import Support.Model.WalkSplitting
 /-!
 # Support — Model — Subtraction
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-Definition 6.3's `⊟`: lifetime-set difference, and `⊟` inhabited, total and a term at `SubKeep`.
+`[about ours]`.  Definition 6.3's `⊟`: lifetime-set difference, and `⊟` inhabited, total and a term at `SubKeep`.
 -/
 
 noncomputable section
@@ -63,8 +61,8 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- The corrected third bullet implies the bullet's own glyphs, so every
-`ρ ⊟ ρ′` on the paragraph's reading is one on the bullets' reading. -/
+/-- Every `ρ ⊟ ρ′` on the paragraph's reading (§12.58) is one on the bullets'
+reading. -/
 theorem ResU.SubKeep.toSub {ρ ρ' χ : ResU Loc Val} (h : ResU.SubKeep ρ ρ' χ) :
     ResU.Sub ρ ρ' χ := by
   obtain ⟨ρ'', h1, h2, h3, h4, h5⟩ := h
@@ -148,9 +146,7 @@ theorem ResU.exclPart_restrict_compS (ρ : ResU Loc Val) :
       | some ζ => rfl
 
 open Classical in
-/-- `ψ` with the lifetimes of `t̄` removed — Definition 6.3's fourth bullet at
-one cell.  `LSet.exists_diff` gives the set and `LSet.Diff.functional` makes the
-choice a function.
+/-- `ψ` with the lifetimes of `t̄` removed.
 `[about ours: `[TR]` Definition 6.3's fourth bullet, as a function on cells]` -/
 noncomputable def CellU.subLS (ζ : CellU Loc Val) (t : LSet) : Option (CellU Loc Val) :=
   match ζ with
@@ -227,16 +223,9 @@ theorem ResU.subWitness_dom {ρ ρ' : ResU Loc Val} {l : Loc} {ζ : CellU Loc Va
         rw [e]; rfl
       rw [this] at h; exact absurd h (by simp)
 
-/-- **`ρ ⊟ ρ′` at a subtrahend with any number of cells.**  If `ρ′` carries
-`imm` cells only and, at every location it covers, `ρ` carries an `imm` cell
-over the same value and witness whose lifetime set contains `ρ′`'s, then
-`ρ ⊟ ρ′` is defined and composes with `ρ′` back to `ρ`.
-
-The witness is `ResU.subWitness`, which is Definition 6.3's four bullets read as
-a construction: `ρ|imm` off `dom(ρ′)`, dropped where `ᾱ ∖ β̄ = ∅`, and
-`imm(ᾱ ∖ β̄, v, χ)` otherwise.  `ρ″ ≤ ρ|imm` holds with `ρ′` itself as the frame,
-which is `LSet.diff_union` — the printed *"removing the lifetimes of borrows
-from `ρ′`, but keeping the lifetimes only in `ρ`"* — at every location at once.
+/-- If `ρ′` carries `imm` cells only and, at every location it covers, `ρ`
+carries an `imm` cell over the same value and witness whose lifetime set contains
+`ρ′`'s, then `ρ ⊟ ρ′` is defined and composes with `ρ′` back to `ρ`.
 `[about ours: `[TR]` Definition 6.3 inhabited at a general subtrahend; `⊟` and
 `●` appear as their graphs (G4)]` -/
 theorem ResU.sub_of_le {ρ ρ' : ResU Loc Val}
@@ -328,17 +317,9 @@ theorem ResU.sub_of_le {ρ ρ' : ResU Loc Val}
     (ResU.CompS.assoc ρ.exclPart (ρ.subWitness ρ') ρ' ρ).mp ⟨_, hLe, hsplit⟩
   rwa [ResU.CompS.functional hy hψ] at hyc
 
-/-- **`⊟` is a function on the paragraph's reading**, wherever `ρ` and `ρ′`
-carry `imm` cells over one value and one witness at each shared location —
-which is the hypothesis `ResU.sub_of_le` already asks and `[TR]` 6.52's H1
-already establishes.
-
-Off `dom(ρ′)` the corrected third bullet fixes the cell outright; on it the
-fourth bullet does, `LSet.Diff.functional` making `ᾱ ∖ β̄` unique; and outside
-`dom(ρ|imm)` the second bullet empties `ρ″`.  So `ρ″` is pinned everywhere, and
-`ρ|own,mut ● ρ″` with it.
-`[about ours: `ResU.SubKeep` single-valued under `ResU.sub_of_le`'s
-hypothesis]` -/
+/-- `⊟` is single-valued on the paragraph's reading, under `ResU.sub_of_le`'s
+hypothesis (which `[TR]` 6.52's H1 establishes).
+`[about ours]` -/
 theorem ResU.SubKeep.functional {ρ ρ' χ χ' : ResU Loc Val}
     (hle : ∀ (l : Loc) (s' : LSet) (v : Val) (w : ResU Loc Val)
         (h' : w.InStratum s'.join), ρ'.get l = some (CellU.immOf s' v w h') →
@@ -381,9 +362,8 @@ theorem ResU.SubKeep.functional {ρ ρ' χ χ' : ResU Loc Val}
               rw [hgA, hgB]
   exact ResU.CompS.functional ha5 (hab ▸ hb5)
 
-/-- **…and it composes back**, so `[TR]` 6.52's `ρ = (ρ ⊟ ρ′) ● ρ′` holds of
-every `χ` the corrected definition admits, not only of the one
-`ResU.sub_of_le` builds.
+/-- `[TR]` 6.52's `ρ = (ρ ⊟ ρ′) ● ρ′` holds of every `χ` that `ResU.SubKeep`
+admits.
 `[about ours: `[TR]` 6.52's equation at any `ResU.SubKeep`]` -/
 theorem ResU.SubKeep.compS {ρ ρ' χ : ResU Loc Val}
     (hle : ∀ (l : Loc) (s' : LSet) (v : Val) (w : ResU Loc Val)

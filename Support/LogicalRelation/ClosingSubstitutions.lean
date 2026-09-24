@@ -6,9 +6,7 @@ import Support.Syntax.Terms
 /-!
 # Support — LogicalRelation — ClosingSubstitutions
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-closing substitutions `γ(e)`, free lifetime variables of a type, and the empty resource in every stratum.
+`[about ours]`.  Closing substitutions `γ(e)`, free lifetime variables of a type, and the empty resource in every stratum.
 -/
 
 noncomputable section
@@ -36,10 +34,8 @@ convention L5 (`docs/adjudications.md`) gives: a fold of `Expr.subst 0` is the c
 substitution only for a closed `γ`. -/
 def substAll (γ : List Val) (e : Expr) : Expr := Expr.psub 0 γ e
 
-/-- `'x` occurs free in `T`, with `∀'y ⊏ @b. T` binding `'y` in `T` and **not**
-in `@b` — the binder's own bound is in the outer scope.  `𝒱⟦T⟧δ` reads `δ` only
-at these variables, which is what lets a capture-avoiding renaming move the
-binder: the new name is chosen outside them. -/
+/-- `'x` occurs free in `T`, with `∀'y ⊏ @b. T` binding `'y` in `T` and not in
+`@b`.  `𝒱⟦T⟧δ` reads `δ` only at these variables. -/
 def LFree (x : LifeVar) : Ty → Prop
   | .unit          => False
   | .unk           => False

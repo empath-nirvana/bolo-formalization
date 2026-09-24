@@ -4,9 +4,7 @@ import Support.Model.Composition
 /-!
 # Support — Model — Restriction
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`ρ∣dom(σ)` and `ρ/dom(σ)`, the restriction `[TR]` §6 uses and neither document defines.
+`[about ours]`.  `ρ∣dom(σ)` and `ρ/dom(σ)`, the restriction `[TR]` §6 uses and neither document defines.
 -/
 
 noncomputable section
@@ -42,8 +40,8 @@ theorem ResU.restrictDom_get_inv {ρ σ : ResU Loc Val} {l : Loc} {ζ : CellU Lo
   | none => rw [ResU.restrictDom_get_of_none e] at h; exact absurd h (by simp)
   | some χ => rw [ResU.restrictDom_get_of_some e] at h; exact h
 
-/-- **`ρ = ρ|dom(σ) ● ρ/dom(σ)`** — the splitting `[TR]` 6.56's appeal to 6.11
-needs.  The two halves are disjoint by construction. -/
+/-- `ρ = ρ|dom(σ) ● ρ/dom(σ)`, the splitting `[TR]` 6.56's appeal to 6.11
+needs. -/
 theorem ResU.restrictDom_compS (ρ σ : ResU Loc Val) :
     ResU.CompS (ρ.restrictDom σ) (ρ.delDom σ) ρ := by
   refine ⟨ResU.Compat.of_disjoint (fun l => ?_), fun l => ?_⟩

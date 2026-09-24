@@ -11,9 +11,7 @@ import Support.Model.Subtraction
 /-!
 # Support — Model — ReborrowRule
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-what `[TR]` 6.150 names and does not prove: the hypothesis `RebEscrow` (6.55's two inputs at the reborrows `↺_β P̂` names), a lifetime below two given ones, and `ρ⁺|own = ∅` through the pieces of `ρᵢ ● ρ⁺′`.
+`[about ours]`.  What `[TR]` 6.150 names and does not prove: the hypothesis `RebEscrow` (6.55's two inputs at the reborrows `↺_β P̂` names), a lifetime below two given ones, and `ρ⁺|own = ∅` through the pieces of `ρᵢ ● ρ⁺′`.
 -/
 
 noncomputable section
@@ -22,16 +20,9 @@ namespace BoCa.Fig16.BoLo
 open BoCa.Fig16
 open BoCa.BoLo (Heap Steps)
 
-/-- The two inputs `[TR]` 6.55 adds, quantified over exactly the reborrows
-`↺_β P̂` produces: `χ ∈ reb_β(σ)` with `P̂(w)(χ)`.  Nothing else about `σ`, `χ`
-or the frame is assumed.
-
-`EscrowAgree σ χ a` is asked of every `a` that is *some* resource's aliasable
-walk, which is the shape 6.55 takes it in (`∀a. ag(ρ_f) = a ⇒ …`) with the
-frame left free — 6.150's proof spends 6.55 at three different frames.
-
-The `b` that indexes `P̂` is the `b` of the reborrow: `↺_β P̂` puts `P̂` under
-the `Иβ` binder, so the predicate read off a reborrow at `β` is `P̂(β)`.
+/-- The two inputs `[TR]` 6.55 adds, at the reborrows `↺_β P̂` produces:
+`χ ∈ reb_β(σ)` with `P̂(w)(χ)`.  `EscrowAgree σ χ a` is asked of every `a` that is
+some resource's aliasable walk, as 6.55 takes it (`∀a. ag(ρ_f) = a ⇒ …`).
 `[about ours: the two added inputs of `Fig16.ResU.six55`, at the reborrows
 `[TR]` 6.150's precondition names]` -/
 def RebEscrow (P : Life → BoCa.Val → WProp) : Prop :=
@@ -40,8 +31,7 @@ def RebEscrow (P : Life → BoCa.Val → WProp) : Prop :=
       (∃ A, AgW χ A) ∧ ∀ r a : WRes, AgW r a → EscrowAgree σ χ a
 
 /-- *"Such a `β` always exists because for any lifetime, the set of lifetimes
-shorter than it is infinite."* — `[TR]` p. 39, H11.  `↓γ` is `[TR]` p. 5's
-next-shorter lifetime, and `γᵢ ⊓ γ_b` the shorter of the two bounds.
+shorter than it is infinite."* — `[TR]` p. 39, H11.
 `[about ours: the sentence `[TR]` p. 39 gives for H11, at `↓`]` -/
 theorem exists_shorter (gi gb : Life) : ∃ b : Life, b ⊏ gi ∧ b ⊏ gb :=
   ⟨↓(gi ⊓ gb),
@@ -65,9 +55,7 @@ theorem noOwn_exclPart {ρ : WRes} (h : NoOwn ρ) : NoOwn ρ.exclPart :=
   noOwn_iff.mpr fun l ψ hl =>
     noOwn_iff.mp h l ψ (ResU.exclPart_eq_some.mp hl).1
 
-/-- A `●`-factor of an all-`imm` resource has no `own` cell: `●` composes two
-`imm` cells and nothing else (`Fig16.CellU.CompS`), so an `own` cell of the
-factor would have to survive into the composite.
+/-- A `●`-factor of an all-`imm` resource has no `own` cell.
 `[about ours: the `|own = ∅` of a factor of `ρ|imm`, which `[TR]` 6.150's G6
 takes in one step]` -/
 theorem noOwn_le_restrict_imm {τ ρ : WRes} (h : ResU.Le τ (ρ.restrict Kind.imm)) :
@@ -88,8 +76,7 @@ theorem noOwn_le_restrict_imm {τ ρ : WRes} (h : ResU.Le τ (ρ.restrict Kind.i
       rw [e₁, CellU.kind_immOf] at hk
       exact Kind.noConfusion hk
 
-/-- `ρ⁺ ⊟ ρ_reb` has no `own` cell when `ρ⁺` has none — `⊟`'s two factors are
-`ρ⁺|own,mut` and a `ρ″ ≤ ρ⁺|imm`. -/
+/-- `ρ⁺ ⊟ ρ_reb` has no `own` cell when `ρ⁺` has none. -/
 theorem noOwn_subKeep {ρp D ψ : WRes} (h : ResU.SubKeep ρp D ψ) (hn : NoOwn ρp) :
     NoOwn ψ := by
   obtain ⟨ρ'', -, hle, -, -, hcomp⟩ := h

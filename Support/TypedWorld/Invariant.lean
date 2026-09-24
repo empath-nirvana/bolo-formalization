@@ -35,9 +35,7 @@ import Support.TypedWorld.World
 /-!
 # Support — TypedWorld — Invariant
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the family `TW` and its invariant: `mut` cells at any depth, `Mut` positions, coherence, sub-records and lineages, and preservation of the invariant by every step.
+`[about ours]`.  The family `TW` and its invariant: `mut` cells at any depth, `Mut` positions, coherence, sub-records and lineages, and preservation of the invariant by every step.
 -/
 
 noncomputable section
@@ -49,7 +47,7 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- **Any step whose `ag` is contained in the old one keeps `ChainInv`** — every clause of `ChainInv`
+/-- Any step whose `ag` is contained in the old one keeps `ChainInv` — every clause of `ChainInv`
 reads `ag(W′)` only through `AgW W′ a` hypotheses. -/
 theorem chainInv_of_ag_sub {W W' : WRes} {rs : List FrameRec} (t : ∀ a, AgW W' a → AgW W a)
     (h : ChainInv W rs) : ChainInv W' rs := by
@@ -78,7 +76,7 @@ theorem own_cell_ag {Z W : WRes} {l : Loc} {v : Val}
   · intro ha
     exact (AgW.split h).mpr ⟨_, _, AgW.single_own l v, ha, ResU.comp_empty_left a⟩
 
-/-- **`ag(ℓ ↦ own(v) ● ρ ● Z) = ag(ℓ ↦ mut(β, v, ρ, P̂) ● Z)`.** -/
+/-- `ag(ℓ ↦ own(v) ● ρ ● Z) = ag(ℓ ↦ mut(β, v, ρ, P̂) ● Z)`. -/
 theorem mut_fold_ag {W X Z ρ W' : WRes} {l : Loc} {v : Val} {b : Life}
     {hstr : ρ.InStratum b} {P : Val → SPropS Loc Val b} {hw : P v ⟨ρ, hstr⟩}
     (hX : ResU.CompS (ResU.single l (CellU.ownOf v)) ρ X) (hW : ResU.CompS X Z W)
@@ -293,7 +291,7 @@ theorem icpAt_of_immFree {b ρ : WRes} (h : ρ.ImmFree) (x : Loc) : ICpAt b ρ x
 theorem icpAt_none {b ρ : WRes} {x : Loc} (h : ρ.get x = none) : ICpAt b ρ x := by
   intro ψ e; rw [h] at e; cases e
 
-/-- **`ag(ρ)` keeps every `imm` cell of `ρ`** over its value and witness, and never drops a
+/-- `ag(ρ)` keeps every `imm` cell of `ρ` over its value and witness, and never drops a
 lifetime (`AgW.get_imm`, `AgW.get_ls_imm`). -/
 theorem icpAt_agW {ρ σ : WRes} (h : AgW ρ σ) (x : Loc) : ICpAt σ ρ x := by
   intro ψ e hk
@@ -427,7 +425,7 @@ theorem bigComp_mut_src {R : CellU Loc Val → CellU Loc Val → Prop}
           · obtain ⟨τ, hτ, ψ', e', k'⟩ := bigComp_mut_src hC hrest e₂ k₂
             exact ⟨τ, List.mem_cons_of_mem _ hτ, ψ', e', k'⟩
 
-/-- **`ex(ρ)` raises a `mut` cell only from one in `ρ`.** -/
+/-- `ex(ρ)` raises a `mut` cell only from one in `ρ`. -/
 theorem exW_mut {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     (hC : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → ψ.kind = Kind.mut → ψ₁.kind = Kind.mut ∨ ψ₂.kind = Kind.mut)
@@ -453,7 +451,7 @@ theorem exW_mut {R : CellU Loc Val → CellU Loc Val → Prop}
     · exact MutAt.nest hψ (by rw [hk]; simp) (ihe x ψ' e' k')
     · exact ihw p hp x ψ' e' k'
 
-/-- **`ag(ρ)` raises a `mut` cell only from one in `ρ`.** -/
+/-- `ag(ρ)` raises a `mut` cell only from one in `ρ`. -/
 theorem agW_mut {ρ σ : WRes} (h : AgW ρ σ) :
     ∀ x (ψ : CellU Loc Val), σ.get x = some ψ → ψ.kind = Kind.mut → MutAt ρ x := by
   refine AgW.rec (motive_1 := fun ρ σ _ => ∀ x (ψ : CellU Loc Val), σ.get x = some ψ →
@@ -494,7 +492,7 @@ theorem hSS : ∀ ψ₁ ψ₂ ψ : CellU Loc Val, CellU.CompS ψ₁ ψ₂ ψ →
   obtain ⟨s₁, s₂, v, ρ, h₁, h₂, -, e₁, e₂, -⟩ := h
   exact ⟨s₁, s₂, v, ρ, h₁, h₂, e₁, e₂⟩
 
-/-- **A `mut` cell at `ℓ` at any depth of `ρ` shows at `ℓ` in `ex(ρ)` or in `ag(ρ)`.** -/
+/-- A `mut` cell at `ℓ` at any depth of `ρ` shows at `ℓ` in `ex(ρ)` or in `ag(ρ)`. -/
 theorem mutAt_walk_dom {ρ : WRes} {x : Loc} (h : MutAt ρ x) :
     ∀ {R : CellU Loc Val → CellU Loc Val → Prop}
       {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop},
@@ -524,7 +522,7 @@ theorem mutAt_walk_dom {ρ : WRes} {x : Loc} (h : MutAt ρ x) :
           · exact Or.inl (comp_some hz hζ)
           · exact Or.inr (comp_some hz' hζ)
 
-/-- **A top-level `ℓ ↦ own(u)` of a valid resource is borrowed mutably nowhere in it.**
+/-- A top-level `ℓ ↦ own(u)` of a valid resource is borrowed mutably nowhere in it.
 `⦇W⦈ = ex(W)_● ● ag(W)`: a `mut` cell at `ℓ` under an `imm` cell lands in `ag(W)`, which is
 disjoint from `ex(W)_●`'s `own(u)` (`ex_ag_disjoint`); under a `mut` cell it lands in
 `ex(W)_●`'s `⨀`, which `●`s against `W|own`'s `own(u)`, and `●` joins `imm` cells only. -/
@@ -577,7 +575,7 @@ theorem not_mutAt_top_own {W : WRes} (hv : ResU.Valid W) {x : Loc} {u : Val}
               · obtain ⟨_, h1⟩ := comp_some hz hζ
                 exact noAg _ h1
 
-/-- **A cell of `c ∈ reb_β(σ)`, with its lifetimes** (`[TR]` p. 5, `reb_α`'s three clauses):
+/-- A cell of `c ∈ reb_β(σ)`, with its lifetimes (`[TR]` p. 5, `reb_α`'s three clauses):
 over an `own` or `mut` cell of `σ` it is `imm({β}, …)`; over an `imm` cell `imm(s, v, χ)` it
 is `imm(t, v, χ)` with `t ⊆ s`. -/
 theorem reb_cell_ls {β : Life} {σ c : WRes} (hr : ResU.Reb β σ c) {m : Loc}
@@ -633,7 +631,7 @@ theorem mutAt_of_cell {W w₀ : WRes} {le : Loc} {s : LSet} {v : Val}
     (hm : MutAt w₀ x) : MutAt W x :=
   MutAt.nest hle (by simp) (by rw [CellU.wit_immOf]; exact hm)
 
-/-- **`ag(ρ₀)` of an escrow sits in `ag(W)`** — `W(ℓₑ) = imm(s, v, ρ₀)` contributes
+/-- `ag(ρ₀)` of an escrow sits in `ag(W)` — `W(ℓₑ) = imm(s, v, ρ₀)` contributes
 `ex(ρ₀)_○ ○ ag(ρ₀)` to `ag(W)`. -/
 theorem escrow_icp {W a₁ w₀ : WRes} {le : Loc} {s : LSet} {v : Val}
     {hs : w₀.InStratum s.join} (ha₁ : AgW W a₁)
@@ -644,7 +642,7 @@ theorem escrow_icp {W a₁ w₀ : WRes} {le : Loc} {s : LSet} {v : Val}
   exact ⟨e₀, a₀, he₀, ha₀, fun x =>
     icpAt_trans (icpAt_right hp₀ x) (icpAt_trans (icpAt_right hcp₀ x) (icpAt_right h12 x))⟩
 
-/-- **The walk of a part of a reborrow image, taken at `W(ℓₑ) = imm(s, v, w₀)`.**  If every
+/-- The walk of a part of a reborrow image, taken at `W(ℓₑ) = imm(s, v, w₀)`.  If every
 cell of `d` is a cell of `c ∈ reb_β(w₀)`, then `ag(d) = d ○ b` where every `imm` cell of `b`
 has an `imm` counterpart in `ag(W)`: `b` is `⨀` of `ex(χ)_○ ○ ag(χ)` over `d`'s witnesses
 `χ`, each a piece of `w₀` or a witness of one of its cells (`[TR]` 6.54's *"every witness is
@@ -698,7 +696,7 @@ theorem img_walk {W₁ a₁ w₀ c d ad : WRes} {le : Loc} {s : LSet} {v : Val}
       obtain ⟨ψ, ev, av, eψ, hev, hav, hc⟩ := AgWitsI.mem hwi p hp
       exact icpAt_comp hc (icpAt_of_immFree (ExR.immFree hev) y) (witICp _ ψ eψ av hav y)
 
-/-- **A cell of the image, against `ag(W)`**: over an `imm` cell of `w₀` it has an `imm`
+/-- A cell of the image, against `ag(W)`: over an `imm` cell of `w₀` it has an `imm`
 counterpart in `ag(W)`; over an `own` or `mut` cell it is `imm({β}, …)`. -/
 theorem img_cell {W₁ a₁ w₀ c : WRes} {le : Loc} {s : LSet} {v : Val}
     {hs : w₀.InStratum s.join} {β : Life} (ha₁ : AgW W₁ a₁)
@@ -736,11 +734,11 @@ theorem img_ls {W₁ a₁ w₀ c d ad : WRes} {le : Loc} {s : LSet} {v : Val}
       exact Or.inr ⟨hy₁, ⟨ξ, ed⟩, hz⟩
   · exact Or.inl ((hbi m ξ e₁).ls ht₁ hy₁)
 
-/-- **Nested views are shorter than their parents.**  At a chain position `ℓ` with parent
+/-- Nested views are shorter than their parents.  At a chain position `ℓ` with parent
 `ℓ₀`, every lifetime of the view at `ℓ` in `ag(W)` is shorter than some lifetime of the view
 at `ℓ₀`.  This is `[TR]` 6.150's H11 choice (`β ⊏ γᵢ ⊓ γ_b`, taken below every lifetime of the
 world) read at the view a `withload` inside a `withload` makes: the inner `β′` is shorter than
-the outer view's.  `[about ours: an invariant of the typed world; not printed]` -/
+the outer view's.  `[about ours: an invariant of the typed world]` -/
 def NestLife (W : WRes) (r : FrameRec) : Prop :=
   ∀ l₀ l S u, Chain r.R r.T r.v (some l₀) l S u → ∀ a, AgW W a → ∀ (ψ : CellU Loc Val) s,
     a.get l = some ψ → ψ.lsOf = some s → ∀ x, s.mem x →
@@ -792,7 +790,7 @@ theorem leInv_of_reb {W W' c : WRes} {rs : List FrameRec} (hvW : ResU.Valid W)
   obtain ⟨ψ, e, k, r'', w⟩ := imm_fwd_full_l hcomp e₀ k₀
   exact ⟨ψ, e, k, r''.trans r₀, w.trans w₀⟩
 
-/-- **At a `Mut` position a typed escrow holds a `mut` cell** (`𝒱⟦Mut @a S⟧`'s
+/-- At a `Mut` position a typed escrow holds a `mut` cell (`𝒱⟦Mut @a S⟧`'s
 `ℓ ↦ Mut @a 𝒱⟦S⟧`, reached through the `⊗`, `⊕` and `[@a]` clauses). -/
 theorem mut_split {δ : LSub} {T : Ty} {v : Val} {m : Loc} {S : Ty} (hp : MutPos T v m S) :
     ∀ {R : WRes}, vShape T δ v R → ∃ ζ : CellU Loc Val, R.get m = some ζ ∧ ζ.kind = Kind.mut := by
@@ -841,7 +839,7 @@ theorem mut_split {δ : LSub} {T : Ty} {v : Val} {m : Loc} {S : Ty} (hp : MutPos
       obtain ⟨α, -, hb, -⟩ := hR
       exact ih hb
 
-/-- **A typed reborrow's cell over a `mut` cell sits at a `Mut` position** — the `Mut @a S`
+/-- A typed reborrow's cell over a `mut` cell sits at a `Mut` position — the `Mut @a S`
 clause of `Imm̲` (`[CONF]` Fig. 9, `[TR]` 6.122), carried up through `⊗`, `⊕` and `[@a]`.
 `[about ours: a typed reborrow's image against the positions of its type]` -/
 theorem image_dom_mut {x : LifeVar} {δ δ' : LSub} :
@@ -1006,7 +1004,7 @@ theorem vShape_immReb_agree {T : Ty} {δ' δ : LSub} (h : AgreeOn T δ' δ) (x :
     · subst hxy; rw [find?_extend_self, find?_extend_self]
     · rw [find?_extend_ne _ _ hxy, find?_extend_ne _ _ hxy]; exact h y hy'
 
-/-- **A reborrow's view at a root is coherent**: the type it puts there is `Imm 'x S` at
+/-- A reborrow's view at a root is coherent: the type it puts there is `Imm 'x S` at
 `δ[x↦β]`, `S` the root's pointee, and `x ∉ FV(S)`. -/
 theorem coh_root {rs : List FrameRec} {r : FrameRec} (hr : r ∈ rs) {x : LifeVar} {β : Life}
     (hx : ¬ LFree x r.T) {m : Loc} {S : Ty} {u : Val} (hpos : RefPos r.T r.v m S)
@@ -1015,7 +1013,7 @@ theorem coh_root {rs : List FrameRec} {r : FrameRec} (hr : r ∈ rs) {x : LifeVa
   have hxy : x ≠ y := fun e => RefPos.not_free hpos hx (e ▸ hy)
   exact find?_extend_ne _ _ hxy
 
-/-- **…and at a child of a chain position**, for a reborrow run at a coherent `δ′`. -/
+/-- …and at a child of a chain position, for a reborrow run at a coherent `δ′`. -/
 theorem coh_child {rs : List FrameRec} {r : FrameRec} (hr : r ∈ rs) {p : Option Loc}
     {l₀ : Loc} {S₀ : Ty} {u₀ : Val} (hch : Chain r.R r.T r.v p l₀ S₀ u₀) {δ' : LSub}
     (hag : AgreeOn S₀ δ' r.δ) {x : LifeVar} {β : Life} (hx : ¬ LFree x S₀) {m : Loc}
@@ -1058,7 +1056,7 @@ theorem bigComp_two {x : Loc} :
             rw [ResU.CompatS.right_eq_none hc.1 e₂ k₂] at this; cases this
           · exact bigComp_two hrest h₁' h₂' hne e₁ k₁ e₂ k₂
 
-/-- **A non-`imm` cell reached through `mut` witnesses is a cell of `ex(ρ)_●`.** -/
+/-- A non-`imm` cell reached through `mut` witnesses is a cell of `ex(ρ)_●`. -/
 theorem xpath_ex {ρ e : WRes} (h : ExS ρ e) :
     ∀ {p : List Loc} {σ : WRes}, XPath ρ p σ → ∀ {x : Loc} {ζ : CellU Loc Val},
       σ.get x = some ζ → ζ.kind ≠ Kind.imm → e.get x = some ζ := by
@@ -1085,7 +1083,7 @@ theorem xpath_ex {ρ e : WRes} (h : ExS ρ e) :
       exact ihe hp ex kx
     · exact ihw q hq ψ' eψ' hp ex kx
 
-/-- **…at one path only.** -/
+/-- …at one path only. -/
 theorem xpath_unique {ρ e : WRes} (h : ExS ρ e) :
     ∀ {p₁ : List Loc} {σ₁ : WRes}, XPath ρ p₁ σ₁ → ∀ {p₂ : List Loc} {σ₂ : WRes},
       XPath ρ p₂ σ₂ → ∀ {x : Loc} {ζ₁ ζ₂ : CellU Loc Val},
@@ -1199,7 +1197,7 @@ theorem not_mutAt_ex_own_aux {x : Loc} {u : Val} {ρ : WRes} (h : MutAt ρ x) :
                 exact ih hex' hav hζ avn
               · rw [avn] at hζ; cases hζ
 
-/-- **An `own` cell of `ex(W)_●` is borrowed mutably nowhere in `W`.**  `not_mutAt_top_own`
+/-- An `own` cell of `ex(W)_●` is borrowed mutably nowhere in `W`.  `not_mutAt_top_own`
 at every depth `ex` descends to. -/
 theorem not_mutAt_ex_own {W e : WRes} (hv : ResU.Valid W) (he : ExS W e) {x : Loc} {u : Val}
     (hx : e.get x = some (CellU.ownOf u)) : ¬ MutAt W x := by
@@ -1257,7 +1255,7 @@ theorem lifts_left {a₁ a₂ a : WRes} (h : ResU.CompR a₁ a₂ a) : Lifts a�
 theorem lifts_right {a₁ a₂ a : WRes} (h : ResU.CompR a₁ a₂ a) : Lifts a₂ a :=
   lifts_left (ResU.CompR.comm h)
 
-/-- **`ex(ρ)_○` of a `mut` witness of `ρ` is a `○`-part of `ex(ρ)_○`.** -/
+/-- `ex(ρ)_○` of a `mut` witness of `ρ` is a `○`-part of `ex(ρ)_○`. -/
 theorem exR_mut_wit {ρ e : WRes} (h : ExR ρ e) {m : Loc} {ψ : CellU Loc Val}
     (em : ρ.get m = some ψ) (km : ψ.kind = Kind.mut) : ∃ e', ExR ψ.wit e' ∧ Lifts e' e := by
   cases h with
@@ -1310,8 +1308,8 @@ theorem MutPos.free {T : Ty} {v : Val} {l : Loc} {S : Ty} (h : MutPos T v l S) {
   | sumR _ ih => exact Or.inr (ih hy)
   | box _ ih => exact Or.inr (ih hy)
 
-/-- **At a `Mut @a S` position a typed escrow holds `ℓ ↦ mut(b, u, χ, Q̂)` with
-`χ ∈ 𝒱⟦S⟧δ(u)`** — `ptoMut`'s `ofS Q̂ = 𝒱⟦S⟧δ` read at the cell's own value and witness. -/
+/-- At a `Mut @a S` position a typed escrow holds `ℓ ↦ mut(b, u, χ, Q̂)` with
+`χ ∈ 𝒱⟦S⟧δ(u)` — `ptoMut`'s `ofS Q̂ = 𝒱⟦S⟧δ` read at the cell's own value and witness. -/
 theorem mut_split_den {δ : LSub} {T : Ty} {v : Val} {m : Loc} {S : Ty} (hp : MutPos T v m S) :
     ∀ {R : WRes}, vShape T δ v R → ∃ ζ : CellU Loc Val, R.get m = some ζ ∧ ζ.kind = Kind.mut ∧
       vShape S δ ζ.erase ζ.wit := by
@@ -1425,8 +1423,8 @@ theorem mutPos_unique {δ : LSub} :
   | all _ _ _ _ => intro v R m S₁ S₂ _ hp; cases hp
   | unk => intro v R m S₁ S₂ _ hp; cases hp
 
-/-- **A `Mut` position and a `Ref` position of a typed escrow have strictly composable
-blocks**: the `mut` cell, and the `Ref`'s `ℓ ↦ own(u) ● Q` with `Q ∈ 𝒱⟦S⟧δ(u)`. -/
+/-- A `Mut` position and a `Ref` position of a typed escrow have strictly composable
+blocks: the `mut` cell, and the `Ref`'s `ℓ ↦ own(u) ● Q` with `Q ∈ 𝒱⟦S⟧δ(u)`. -/
 theorem mut_ref_blocks {δ : LSub} :
     ∀ (T : Ty) {v : Val} {R : WRes} {m l : Loc} {S₁ S₂ : Ty}, vShape T δ v R →
       MutPos T v m S₁ → RefPos T v l S₂ →
@@ -1501,7 +1499,7 @@ theorem GPos.free {R : WRes} {T : Ty} {v : Val} {m : Loc} {S : Ty} (h : GPos R T
   | here hp => exact hp.free hy
   | step hp _ _ ih => exact hp.free (ih hy)
 
-/-- **At a `GPos` a typed piece holds the `mut` cell, its witness typed at the pointee.** -/
+/-- At a `GPos` a typed piece holds the `mut` cell, its witness typed at the pointee. -/
 theorem gpos_mut_cell {δ : LSub} {R : WRes} {T : Ty} {v : Val} {m : Loc} {S : Ty}
     (h : GPos R T v m S) :
     ∀ {P : WRes}, vShape T δ v P →
@@ -1537,7 +1535,7 @@ theorem gpos_cross {δ : LSub} {R : WRes} {m : Loc} {T : Ty} {v : Val} {P : WRes
   have eB₂ := (ResU.CompS.get_right_of_ne_imm hB eξ (by rw [kξ]; simp)).2
   exact not_mut_both hX eζ (by rw [kζ]; simp) eB₂
 
-/-- **A location of a typed escrow is at one `GPos` pointee type.** -/
+/-- A location of a typed escrow is at one `GPos` pointee type. -/
 theorem gpos_unique {δ : LSub} {R : WRes} {T : Ty} {v : Val} {m : Loc} {S₁ : Ty}
     (h₁ : GPos R T v m S₁) :
     ∀ {P : WRes}, vShape T δ v P →
@@ -1622,7 +1620,7 @@ theorem FrameRec.ext' {a b : FrameRec} (h₁ : a.le = b.le) (h₂ : a.v = b.v) (
     (h₄ : a.T = b.T) (h₅ : a.δ = b.δ) : a = b := by
   cases a; cases b; simp_all
 
-/-- **Two sub-records of a typed record at one location are one.** -/
+/-- Two sub-records of a typed record at one location are one. -/
 theorem SubRec.functional {r d₁ d₂ : FrameRec} (hR : vShape r.T r.δ r.v r.R) (h₁ : SubRec r d₁)
     (h₂ : SubRec r d₂) (he : d₁.le = d₂.le) : d₁ = d₂ := by
   obtain ⟨hδ₁, hg₁, ζ₁, e₁, -, r₁, w₁⟩ := h₁
@@ -1648,7 +1646,7 @@ theorem LinPath.inv_cons {r e : FrameRec} {m : Loc} {p : List Loc} (h : LinPath 
       subst h₁; subst h₂
       exact ⟨_, hs, rfl, t⟩
 
-/-- **A lineage path names one record.** -/
+/-- A lineage path names one record. -/
 theorem LinPath.functional {r d₁ : FrameRec} {p : List Loc} (h₁ : LinPath r p d₁) :
     vShape r.T r.δ r.v r.R → AdmWf r.T r.δ → ∀ {d₂ : FrameRec}, LinPath r p d₂ → d₁ = d₂ := by
   induction h₁ with
@@ -1681,7 +1679,7 @@ theorem exIn_of_imm {W R : WRes} {le : Loc}
   rw [w] at hev
   exact ⟨ev, hev, (lifts_left hp).trans (lifts_left hz)⟩
 
-/-- **A `mut` cell of an escrow in `ag(W)` is in `ag(W)`, and so is its witness's `ex`.** -/
+/-- A `mut` cell of an escrow in `ag(W)` is in `ag(W)`, and so is its witness's `ex`. -/
 theorem exIn_mut {W σ : WRes} (h : ExIn W σ) {m : Loc} {ζ : CellU Loc Val}
     (em : σ.get m = some ζ) (km : ζ.kind = Kind.mut) :
     ExIn W ζ.wit ∧ NVAt W m ζ.erase ζ.wit := by
@@ -1704,7 +1702,7 @@ theorem exIn_support {W σ : WRes} (h : ExIn W σ) {x : Loc} {ζ : CellU Loc Val
   obtain ⟨ψ, eψ, -⟩ := hl x χ eχ
   exact ⟨ψ, eψ⟩
 
-/-- **Along a lineage from a record whose `ex` is in `ag(W)`**: every member's `ex` is too,
+/-- Along a lineage from a record whose `ex` is in `ag(W)`: every member's `ex` is too,
 and every proper member's location carries a non-`own` cell over its value and witness. -/
 theorem exIn_path {W : WRes} {r d : FrameRec} {p : List Loc} (h : LinPath r p d) :
     ExIn W r.R → ExIn W d.R ∧ (p ≠ [] → NVAt W d.le d.v d.R) := by
@@ -1721,8 +1719,8 @@ theorem exIn_path {W : WRes} {r d : FrameRec} {p : List Loc} (h : LinPath r p d)
       | nil => exact hnv
       | cons _ _ => exact hne (by simp)
 
-/-- **The weakened `LeInv`**: every record's location carries a non-`own` cell of `ag(W)` over
-the recorded value and escrow.  `[about ours: an invariant of the typed world; not printed]` -/
+/-- The weakened `LeInv`: every record's location carries a non-`own` cell of `ag(W)` over
+the recorded value and escrow.  `[about ours: an invariant of the typed world]` -/
 def LeInvW (W : WRes) (rs : List FrameRec) : Prop :=
   ∀ r ∈ rs, ∀ a, AgW W a → ∃ ψ : CellU Loc Val, a.get r.le = some ψ ∧ ψ.kind ≠ Kind.own ∧
     ψ.erase = r.v ∧ ψ.wit = r.R
@@ -1762,24 +1760,24 @@ theorem TW.valid {W : WRes} {ps rs : List FrameRec} (h : TW W ps rs) : ResU.Vali
   | rebEndDeep _ _ _ _ _ _ hW _ ih => exact (ResU.Valid.split hW ih).1
 
 /-- `NoMut` with the location clause at the records proper only: a sub-record's location is
-a `mut` cell of its parent's escrow.  `[about ours: an invariant of the typed world; not printed]` -/
+a `mut` cell of its parent's escrow.  `[about ours: an invariant of the typed world]` -/
 def NoMut (W : WRes) (ps rs : List FrameRec) : Prop :=
   (∀ r ∈ ps, ¬ MutAt W r.le) ∧ (∀ r ∈ rs, ∀ l u, r.R.get l = some (CellU.ownOf u) → ¬ MutAt W l)
 
-/-- **Where an `imm` view may sit**: at a record's cell over its value and escrow, or at a chain
+/-- Where an `imm` view may sit: at a record's cell over its value and escrow, or at a chain
 position of a record.  A view at a `Mut` position is a sub-record's cell.
-`[about ours: our classification; not printed]` -/
+`[about ours: our classification]` -/
 def Class (rs : List FrameRec) (m : Loc) (ψ : CellU Loc Val) : Prop :=
   (∃ r ∈ rs, m = r.le ∧ ψ.erase = r.v ∧ ψ.wit = r.R) ∨
   (∃ r ∈ rs, ∃ p S u, Chain r.R r.T r.v p m S u)
 
 /-- Every `imm` view of `ag(W)` is classified by a record.
-`[about ours: an invariant of the typed world; not printed]` -/
+`[about ours: an invariant of the typed world]` -/
 def Coverage (W : WRes) (rs : List FrameRec) : Prop :=
   ∀ a, AgW W a → ∀ m (ψ : CellU Loc Val), a.get m = some ψ → ψ.kind = Kind.imm → Class rs m ψ
 
-/-- **The invariant of the typed world.**
-`[about ours: an invariant of the typed world; not printed]` -/
+/-- The invariant of the typed world.
+`[about ours: an invariant of the typed world]` -/
 def TI (W : WRes) (ps rs : List FrameRec) : Prop :=
   ChainInv W rs ∧ LeInv W ps ∧ (∀ r₁ ∈ ps, ∀ r₂ ∈ ps, r₁.le = r₂.le → r₁ = r₂) ∧
   (∀ r ∈ rs, ∀ r' ∈ rs, ∀ u, r'.R.get r.le ≠ some (CellU.ownOf u)) ∧
@@ -1865,7 +1863,7 @@ theorem DescR.cases {r d : FrameRec} (h : DescR r d) : d = r ∨ Desc r d := by
   | nil => exact Or.inl hp.inv_nil
   | cons m q => exact Or.inr ⟨_, by simp, hp⟩
 
-/-- **`immFrame` keeps `TI`.** -/
+/-- `immFrame` keeps `TI`. -/
 theorem ti_frame {W X Z R W' : WRes} {ps rs ds : List FrameRec} {l : Loc} {v : Val}
     {α : Life} {T : Ty} {δ : LSub} {hα : R.InStratum (LSet.singleton α).join}
     (hvW : ResU.Valid W) (hadm : AdmWf T δ)
@@ -2217,7 +2215,7 @@ theorem nm_reb_like {W W' c w₀ : WRes} {ps rs : List FrameRec} {le : Loc} {s :
     rw [AgW.functional haW' haW] at hcomp
     exact (icpAt_left hcomp l₀ ζ e).ls ht hy
 
-/-- **A reborrow's coverage**: a view over an `imm` cell of the escrow copies a classified
+/-- A reborrow's coverage: a view over an `imm` cell of the escrow copies a classified
 cell; one over an `own` cell is at a chain position (`newOwn`); one over a `mut` cell is at a
 sub-record's location (`newMut`), where `ag(W′)` holds the sub-record's value and witness. -/
 theorem cov_reb_like {W W' c w₀ : WRes} {rs : List FrameRec} {le : Loc} {s : LSet} {v : Val}
@@ -2252,7 +2250,7 @@ theorem cov_reb_like {W W' c w₀ : WRes} {rs : List FrameRec} {le : Loc} {s : L
       exact (hC aW haW m ξ eξ kξ).congr (r₁.symm.trans (r₂.symm.trans rξ.symm))
         (w₁.symm.trans (w₂.symm.trans wξ.symm))
 
-/-- **A reborrow at any record keeps `TI`.** -/
+/-- A reborrow at any record keeps `TI`. -/
 theorem ti_reb {W W' c : WRes} {ps rs : List FrameRec} {r₀ : FrameRec} {le : Loc} {s : LSet}
     {β : Life} {hs : r₀.R.InStratum s.join} {x : LifeVar}
     (hvW : ResU.Valid W) (hr₀ : r₀ ∈ rs) (hle : W.get le = some (CellU.immOf s r₀.v r₀.R hs))
@@ -2283,7 +2281,7 @@ theorem ti_reb {W W' c : WRes} {ps rs : List FrameRec} {r₀ : FrameRec} {le : L
     refine ⟨⟨m, ζ.erase, ζ.wit, S, r₀.δ⟩, (hmem _).mpr ⟨p, hp, hpr.sub ?_⟩, rfl⟩
     exact ⟨rfl, GPos.here hS, ζ, eζ, kζ, rfl, rfl⟩
 
-/-- **A reborrow at a chain view of any record keeps `TI`.** -/
+/-- A reborrow at a chain view of any record keeps `TI`. -/
 theorem ti_rebDeep {W W' c : WRes} {ps rs : List FrameRec} {r₀ : FrameRec} {p₀ : Option Loc}
     {l₁ : Loc} {S₀ : Ty} {u₀ : Val} {s : LSet} {w₀ : WRes} {hs : w₀.InStratum s.join}
     {β : Life} {x : LifeVar}
@@ -2345,7 +2343,7 @@ theorem xpath_ex_part {A C e : WRes} (hle : ResU.Le A C) (he : ExS C e) {p : Lis
       have eC := (ResU.CompS.get_left_of_ne_imm hτ em (by rw [km]; simp)).2
       exact xpath_ex he (XPath.cons eC km hq) ex k
 
-/-- **`immEnd` keeps `TI`.** -/
+/-- `immEnd` keeps `TI`. -/
 theorem ti_end {W Y X' W' : WRes} {ps rs ps' rs' : List FrameRec} {r : FrameRec} {s : LSet}
     {hs : r.R.InStratum s.join} (hvW : ResU.Valid W) (hr : r ∈ ps)
     (hc : ResU.CompS (ResU.single r.le (CellU.immOf s r.v r.R hs)) Y W)
@@ -2498,7 +2496,7 @@ theorem ti_end {W Y X' W' : WRes} {ps rs ps' rs' : List FrameRec} {r : FrameRec}
         have hd := gone_desc r' hr' hin
         rw [gone r' hd _ _ hch.own (by simp) a₁ ha₁] at e; cases e
 
-/-- **`rebEnd`/`rebEndDeep` keep `TI`.** -/
+/-- `rebEnd`/`rebEndDeep` keep `TI`. -/
 theorem ti_endReb {W W' c w₀ : WRes} {ps rs : List FrameRec} {le : Loc} {s : LSet} {v : Val}
     {hs : w₀.InStratum s.join} {β : Life}
     (hvW : ResU.Valid W) (hle : W'.get le = some (CellU.immOf s v w₀ hs))
@@ -2645,7 +2643,7 @@ theorem ti_endReb {W W' c w₀ : WRes} {ps rs : List FrameRec} {le : Loc} {s : L
   rw [AgW.functional ha₁ ha']
   exact icpAt_left hcomp m
 
-/-- **Every `TW` world satisfies `TI`.** -/
+/-- Every `TW` world satisfies `TI`. -/
 theorem TW.inv {W : WRes} {ps rs : List FrameRec} (h : TW W ps rs) : TI W ps rs := by
   induction h with
   | empty =>
@@ -2707,7 +2705,7 @@ theorem TW.inv {W : WRes} {ps rs : List FrameRec} (h : TW W ps rs) : TI W ps rs 
         exact ih.2.2.2.1 r' hr' r hr u (o _ u hu)
       exact ti_endReb hvW hle hreb hW hβ hexcl ih
 
-/-- **The type a reborrow puts at a `Mut` position is coherent**: `Imm̲ 'x (Mut @a S) =
+/-- The type a reborrow puts at a `Mut` position is coherent: `Imm̲ 'x (Mut @a S) =
 Imm 'x S` at `δ[x↦β]`, against the sub-record at that position. -/
 theorem coh_mut {W : WRes} {ps rs : List FrameRec} (hTW : TW W ps rs) {r₀ : FrameRec}
     (hr₀ : r₀ ∈ rs) {x : LifeVar} {β : Life} (hx : ¬ LFree x r₀.T) {m : Loc} {S : Ty}
@@ -2734,7 +2732,7 @@ theorem coh_mut_child {W : WRes} {ps rs : List FrameRec} (hTW : TW W ps rs) {r :
   rw [find?_extend_ne _ _ hxy]
   exact hag y (hS.free hy)
 
-/-- **A typed record whose escrow has an `ex(R)_●` has a finite lineage.** -/
+/-- A typed record whose escrow has an `ex(R)_●` has a finite lineage. -/
 theorem lineage_list {r : FrameRec} (hR : vShape r.T r.δ r.v r.R) (hadm : AdmWf r.T r.δ)
     {eR : WRes} (heR : ExS r.R eR) : ∃ ds : List FrameRec, ∀ d, d ∈ ds ↔ Desc r d := by
   classical

@@ -31,9 +31,7 @@ import Support.TypedWorld.World
 /-!
 # Support — TypedWorld — Wp
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-stratified record lists and `wp` at a tagged typed world: relevance, the Kripke order, the stratified `Mut` clause, tags, and the frame steps that only regroup.
+`[about ours]`.  Stratified record lists and `wp` at a tagged typed world: relevance, the Kripke order, the stratified `Mut` clause, tags, and the frame steps that only regroup.
 -/
 
 noncomputable section
@@ -154,12 +152,12 @@ theorem ext_stored_current {ls ls₀ : List SRec} {b c : Life} {σ : WRes}
     have hxb : x.2 ⊐ b := lt_trans hbb hx
     exact ⟨fun h => ((hls₀ x).mp h).1, fun h => (hls₀ x).mpr ⟨h, hxb⟩⟩
 
-/-- **The stratification fact at a write**: every record relevant to the new content is
+/-- The stratification fact at a write: every record relevant to the new content is
 strictly longer-lived than the cell.  `[about ours]` -/
 def LifeBound (ls : List SRec) (σ : WRes) (b : Life) : Prop :=
   ∀ x ∈ ls, Rel x.1 σ → x.2 ⊐ b
 
-/-- **At a lifetime shorter than every record, the stratified list is the whole list**:
+/-- At a lifetime shorter than every record, the stratified list is the whole list:
 `[TR]` 6.65 picks `α ⊏ γ ⊓ β` after `ρf` is fixed, and the list is finite. -/
 theorem strat_fresh {ls : List SRec} {b : Life} (h : ∀ x ∈ ls, x.2 ⊐ b) :
     ∀ x, x ∈ ls ↔ (x ∈ ls ∧ x.2 ⊐ b) :=
@@ -197,7 +195,7 @@ theorem linLife_of_ag {W W' : WRes} {ps : List FrameRec} (t : ∀ a, AgW W' a �
   obtain ⟨α, hα⟩ := h p hp
   exact ⟨α, frameLife_of_ag t hα⟩
 
-/-- **A reborrow keeps `FrameLife`**: a new view is at a lifetime of `ag(W)` or at `β`, and
+/-- A reborrow keeps `FrameLife`: a new view is at a lifetime of `ag(W)` or at `β`, and
 `β` is below the frame (`W.InStratum β`); the frame's own cell gets no `β`, since the
 escrow reborrowed has no `own` or `mut` cell there. -/
 theorem frameLife_reb_like {W W' c w₀ : WRes} {le : Loc} {s : LSet} {v : Val}
@@ -241,7 +239,7 @@ theorem lsOf_singleton_mem {α y : Life} {v : Val} {R : WRes}
   cases Option.some.inj ht
   exact hy
 
-/-- **`immFrame` keeps `LinLife`**: the new record's cell is `imm({α}, …)` and its lineage
+/-- `immFrame` keeps `LinLife`: the new record's cell is `imm({α}, …)` and its lineage
 carries no view (its cells were in `ex(W)_●`); an old record's cells are not `ℓ`. -/
 theorem frameLife_frame {W X Z R W' : WRes} {ps rs : List FrameRec} {l : Loc} {v : Val}
     {α : Life} (T : Ty) (δ : LSub) {hα : R.InStratum (LSet.singleton α).join}
@@ -325,7 +323,7 @@ theorem linLife_frame {W X Z R W' : WRes} {ps rs : List FrameRec} {l : Loc} {v :
   · obtain ⟨β, hβ⟩ := h p hp
     exact ⟨β, hold p hp β hβ⟩
 
-/-- **Every `TW` world satisfies `LinLife`.** -/
+/-- Every `TW` world satisfies `LinLife`. -/
 theorem TW.linLife {W : WRes} {ps rs : List FrameRec} (h : TW W ps rs) : LinLife W ps := by
   induction h with
   | empty => intro p hp; exact absurd hp (by simp)
@@ -417,7 +415,7 @@ theorem ag_ls_of_le {σ W aW : WRes} (hle : ResU.Le σ W) (haW : AgW W aW) {m : 
   obtain ⟨τ, hτ⟩ := hle
   exact (icp_trans (icpAt_left (ResU.CompS.toCompR hτ) m ψ e) (icpAt_agW haW m)).ls hs hy
 
-/-- **`LifeBound` at a write**: content in `Res_b` that is a part of the
+/-- `LifeBound` at a write: content in `Res_b` that is a part of the
 world is relevant only to records tagged `⊐ b`. -/
 theorem lifeBound_of_tagged {W : WRes} {ps : List FrameRec} {ls : List SRec} {σ : WRes}
     {b : Life} (hvW : ResU.Valid W) (htag : Tagged W ps ls) (hle : ResU.Le σ W)
@@ -444,7 +442,7 @@ theorem tagged_of_ag {W W' : WRes} {ps : List FrameRec} {ls : List SRec}
     (t : ∀ a, AgW W' a → AgW W a) (h : Tagged W ps ls) : Tagged W' ps ls :=
   tagged_of_frameLife (fun _ _ hf => frameLife_of_ag t hf) h
 
-/-- **Same members give `Ext` at every resource.** -/
+/-- Same members give `Ext` at every resource. -/
 theorem ext_of_same {ls ls' : List SRec} (h : ∀ x, x ∈ ls' ↔ x ∈ ls) (ρ : WRes) :
     Ext ls ls' ρ :=
   ⟨fun r hr _ => by
@@ -457,11 +455,11 @@ a run can return]` -/
 def wandAllTS (ls : List SRec) (P Q : List SRec → Val → WProp) : WProp :=
   fun ρ => ∀ ls', (∀ x, x ∈ ls' ↔ x ∈ ls) → ∀ v, wand (P ls' v) (Q ls' v) ρ
 
-/-- **`ls′` is `ls` with records at `α` added.**  `[about ours]` -/
+/-- `ls′` is `ls` with records at `α` added.  `[about ours]` -/
 def AddAt (ls ls' : List SRec) (α : Life) : Prop :=
   (∀ x ∈ ls, x ∈ ls') ∧ ∀ x ∈ ls', x ∉ ls → x.2 = α
 
-/-- **Adding records at `α` is `Ext` at a resource in `Res_α`** (6.64's entry). -/
+/-- Adding records at `α` is `Ext` at a resource in `Res_α` (6.64's entry). -/
 theorem ext_add {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
     (hρ : ρ.InStratum α) : Ext ls ls' ρ := by
   refine ⟨fun r hr _ => ?_, fun b hb x hx => ⟨h.1 x, fun h' => ?_⟩⟩
@@ -472,8 +470,8 @@ theorem ext_add {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRe
     rw [e] at hx
     exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
 
-/-- **Dropping records at `α` is `Ext` at a resource in `Res_α` none of whose relevant records
-is dropped** (6.64's exit). -/
+/-- Dropping records at `α` is `Ext` at a resource in `Res_α` none of whose relevant records
+is dropped (6.64's exit). -/
 theorem ext_drop {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
     (hρ : ρ.InStratum α) (hk : ∀ r ∈ rsOf ls', Rel r ρ → r ∈ rsOf ls) : Ext ls' ls ρ := by
   refine ⟨hk, fun b hb x hx => ⟨fun h' => ?_, h.1 x⟩⟩
@@ -482,8 +480,8 @@ theorem ext_drop {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WR
   rw [e] at hx
   exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
 
-/-- **A resource in `Res_α`, whose `imm` cells are in `ag(W)` and none at `p.le`, holds no view
-at `p`'s lineage** — `[TR]` 6.52's *"there are no borrows … at any lifetime shorter than α"*
+/-- A resource in `Res_α`, whose `imm` cells are in `ag(W)` and none at `p.le`, holds no view
+at `p`'s lineage — `[TR]` 6.52's *"there are no borrows … at any lifetime shorter than α"*
 read through `FrameLife`. -/
 theorem not_rel_lineage {W : WRes} {p : FrameRec} {α : Life} (hFL : FrameLife W p α)
     {aW : WRes} (haW : AgW W aW) {ρ : WRes} (hicp : ∀ m, ICpAt aW ρ m)
@@ -520,12 +518,8 @@ theorem addAt_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : Li
   · rfl
   · exact absurd hx hn
 
-/-!
-### Lemma 6.136 (wp-val) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.136 (wp-val).
--/
-/-- **`[TR]` 6.136** (`wp-val`) at `wpTS`. -/
+/-! ### Lemma 6.136 (wp-val) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.136 (`wp-val`) at `wpTS`. -/
 theorem wpTS_val (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (Q ls v) (wpTS ls (.val v) Q) := by
   intro ρ hQ ρf fρ ps hf hc hT htg
@@ -536,11 +530,7 @@ theorem wpTS_val (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
     (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
     fun _ => Iff.rfl, fun _ => Iff.rfl, hQ⟩
 
-/-!
-### Lemma 6.137 (wp1) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.137 (wp1).
--/
+/-! ### Lemma 6.137 (wp1) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
 /-- One deterministic head step in front of a `wpTS` (6.137–6.140). -/
 theorem wpTS_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (ls : List SRec)
     (Q : List SRec → Val → WProp) : Entails (wpTS ls e' Q) (wpTS ls e Q) := by
@@ -550,54 +540,36 @@ theorem wpTS_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (ls : List 
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇,
     .more (Step1.head (h μ)) h₈, h₉, hA, hB, hT', htg', hps, hls, hC⟩
 
-/-! Lemma 6.137 (wp1), typed-world version, continued. -/
-/-- **`[TR]` 6.137** (`wp1`) at `wpTS`. -/
+/-- `[TR]` 6.137 (`wp1`) at `wpTS`. -/
 theorem wpTS_1 (ls : List SRec) (e : Expr) (Q : List SRec → Val → WProp) :
     Entails (wpTS ls e Q) (wpTS ls (.seq (.val .unit) e) Q) :=
   wpTS_head (fun μ => .seq μ e) ls Q
 
-/-!
-### Lemma 6.138 (wp⊗) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.138 (wp⊗).
--/
-/-- **`[TR]` 6.138** (`wp⊗`) at `wpTS`. -/
+/-! ### Lemma 6.138 (wp⊗) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.138 (`wp⊗`) at `wpTS`. -/
 theorem wpTS_tensor (ls : List SRec) (v₁ v₂ : Val) (e : Expr) (Q : List SRec → Val → WProp) :
     Entails (wpTS ls ((e.subst 0 (v₂.shift 1 0)).subst 0 v₁) Q)
       (wpTS ls (.letpair (.val (.pair v₁ v₂)) e) Q) :=
   wpTS_head (fun μ => .letpair μ v₁ v₂ e) ls Q
 
-/-!
-### Lemma 6.139 (wp⊕) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.139 (wp⊕).
--/
-/-- **`[TR]` 6.139** (`wp⊕`) at `wpTS`, both summands. -/
+/-! ### Lemma 6.139 (wp⊕) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.139 (`wp⊕`) at `wpTS`, both summands. -/
 theorem wpTS_sum₁ (ls : List SRec) (v : Val) (e₁ e₂ : Expr) (Q : List SRec → Val → WProp) :
     Entails (wpTS ls (e₁.subst 0 v) Q) (wpTS ls (.case (.val (.inj₁ v)) e₁ e₂) Q) :=
   wpTS_head (fun μ => .case₁ μ v e₁ e₂) ls Q
 
-/-! Lemma 6.139 (wp⊕), typed-world version, continued. -/
 theorem wpTS_sum₂ (ls : List SRec) (v : Val) (e₁ e₂ : Expr) (Q : List SRec → Val → WProp) :
     Entails (wpTS ls (e₂.subst 0 v) Q) (wpTS ls (.case (.val (.inj₂ v)) e₁ e₂) Q) :=
   wpTS_head (fun μ => .case₂ μ v e₁ e₂) ls Q
 
-/-!
-### Lemma 6.140 (wp⊸) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.140 (wp⊸).
--/
-/-- **`[TR]` 6.140** (`wp⊸`) at `wpTS`. -/
+/-! ### Lemma 6.140 (wp⊸) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.140 (`wp⊸`) at `wpTS`. -/
 theorem wpTS_lolli (ls : List SRec) (b : Expr) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (wpTS ls (b.subst 0 v) Q) (wpTS ls (.app (.val (.lam b)) (.val v)) Q) :=
   wpTS_head (fun μ => .beta μ b v) ls Q
 
-/-!
-### Lemma 6.141 (wp-alloc) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.141 (wp-alloc).
--/
-/-- **`[TR]` 6.141** (`wp-alloc`) at `wpTS`: the post-world is `TW.alloc`'s. -/
+/-! ### Lemma 6.141 (wp-alloc) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.141 (`wp-alloc`) at `wpTS`: the post-world is `TW.alloc`'s. -/
 theorem wpTS_alloc (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (all fun l : BoCa.Loc => wand (ptoOwn l v) (Q ls (.loc l)))
       (wpTS ls (.app (.val (.prim .alloc)) (.val v)) Q) := by
@@ -624,12 +596,8 @@ theorem wpTS_alloc (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) 
     noOwn_empty, hT', tagged_of_ag (fun a ha => alloc_ag hyσ' ha) htg,
     fun _ => Iff.rfl, fun _ => Iff.rfl, h l _ x rfl hx⟩
 
-/-!
-### Lemma 6.142 (wp-free) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.142 (wp-free).
--/
-/-- **`[TR]` 6.142** (`wp-free`) at `wpTS`: the post-world is `TW.free`'s. -/
+/-! ### Lemma 6.142 (wp-free) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.142 (`wp-free`) at `wpTS`: the post-world is `TW.free`'s. -/
 theorem wpTS_free (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoOwn l v) (Q ls v))
       (wpTS ls (.app (.val (.prim .free)) (.val (.loc l))) Q) := by
@@ -659,12 +627,8 @@ theorem wpTS_free (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → V
   rw [← hdel]
   exact Steps.one (Step1.head (Head.free μ l v hlv))
 
-/-!
-### Lemma 6.143 (wp-load) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.143 (wp-load).
--/
-/-- **`[TR]` 6.143** (`wp-load`) at `wpTS`. -/
+/-! ### Lemma 6.143 (wp-load) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.143 (`wp-load`) at `wpTS`. -/
 theorem wpTS_load (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoOwn l v) (wand (ptoOwn l v) (Q ls v)))
       (wpTS ls (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
@@ -686,12 +650,8 @@ theorem wpTS_load (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → V
     (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
     fun _ => Iff.rfl, fun _ => Iff.rfl, hwand _ ρ rfl (ResU.CompS.comm hcρ)⟩
 
-/-!
-### Lemma 6.144 (wp-load-I) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.144 (wp-load-I).
--/
-/-- **`[TR]` 6.144** (`wp-load-I`) at `wpTS`. -/
+/-! ### Lemma 6.144 (wp-load-I) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.144 (`wp-load-I`) at `wpTS`. -/
 theorem wpTS_load_I (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WProp)
     (Q : List SRec → Val → WProp) :
     Entails
@@ -718,12 +678,8 @@ theorem wpTS_load_I (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WPr
     (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
     fun _ => Iff.rfl, fun _ => Iff.rfl, hQ⟩
 
-/-!
-### Lemma 6.145 (wp-store) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.145 (wp-store).
--/
-/-- **`[TR]` 6.145** (`wp-store`) at `wpTS`: the post-world is `TW.store`'s. -/
+/-! ### Lemma 6.145 (wp-store) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.145 (`wp-store`) at `wpTS`: the post-world is `TW.store`'s. -/
 theorem wpTS_store (ls : List SRec) (l : BoCa.Loc) (v₁ v₂ : Val) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoOwn l v₁) (wand (ptoOwn l v₂) (Q ls .unit)))
       (wpTS ls (.app (.val (.storeV (.loc l))) (.val v₂)) Q) := by
@@ -763,12 +719,8 @@ theorem wpTS_store (ls : List SRec) (l : BoCa.Loc) (v₁ v₂ : Val) (Q : List S
       (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2 (hash_valid hf).2).symm
       (updV_compS_own hx (hash_valid h₂).2 (hash_valid hfx).2)
 
-/-!
-### Lemma 6.135 (wp-bind) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.135 (wp-bind).
--/
-/-- **`[TR]` 6.135** (`wp-bind`) at `wpTS`: the continuation runs at the intermediate
+/-! ### Lemma 6.135 (wp-bind) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.135 (`wp-bind`) at `wpTS`: the continuation runs at the intermediate
 typed world with the list the first run returned. -/
 theorem wpTS_bind (K : Kont) (e : Expr) (ls : List SRec) (Q : List SRec → Val → WProp) :
     Entails (wpTS ls e fun ls' v => wpTS ls' (K.plug (.val v)) Q) (wpTS ls (K.plug e) Q) := by
@@ -805,12 +757,8 @@ theorem wpTS_bind (K : Kont) (e : Expr) (ls : List SRec) (Q : List SRec → Val 
   exact ResU.UpdV.trans hA
     (updV_frame (ResU.CompS.comm h₉) hYn (ResU.hash_symm hpρ') hpπ kA)
 
-/-!
-### Lemma 6.146 (wp-ramify) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.146 (wp-ramify).
--/
-/-- **`[TR]` 6.146** (`wp-ramify`) at `wpTS`. -/
+/-! ### Lemma 6.146 (wp-ramify) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.146 (`wp-ramify`) at `wpTS`. -/
 theorem wpTS_ramify (ls : List SRec) (e : Expr) (P Q : List SRec → Val → WProp) :
     Entails (sep (wpTS ls e P) (wandAllTS ls P Q)) (wpTS ls e Q) := by
   rintro ρ ⟨ρ₁, ρ₂, hcρ, hwp, hwand⟩ ρf fρ ps hf hc hT htg
@@ -835,12 +783,8 @@ theorem wpTS_ramify (ls : List SRec) (e : Expr) (P Q : List SRec → Val → WPr
   exact updV_frame (ResU.CompS.comm hcρ) hπn
     ⟨(ResU.CompS.comm hcρ).1, ρ, ResU.CompS.comm hcρ, (hash_valid hf).2⟩ h₂π gA
 
-/-!
-### Lemma 6.147 (wp[]) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.147 (wp[]).
--/
-/-- **`[TR]` 6.147** (`wp-box`) at `wpTS`. -/
+/-! ### Lemma 6.147 (wp[]) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.147 (`wp-box`) at `wpTS`. -/
 theorem wpTS_box (ls : List SRec) (α : Life) (e : Expr) (Q : List SRec → Val → WProp) :
     Entails (box α (wpTS ls e Q)) (wpTS ls e fun ls' v => box α (Q ls' v)) := by
   rintro ρ ⟨hw, hout⟩ ρf fρ ps hf hc hT htg
@@ -849,11 +793,7 @@ theorem wpTS_box (ls : List SRec) (α : Life) (e : Expr) (Q : List SRec → Val 
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
     hA, hB, hT', htg', hps, hls, hC, ((outlives_comp h₉ α).mp (updV_outlives hout hA)).1⟩
 
-/-!
-### Lemma 6.148 (wp-M-forget) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.148 (wp-M-forget).
--/
+/-! ### Lemma 6.148 (wp-M-forget) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
 /-- A frame with no owned cell passes through a `wpTS` run (6.148/6.149's shared argument). -/
 theorem wpTS_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ) (ls : List SRec) (e : Expr)
     (Q : List SRec → Val → WProp) : Entails (sep R (wpTS ls e Q)) (wpTS ls e Q) := by
@@ -882,8 +822,7 @@ theorem wpTS_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ) (ls : List
     g₅, hFZ, g₇, g₈, hπZ, ?_, noOwn_compS hZ gB (hR ρ₁ hR₁), gT, gtg, gps, gls, gC⟩
   exact updV_frame hcρ hπn ⟨hcρ.1, ρ, hcρ, (hash_valid hf).2⟩ h₁π gA
 
-/-! Lemma 6.148 (wp-M-forget), typed-world version, continued. -/
-/-- **`[TR]` 6.148** (`wp-M-forget`) at `wpTS`. -/
+/-- `[TR]` 6.148 (`wp-M-forget`) at `wpTS`. -/
 theorem wpTS_M_forget (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WProp)
     (e : Expr) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoMut l α P) (wpTS ls e Q)) (wpTS ls e Q) := by
@@ -891,12 +830,8 @@ theorem wpTS_M_forget (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → W
   obtain ⟨b, v, σ, hs, R, hw, hα, rfl, -⟩ := h
   exact ResU.restrict_single_other (by simp)
 
-/-!
-### Lemma 6.149 (wp-I-forget) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.149 (wp-I-forget).
--/
-/-- **`[TR]` 6.149** (`wp-I-forget`) at `wpTS`. -/
+/-! ### Lemma 6.149 (wp-I-forget) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` 6.149 (`wp-I-forget`) at `wpTS`. -/
 theorem wpTS_I_forget (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WProp)
     (e : Expr) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoImm l α P) (wpTS ls e Q)) (wpTS ls e Q) := by

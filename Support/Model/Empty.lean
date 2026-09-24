@@ -7,9 +7,7 @@ import Support.Model.WalkSplitting
 /-!
 # Support — Model — Empty
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the walks and restrictions of the empty resource.
+`[about ours]`.  The walks and restrictions of the empty resource.
 -/
 
 noncomputable section
@@ -30,8 +28,7 @@ theorem agW_empty : AgW (PMap.empty : WRes) PMap.empty := by
     BigComp.nil BigComp.nil ?_ (ResU.comp_empty_right _)
   rw [hre]; exact ResU.comp_empty_right _
 
-/-- `ex(∅)_◐ = ∅`, at either operator: no `mut` site, so no witness walk, and
-`∅|own ◐ ∅|mut` is `∅`.  The `ex` counterpart of `agW_empty`.
+/-- `ex(∅)_◐ = ∅`, at either operator.
 `[about ours: `[TR]` p. 5's `ex` row at the empty resource]` -/
 theorem exW_empty {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
     {C : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop} :
@@ -45,14 +42,12 @@ theorem exW_empty {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → P
     (hsites _) ExWits.nil BigComp.nil ?_ (ResU.comp_empty_right _)
   rw [hre, hre]; exact ResU.comp_empty_right _
 
-/-- `⦇∅⦈ = ∅`.  `Fig16.LogRel.valid_empty` is `✓∅` and reaches it by splitting
-an owned singleton; this names the flattening, which is what a `wp` unfolded at
-the empty frame reads.
+/-- `⦇∅⦈ = ∅`.
 `[about ours: `⦇−⦈` at the empty resource]` -/
 theorem flat_empty : ResU.Flat (PMap.empty : WRes) PMap.empty :=
   ⟨PMap.empty, PMap.empty, exW_empty, agW_empty, ResU.comp_empty_right _⟩
 
-/-- `⟦∅⟧ = ∅` — `[TR]` p. 6's `⟦ρ⟧` at the empty resource is the empty memory.
+/-- `⟦∅⟧ = ∅`.
 `[about ours: `[TR]` p. 6's `⟦ρ⟧` at the empty resource]` -/
 theorem lower_empty : ResU.Lower (PMap.empty : WRes) (fun _ => none) :=
   ⟨PMap.empty, flat_empty, fun l => by rw [PMap.empty_get]; rfl⟩

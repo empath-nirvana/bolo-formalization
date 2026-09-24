@@ -19,9 +19,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — ReborrowLowering
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the steps of Lemmas 6.56–6.58: absorption at `○` and the domains of reborrows.
+`[about ours]`.  The steps of Lemmas 6.56–6.58: absorption at `○` and the domains of reborrows.
 -/
 
 noncomputable section
@@ -29,8 +27,7 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **A `○`-factor absorbs.**  `[TR]` 6.3 at `○` with `[TR]` 6.19's `ρ ○ ρ = ρ`:
-regroup `X ○ (X ○ Y)` as `(X ○ X) ○ Y`, and `○` is single-valued.
+/-- A `○`-factor absorbs: `X ○ (X ○ Y) = X ○ Y`.
 `[about ours: `[TR]` 6.3 and 6.19 at `○`, in the form `[TR]` 6.57's display
 uses them]` -/
 theorem ResU.CompR.absorb {X Y Z : ResU Loc Val} (h : ResU.CompR X Y Z) :
@@ -41,20 +38,17 @@ theorem ResU.CompR.absorb {X Y Z : ResU Loc Val} (h : ResU.CompR X Y Z) :
     (ResU.CompR.assoc X X Y Z).mpr ⟨X, ResU.compR_self X, h⟩
   rwa [ResU.CompR.functional hχ h] at hZ
 
-/-- **A `≼`-smaller resource is absorbed.**  `ResU.CompR.absorb`, named through
-the order: this is what makes `≼` the right notion for the walk arguments —
-`ρ ≼ σ` gives `ρ ○ σ = σ`, so a factor never adds anything to the whole. -/
+/-- `ρ ≼ σ` gives `ρ ○ σ = σ`. -/
 theorem ResU.LeR.absorb {ρ σ : ResU Loc Val} (h : ResU.LeR ρ σ) :
     ResU.CompR ρ σ σ := ResU.CompR.absorb h.choose_spec
 
-/-- …and absorption survives `○`: if two operands both absorb `Z`, so does their
-composite.  `[TR]` 6.3 at `○` again. -/
+/-- If two operands both absorb `Z`, so does their `○` composite. -/
 theorem ResU.CompR.absorb_comp {X Y W Z : ResU Loc Val} (h : ResU.CompR X Y W)
     (hX : ResU.CompR X Z Z) (hY : ResU.CompR Y Z Z) : ResU.CompR W Z Z := by
   obtain ⟨y, hy, hw⟩ := (ResU.CompR.assoc X Y Z Z).mp ⟨Z, hY, hX⟩
   rwa [ResU.CompR.functional hy h] at hw
 
-/-- …and `⨀`, by induction along the fold. -/
+/-- The same along `⨀`. -/
 theorem BigComp.absorb {Z : ResU Loc Val} :
     ∀ {L : List (ResU Loc Val)} {b : ResU Loc Val},
       BigComp CellU.CompatR CellU.CompR L b →
@@ -76,8 +70,7 @@ theorem ResU.restrictDom_dom {ρ σ : ResU Loc Val} {l : Loc} {ζ : CellU Loc Va
   | none => rw [ResU.restrictDom_get_of_none e] at h; exact absurd h (by simp)
   | some φ => exact ⟨φ, rfl⟩
 
-/-- `imm(t̄, v, χ) ○ imm(s̄, v, χ) = imm(s̄, v, χ)` when `t̄ ⊆ s̄`: clause (2) of
-`○` unions the sets. -/
+/-- `imm(t̄, v, χ) ○ imm(s̄, v, χ) = imm(s̄, v, χ)` when `t̄ ⊆ s̄`. -/
 theorem CellU.compR_imm_sub {s t : LSet} {v : Val} {χ : ResU Loc Val}
     {hs : χ.InStratum s.join} {ht : χ.InStratum t.join}
     (hts : ∀ x, t.mem x → s.mem x) :
@@ -92,10 +85,7 @@ theorem CellU.compR_imm_sub {s t : LSet} {v : Val} {χ : ResU Loc Val}
     clear this; revert h₃; rw [e]; intro h₃; rfl
   rwa [e'] at this
 
-/-- **`ρ|dom(ρ′|imm) ≤ ρ′|imm`**, at `○` — `[TR]` 6.57's opening note.  At a
-location where the source carries an `imm` cell, `reb_α`'s `imm` clause hands
-the image that cell over a subset of its lifetime set, at its value and witness,
-and `○`'s clause (2) returns the image's cell (`CellU.compR_imm_sub`).
+/-- `ρ|dom(ρ′|imm) ≤ ρ′|imm`, at `○`.
 `[about ours: `[TR]` 6.57's *"by unfolding reb, we have that
 `ρ|dom(ρ′ᵢ|imm) ≤ ρ′ᵢ|imm`"* (p. 18), at `○`]` -/
 theorem ResU.restrictDom_compR_restrict {β : Life} {ρ' ρ : ResU Loc Val}
@@ -131,15 +121,9 @@ theorem ResU.restrictDom_compR_restrict {β : Life} {ρ' ρ : ResU Loc Val}
         rw [hφ]
         exact ⟨φ, rfl, hC⟩
 
-/-- **`ag(ρ|dom(ρ′ᵢ|imm))` absorbs `ag(ρᵢ)`.**  `[TR]` 6.57's display, at the
-aliasable walk alone: `ρ|D ≤ ρ′ᵢ|imm` (`ResU.restrictDom_compR_restrict`), the
-`mut` family of `ρ|D` is empty because `reb_β`'s image is `imm`-only, and every
-entry of its `imm` family is a witness `reb_β` reads off `ρ′ᵢ`, hence a
-`○`-factor of `⦇ρ′ᵢ⦈_○` — which is `ag(ρᵢ)`'s own `imm`-family entry.
-
-6.57 states the absorption through `⦇−⦈`; this is the walk-level fact its proof
-turns on, and `[TR]` 6.59's *"it suffices to show `ρ|dom(ρ′ᵢ|imm) ● ρᵢ ● ρ_b ↭ …`"*
-needs it on its own, with no flattening in sight.
+/-- `ag(ρ|dom(ρ′ᵢ|imm))` absorbs `ag(ρᵢ)`: `[TR]` 6.57's display at the
+aliasable walk, as 6.59's *"it suffices to show `ρ|dom(ρ′ᵢ|imm) ● ρᵢ ● ρ_b ↭ …`"*
+uses it.
 `[about ours: `[TR]` 6.57's display at `ag`, with `ag(ρ|D)` given]` -/
 theorem ResU.reb_immPart_ag_absorbs {β : Life} {ρ'i ρ aD a₂ : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
@@ -198,10 +182,8 @@ theorem ResU.reb_immPart_ag_absorbs {β : Life} {ρ'i ρ aD a₂ : ResU Loc Val}
         exact hchain _ ⟨z', hz'⟩
       exact ResU.CompR.absorb_comp hσ haaabs hbiabs
 
-/-- **`ρ = ρ|dom(ρ′|imm) ● ρ|dom(ρ′|mut,own)`.**  The two restrictions are
-disjoint because a cell's tag is `imm` or it is not, and together they cover
-`ρ` because `dom(ρ) ⊆ dom(ρ′)` (`ResU.reb_dom_subset`) — which is what
-`[TR]` 6.58's *"note `dom(ρ) ⊆ dom(ρ′ᵢ)` by unfolding reb"* is for.
+/-- `ρ = ρ|dom(ρ′|imm) ● ρ|dom(ρ′|mut,own)`, using `[TR]` 6.58's *"note
+`dom(ρ) ⊆ dom(ρ′ᵢ)` by unfolding reb"*.
 `[about ours: the splitting `[TR]` 6.58's and 6.59's proofs open with]` -/
 theorem ResU.restrictDom_split {α : Life} {ρ' ρ : ResU Loc Val}
     (hreb : ResU.Reb α ρ' ρ) :
@@ -246,11 +228,8 @@ theorem ResU.restrictDom_split {α : Life} {ρ' ρ : ResU Loc Val}
       | none => rfl
       | some ζ => rfl
 
-/-- **`[TR]` Lemma 6.8 with both lowerings given as a Kleene equality.**  The
-printed hypothesis `⟦ρ₂⟧ = ⟦ρ₃⟧` is an equation between partial terms; where the
-consumer has it as the `↔` between the two graphs rather than at a common
-value, this is the one step to `ResU.Lower.congr`: `✓ρ₂` comes from the printed
-`#` (6.10), which names the value.
+/-- `[TR]` Lemma 6.8 with the hypothesis `⟦ρ₂⟧ = ⟦ρ₃⟧` as a Kleene equality
+(`↔` between the two graphs).
 `[about ours: `[TR]` 6.8 with its printed hypothesis in the Kleene shape]` -/
 theorem ResU.lower_congr_iff {ρ₁ ρ₂ ρ₃ ρ₁₂ ρ₁₃ : ResU Loc Val}
     (heq : ∀ m, ResU.Lower ρ₂ m ↔ ResU.Lower ρ₃ m)

@@ -8,9 +8,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — UpdateFrame
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the pointwise route through Lemma 6.48: `⦇−⦈` of a `○`-composite and the cell-level update.
+`[about ours]`.  The pointwise route through Lemma 6.48: `⦇−⦈` of a `○`-composite and the cell-level update.
 -/
 
 noncomputable section
@@ -33,12 +31,7 @@ theorem optComp_right_none
     OptComp C' o₁ none o := by
   cases o₁ <;> exact h
 
-/-- **`⦇ρ₁ ● ρ₂⦈ = ⦇ρ₁⦈ ○ ⦇ρ₂⦈.**  `[TR]` 6.48's proof takes this apart into
-the three domains `ex(ρ₁)`, `ex(ρ₂)` and `ag(ρ₁) ○ ag(ρ₂)`; here it is one
-equation, from `Fig16.ResU.Flat.split_factors` (6.18 and 6.20) plus `[TR]`
-Lemma 6.36 — the exclusive part is `imm`-free, so it is disjoint from the
-aliasable part and the two exclusive parts are disjoint from each other, and at
-a location where one operand is silent `●` and `○` agree.
+/-- `⦇ρ₁ ● ρ₂⦈ = ⦇ρ₁⦈ ○ ⦇ρ₂⦈`.
 `[about ours: the factorisation `[TR]` 6.48's proof performs, as an equation
 between flattenings]` -/
 theorem flat_compR {ρ₁ ρ₂ ρ₁₂ σ : WRes} (h : ResU.CompS ρ₁ ρ₂ ρ₁₂)
@@ -76,18 +69,14 @@ theorem flat_compR {ρ₁ ρ₂ ρ₁₂ σ : WRes} (h : ResU.CompS ρ₁ ρ₂ 
       · rw [hn] at hp ⊢; exact optComp_right_none hp
     · rw [k₁, k₂, k]; exact hac.2 l
 
-/-- `ψ` is a `mut` cell of lifetime `b` and invariant `P̂` — the data `↭`'s
-second clause fixes, with the value and the witness left free as the print's two
-underscores leave them. -/
+/-- `ψ` is a `mut` cell of lifetime `b` and invariant `P̂`, value and witness
+free: the data `↭`'s second clause fixes. -/
 def IsMutSig (ψ : CellU BoCa.Loc BoCa.Val) (b : Life)
     (P : Val → SPropS BoCa.Loc BoCa.Val b) : Prop :=
   ∃ (v : Val) (χ : WRes) (h : χ.InStratum b) (hw : P v ⟨χ, h⟩),
     ψ = CellU.mutOf b v χ h P hw
 
-/-- `↭`'s two clauses at one location of the two flattenings: an `imm` cell is
-fixed outright, and a `mut` cell's lifetime and invariant are fixed while its
-value and witness are free.  `Fig16.ResU.UpdImm` and `Fig16.ResU.UpdMut` are the
-conjunction of this over all locations.
+/-- `↭`'s two clauses at one location of the two flattenings.
 `[about ours: `[TR]` p. 5's `↭`, at one location of the flattenings]` -/
 def CellUpd (o o' : Option (CellU BoCa.Loc BoCa.Val)) : Prop :=
   (∀ (s : LSet) (v : Val) (χ : WRes) (h : χ.InStratum s.join),
@@ -126,8 +115,7 @@ theorem compS_reassoc' {a b c bc x : WRes} (h₁ : ResU.CompS b c bc)
     (h₂ : ResU.CompS a bc x) : ∃ ab, ResU.CompS a b ab ∧ ResU.CompS ab c x :=
   (ResU.CompS.assoc a b c x).mp ⟨bc, h₁, h₂⟩
 
-/-- `(ρ₁ ● ρ₂) ● ρ₃ = (ρ₁ ● ρ₃) ● ρ₂` — the exchange of the last two factors,
-`[TR]` Lemmas 6.2 and 6.3 together. -/
+/-- `(ρ₁ ● ρ₂) ● ρ₃ = (ρ₁ ● ρ₃) ● ρ₂`. -/
 theorem compS_exch {a b c ab x : WRes} (h₁ : ResU.CompS a b ab)
     (h₂ : ResU.CompS ab c x) : ∃ ac, ResU.CompS a c ac ∧ ResU.CompS ac b x := by
   obtain ⟨bc, hbc, hx⟩ := compS_reassoc h₁ h₂
@@ -140,9 +128,8 @@ theorem compS_lcomm {a b c bc x : WRes} (h₁ : ResU.CompS b c bc)
   obtain ⟨ac, hac, hx'⟩ := compS_exch hab hx
   exact ⟨ac, hac, ResU.CompS.comm hx'⟩
 
-/-- `∀v. P̂(v) ─⋆ Q̂(v)` — the ramification wand.  `[TR]` 6.146 prints
-`(P̂ –⋆ Q̂)` and H2 of its own proof reads `(∀ (P̂ –⋆ Q̂))(ρ₂)` at 500 dpi, which
-is also the only well-typed reading at `P̂, Q̂ : Val → SProp`. -/
+/-- `∀v. P̂(v) ─⋆ Q̂(v)`, the ramification wand: `[TR]` 6.146 prints `(P̂ –⋆ Q̂)`
+and H2 of its proof reads `(∀ (P̂ –⋆ Q̂))(ρ₂)`. -/
 def wandAll (P Q : Val → WProp) : WProp := all fun v => wand (P v) (Q v)
 
 end BoCa.Fig16.BoLo

@@ -20,9 +20,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — Outlives
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`@ρ ⊐ α` across `⦇−⦈`, the walks and `↭` (the steps Lemma 6.50's one sentence elides), and *“there are no borrows at any lifetime shorter than `α`”*.
+`[about ours]`.  `@ρ ⊐ α` across `⦇−⦈`, the walks and `↭` (the steps Lemma 6.50's one sentence elides), and *“there are no borrows at any lifetime shorter than `α`”*.
 -/
 
 noncomputable section
@@ -39,7 +37,7 @@ theorem cell_inStratum_of_at {α : Life} {ψ : CellU BoCa.Loc BoCa.Val}
   | imm i => exact h
   | «mut» m => exact h
 
-/-- …and the converse away from `own`, whose `Cell_α` condition is empty. -/
+/-- The converse of `cell_inStratum_of_at`, away from `own`. -/
 theorem cell_at_of_inStratum {α : Life} {ψ : CellU BoCa.Loc BoCa.Val}
     (hk : ψ.kind ≠ Kind.own) (h : ψ.InStratum α) : ψ.at ⊐ α := by
   cases ψ with
@@ -47,10 +45,7 @@ theorem cell_at_of_inStratum {α : Life} {ψ : CellU BoCa.Loc BoCa.Val}
   | imm i => exact h
   | «mut» m => exact h
 
-/-- **A cell's witness lies in every stratum the cell does.**  Fig. 16's `imm`
-carries `ρ : Res_{⊔ᾱ}` with `⊔ᾱ ⊑ ⊓ᾱ = @ψ`, and its `mut` carries `ρ : Res_β`
-with `β = @ψ`; an `own` cell has no witness.  This is what makes the exclusive
-walk's descent into a borrow keep the stratum.
+/-- A cell's witness lies in every stratum the cell does.
 `[about ours: the hereditary reading of Fig. 16's own typing constraints on the
 `imm` and `mut` payloads]` -/
 theorem cell_wit_inStratum {α : Life} {ψ : CellU BoCa.Loc BoCa.Val}
@@ -62,9 +57,7 @@ theorem cell_wit_inStratum {α : Life} {ψ : CellU BoCa.Loc BoCa.Val}
         (le_of_lt (lt_of_lt_of_le h i.ls.meet_le_join)) (Res.toU_inStratum i.ρ)
   | «mut» m => exact ResU.InStratum.mono (le_of_lt h) (Res.toU_inStratum m.ρ)
 
-/-- `Cell_α` is closed under `●`: the composite's lifetime is the meet of the
-two (`Fig16.CellU.CompS.at`, the cell-level content of `[TR]` Lemma 6.45), and
-`⊓ = max`.  `[about ours: `[TR]` Lemma 6.45's cell level, read at `Cell_α`]` -/
+/-- `Cell_α` is closed under `●`.  `[about ours: `[TR]` Lemma 6.45's cell level, read at `Cell_α`]` -/
 theorem cellCompS_inStratum {α : Life} {ψ₁ ψ₂ ψ : CellU BoCa.Loc BoCa.Val}
     (h : CellU.CompS ψ₁ ψ₂ ψ) (h₁ : ψ₁.InStratum α) (h₂ : ψ₂.InStratum α) :
     ψ.InStratum α := by
@@ -75,8 +68,7 @@ theorem cellCompS_inStratum {α : Life} {ψ₁ ψ₂ ψ : CellU BoCa.Loc BoCa.Va
     ⟨cell_at_of_inStratum (by rw [k₁]; simp) h₁,
       cell_at_of_inStratum (by rw [k₂]; simp) h₂⟩
 
-/-- `Cell_α` is closed under `○` as well.  Most clauses return one of their
-operands; clause (2) is `●` and clause (3) takes the meet of the two lifetimes.
+/-- `Cell_α` is closed under `○`.
 `[about ours: `Cell_α` at `[TR]` p. 5's `○`]` -/
 theorem cellCompR_inStratum {α : Life} {ψ₁ ψ₂ ψ : CellU BoCa.Loc BoCa.Val}
     (h : CellU.CompR ψ₁ ψ₂ ψ) (h₁ : ψ₁.InStratum α) (h₂ : ψ₂.InStratum α) :
@@ -92,9 +84,7 @@ theorem cellCompR_inStratum {α : Life} {ψ₁ ψ₂ ψ : CellU BoCa.Loc BoCa.Va
   | immMut s v ρ hs b hb P hP => exact h₁
   | mutImm s v ρ hs b hb P hP => exact h₂
 
-/-- `○` never *shortens* an `imm` operand: clause (2) unions the two lifetime
-sets and clauses (1) and (5) return the `imm` cell itself.  This is the slack
-`ag`'s `○`s introduce, and it is in the direction `Cell_α` needs.
+/-- `○` does not shorten an `imm` operand.
 `[about ours: the lifetime half of "`ag(ρ)` keeps every `imm` cell of `ρ`"]` -/
 theorem cellCompR_at_le_imm {ψ₁ ψ₂ ψ : CellU BoCa.Loc BoCa.Val}
     (h : CellU.CompR ψ₁ ψ₂ ψ) (hk : ψ₁.kind = Kind.imm) : ψ.at ≤ ψ₁.at := by
@@ -114,7 +104,7 @@ theorem inStratum_restrict {α : Life} {ρ : WRes} {k : Kind} (h : ρ.InStratum 
   fun l ψ e => h l ψ (ResU.restrict_eq_some.mp e).1
 
 /-- `Res_α` is closed under `◐` whenever `Cell_α` is closed under the cell
-operation, which the schema then instantiates at `●` and at `○`.
+operation.
 `[about ours: `Res_α` at the composition schema]` -/
 theorem inStratum_comp {α : Life}
     {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
@@ -130,7 +120,7 @@ theorem inStratum_comp {α : Life}
   · rw [f] at e; cases Option.some.inj e; exact h₂ l _ f₂
   · rw [f] at e; cases Option.some.inj e; exact hC _ _ _ hCc (h₁ l _ f₁) (h₂ l _ f₂)
 
-/-- …and under the iterated `⨀`. -/
+/-- `Res_α` is closed under `⨀`. -/
 theorem inStratum_bigComp {α : Life}
     {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
     {C : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
@@ -153,9 +143,7 @@ theorem compR_hC (α : Life) : ∀ ψ₁ ψ₂ ψ : CellU BoCa.Loc BoCa.Val,
     CellU.CompR ψ₁ ψ₂ ψ → ψ₁.InStratum α → ψ₂.InStratum α → ψ.InStratum α :=
   fun _ _ _ => cellCompR_inStratum
 
-/-- **The exclusive walk keeps the stratum.**  `ρ|own ◐ ρ|mut` is `ρ`'s own
-cells, and the family it composes with is the walks of the `mut` witnesses,
-each in `Res_β` for the borrow's `β ⊐ α`.
+/-- The exclusive walk keeps the stratum.
 `[about ours: the step 6.50's proof needs and does not name, at `ex(ρ)_◐`]` -/
 theorem ExW.inStratum
     {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
@@ -181,8 +169,7 @@ theorem ExW.inStratum
     · exact ihe α (cell_wit_inStratum (hρ l ψ hψ))
     · exact ihw α hρ p hp
 
-/-- **The aliasable walk keeps the stratum**, for the same reason, with the
-`imm` family's `ex(ρ′)_○ ○ ag(ρ′)` composed clause by clause.
+/-- The aliasable walk keeps the stratum.
 `[about ours: the step 6.50's proof needs and does not name, at `ag(ρ)`]` -/
 theorem AgW.inStratum {ρ σ : WRes} (h : AgW ρ σ) :
     ∀ α, ρ.InStratum α → σ.InStratum α := by
@@ -217,7 +204,7 @@ theorem AgW.inStratum {ρ σ : WRes} (h : AgW ρ σ) :
         (iha α (cell_wit_inStratum (hρ l ψ hψ)))
     · exact ihw α hρ p hp
 
-/-- **`ρ ∈ Res_α` implies `⦇ρ⦈ ∈ Res_α`.**
+/-- `ρ ∈ Res_α` implies `⦇ρ⦈ ∈ Res_α`.
 `[about ours: the first elided step of `[TR]` Lemma 6.50's proof]` -/
 theorem flat_inStratum {ρ σ : WRes} {α : Life} (h : ResU.Flat ρ σ)
     (hρ : ρ.InStratum α) : σ.InStratum α := by
@@ -225,9 +212,8 @@ theorem flat_inStratum {ρ σ : WRes} {α : Life} (h : ResU.Flat ρ σ)
   exact inStratum_comp (compS_hC α) hc (ExW.inStratum compS_hC he α hρ)
     (AgW.inStratum ha α hρ)
 
-/-- `ag(ρ)` keeps every `imm` cell of `ρ` at its own location and never
-shortens it — `Fig16.AgW.get_imm` with the lifetime bound `cellCompR_at_le_imm`
-carried alongside.
+/-- `ag(ρ)` keeps every `imm` cell of `ρ` at its own location and does not
+shorten it.
 `[about ours: `Fig16.AgW.get_imm` with the lifetime relation the print's
 "`ag(ρ)` keeps every `imm` cell" leaves implicit]` -/
 theorem compR_get_at {ρ₁ ρ₂ ρ : WRes} (h : ResU.CompR ρ₁ ρ₂ ρ) {l : BoCa.Loc}
@@ -251,9 +237,7 @@ theorem agW_get_at {ρ σ : WRes} (h : AgW ρ σ) {l : BoCa.Loc}
       obtain ⟨χ, f, k', le₁⟩ := compR_get_at hσ f₀ k₀
       exact ⟨χ, f, k', le_trans le₁ le₀⟩
 
-/-- **`⦇ρ⦈ ∈ Res_α` implies `ρ ∈ Res_α`.**  An `own` or `mut` cell of `ρ` sits
-in `⦇ρ⦈` unchanged; an `imm` cell sits there over the same value and witness
-with a lifetime set no longer.
+/-- `⦇ρ⦈ ∈ Res_α` implies `ρ ∈ Res_α`.
 `[about ours: the second elided step of `[TR]` Lemma 6.50's proof]` -/
 theorem flat_inStratum_inv {ρ σ : WRes} {α : Life} (h : ResU.Flat ρ σ)
     (hσ : σ.InStratum α) : ρ.InStratum α := by
@@ -272,10 +256,7 @@ end BoCa.Fig16.BoLo
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **A cell's witness lies in the cell's own stratum.**  Fig. 16's `imm` carries
-`ρ : Res_{⊔ᾱ}` with `⊔ᾱ ⊒ ⊓ᾱ = @ψ`, and its `mut` carries `ρ : Res_β` with
-`β = @ψ`.  This is `BoLo.cell_wit_inStratum` at the cell's own lifetime rather
-than at a stratum it already lies in.
+/-- A cell's witness lies in the cell's own stratum.
 `[about ours: Fig. 16's typing of the `imm` and `mut` payloads, at `@ψ`]` -/
 theorem CellU.wit_inStratum_at (ψ : CellU Loc Val) : ψ.wit.InStratum ψ.at := by
   cases ψ with
@@ -283,8 +264,7 @@ theorem CellU.wit_inStratum_at (ψ : CellU Loc Val) : ψ.wit.InStratum ψ.at := 
   | imm i => exact ResU.InStratum.mono i.ls.meet_le_join i.ρ.toU_inStratum
   | «mut» m => exact m.ρ.toU_inStratum
 
-/-- **`○` introduces no lifetime of its own**: a lifetime of the composite is a
-lifetime of one of the operands.  The converse of `CellU.CompR.ls_imm`. -/
+/-- A lifetime of a `○` composite is a lifetime of one of the operands. -/
 theorem CellU.CompR.lsOf_inv {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     {s : LSet} (hs : ψ.lsOf = some s) {x : Life} (hx : s.mem x) :
     (∃ t, ψ₁.lsOf = some t ∧ t.mem x) ∨ (∃ t, ψ₂.lsOf = some t ∧ t.mem x) := by
@@ -324,7 +304,7 @@ theorem ResU.CompR.lsOf_inv {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR ρ�
     · exact Or.inl ⟨ξ₁, t, e₁, ht, hxt⟩
     · exact Or.inr ⟨ξ₂, t, e₂, ht, hxt⟩
 
-/-- …and along `⨀`. -/
+/-- The same along `⨀`. -/
 theorem BigComp.lsOf_inv :
     ∀ {L : List (ResU Loc Val)} {b : ResU Loc Val},
       BigComp CellU.CompatR CellU.CompR L b →
@@ -360,15 +340,9 @@ theorem CellU.kind_of_lsOf {ζ : CellU Loc Val} {t : LSet} (h : ζ.lsOf = some t
   | imm i => rfl
   | «mut» m => simp [CellU.lsOf] at h
 
-/-- **A cell `ag(X)` raises to a location `X` does not cover sits strictly
-inside a borrow of `X`.**  It came out of a witness, a witness lies in its
-borrow's own stratum (`CellU.wit_inStratum_at`), and the walks keep strata
-(`BoLo.AgW.inStratum`, `BoLo.ExW.inStratum`) — so every lifetime it carries
-strictly outlives that borrow's.
-
-This is the descent `[TR]` 6.29's single-cell case avoids and 6.52's several-cell
-one needs: *"there cannot be any borrow that contains `ρ(ℓ)`"*, read as a
-statement about lifetimes.
+/-- A cell `ag(X)` raises to a location `X` does not cover sits strictly
+inside a borrow of `X`: `[TR]` 6.52's *"there cannot be any borrow that contains
+`ρ(ℓ)`"*, read as a statement about lifetimes.
 `[about ours: the nesting `[TR]` 6.52's proof rules out, at `ag(−)`]` -/
 theorem AgW.lsOf_source {X a : ResU BoCa.Loc BoCa.Val} (h : AgW X a)
     {l : BoCa.Loc} {ζ : CellU BoCa.Loc BoCa.Val} (hg : a.get l = some ζ)
@@ -397,14 +371,10 @@ theorem AgW.lsOf_source {X a : ResU BoCa.Loc BoCa.Val} (h : AgW X a)
           (BoLo.ExW.inStratum BoLo.compR_hC hexq _ (CellU.wit_inStratum_at ψq))
           (BoLo.AgW.inStratum hagq _ (CellU.wit_inStratum_at ψq)) l ξ'' e''
 
-/-- **`[TR]` 6.52's form of "cannot be in any `ρ″`".**  If no borrow of `X`
-is at a lifetime strictly shorter than `α`, then a cell of `⦇X⦈` carrying `α`
-among its lifetimes is at a location `X` covers.
-
-This is the printed *"there are no borrows, mutable or immutable, at any
-lifetime shorter than `α`, so there cannot be any borrow that contains
-`ρ(ℓ)`"*, and unlike `ResU.flat_imm_at_top` it allows other cells of `⦇X⦈` to be
-at `α` too — which is what 6.52 needs, its reborrowed locations all being there.
+/-- If no borrow of `X` is at a lifetime strictly shorter than `α`, then a cell
+of `⦇X⦈` carrying `α` among its lifetimes is at a location `X` covers: `[TR]`
+6.52's *"there are no borrows, mutable or immutable, at any lifetime shorter than
+`α`, so there cannot be any borrow that contains `ρ(ℓ)`"*.
 `[about ours: `[TR]` 6.52's phrasing of the step 6.29 takes, at several
 locations at once]` -/
 theorem ResU.flat_imm_at_top_of_no_shorter {X σ : ResU BoCa.Loc BoCa.Val}
@@ -462,8 +432,7 @@ theorem CellU.not_at_lt_of_inStratum_down {ζ : CellU Loc Val} {α : Life}
   | imm i => exact Life.not_lt_of_down_lt h
   | «mut» m => exact Life.not_lt_of_down_lt h
 
-/-- `Res_α` is inherited by a `●`-factor: the composite's cell is at a lifetime
-no longer than the factor's. -/
+/-- `Res_α` is inherited by a `●`-factor. -/
 theorem ResU.CompS.inStratum_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {α : Life} (hρ : ρ.InStratum α) : ρ₁.InStratum α := by
   intro l ψ e₁
@@ -484,8 +453,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- Nothing lies strictly between `α` and the next-shorter lifetime: `↓α ⊏ β`
-gives `α ⊑ β`.  The `≤` companion of `Life.not_lt_of_down_lt`. -/
+/-- `↓α ⊏ β` gives `α ⊑ β`. -/
 theorem Life.le_of_down_lt {a b : Life} (h : (↓a) < b) : a ≤ b := by
   have h1 : OrderDual.ofDual b < OrderDual.ofDual a + 1 := h
   show OrderDual.ofDual b ≤ OrderDual.ofDual a
@@ -496,9 +464,7 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **A cell in `Res_{↓α}` has its witness in `Res_α`.**  Fig. 16 types the
-witness at the cell's own lifetime (`CellU.wit_inStratum_at`), and a cell no
-shorter than `α` has that lifetime no shorter than `α`.
+/-- A cell in `Res_{↓α}` has its witness in `Res_α`.
 `[about ours: Fig. 16's typing of the `imm` and `mut` payloads, read at `↓α`]` -/
 theorem CellU.wit_inStratum_of_down {ψ : CellU Loc Val} {α : Life}
     (h : ψ.InStratum (↓α)) : ψ.wit.InStratum α := by
@@ -525,7 +491,7 @@ theorem ResU.inStratum_comp_at {α : Life}
   · rw [f] at e; cases Option.some.inj e; exact h₂ _ f₂
   · rw [f] at e; cases Option.some.inj e; exact hC _ _ _ hCc (h₁ _ f₁) (h₂ _ f₂)
 
-/-- `Cell_α` is closed under `●`, as `BoLo.compS_hC` says at `BoCa.Loc`. -/
+/-- `Cell_α` is closed under `●`. -/
 theorem CellU.compS_hC (α : Life) : ∀ ψ₁ ψ₂ ψ : CellU Loc Val,
     CellU.CompS ψ₁ ψ₂ ψ → ψ₁.InStratum α → ψ₂.InStratum α → ψ.InStratum α :=
   fun _ _ _ hC h₁ h₂ => (CellU.CompS.inStratum hC α).mpr ⟨h₁, h₂⟩
@@ -550,10 +516,7 @@ theorem ResU.CompS.inStratum_right_at {ρ₁ ρ₂ ρ : ResU Loc Val}
     {ψ : CellU Loc Val} (e₂ : ρ₂.get l = some ψ) : ψ.InStratum α :=
   ResU.CompS.inStratum_left_at (ResU.CompS.comm h) hρ e₂
 
-/-- **The exclusive walk keeps the stratum at one location.**  `ex(ρ)_◐` is
-`(ρ|own ◐ ρ|mut) ◐ ⨀ ex(ρ_ℓ)_◐` over the `mut` witnesses, and each witness of a
-cell of `ρ ∈ Res_{↓α}` lies in `Res_α`; so the `⨀` lies in `Res_α` everywhere
-and only `ρ(ℓ)` is asked for.
+/-- The exclusive walk keeps the stratum at one location.
 `[about ours: `BoLo.ExW.inStratum` at one location]` -/
 theorem ExW.inStratum_at
     {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
@@ -580,8 +543,7 @@ theorem ExW.inStratum_at
         (fun χ f => hl χ (ResU.restrict_eq_some.mp f).1)
         (fun χ f => hl χ (ResU.restrict_eq_some.mp f).1) e
 
-/-- **The aliasable walk keeps the stratum at one location**, for the same
-reason, with the `imm` family's `ex(ρ′)_○ ○ ag(ρ′)` composed clause by clause.
+/-- The aliasable walk keeps the stratum at one location.
 `[about ours: `BoLo.AgW.inStratum` at one location]` -/
 theorem AgW.inStratum_at {ρ σ : ResU BoCa.Loc BoCa.Val} (h : AgW ρ σ) {α : Life}
     (hd : ρ.InStratum (↓α)) {l : BoCa.Loc}
@@ -611,7 +573,7 @@ theorem AgW.inStratum_at {ρ σ : ResU BoCa.Loc BoCa.Val} (h : AgW ρ σ) {α : 
         (fun χ f => hl χ (ResU.restrict_eq_some.mp f).1)
         (fun χ f => hbms l χ f) e
 
-/-- **`BoLo.flat_inStratum` at one location**, for a resource in `Res_{↓α}`.
+/-- `BoLo.flat_inStratum` at one location, for a resource in `Res_{↓α}`.
 `[about ours: the first elided step of `[TR]` Lemma 6.50's proof, at one
 location]` -/
 theorem ResU.flat_inStratum_at {ρ σ : ResU BoCa.Loc BoCa.Val} {α : Life}
@@ -623,9 +585,7 @@ theorem ResU.flat_inStratum_at {ρ σ : ResU BoCa.Loc BoCa.Val} {α : Life}
     (fun φ f => ExW.inStratum_at BoLo.compS_hC he hd hl f)
     (fun φ f => AgW.inStratum_at ha hd hl f) hg
 
-/-- **`BoLo.flat_inStratum_inv` at one location.**  Its proof already stays at
-`ℓ`: an `own` or `mut` cell of `ρ` sits in `⦇ρ⦈` at `ℓ` unchanged, and an `imm`
-cell sits there with a lifetime set no longer.
+/-- `BoLo.flat_inStratum_inv` at one location.
 `[about ours: the second elided step of `[TR]` Lemma 6.50's proof, at one
 location]` -/
 theorem ResU.flat_inStratum_inv_at {ρ σ : ResU BoCa.Loc BoCa.Val} {α : Life}
@@ -641,9 +601,7 @@ theorem ResU.flat_inStratum_inv_at {ρ σ : ResU BoCa.Loc BoCa.Val} {α : Life}
       (BoLo.cell_at_of_inStratum (by rw [hkχ]; simp) (hσ χ hσl)) hle)
   · exact hσ ψ (ResU.CompS.get_left_of_ne_imm hc (ExS.get_of_ne_imm he hl hk) hk).2
 
-/-- **`[TR]` Lemma 6.50 at one location**, for a resource in `Res_{↓α}`: `↭`'s
-clause (1) fixes an `imm` cell of `⦇ρ′⦈` outright and clause (2) fixes a `mut`
-cell's lifetime, both at the location they are read at.
+/-- `[TR]` Lemma 6.50 at one location, for a resource in `Res_{↓α}`.
 `[about ours: `[TR]` Lemma 6.50 (p. 16) at one location]` -/
 theorem ResU.updV_outlives_at {ρ ρ' : ResU BoCa.Loc BoCa.Val} {α : Life}
     (hd : ρ.InStratum (↓α)) (hu : ResU.UpdV ρ ρ') {l : BoCa.Loc}
@@ -662,15 +620,9 @@ theorem ResU.updV_outlives_at {ρ ρ' : ResU BoCa.Loc BoCa.Val} {α : Life}
     cases ResU.Flat.functional hτ hσ
     exact (ResU.flat_inStratum_at hσ hd hl hgg : b ⊐ α)
 
-/-- **`@(ρ ⊟ ρ′) ⊐ α`**, at `⊟` itself — `[TR]` 6.52's second conclusion once
-its two sides are named.
-
-`ρ ⊟ ρ′` is `ρ|own,mut ● ρ″` with `ρ″ ≤ ρ|imm` cut down by Definition 6.3's
-fourth bullet.  `hoff` is the printed *"all parts of the resource outlive
-`α`"*, asked only off `dom(ρ′)`; `hon` is the printed exception *"except for
-the locations in `ρ` that are mut or own in `ρ′ᵢ`"*, at which `ρ` carries an
-`imm` cell whose set contains `α` and the fourth bullet removes exactly `ρ′`'s
-lifetimes — so `α` is gone and `ρ ∈ Res_{↓α}` leaves nothing shorter behind.
+/-- `@(ρ ⊟ ρ′) ⊐ α`: `[TR]` 6.52's second conclusion.  `hoff` is the printed
+*"all parts of the resource outlive `α`"*, off `dom(ρ′)`; `hon` is the printed
+exception *"except for the locations in `ρ` that are mut or own in `ρ′ᵢ`"*.
 `[about ours: `[TR]` 6.52's second conclusion, stated at `⊟`]` -/
 theorem ResU.Sub.inStratum {ρ ρ' χ : ResU Loc Val} {α : Life}
     (h : ResU.Sub ρ ρ' χ) (hd : ρ.InStratum (↓α))
@@ -718,9 +670,7 @@ theorem ResU.Sub.inStratum {ρ ρ' χ : ResU Loc Val} {α : Life}
           exact lt_of_le_of_ne (Life.le_of_down_lt hdown)
             (fun e => hnot (e ▸ hα))
 
-/-- **`ρ|dom(ρ′ᵢ|mut,own)` carries `imm` cells only**, so Definition 6.3's first
-bullet holds of it: the image of `reb_α` is `imm` everywhere
-(`ResU.reb_imm_image`).
+/-- `ρ|dom(ρ′ᵢ|mut,own)` carries `imm` cells only.
 `[about ours: Definition 6.3's first bullet at `[TR]` 6.52's subtrahend]` -/
 theorem ResU.reb_restrictDom_exclPart_empty {α : Life} {ρ'i ρ : ResU Loc Val}
     (hreb : ResU.Reb α ρ'i ρ) :

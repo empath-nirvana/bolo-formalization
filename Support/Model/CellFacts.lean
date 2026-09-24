@@ -4,9 +4,7 @@ import Support.Model.Prelude
 /-!
 # Support — Model — CellFacts
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-facts about the cell constructors: injectivity and distinctness of `own`/`imm`/`mut`, the lifetime of a `mut` cell, and the stored predicate.
+`[about ours]`.  Facts about the cell constructors: injectivity and distinctness of `own`/`imm`/`mut`, the lifetime of a `mut` cell, and the stored predicate.
 -/
 
 noncomputable section
@@ -14,14 +12,12 @@ noncomputable section
 namespace BoCa.Fig16.PMap
 variable {Loc A B : Type}
 
-/-- `Loc` is infinite.  **Ours** — neither document states it. -/
+/-- `Loc` is infinite. -/
 def Infinite (Loc : Type) : Prop := ∀ d : List Loc, ∃ l : Loc, l ∉ d
 
-/-- The step `[TR]` Lemma 6.141 (`wp-alloc`, p. 37) takes without justification:
-a finite map over an infinite `Loc` misses a location.  This is what the `fin`
-mark buys.
-`[about ours: the existence of a fresh location, which 6.141's proof uses in one
-unjustified step; 6.141 itself is a `wp` rule and is not stated here]` -/
+/-- A finite map over an infinite `Loc` misses a location: the fresh location
+`[TR]` Lemma 6.141's proof (`wp-alloc`, p. 37) allocates.
+`[about ours: the fresh location 6.141's proof uses]` -/
 theorem exists_fresh (h : Infinite Loc) (p : PMap Loc A) : ∃ l, p.get l = none := by
   obtain ⟨d, hd⟩ := p.finite
   obtain ⟨l, hl⟩ := h d
@@ -35,9 +31,9 @@ end BoCa.Fig16.PMap
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- The invariant of a `mut` cell, read as a predicate on `Res` — extension by
-falsity outside `Res_β`.  Non-dependent, unlike the `P` field, which is what
-makes it usable to read an invariant off an equation between cells. -/
+/-- The invariant of a `mut` cell as a predicate on `Res`, false outside
+`Res_β`.  Unlike the dependent `P` field, it can be read off an equation between
+cells. -/
 def MutU.pred (m : MutU Loc Val) : Val → ResU Loc Val → Prop :=
   fun v r => ∃ h : r.InStratum m.β, m.P v (ResU.toStratum r h)
 
@@ -98,9 +94,7 @@ theorem CellU.mutOf_inj {b : Life} {v₁ v₂ : Val} {ρ₁ ρ₂ : ResU Loc Val
       rw [ResS.toS_toStratum] at hz
       exact hz
 
-/-- **The meet-compare implies membership in the stratum, at every `α`.**  `@ψ`
-is `⊤` on an `own` cell and `Res_α` asks nothing of it, so a bound on `@ρ` is a
-bound on the borrow cells alone — which is all `Res_α` constrains. -/
+/-- A bound on `@ρ` puts `ρ` in the stratum. -/
 theorem ResU.inStratum_of_atLife {ρ : ResU Loc Val} {a α : Life} (ha : ρ.AtLife a)
     (h : a ⊐ α) : ρ.InStratum α := by
   intro l ψ e

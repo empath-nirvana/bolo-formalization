@@ -33,9 +33,7 @@ import Support.TypedWorld.Wp
 /-!
 # Support — TypedWorld — Reborrow
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`[TR]` Theorem 6.150 at `wpTS`: the chooser `RebChooseTW` that replaces `RebEscrow`, and the rule.
+`[about ours]`.  `[TR]` Theorem 6.150 at `wpTS`: the chooser `RebChooseTW` that replaces `RebEscrow`, and the rule.
 -/
 
 noncomputable section
@@ -47,7 +45,7 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- **A reborrow keeps `Tagged`** — `TW.linLife`'s `reb` case at the tag's lifetime. -/
+/-- A reborrow keeps `Tagged` — `TW.linLife`'s `reb` case at the tag's lifetime. -/
 theorem tagged_reb {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} {r : FrameRec}
     {le : Loc} {s : LSet} {β : Life} {hs : r.R.InStratum s.join}
     (hW₀ : TW W ps rs) (hr : r ∈ rs) (hle : W.get le = some (CellU.immOf s r.v r.R hs))
@@ -64,7 +62,7 @@ theorem tagged_reb {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} {r :
   · exact CellU.kind_immOf _ _ _ _
   · exact (hTI.2.2.2.2.2.1.1 p hp (mutAt_of_cell hle (MutAt.top e (by simp)))).elim
 
-/-- **…and a reborrow at a chain view** — `TW.linLife`'s `rebDeep` case. -/
+/-- …and a reborrow at a chain view — `TW.linLife`'s `rebDeep` case. -/
 theorem tagged_rebDeep {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} {r : FrameRec}
     {p₀ : Option Loc} {l₁ : Loc} {S₀ : Ty} {u₀ : Val} {s : LSet} {w₀ : WRes}
     {hs : w₀.InStratum s.join} {β : Life}
@@ -90,7 +88,7 @@ theorem tagged_rebDeep {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} 
   · exact CellU.kind_immOf _ _ _ _
   · exact (hTI.2.2.2.2.2.1.1 p hp (mutAt_of_cell hcell (MutAt.top e (by simp)))).elim
 
-/-- **A reborrow's end keeps `Tagged`** — `TW.linLife`'s `rebEnd` case: `ag` only loses
+/-- A reborrow's end keeps `Tagged` — `TW.linLife`'s `rebEnd` case: `ag` only loses
 lifetimes. -/
 theorem tagged_rebEnd {W W' D : WRes} {ps rs : List FrameRec} {ls : List SRec}
     (hW₀ : TW W ps rs) (hW : ResU.CompS W' D W) (htag : Tagged W ps ls) : Tagged W' ps ls := by
@@ -102,12 +100,12 @@ theorem tagged_rebEnd {W W' D : WRes} {ps rs : List FrameRec} {ls : List SRec}
   rw [AgW.functional ha'' ha'] at hcomp
   exact ⟨aW, haW, icpAt_left hcomp _, fun m _ => icpAt_left hcomp m⟩
 
-/-- **6.150's reborrow, chosen at the tagged world.**  Given the handed `χ₀ ∈ reb_β(ρ′)` with
+/-- 6.150's reborrow, chosen at the tagged world.  Given the handed `χ₀ ∈ reb_β(ρ′)` with
 `P̂₀(β)(w)(χ₀)` (H16/H17), a world `W` holding the cell `ℓ ↦ imm(s̄, w, ρ′)` with frame `F`,
 and `β` below `W`: some `χ ∈ reb_β(ρ′)` with `P̂(β)(w)(χ)`, the two inputs `[TR]` 6.55 adds
 (`ag(χ)` defined and `EscrowAgree` at `F` and at the cell), the world `W ● χ` typed (entry), and
 every world `W″` with `W″ ● χ|dom(ρ′|mut,own)` typed, holding the cell and in `Res_β`, typed
-(exit).  `[about ours: our chooser at the typed world; not printed]` -/
+(exit).  `[about ours: our chooser at the typed world]` -/
 def RebChooseTW (ls : List SRec) (l : Loc) (R : Val → WRes → Prop)
     (P₀ P : Life → Val → WProp) : Prop :=
   ∀ (W F χ₀ σ : WRes) (ps : List FrameRec) (β : Life) (w : Val) (s : LSet)
@@ -126,7 +124,7 @@ def RebChooseTW (ls : List SRec) (l : Loc) (R : Val → WRes → Prop)
         ResU.CompS W'' (χ.restrictDom σ.exclPart) Wp → W''.InStratum β →
         TW W'' ps' (rsOf ls') ∧ Tagged W'' ps' ls')
 
-/-- **`RebChooseTW` at a record's cell, at `𝒱X`.**  The cell's value and escrow are the
+/-- `RebChooseTW` at a record's cell, at `𝒱X`.  The cell's value and escrow are the
 record's (`LeInvW`); the handed shaped image is typed at `𝒱X` by `image_vX_of_shape` (6.131 at
 `𝒱X`) from the world's `WitLB`, the tag bound and `Coh`; `rebChooseO_top_tw` chooses;
 entry is `TW.reb`, exit `TW.rebEnd`.  The payload input `R` is the program's own: the escrow
@@ -175,7 +173,7 @@ theorem rebChooseTW_top {ls : List SRec} {r : FrameRec} {x : LifeVar} {δ' : LSu
       obtain ⟨t, ht⟩ := mem_rsOf.mp hr; exact mem_rsOf.mpr ⟨t, (hls _).mpr ht⟩
     exact ⟨TW.rebEnd r hTp hr' hc'' hreb hcomp hβ'', tagged_rebEnd hTp hcomp htgp⟩
 
-/-- **`RebChooseTW` at a chain view, at `𝒱X`**: the cell's value is the chain's own (`ExIn`);
+/-- `RebChooseTW` at a chain view, at `𝒱X`: the cell's value is the chain's own (`ExIn`);
 `image_vX_of_shape` with `coh_child`/`coh_mut_child`; `rebChooseO_deep_tw` chooses; entry
 `TW.rebDeep`, exit `TW.rebEndDeep`.  `[about ours: our chooser at a chain view]` -/
 theorem rebChooseTW_deep {ls : List SRec} {r : FrameRec} {p₀ : Option Loc} {l₀ : Loc}
@@ -217,12 +215,8 @@ theorem rebChooseTW_deep {ls : List SRec} {r : FrameRec} {p₀ : Option Loc} {l�
       obtain ⟨t, ht⟩ := mem_rsOf.mp hr; exact mem_rsOf.mpr ⟨t, (hls _).mpr ht⟩
     exact ⟨TW.rebEndDeep r hTp hr' hch hc'' hreb hcomp hβ'', tagged_rebEnd hTp hcomp htgp⟩
 
-/-!
-### Theorem 6.150 (↺ rule) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Theorem 6.150 (↺ rule).
--/
-/-- **`[TR]` Theorem 6.150** (`↺` rule, p. 39) at the tagged `wpTS`:
+/-! ### Theorem 6.150 (↺ rule) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
+/-- `[TR]` Theorem 6.150 (`↺` rule, p. 39) at the tagged `wpTS`:
 
     ℓ ↦ Imm α (R ∧ Иβ. ↺_β P̂₀) ⋆ (Иβ. ∀v. P̂(v) ─⋆ wp_{ls}(e){[β]Q̂}) ⊧ wp_{ls}(e){Q̂}
 
@@ -264,7 +258,7 @@ theorem wpTS_reborrow (ls : List SRec) (l : BoCa.Loc) (α : Life) (R : Val → W
     obtain ⟨ab, hab, hab'⟩ := compS_reassoc' (ResU.CompS.comm hc) hcf
     rw [ResU.CompS.functional hab hbf] at hab'
     exact ResU.CompS.comm hab'
-  -- CHOOSE the reborrow, now that the frame `ρ_b ● ρ_f` and the world are known.
+  -- choose the reborrow, now that the frame `ρ_b ● ρ_f` and the world are known.
   obtain ⟨χ, hreb, hPχ, ⟨A, hagχ⟩, hEF, hEI, hentry, hexit⟩ :=
     hesc fρ ρbf χ₀ σ ps β v' s hs hT htg hβW hWcell hRv hreb₀ hPχ₀
   -- *"By similar reasoning, we have `ρ_P̂(v′) # ρ_b ● ρ_f`."*

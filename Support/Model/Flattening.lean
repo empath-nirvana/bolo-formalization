@@ -6,9 +6,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — Flattening
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-validity and lowering: the pointwise facts behind Lemmas 6.7, 6.10 and 6.30, and the union of two memories.
+`[about ours]`.  Validity and lowering: the pointwise facts behind Lemmas 6.7, 6.10 and 6.30, and the union of two memories.
 -/
 
 noncomputable section
@@ -16,12 +14,10 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- `dom(ρ₁ ◐ ρ₂) = dom(ρ₁) ∪ dom(ρ₂)`, pointwise and in the negative: a
-composite is undefined at `ℓ` exactly when both operands are.  Read off `◐`'s
-three pieces, so it holds at every guard and every cell-level operation.
+/-- `dom(ρ₁ ◐ ρ₂) = dom(ρ₁) ∪ dom(ρ₂)`, pointwise: a composite is undefined at
+`ℓ` exactly when both operands are.
 `[about ours: the step "unfolding ○, dom(ρ₁ ○ ρ₂) = dom(ρ₁) ∪ dom(ρ₂)" of
-`[TR]` Lemma 6.30's proof, at the schema and written pointwise, `dom` not
-being an object on this carrier]` -/
+`[TR]` Lemma 6.30's proof, at the schema]` -/
 theorem ResU.Comp.eq_none_iff {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.Comp R C ρ₁ ρ₂ ρ) (l : Loc) :
@@ -29,8 +25,7 @@ theorem ResU.Comp.eq_none_iff {R : CellU Loc Val → CellU Loc Val → Prop}
   rcases ResU.Comp.get h l with ⟨e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ |
       ⟨ψ₁, ψ₂, ψ, e₁, e₂, e, -⟩ <;> rw [e, e₁, e₂] <;> simp
 
-/-- Where one operand is silent, the composite is the other operand.  These are
-the two outer pieces of `◐`, in the form 6.7's case analysis reads them. -/
+/-- Where one operand is undefined, the composite is the other operand. -/
 theorem ResU.Comp.get_of_left_none {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.Comp R C ρ₁ ρ₂ ρ) {l : Loc}
@@ -54,20 +49,16 @@ theorem ResU.Comp.get_of_right_none {R : CellU Loc Val → CellU Loc Val → Pro
   · rw [f₂] at e; exact absurd e (by simp)
   · rw [f₂] at e; exact absurd e (by simp)
 
-/-- `ex(ρ₁)_● ● ex(ρ₂)_●` is `imm`-free: 6.36 (`ExS.immFree`) at each
-factor, and `●` cannot manufacture an `imm` cell out of two non-`imm` ones.
-This is the side condition 6.35's proof hands to 6.30.
+/-- `ex(ρ₁)_● ● ex(ρ₂)_●` is `imm`-free: the side condition 6.35's proof hands
+to 6.30.
 `[about ours: `ResU.ImmFree` is `[TR]` p. 5's `ρ|imm = ∅` written pointwise;
 this closes it under `●`]` -/
 theorem ResU.ImmFree.compS {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     (h₁ : ρ₁.ImmFree) (h₂ : ρ₂.ImmFree) : ρ.ImmFree :=
   ResU.ImmFree.comp (fun ψ₁ ψ₂ ψ hc k₁ _ => CellU.compS_ne_imm ψ₁ ψ₂ ψ hc k₁) h h₁ h₂
 
-/-- The three pieces of `m₁ ∪ m₂` at one location: `m₁` off `dom(m₂)`, `m₂` off
-`dom(m₁)`, and on the overlap the value both give.  A union of partial maps is
-partial for the same reason `◐` is, so it is written in `OptComp`'s shape, with
-the agreement of the two values standing where `OptComp` has the cell-level
-guard. -/
+/-- `m₁ ∪ m₂` at one location: `m₁` off `dom(m₂)`, `m₂` off `dom(m₁)`, and on
+the overlap the value both give. -/
 def OptUnion {Val : Type} : Option Val → Option Val → Option Val → Prop
   | none, none, o => o = none
   | some v, none, o => o = some v
@@ -78,7 +69,7 @@ def OptUnion {Val : Type} : Option Val → Option Val → Option Val → Prop
 `[about ours: the union on the right of `[TR]` Lemma 6.7, as a graph (G4)]` -/
 def MemUnion (m₁ m₂ m : Loc → Option Val) : Prop := ∀ l, OptUnion (m₁ l) (m₂ l) (m l)
 
-/-- The union is single-valued, so writing it as a graph loses nothing. -/
+/-- The union is single-valued. -/
 theorem MemUnion.functional {m₁ m₂ m m' : Loc → Option Val}
     (h : MemUnion m₁ m₂ m) (h' : MemUnion m₁ m₂ m') : m = m' := by
   refine funext fun l => ?_
@@ -90,11 +81,8 @@ theorem MemUnion.functional {m₁ m₂ m m' : Loc → Option Val}
   · rw [k, k']
   · rw [k.2, k'.2]
 
-/-- **Erasing a composition gives the union of the erasures**, provided the
-cell-level composition composes over a common value — which both `●` and `○` do,
-by `CellU.CompS.erase` and `CellU.CompR.erase`.  The overlap clause is
-where the print's closing sentence lands: at a location both operands own, the
-one value they share is the value the composite carries. -/
+/-- Erasing a composition gives the union of the erasures, for a cell-level
+composition over a common value. -/
 theorem optUnion_map_erase {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     (hC : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → ψ₁.erase = ψ₂.erase ∧ ψ.erase = ψ₁.erase)
     {o₁ o₂ o : Option (CellU Loc Val)} (h : OptComp C o₁ o₂ o) :

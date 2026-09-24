@@ -14,9 +14,7 @@ import Support.TypedWorld.World
 /-!
 # Support — TypedWorld — ReborrowShapes
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`[TR]` Lemmas 6.131 and 6.132 at the shape relation `vShape`.
+`[about ours]`.  `[TR]` Lemmas 6.131 and 6.132 at the shape relation `vShape`.
 -/
 
 noncomputable section
@@ -28,14 +26,10 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-!
-### Lemma 6.131 (↺V₁) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.131 (↺V₁).
--/
-/-- **`[TR]` Lemma 6.131** (`↺V₁`, p. 34) at the shape relation:
+/-! ### Lemma 6.131 (↺V₁) at the typed world; record in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.131 (`↺V₁`, p. 34) at the shape relation:
 `[α] vShape⟦T⟧δ(v) ⊨ ↺_α vShape⟦Imm̲ 'a T⟧δ(v)` where `δ('a) = α`, at every `T`.
-The library's `reborrow_vDen`, bullet for bullet.  `[about ours: 6.131 at our shape
+The proof is `reborrow_vDen`'s, bullet for bullet.  `[about ours: 6.131 at our shape
 relation; the `Ref` bullet as `reborrow_vDen` takes it]` -/
 theorem reborrow_vShape {α : Life} {x : LifeVar} {δ : LSub}
     (hδ : (Lifetime.Life.var x).interp δ = some α) :
@@ -117,12 +111,8 @@ theorem reborrow_vShape {α : Life} {x : LifeVar} {δ : LSub}
       intro v
       exact reborrow_emp_box α _
 
-/-!
-### Lemma 6.132 (↺V₂) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean`, under the record of Lemma 6.132 (↺V₂).
--/
-/-- **`[TR]` Lemma 6.132** (`↺V₂`, p. 35) at the shape relation, at one `β`:
+/-! ### Lemma 6.132 (↺V₂) at the typed world; record in `Paper/S6_6_ReborrowingEntailments/Lemmas.lean` -/
+/-- `[TR]` Lemma 6.132 (`↺V₂`, p. 35) at the shape relation, at one `β`:
 `vShape⟦T⟧δ(v) ⊨ [β] … ⊨ ↺_β vShape⟦Imm̲ 'a T⟧δ['a↦β](v)` for `ρ ∈ Res_β` — the printed
 proof's steps after "fix `α ⊏ δ` arbitrary": `[]R`, `'a ∉ FV(T)`, `↺V₁`.
 `[about ours: 6.132 at the shape relation, at a fixed lifetime of the `И`]` -/
@@ -133,8 +123,7 @@ theorem six132_shape {x : LifeVar} {T : Ty} (hx : ¬ LFree x T) (δ : LSub) (β 
     rw [vShape_extend_of_not_free hx]; exact ⟨h, hρ⟩
   exact reborrow_vShape (interp_ext_self δ x β) T v ρ h'
 
-/-! Lemma 6.132 (↺V₂), typed-world version, continued. -/
-/-- **`[TR]` Lemma 6.132** at the shape relation, with its `И`: every `β` below the stratum of
+/-- `[TR]` Lemma 6.132 at the shape relation, with its `И`: every `β` below the stratum of
 the resource.  `[about ours: 6.132 at our shape relation]` -/
 theorem six132_shape_fresh {x : LifeVar} {T : Ty} (hx : ¬ LFree x T) (δ : LSub) (v : Val) :
     vShape T δ v ⊨ fresh (fun β => reborrow β (vShape (T.immReborrow (.var x)) (δ.extend x β) v)) := by

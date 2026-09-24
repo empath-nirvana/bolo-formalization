@@ -7,9 +7,7 @@ import Support.Model.WalkSplitting
 /-!
 # Support — Model — Compatibility
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-cell-level compatibility read off tags, values and witnesses, and `○` at an `imm` cell.
+`[about ours]`.  Cell-level compatibility read off tags, values and witnesses, and `○` at an `imm` cell.
 -/
 
 noncomputable section
@@ -17,12 +15,8 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **`▶◀` is exactly "two `imm` cells that agree up to lifetimes".**  `[TR]`
-p. 5's defining equation binds one `v` and one `ρ` across two `imm` cells and
-leaves the two lifetime sets free, so `▶◀` says precisely: both tags are `imm`,
-the values agree, the witnesses agree.  Left to right is `CellU.CompatS.kinds`
-and `CellU.CompatS.imm_imm`; right to left rebuilds both cells through
-`CellU.rep`.  Every "agree up to lifetimes" in `[TR]` §6.1 is this.
+/-- `▶◀` is "two `imm` cells that agree up to lifetimes": both tags `imm`,
+equal values, equal witnesses.
 `[about ours: `CellU.erase` and `CellU.wit` are this file's projections; what
 the equivalence says is the printed phrase "agree up to lifetimes"]` -/
 theorem CellU.compatS_iff {ψ₁ ψ₂ : CellU Loc Val} :
@@ -46,13 +40,9 @@ theorem CellU.compatS_iff {ψ₁ ψ₂ : CellU Loc Val} :
       · exact absurd k₂ (by simp)
     · exact absurd k₁ (by simp)
 
-/-- **`○` hands an `imm` operand back as an `imm` cell over the same value and
-the same witness.**  Only four clauses admit an `imm` cell on the left — (1),
-(2) and the two halves of (5) — and each returns either that cell or its `●`
-with another `imm` cell over the same witness.  This is 6.12's case (1) and
-6.14's "the resulting composites still agree on overlapping imm cells up to
-lifetimes", at the cell level; it is also what carries an `imm` cell of `ρ`
-through the two `○`s of `ag(ρ)`. -/
+/-- `○` returns an `imm` operand as an `imm` cell over the same value and
+witness: 6.14's "the resulting composites still agree on overlapping imm cells
+up to lifetimes", at the cell level. -/
 theorem CellU.CompR.imm_left {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     (hk : ψ₁.kind = Kind.imm) :
     ψ.kind = Kind.imm ∧ ψ.erase = ψ₁.erase ∧ ψ.wit = ψ₁.wit := by
@@ -69,11 +59,7 @@ theorem CellU.CompR.imm_left {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR �
   | immMut => exact ⟨rfl, rfl, rfl⟩
   | mutImm => exact absurd hk (by simp)
 
-/-- **Which operand a `○` composite takes its witness from.**  The composite is
-`own` only when both operands are, so where it is not, at least one operand is
-not `own` and the composite carries that operand's witness.  This is the
-bookkeeping 6.14's "the same value and subresource inside of it" needs, since
-`CellU.CompR.wit` compares two operands only when neither is `own`. -/
+/-- A non-`own` `○` composite carries the witness of a non-`own` operand. -/
 theorem CellU.CompR.wit_of_ne_own {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     (hk : ψ.kind ≠ Kind.own) :
     (ψ₁.kind ≠ Kind.own ∧ ψ.wit = ψ₁.wit) ∨ (ψ₂.kind ≠ Kind.own ∧ ψ.wit = ψ₂.wit) := by
@@ -92,9 +78,7 @@ theorem CellU.CompR.wit_of_ne_own {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.Co
   | immMut => exact Or.inl ⟨by simp, rfl⟩
   | mutImm => exact Or.inr ⟨by simp, rfl⟩
 
-/-- **The cell level of `[TR]` Lemma 6.12.**  A cell `▶◀` the left operand of a
-`○` is `▶◀` the value of that `○`.  `▶◀` forces that operand to be `imm`, and
-`CellU.CompR.imm_left` then keeps the value and the witness fixed.
+/-- A cell `▶◀` the left operand of a `○` is `▶◀` its value.
 `[about ours: the cell-level step `[TR]` Lemma 6.12's proof takes at a location
 where both `ρ₂` and `ρ₃` are defined]` -/
 theorem CellU.CompatS.of_compR_left {χ ψ₁ ψ₂ ψ : CellU Loc Val}

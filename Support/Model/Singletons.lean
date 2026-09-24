@@ -6,9 +6,7 @@ import Support.Model.Prelude
 /-!
 # Support — Model — Singletons
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-restriction `ρ∣ι`, singleton resources `ℓ ↦ ψ`, the order `ρ ≤ ρ′`, and the walks and restrictions of singletons.
+`[about ours]`.  Restriction `ρ∣ι`, singleton resources `ℓ ↦ ψ`, the order `ρ ≤ ρ′`, and the walks and restrictions of singletons.
 -/
 
 noncomputable section
@@ -38,7 +36,7 @@ open Classical in
 theorem ResU.single_get_ne {l l' : Loc} (ψ : CellU Loc Val) (h : l' ≠ l) :
     (ResU.single l ψ).get l' = none := if_neg h
 
-/-- `∅ ∈ Res_α` at every `α` — there is no cell to constrain. -/
+/-- `∅ ∈ Res_α` at every `α`. -/
 theorem ResU.inStratum_empty (α : Life) :
     ResU.InStratum α (PMap.empty : ResU Loc Val) :=
   fun l _ e => absurd (e.symm.trans (PMap.empty_get l)) (by simp)
@@ -51,7 +49,7 @@ theorem ResU.inStratum_single {α : Life} (l : Loc) {ψ : CellU Loc Val}
   · subst hk; rw [ResU.single_get_self] at e; cases Option.some.inj e; exact h
   · rw [ResU.single_get_ne _ hk] at e; exact absurd e (by simp)
 
-/-- An owned cell lies in every stratum: `Res_α` asks nothing of it. -/
+/-- An owned cell lies in every stratum. -/
 theorem ResU.inStratum_single_own (α : Life) (l : Loc) (v : Val) :
     (ResU.single l (CellU.ownOf v)).InStratum α :=
   ResU.inStratum_single l trivial
@@ -63,15 +61,7 @@ theorem ResU.single_get_eq_some {l l' : Loc} {ψ χ : CellU Loc Val}
   · exact ⟨e, (Option.some.inj (by rw [← h, e, ResU.single_get_self])).symm⟩
   · exact absurd (h.symm.trans (ResU.single_get_ne ψ e)) (by simp)
 
-/-- `ρ ≼ ρ′` — **`[CONF]` p. 415:24 footnote 1's `≤`, at `○` instead of `●`.**
-The print defines the order only at the strict operator, and uses it there for
-`reb_α`'s partition.  The walk arguments use the same order at the **relaxed**
-operator throughout — "is a `○`-factor of" — and it was written out inline
-rather than named.
-
-`ResU.Comp.factor_trans` is its transitivity and `ResU.comp_empty_right` is
-reflexivity.  Absorption — a `≼`-smaller resource composes onto the larger one
-and changes nothing — is stated downstream, where its ingredient is defined.
+/-- `ρ ≼ ρ′`: "is a `○`-factor of".
 `[variant: `[CONF]` p. 415:24 footnote 1's `≤` at `○`; the print defines it at
 `●` only]` -/
 def ResU.LeR (ρ σ : ResU Loc Val) : Prop := ∃ τ, ResU.CompR ρ τ σ
@@ -146,8 +136,7 @@ theorem AgW.single_own (l : Loc) (v : Val) :
   rw [ResU.restrict_single_other (k := Kind.imm) (fun e => Kind.noConfusion e)]
   exact ResU.comp_empty_right _
 
-/-- **The layer is not empty.**  `⦇ℓ ↦ own(v)⦈ = ℓ ↦ own(v)`, hence
-`✓(ℓ ↦ own(v))`. -/
+/-- `⦇ℓ ↦ own(v)⦈ = ℓ ↦ own(v)`, hence `✓(ℓ ↦ own(v))`. -/
 theorem ResU.flat_single_own (l : Loc) (v : Val) :
     ResU.Flat (ResU.single l (CellU.ownOf v)) (ResU.single l (CellU.ownOf v)) :=
   ⟨_, _, ExW.single_own l v, AgW.single_own l v, ResU.comp_empty_right _⟩

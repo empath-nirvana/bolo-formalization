@@ -10,9 +10,7 @@ import Support.Model.Surgery
 /-!
 # Support — Model — FrameSurgery
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the swaps §6.3's frame rules spend at both ends of the run: `ℓ ↦ own(v) ● ρ_P̂(v)` against the `mut` or `imm` cell that borrows it, under a frame, lowered and validated.
+`[about ours]`.  The swaps §6.3's frame rules spend at both ends of the run: `ℓ ↦ own(v) ● ρ_P̂(v)` against the `mut` or `imm` cell that borrows it, under a frame, lowered and validated.
 -/
 
 noncomputable section
@@ -21,12 +19,9 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 variable {Loc Val : Type}
 
-/-- **A well-formed `mut` cell does not hold its own location in its witness.**
-`✓(ℓ ↦ mut(β, v, σ, P̂))` unfolds to `(ℓ ↦ mut(…) ● ex(σ)_●) ● ag(σ)` being
-defined, so `⦇σ⦈` is defined and misses `ℓ`, and 6.16's *"the cells of `ρ′` are
-a subset of those of `⦇ρ′⦈`"* (`ResU.Flat.get`) carries that back to `σ`.
+/-- A valid `mut` cell does not hold its own location in its witness.
 `[about ours: what `[TR]` 6.66's "assuming all compositions are defined" asks
-of the borrowed cell, derived from `✓` instead of assumed]` -/
+of the borrowed cell, from `✓`]` -/
 theorem ResU.wit_get_none_of_valid_mut {l : Loc} {b : Life} {v : Val} {σ : ResU Loc Val}
     {h : ResU.InStratum b σ} {P : Val → SPropS Loc Val b} {hw : P v ⟨σ, h⟩}
     (hv : ResU.Valid (ResU.single l (CellU.mutOf b v σ h P hw))) : σ.get l = none := by
@@ -47,9 +42,8 @@ theorem ResU.wit_get_none_of_valid_mut {l : Loc} {b : Life} {v : Val} {σ : ResU
   rw [hτl] at hχ
   simp at hχ
 
-/-- `ρ_v ● ℓ ↦ own(v)` is defined whenever `ℓ ↦ mut(β, v, ρ_v, P̂)` is valid.
-`[TR]` 6.66 writes `ρ_ℓ ● ρ_P̂(v)` without comment; this is where that comes
-from, and it is what lets 6.24 be applied there. -/
+/-- `ρ_v ● ℓ ↦ own(v)` is defined whenever `ℓ ↦ mut(β, v, ρ_v, P̂)` is valid:
+the `ρ_ℓ ● ρ_P̂(v)` of `[TR]` 6.66. -/
 theorem ResU.compS_own_of_valid_mut {l : Loc} {b : Life} {v : Val} {σ : ResU Loc Val}
     {h : ResU.InStratum b σ} {P : Val → SPropS Loc Val b} {hw : P v ⟨σ, h⟩}
     (hv : ResU.Valid (ResU.single l (CellU.mutOf b v σ h P hw))) :
@@ -59,9 +53,8 @@ theorem ResU.compS_own_of_valid_mut {l : Loc} {b : Life} {v : Val} {σ : ResU Lo
     · exact Or.inl (hx ▸ ResU.wit_get_none_of_valid_mut hv)
     · exact Or.inr (ResU.single_get_ne _ hx)))
 
-/-- **`[TR]` 6.66's H24.**  *"By lemmas 6.25 and 6.8 …"*: 6.25 says the `mut`
-cell and `ρ_v ● ℓ ↦ own(v)` lower to the same memory, and 6.8 carries that
-under a frame, so a run's memory is unchanged by the exchange at either end. -/
+/-- `[TR]` 6.66's H24, *"By lemmas 6.25 and 6.8 …"*: the `mut` cell and
+`ρ_v ● ℓ ↦ own(v)` lower to the same memory under a frame. -/
 theorem ResU.lower_swap_mut_own {l : Loc} {b : Life} {v : Val}
     {σ W F G frame : ResU Loc Val} {h : ResU.InStratum b σ}
     {P : Val → SPropS Loc Val b} {hw : P v ⟨σ, h⟩} {w : Loc → Option Val}
@@ -79,10 +72,8 @@ theorem ResU.lower_swap_mut_own {l : Loc} {b : Life} {v : Val}
     (ResU.six25 hW ⟨σm, hσm⟩ hvW).mp hLm
   exact ResU.Lower.congr hLm hLW hF hHF hG hHG
 
-/-- **`[TR]` 6.64's H34.**  *"By lemmas 6.26 and 6.8 …"*: 6.26 says the `imm`
-cell and `ρ_v ● ℓ ↦ own(v)` lower to the same memory, and 6.8 carries that under
-a frame, so a run's memory is unchanged by the exchange at either end.  The
-`imm` twin of `ResU.lower_swap_mut_own`. -/
+/-- `[TR]` 6.64's H34, *"By lemmas 6.26 and 6.8 …"*: the `imm` cell and
+`ρ_v ● ℓ ↦ own(v)` lower to the same memory under a frame. -/
 theorem ResU.lower_swap_imm_own {l : Loc} {s : LSet} {v : Val}
     {ρv W F G frame : ResU Loc Val} {hs : ρv.InStratum s.join}
     {w : Loc → Option Val}
@@ -100,9 +91,7 @@ theorem ResU.lower_swap_imm_own {l : Loc} {s : LSet} {v : Val}
     (ResU.six26 hW ⟨σi, hσi⟩ hvW).mp hLi
   exact ResU.Lower.congr hLi hLW hF hHF hG hHG
 
-/-- **`[TR]` 6.66's *"note since `ρ_m` is well formed, `ρ''_m` is as well"*.**
-The cell rebuilt from the callback's own payload is valid, by 6.23 at the
-`own` cell the payload comes with. -/
+/-- `[TR]` 6.66's *"note since `ρ_m` is well formed, `ρ''_m` is as well"*. -/
 theorem ResU.valid_single_mut_of_wit {l : Loc} {b : Life} {v : Val}
     {σ W : ResU Loc Val} {h : ResU.InStratum b σ}
     {P : Val → SPropS Loc Val b} {hw : P v ⟨σ, h⟩}

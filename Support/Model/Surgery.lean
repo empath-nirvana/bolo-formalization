@@ -21,9 +21,7 @@ import Support.Model.WalkSplitting
 /-!
 # Support — Model — Surgery
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the steps of the surgery lemmas 6.21–6.29, 6.34, 6.38 and 6.39: the normal forms of `⦇ρ ● ℓ ↦ own(v) ● ρ_v⦈` and `⦇ρ ● ℓ ↦ imm(α, v, ρ_v)⦈`, and the `mut` cell against `ρ_v ● ℓ ↦ own(v)`.
+`[about ours]`.  The steps of the surgery lemmas 6.21–6.29, 6.34, 6.38 and 6.39: the normal forms of `⦇ρ ● ℓ ↦ own(v) ● ρ_v⦈` and `⦇ρ ● ℓ ↦ imm(α, v, ρ_v)⦈`, and the `mut` cell against `ρ_v ● ℓ ↦ own(v)`.
 -/
 
 noncomputable section
@@ -39,10 +37,7 @@ theorem BigComp.toR {L : List (ResU Loc Val)} {b : ResU Loc Val}
   | nil => exact BigComp.nil
   | cons _ hc ih => exact BigComp.cons ih (ResU.CompS.toCompR hc)
 
-/-- **`○` never drops a lifetime from an `imm` operand.**  Clause (2) unions the
-two sets and clauses (1) and (5) return the `imm` cell itself.  This is
-`cellCompR_at_le_imm` at the sets rather than at their meets, which is what
-pins a composite over `{α}` down to operands over `{α}`.
+/-- `○` drops no lifetime from an `imm` operand.
 `[about ours: the set half of "`ag(ρ)` keeps every `imm` cell of `ρ`"]` -/
 theorem CellU.CompR.ls_imm {ψ₁ ψ₂ ψ : CellU Loc Val} (hc : CellU.CompR ψ₁ ψ₂ ψ)
     {s₁ : LSet} {v₁ : Val} {χ₁ : ResU Loc Val} {h₁ : χ₁.InStratum s₁.join}
@@ -87,7 +82,7 @@ theorem ResU.CompR.get_ls_imm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR ρ
     exact CellU.CompR.ls_imm hC (Option.some.inj f₁).symm
       (Option.some.inj (f.symm.trans e)) hx
 
-/-- …and through both `○`s of `ag`. -/
+/-- The same through `ag`. -/
 theorem AgW.get_ls_imm {ρ σ : ResU Loc Val} (h : AgW ρ σ)
     {l : Loc} {s₁ : LSet} {v₁ : Val} {χ₁ : ResU Loc Val} {h₁ : χ₁.InStratum s₁.join}
     (e₁ : ρ.get l = some (CellU.immOf s₁ v₁ χ₁ h₁))
@@ -103,7 +98,7 @@ theorem AgW.get_ls_imm {ρ σ : ResU Loc Val} (h : AgW ρ σ)
       exact ResU.CompR.get_ls_imm ha (ResU.restrict_get_some e₁ hk₁)
         (hζ.trans (congrArg some hetaζ)) hx
 
-/-- …and through `⦇−⦈`, whose `ex` half carries no `imm` cell. -/
+/-- The same through `⦇−⦈`. -/
 theorem ResU.Flat.get_ls_imm {ρ σ : ResU Loc Val} (h : ResU.Flat ρ σ)
     {l : Loc} {s₁ : LSet} {v₁ : Val} {χ₁ : ResU Loc Val} {h₁ : χ₁.InStratum s₁.join}
     (e₁ : ρ.get l = some (CellU.immOf s₁ v₁ χ₁ h₁))
@@ -117,24 +112,14 @@ theorem ResU.Flat.get_ls_imm {ρ σ : ResU Loc Val} (h : ResU.Flat ρ σ)
   obtain rfl : ζ = CellU.immOf s v χ hh := (Option.some.inj this).symm
   exact AgW.get_ls_imm hag e₁ hζ hx
 
-/-- **From `⦇X⦈(ℓ)` to `X(ℓ)`: the step `[TR]` 6.29 and 6.52 both take.**  If the
-flattening carries an `imm` cell at `ℓ` one of whose lifetimes is `α`, and every
-*other* cell of the flattening lies in `Res_α`, then `X` carries a cell at `ℓ`
-itself — the raised cell cannot have come out of a borrow.
-
-`[TR]` 6.29 (p. 11) argues it as *"all borrows in `⦇ρ′⦈` other than `ρᵢ` must be
+/-- If `⦇X⦈` carries an `imm` cell at `ℓ` one of whose lifetimes is `α`, and
+every other cell of the flattening lies in `Res_α`, then `X` carries a cell at
+`ℓ`: `[TR]` 6.29's (p. 11) *"all borrows in `⦇ρ′⦈` other than `ρᵢ` must be
 disjoint from `α`, which by well-formedness of the resource `ρ′` implies that
-the cell … cannot be in any `ρ″` …"*, and 6.52 (p. 17) repeats it.  It needs no
-descent into the nesting: `flat_inStratum_inv` is pointwise, so at a location
-where `X` is silent it asks nothing, and `X ∈ Res_α` then makes `⦇X⦈ ∈ Res_α`,
-which at `ℓ` says `⊓s ⊐ α` against `⊓s ⊑ α`.
-
-*"Well-formedness"* is Fig. 16's own typing of the borrow cells — `imm(ᾱ, v, ρ)`
-carries `ρ : Res_{⊔ᾱ}` and `mut(β, v, ρ, P̂)` carries `ρ : Res_β` — which on this
-carrier are arguments of `CellU.immOf` and `CellU.mutOf` and so hold at every
-cell by construction.  No predicate is added.
-`[about ours: the step `[TR]` 6.29's and 6.52's proofs take at
-"cannot be in any `ρ″`", stated once]` -/
+the cell … cannot be in any `ρ″` …"*, repeated in 6.52 (p. 17).
+*"Well-formedness"* is Fig. 16's typing of the borrow cells' witnesses, which
+are arguments of `CellU.immOf` and `CellU.mutOf`.
+`[about ours: the step of `[TR]` 6.29's and 6.52's proofs]` -/
 theorem ResU.flat_imm_at_top {X σ : ResU BoCa.Loc BoCa.Val} {α : Life}
     (hσ : ResU.Flat X σ) {l : BoCa.Loc} {s : LSet} {v : BoCa.Val}
     {χ : ResU BoCa.Loc BoCa.Val} {h : χ.InStratum s.join}
@@ -167,8 +152,7 @@ theorem ResU.flat_imm_at_top {X σ : ResU BoCa.Loc BoCa.Val} {α : Life}
       exact absurd (s.meet_least α hmem) (not_le_of_gt hbad)
 
 /-- `○` at two `imm` cells over one value and one witness unions the lifetime
-sets — clause (1) when they are the same cell and clause (2) otherwise, which is
-the *"by the definition of `○` and `●`"* of `[TR]` 6.51's proof. -/
+sets: the *"by the definition of `○` and `●`"* of `[TR]` 6.51's proof. -/
 theorem CellU.CompR.imm_union {ψ₁ ψ₂ ζ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ζ)
     {a b : LSet} {v : Val} {χ : ResU Loc Val}
     {ha : χ.InStratum a.join} {hb : χ.InStratum b.join}
@@ -213,8 +197,7 @@ theorem ResU.compS_single_get_ne {l l' : Loc} {ψ : CellU Loc Val}
   · rw [e, e₂]
   · rw [ResU.single_get_ne ψ hne] at e₁; exact absurd e₁ (by simp)
 
-/-- …and at `ℓ` itself `σ` carries the distinguished cell, `K` being silent
-there. -/
+/-- At `ℓ`, `σ = ℓ ↦ ψ ● K` carries `ψ` and `K` is undefined. -/
 theorem ResU.compS_single_get_self {l : Loc} {ψ : CellU Loc Val}
     {K σ : ResU Loc Val} (h : ResU.CompS (ResU.single l ψ) K σ)
     (hn : K.get l = none) : σ.get l = some ψ := by
@@ -225,7 +208,7 @@ theorem ResU.compS_single_get_self {l : Loc} {ψ : CellU Loc Val}
   · exact absurd (hn.symm.trans e₂) (by simp)
   · exact absurd (hn.symm.trans e₂) (by simp)
 
-/-- **The `own` normal form.**  `[TR]` 6.39's first display, lines 2–4:
+/-- The `own` normal form, `[TR]` 6.39's first display, lines 2–4:
 
 ```
 ⦇ρ ● ℓ↦own(v) ● ρ_v⦈ = ex(ρ)_● ● ex(ℓ↦own(v))_● ● ex(ρ_v)_●
@@ -233,11 +216,6 @@ theorem ResU.compS_single_get_self {l : Loc} {ψ : CellU Loc Val}
                      = ℓ↦own(v) ● ex(ρ)_● ● ex(ρ_v)_● ● (ag(ρ) ○ ag(ρ_v))
 ```
 
-6.18 (`ExS.split`) and 6.20 (`AgW.split`) cut the walks, `ExW.single_own` and
-`AgW.single_own` evaluate them at the singleton, and 6.3 (`ResU.CompS.assoc`)
-with 6.2 (`ResU.CompS.comm`) move the cell to the front.  The remainder `K` is
-named by the walks it is built from, so the `imm` form below can be handed the
-same one.
 `[about ours: `[TR]` 6.39's first display, as a graph — G4]` -/
 theorem ResU.flat_own_normal {l : Loc} {v : Val} {ρ ρv ov w σ : ResU Loc Val}
     (hov : ResU.CompS (ResU.single l (CellU.ownOf v)) ρv ov)
@@ -263,10 +241,7 @@ theorem ResU.flat_own_normal {l : Loc} {v : Val} {ρ ρv ov w σ : ResU Loc Val}
     (ResU.CompS.assoc (ResU.single l (CellU.ownOf v)) EX a σ).mpr ⟨e, hle, hσ⟩
   exact ⟨e₁, f₂, EX, a₁, g₂, a, K, he₁, hf₂, hEX, ha₁, hg₂, hac, hK, hKσ⟩
 
-/-- **`ag` at a singleton `imm` cell, forwards.**  `[TR]` p. 5's row has three
-factors there: `ρ|imm` is the cell, the `mut` family is empty, and the `imm`
-family has the one member `ex(ρ_v)_○ ○ ag(ρ_v)`, which Definition 6.1 names
-`⦇ρ_v⦈_○`.  The converse of `AgW.single_imm_inv`.
+/-- `ag` at a singleton `imm` cell, forwards.
 `[about ours: `ag`'s printed row evaluated at one `imm` cell]` -/
 theorem AgW.single_imm {l : Loc} {s : LSet} {v : Val} {χ p σ : ResU Loc Val}
     {hstr : χ.InStratum s.join} (hp : ResU.FlatR χ p)
@@ -285,12 +260,8 @@ theorem AgW.single_imm {l : Loc} {s : LSet} {v : Val} {χ p σ : ResU Loc Val}
   · rw [ResU.restrict_single_self hk]
     exact ResU.comp_empty_right _
 
-/-- **The four walks of `ρ` and `ρ_v` are silent at `ℓ`.**  This is `[TR]`
-Lemma 6.34's *"Unfolding these, we have `ℓ ∉ dom(⦇ρ ● ρ_v⦈)`"*: the printed
-`ρ # ρ_v ● ℓ ↦ own(v)` puts an `own` cell at `ℓ` into `ex(−)_●`, and `●` admits
-no second cell there, so `ex(ρ)_●`, `ag(ρ)`, `ex(ρ_v)_●` and `ag(ρ_v)` are all
-undefined at `ℓ`.  Lemmas 6.18 (`ExS.split`) and 6.20 (`AgW.split`) cut the
-walks and `ExW.single_own` evaluates the exclusive one at the singleton.
+/-- The four walks of `ρ` and `ρ_v` are undefined at `ℓ`: `[TR]` Lemma 6.34's
+*"Unfolding these, we have `ℓ ∉ dom(⦇ρ ● ρ_v⦈)`"*.
 `[about ours: the step `[TR]` Lemma 6.34's proof reads off the printed `#`, at
 the walks; `[TR]` Lemma 6.29's proof reads the same one]` -/
 theorem ResU.walks_none_of_hash_own {l : Loc} {v : Val}
@@ -330,11 +301,9 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **`[TR]` Lemma 6.38** (p. 12), as a proposition.  The six printed
-hypotheses in the printed order, and the printed conclusion.  Stated at
-`BoCa.Loc`/`BoCa.Val`, as 6.29 is.
-`[as printed]` (the printed `●`s appear as their graphs — G4; the conclusion's
-`ρ′ ● ρ⁺/ℓ` is asserted to exist rather than presupposed) -/
+/-- `[TR]` Lemma 6.38 (p. 12), as a proposition.
+`[as printed]` (the `●`s as graphs, G4; the conclusion's `ρ′ ● ρ⁺/ℓ` asserted to
+exist) -/
 def ResU.SixThirtyEight : Prop :=
   ∀ {α : Life} {l : BoCa.Loc} {v : BoCa.Val}
     {ρ ρv ρ' ρp W ρρi ρ'ρp : ResU BoCa.Loc BoCa.Val}
@@ -350,13 +319,8 @@ def ResU.SixThirtyEight : Prop :=
     ResU.UpdV ρρi ρ'ρp →
     ∃ G, ResU.CompS ρ' (ρp.del l) G ∧ ResU.Hash G W
 
-/-- **`[TR]` Lemma 6.38's step 2, the half that is about `ρ′`.**  *"By H4 and
-H7"*: H7 leaves `imm({α}, v, ρ_v)` at `ℓ` in `ρ′ ● ρ⁺`, and `@ρ′ ⊐ α` puts
-every cell of `ρ′` in `Res_α`.  An `imm` cell contributing at `ℓ` has its
-lifetime set inside `{α}` — it is the cell itself where `ρ⁺` is silent there,
-and a `●`-factor of it otherwise, where `●` unions the two sets — so its `@` is
-`⊓{α} = α`, and `α ⊐ α` is false.  Hence `ℓ ∉ dom(ρ′)`, which is what turns
-`(ρ′ ● ρ⁺)/ℓ` into `ρ′ ● ρ⁺/ℓ`.
+/-- `[TR]` Lemma 6.38's step 2, *"By H4 and H7"*, the half about `ρ′`:
+`ℓ ∉ dom(ρ′)`.
 `[about ours: the step `[TR]` Lemma 6.38's proof takes at "By H4 and H7"]` -/
 theorem ResU.six38_no_borrow_in_frame {α : Life} {l : BoCa.Loc} {v : BoCa.Val}
     {ρv ρ' ρp ρ'ρp : ResU BoCa.Loc BoCa.Val}
@@ -397,11 +361,8 @@ theorem ResU.six38_no_borrow_in_frame {α : Life} {l : BoCa.Loc} {v : BoCa.Val}
           rw [hs] at hm; exact hm
         exact key _ w χ k₁ hφα (hjoin ▸ s₁.join_mem)
 
-/-- **`[TR]` Lemma 6.38 from its third sentence on.**  The printed hypotheses
-that are still live, together with what the first two sentences delivered, and
-the printed conclusion.  This is the whole of the two displays, the three
-bullets, the appeal to 6.37 and the closing contradiction — not a detail left
-over from them.
+/-- `[TR]` Lemma 6.38 from its third sentence on: the printed hypotheses still in
+use, what the first two sentences deliver, and the printed conclusion.
 `[about ours: `[TR]` Lemma 6.38's proof from "Then in order to show G1" on]` -/
 def ResU.SixThirtyEightResidual : Prop :=
   ∀ {α : Life} {l : BoCa.Loc} {v : BoCa.Val}
@@ -426,10 +387,8 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 variable {Loc Val : Type}
 
-/-- `ρ ◐ ∅ = σ` determines `σ`.  `[TR]` Lemma 6.4 (`ResU.comp_empty_right`)
-gives the composite; this reads it backwards, and needs no functionality of the
-cell-level operation because the empty operand contributes no cell to compose
-with.  `[about ours: the schema-level converse of `[TR]` 6.4, for the walks,
+/-- `ρ ◐ ∅ = σ` determines `σ`, at any cell-level operation.
+`[about ours: the schema-level converse of `[TR]` 6.4, for the walks,
 whose operator is a parameter]` -/
 theorem ResU.eq_of_comp_empty_right {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} {ρ σ : ResU Loc Val}
@@ -442,7 +401,7 @@ theorem ResU.eq_of_comp_empty_right {R : CellU Loc Val → CellU Loc Val → Pro
   | none => rw [e] at hl; exact (show σ.get l = none from hl).symm
   | some ψ => rw [e] at hl; exact (show σ.get l = some ψ from hl).symm
 
-/-- `∅ ◐ ρ = σ` determines `σ`.  The mirror of `ResU.eq_of_comp_empty_right`.
+/-- `∅ ◐ ρ = σ` determines `σ`.
 `[about ours: the schema-level converse of `[TR]` 6.4, for the walks]` -/
 theorem ResU.eq_of_comp_empty_left {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} {ρ σ : ResU Loc Val}
@@ -455,11 +414,8 @@ theorem ResU.eq_of_comp_empty_left {R : CellU Loc Val → CellU Loc Val → Prop
   | none => rw [e] at hl; exact (show σ.get l = none from hl).symm
   | some ψ => rw [e] at hl; exact (show σ.get l = some ψ from hl).symm
 
-/-- **`ex` at a singleton `mut` cell, read backwards.**  `[TR]` p. 5's row is
-`ex(ρ)_◐ ≜ (ρ|own ◐ ρ|mut) ◐ ⨀{ex(ρ′)_◐ | mut sites}`.  At the one cell
-`ρ|own` is empty, `ρ|mut` is the cell, and the family has the single member
-`ex(ρ_v)_◐`, so the walk is the cell composed with the witness's walk — at
-whichever operator the walk is taken.
+/-- `ex` at a singleton `mut` cell, read backwards: the cell composed with the
+witness's walk.
 `[about ours: `ex`'s printed row evaluated at one `mut` cell]` -/
 theorem ExW.single_mut_inv {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
@@ -507,10 +463,7 @@ theorem ExW.single_mut_inv {R : CellU Loc Val → CellU Loc Val → Prop}
               rw [hnmeq, hbe]
               exact hσ
 
-/-- **`ag` at a singleton `mut` cell, read backwards.**  `[TR]` p. 5's row is
-`ag(ρ) ≜ ρ|imm ○ ⨀{ag(ρ′) | mut sites} ○ ⨀{ex(ρ′)_○ ○ ag(ρ′) | imm sites}`.
-At the one `mut` cell the first factor is empty and the third family is empty,
-so the walk is the witness's own `ag` and nothing else.
+/-- `ag` at a singleton `mut` cell, read backwards: the witness's own `ag`.
 `[about ours: `ag`'s printed row evaluated at one `mut` cell]` -/
 theorem AgW.single_mut_inv {l : Loc} {b : Life} {v : Val} {χ : ResU Loc Val}
     {hstr : ResU.InStratum b χ} {P : Val → SPropS Loc Val b} {hw : P v ⟨χ, hstr⟩}
@@ -564,13 +517,10 @@ theorem AgW.single_mut_inv {l : Loc} {b : Life} {v : Val} {χ : ResU Loc Val}
               rw [← hσeq, ← haeq, ← hbe]
               exact hag
 
-/-- **Compatibility with an exclusive cell does not see which cell it is.**
-`▸◂` at a location carrying an `own` or `mut` cell forces the other side empty
-there — `▶◀` relates `imm` cells only — so two resources that agree off `ℓ` and
-carry an exclusive cell at `ℓ` have the same `▸◂` partners.  This is `[TR]`
-6.22's *"Since `ρ_o` contains a single `own` cell, this composite is
-well-defined if and only if the same composite is defined when `ρ_o` is
-replaced by `ρ_m`"*, which 6.23's proof then reuses by name.
+/-- Two resources that agree off `ℓ` and carry an exclusive cell at `ℓ` have
+the same `▸◂` partners: `[TR]` 6.22's *"Since `ρ_o` contains a single `own`
+cell, this composite is well-defined if and only if the same composite is defined
+when `ρ_o` is replaced by `ρ_m`"*, which 6.23's proof reuses.
 `[about ours: the sentence `[TR]` 6.22 and 6.23 close on, as a lemma]` -/
 theorem ResU.compatS_congr_of_excl {l : Loc} {s s' A : ResU Loc Val}
     (hoff : ∀ x, x ≠ l → s'.get x = s.get x)
@@ -584,10 +534,7 @@ theorem ResU.compatS_congr_of_excl {l : Loc} {s s' A : ResU Loc Val}
   · exact hc x χ₁ χ₂ (by rw [← hoff x hx]; exact e₁) e₂
 
 /-- Two composites over the same left operand agree wherever their right
-operands do.  The companion of `ResU.compatS_congr_of_excl`: once the swapped
-cell is known to sit at `ℓ` alone, the composite it sits in is unchanged off
-`ℓ` too, which is what lets the swap be applied again at the next composition.
-`[about ours: pointwise bookkeeping for the swap]` -/
+operands do. -/
 theorem ResU.compS_agree_off_right {l : Loc} {ρ₁ ρ₂ ρ₂' ρ ρ' : ResU Loc Val}
     (h : ResU.CompS ρ₁ ρ₂ ρ) (h' : ResU.CompS ρ₁ ρ₂' ρ')
     (hoff : ∀ x, x ≠ l → ρ₂'.get x = ρ₂.get x) :
@@ -604,8 +551,7 @@ theorem ResU.compS_agree_off_right {l : Loc} {ρ₁ ρ₂ ρ₂' ρ ρ' : ResU L
     obtain ⟨ψb, hb, hCb⟩ := h2
     rw [ha, hb, CellU.CompS.functional hCa hCb]
 
-/-- **`ex` at a singleton `mut` cell, forwards.**  The converse of
-`ExW.single_mut_inv`.
+/-- `ex` at a singleton `mut` cell, forwards.
 `[about ours: `ex`'s printed row evaluated at one `mut` cell]` -/
 theorem ExW.single_mut {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
@@ -626,8 +572,7 @@ theorem ExW.single_mut {R : CellU Loc Val → CellU Loc Val → Prop}
       ResU.restrict_single_self hk]
     exact ResU.comp_empty_left _
 
-/-- **`ag` at a singleton `mut` cell, forwards.**  The converse of
-`AgW.single_mut_inv`.
+/-- `ag` at a singleton `mut` cell, forwards.
 `[about ours: `ag`'s printed row evaluated at one `mut` cell]` -/
 theorem AgW.single_mut {l : Loc} {b : Life} {v : Val} {χ : ResU Loc Val}
     {hstr : ResU.InStratum b χ} {P : Val → SPropS Loc Val b} {hw : P v ⟨χ, hstr⟩}
@@ -650,12 +595,7 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **`↭` keeps the stratum.**  Clause (1) fixes an `imm` cell of the
-flattening outright and clause (2) fixes a `mut` cell's lifetime, so a
-flattening of `ρ′` carries no cell shorter than one of `⦇ρ⦈`'s; `BoLo`'s two
-`flat_inStratum` lemmas carry that between the resources and their
-flattenings.  This is `ResU.updV_outlives_at` (`[TR]` 6.50 at one location) at
-the whole resource.
+/-- `↭` keeps the stratum.
 `[about ours: `[TR]` Lemma 6.50 read as a statement about `Res_α`]` -/
 theorem ResU.updV_inStratum {ρ ρ' : ResU BoCa.Loc BoCa.Val} {α : Life}
     (hd : ρ.InStratum α) (hu : ResU.UpdV ρ ρ') : ρ'.InStratum α := by
@@ -674,8 +614,7 @@ theorem ResU.updV_inStratum {ρ ρ' : ResU BoCa.Loc BoCa.Val} {α : Life}
     cases ResU.Flat.functional hτ hσ
     exact (hσα m _ hgg : b ⊐ α)
 
-/-- An `own` or a `mut` cell sits in its own flattening unchanged: nothing
-composes with an exclusive cell, so the walks cannot touch it.  `[about ours:
+/-- An `own` or a `mut` cell sits in its own flattening unchanged.  `[about ours:
 the step `[TR]` 6.27's proof reads off `⦇−⦈` at an exclusive cell]` -/
 theorem ResU.flat_get_of_ne_imm {Loc Val : Type} {ρ σ : ResU Loc Val}
     (h : ρ.Flat σ) {l : Loc} {ψ : CellU Loc Val}

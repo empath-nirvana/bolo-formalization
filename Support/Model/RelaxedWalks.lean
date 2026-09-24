@@ -8,9 +8,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — RelaxedWalks
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`ex(ρ)_○` has no `imm` cell, `⦇ρ⦈_○` is functional, and `○` never makes an `imm` cell from two non-`imm` ones.
+`[about ours]`.  `ex(ρ)_○` has no `imm` cell, `⦇ρ⦈_○` is functional, and `○` never makes an `imm` cell from two non-`imm` ones.
 -/
 
 noncomputable section
@@ -31,15 +29,12 @@ theorem CellU.compR_ne_imm (ψ₁ ψ₂ ψ : CellU Loc Val) (h : CellU.CompR ψ�
   | immMut => exact absurd rfl h₁
   | mutImm => exact absurd rfl h₂
 
-/-- `[TR]` Lemma 6.36 at `○`, the other value of `◐`.  Discharged by
-`CellU.compR_ne_imm`, which needs both operands' tags — clause (5) of `○`
-returns an `imm` cell whenever either operand is one.  `[as printed]` -/
+/-- `[TR]` Lemma 6.36 at `○`.  `[as printed]` -/
 theorem ExR.immFree {ρ σ : ResU Loc Val} (h : ExR ρ σ) : σ.ImmFree :=
   ExW.immFree CellU.compR_ne_imm h
 
-/-- **`⦇ρ⦈_○` is a term** — `[TR]` Definition 6.1 (p. 9), `ag(ρ) ○ ex(ρ)_○`.
-`[about ours: `ResU.FlatR` is the graph of Definition 6.1's `⦇ρ⦈_○` (G4); this
-is the proof that the graph is a function]` -/
+/-- `⦇ρ⦈_○ = ag(ρ) ○ ex(ρ)_○` (`[TR]` Definition 6.1, p. 9) is single-valued.
+`[about ours: `ResU.FlatR` is the graph of `⦇ρ⦈_○` (G4)]` -/
 theorem ResU.FlatR.functional {ρ σ σ' : ResU Loc Val}
     (h : ρ.FlatR σ) (h' : ρ.FlatR σ') : σ = σ' := by
   obtain ⟨a, e, hag, hex, hc⟩ := h

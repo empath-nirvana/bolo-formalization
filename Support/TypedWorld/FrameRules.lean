@@ -32,9 +32,7 @@ import Support.TypedWorld.Wp
 /-!
 # Support — TypedWorld — FrameRules
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`[TR]` Theorems 6.64, 6.65 and 6.66 at `wpTS`, with the record list carried.
+`[about ours]`.  `[TR]` Theorems 6.64, 6.65 and 6.66 at `wpTS`, with the record list carried.
 -/
 
 noncomputable section
@@ -46,12 +44,8 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-!
-### Theorem 6.64 (Imm Frame) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean`, under the record of Theorem 6.64 (Imm Frame).
--/
-/-- **`[TR]` Theorem 6.64** (`Imm Frame`) at the tagged `wpTS`:
+/-! ### Theorem 6.64 (Imm Frame) at the typed world; record in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean` -/
+/-- `[TR]` Theorem 6.64 (`Imm Frame`) at the tagged `wpTS`:
 
     ℓ ↦ v ⋆ 𝒱⟦T⟧(ls)δ(v) ⋆ (⋔α. ∀ ls′ ⊇_α ls. Imm α 𝒱⟦T⟧δ ─⋆ wp_{ls′}(e){[α] (ℓ ↦ v ─⋆
         𝒱⟦T⟧δ(v) ─⋆ Q̂)})  ⊨  wp_{ls}(e){Q̂}
@@ -339,12 +333,8 @@ theorem wpTS_I_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (hadm : AdmWf T δ) (v
     ResU.hash_symm hfR, hFR, hPDFR, hmem₁, hFRP, hmem₂, h8, hRP,
     hupdw, hno, hTout, htgout, fun _ => Iff.rfl, fun _ => Iff.rfl, hQls⟩
 
-/-!
-### Theorem 6.65 (Mut Frame) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean`, under the record of Theorem 6.65 (Mut Frame).
--/
-/-- **`[TR]` Theorem 6.65** (`Mut Frame`) at the tagged `wpTS`: if `𝒱⟦T⟧δ ⊨ [β]𝒱⟦T⟧δ` at every
+/-! ### Theorem 6.65 (Mut Frame) at the typed world; record in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean` -/
+/-- `[TR]` Theorem 6.65 (`Mut Frame`) at the tagged `wpTS`: if `𝒱⟦T⟧δ ⊨ [β]𝒱⟦T⟧δ` at every
 list, then
 
     ℓ ↦ v ⋆ 𝒱⟦T⟧(ls)δ(v) ⋆ (⋔α. Mut α 𝒱⟦T⟧δ ─⋆ wp_{ls}(e){[α] ∀v′. ℓ ↦ v′ ─⋆ 𝒱⟦T⟧δ(v′) ─⋆ Q̂})
@@ -548,12 +538,8 @@ theorem wpTS_M_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (β : Life)
     ResU.hash_symm hfR, hFR, hPDFR, hmem₁, hFRP, hmem₂, h8, hRP,
     ⟨hupd, hvρ, hvRP⟩, hno, hTout, htgout, hps'', hls'', hQ⟩
 
-/-!
-### Theorem 6.66 (Anti Frame) — typed-world version
-
-The printed statement, the printed proof and the adjudication are in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean`, under the record of Theorem 6.66 (Anti Frame).
--/
-/-- **`[TR]` Theorem 6.66** (`Anti Frame`) at the tagged `wpTS`:
+/-! ### Theorem 6.66 (Anti Frame) at the typed world; record in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean` -/
+/-- `[TR]` Theorem 6.66 (`Anti Frame`) at the tagged `wpTS`:
 
     ℓ ↦ Mut α 𝒱⟦T⟧δ ⋆ (∀v. ℓ ↦ v ─⋆ 𝒱⟦T⟧(ls)δ(v) ─⋆
         wp_{ls}(e){∃v. ℓ ↦ v ⋆ 𝒱⟦T⟧δ(v) ⋆ (ℓ ↦ Mut α 𝒱⟦T⟧δ ─⋆ Q̂)})  ⊨  wp_{ls}(e){Q̂}

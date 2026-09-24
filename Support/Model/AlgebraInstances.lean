@@ -7,9 +7,7 @@ import Support.Model.Prelude
 /-!
 # Support — Model — AlgebraInstances
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-Lemmas 6.2 and 6.3 at `○`, Lemmas 6.41 and 6.42 as one statement, and the lifetime of a `●` composite.
+`[about ours]`.  Lemmas 6.2 and 6.3 at `○`, Lemmas 6.41 and 6.42 as one statement, and the lifetime of a `●` composite.
 -/
 
 noncomputable section
@@ -29,11 +27,8 @@ theorem ResU.CompR.assoc (ρ₁ ρ₂ ρ₃ w : ResU Loc Val) :
   ResU.Comp.assoc (fun _ _ ψ h => ⟨ψ, h⟩)
     (fun ψ₁ ψ₂ ψ₃ ω => CellU.compR_assoc ψ₁ ψ₂ ψ₃ ω) ρ₁ ρ₂ ρ₃ w
 
-/-- **`[TR]` Lemmas 6.41 and 6.42** (p. 15): if `ℓ ↦ own(−) ▶◀ ρ` — resp.
-`ℓ ↦ mut(−,−,−,−) ▶◀ ρ` — then `ℓ ∉ ρ`.  One theorem for any cell whose tag is
-not `imm`; `hk` names the cell the print fixes.  The print states two lemmas,
-so by the inventory preamble's rule the `[as printed]` tag sits on the two
-instances below, not here.
+/-- `[TR]` Lemmas 6.41 and 6.42 (p. 15): if `ℓ ↦ own(−) ▶◀ ρ` — resp.
+`ℓ ↦ mut(−,−,−,−) ▶◀ ρ` — then `ℓ ∉ ρ`.
 `[variant: 6.41 and 6.42 stated once for any cell whose tag is not `imm`; the
 printed instances are `ResU.compatS_single_own` and `ResU.compatS_single_mut`]`
 -/
@@ -44,9 +39,7 @@ theorem ResU.compatS_single_not_imm {l : Loc} {ψ : CellU Loc Val} {ρ : ResU Lo
   | some χ =>
       exact absurd (CellU.CompatS.kinds (h l ψ χ (ResU.single_get_self l ψ) e)).1 hk
 
-/-- The lifetime of a strict composite is the meet of the two: `●` unions the
-lifetime sets and `@` is their meet, so `@(ψ₁ ● ψ₂) = @ψ₁ ⊓ @ψ₂`.  This is the
-cell-level content of `[TR]` Lemma 6.45.
+/-- `@(ψ₁ ● ψ₂) = @ψ₁ ⊓ @ψ₂`.
 `[about ours: the cell-level fact the resource-level 6.45 is proved from]` -/
 theorem CellU.CompS.at {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁ ψ₂ ψ) :
     ψ.at = ψ₁.at ⊓ ψ₂.at := by
@@ -54,10 +47,7 @@ theorem CellU.CompS.at {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁ �
   subst e₁; subst e₂; subst e₃
   rfl
 
-/-- **`Res_α` is preserved and reflected by `●`.**  All three cells are `imm`
-(`CellU.CompS.kind`, `CellU.CompatS.kinds`), `@` of the composite is the meet of
-the operands' (`CellU.CompS.at`), and a meet clears `α` exactly when both do.
-This is the cell-level content of `[TR]` Lemma 6.45 at `[α]`'s own conjunct.
+/-- `Res_α` is preserved and reflected by `●` at a cell.
 `[about ours: the cell-level fact the resource-level 6.45 is proved from]` -/
 theorem CellU.CompS.inStratum {ψ₁ ψ₂ ψ : CellU Loc Val} (hC : CellU.CompS ψ₁ ψ₂ ψ)
     (α : Life) : ψ.InStratum α ↔ (ψ₁.InStratum α ∧ ψ₂.InStratum α) := by

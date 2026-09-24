@@ -17,9 +17,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — ReborrowFrame
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the steps of Lemmas 6.53–6.55 and 6.61 that the printed proofs name.
+`[about ours]`.  The steps of Lemmas 6.53–6.55 and 6.61 that the printed proofs name.
 -/
 
 noncomputable section
@@ -27,44 +25,26 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **The printed `#` already delivers `ag(ρ_f)`.**  `✓(ρ_f ● ρ_i)` splits
-through 6.20 (`AgW.split`), so the aliasable walk of the frame is defined
-wherever 6.53 and 6.55 are stated.  Naming it is therefore not a restriction.
-`[about ours: the `ag(ρ_f)` of `[TR]` p. 18's displays, produced from the
-printed hypothesis rather than assumed]` -/
+/-- `ρ_f # ρ_i` gives `ag(ρ_f)`.
+`[about ours: the `ag(ρ_f)` of `[TR]` p. 18's displays, from the printed `#`]` -/
 theorem ResU.agW_of_hash_left {ρf ρi ρc : ResU Loc Val}
     (hcomp : ResU.CompS ρf ρi ρc) (hval : ρc.Valid) : ∃ a, AgW ρf a := by
   obtain ⟨σ, e, a, hex, hag, hcs⟩ := hval
   obtain ⟨a₁, a₂, haf, -, -⟩ := (AgW.split hcomp).mp hag
   exact ⟨a₁, haf⟩
 
-/-- **§12.41's conjunct, written out.**  `[TR]` p. 18, in the proof of 6.55:
-*"`ρ` and `ρ′` differ only by potentially changing from own or mut to imm, but
-**witnesses and values always stay the same**."*  At the `mut` and `imm` clauses
-of `reb_α` that is true and derived (`ResU.reb_src`, `ResU.reb_imm_cell_kw`); at
-the `own` clause the witness is fabricated from `π(ℓ)/ℓ` and the definition
-pins nothing, so two reborrows of one source may disagree there.
-
-`EscrowAgree χ ρ σ` says they do not: over an `own` cell of the source `χ`, a
-cell of the image `ρ` and a cell of `σ` at that location carry the same witness
-whenever neither is `own`.  It is an agreement between the two, with no choice
-of which resource the common witness is.  `own` is excluded exactly where `▶◀`
-and `▷◁` exclude it (`CellU.compatS_iff`, `CellU.compatR_iff`), an `own` cell
-having no witness to compare; `≠ own` rather than `= imm` because `ag(ρ_f)`,
-which is where 6.55 spends the sentence, carries `mut` cells too — every
-`ex(χ)_○` inside its `imm` family keeps them.
-`[about ours: a named hypothesis for a sentence `[TR]` p. 18 asserts and
-`[TR]` p. 5's `reb_α` does not deliver; carried in every consumer's type]` -/
+/-- `[TR]` p. 18, in the proof of 6.55: *"`ρ` and `ρ′` differ only by
+potentially changing from own or mut to imm, but witnesses and values always stay
+the same"*, at `reb_α`'s `own` clause (`docs/adjudications.md` §12.41).  Over an
+`own` cell of the source `χ`, a cell of the image `ρ` and a cell of `σ` at that
+location carry the same witness whenever neither is `own`.
+`[about ours: a named hypothesis for the sentence `[TR]` p. 18 asserts]` -/
 def EscrowAgree (χ ρ σ : ResU Loc Val) : Prop :=
   ∀ (l : Loc) (v : Val) (ψ ψf : CellU Loc Val),
     χ.get l = some (CellU.ownOf v) → ρ.get l = some ψ → σ.get l = some ψf →
       ψ.kind ≠ Kind.own → ψf.kind ≠ Kind.own → ψf.wit = ψ.wit
 
-/-- **…and it asks nothing where `[TR]` p. 18's sentence is already true.**  The
-conjunct is quantified over the `own` cells of the source alone, so at a source
-with none — where `reb_α` reads every witness off the cell it reborrows — it
-holds of any image and any frame whatever.  That is exactly the scope
-`docs/adjudications.md` §12.41 gives it.
+/-- `EscrowAgree` holds at a source with no `own` cell (§12.41).
 `[about ours: the added hypothesis is empty off the `own` clause]` -/
 theorem escrowAgree_of_no_own {χ : ResU Loc Val}
     (h : ∀ l ψ, χ.get l = some ψ → ψ.kind ≠ Kind.own) (ρ σ : ResU Loc Val) :
@@ -72,11 +52,8 @@ theorem escrowAgree_of_no_own {χ : ResU Loc Val}
   intro l v ψ ψf hχ _ _ _ _
   exact absurd rfl (h l _ hχ)
 
-/-- **The image of `reb_α` carries `imm` cells only** — `[TR]`'s
-`ρ|own,mut = ∅`, which 6.52's and 6.53's proofs both open with.  Derived from
-`reb_α`, not assumed: at an `imm` source cell the image cell is `imm`
-(`ResU.reb_imm_cell_kw`) and at any other it is `imm({α}, v, −)`
-(`ResU.reb_src`). -/
+/-- The image of `reb_α` carries `imm` cells only: the `ρ|own,mut = ∅` 6.52's
+and 6.53's proofs open with. -/
 theorem ResU.reb_imm_image {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
     {l : Loc} {ψ : CellU Loc Val} (hg : ρ'.get l = some ψ) : ψ.kind = Kind.imm := by
   obtain ⟨φ, hφ⟩ := ResU.reb_dom_subset h hg
@@ -85,7 +62,7 @@ theorem ResU.reb_imm_image {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α 
   · obtain ⟨v, χ, hχ, hψ, -, -⟩ := ResU.reb_src h hg hφ hk
     rw [hψ]; exact CellU.kind_immOf _ _ _ _
 
-/-- `ρ = ρ/ℓ ● ℓ ↦ ρ(ℓ)` — the one splitting `reb_α`'s `π(ℓ)/ℓ` calls for.
+/-- `ρ = ρ/ℓ ● ℓ ↦ ρ(ℓ)`.
 `[about ours: `[TR]` p. 5's `/` against `●`, at one location]` -/
 theorem ResU.del_compS {ρ : ResU Loc Val} {l : Loc} {ψ : CellU Loc Val}
     (hg : ρ.get l = some ψ) : ResU.CompS (ρ.del l) (ResU.single l ψ) ρ := by
@@ -105,11 +82,8 @@ theorem ResU.del_compS {ρ : ResU Loc Val} {l : Loc} {ψ : CellU Loc Val}
       | none => rfl
       | some χ => rfl
 
-/-- **The `own` clause of `reb_α` gives its escrow a `≤`.**  `[TR]` 6.54's third
-bullet reads *"either `ρ″ ≤ ρ′`, or `ρ′(ℓ) = mut(_, ρ″, _, _)"*; this is the
-first disjunct, derived.  At an `own` source cell `reb_α` sets the image's
-witness to `π(ℓ)/ℓ`, and `π(ℓ)` is a `●`-factor of `⨀π`, which is a `●`-factor
-of the source by `reb_α`'s own `ρ ≥ ⨀π`.
+/-- At `reb_α`'s `own` clause the witness is `≤` the source: the first disjunct
+of `[TR]` 6.54's third bullet, *"either `ρ″ ≤ ρ′`, or `ρ′(ℓ) = mut(_, ρ″, _, _)"*.
 `[about ours: `[TR]` 6.54's *"`ρ″ ≤ ρ′`"* (p. 18), read off `reb_α`'s own
 clauses]` -/
 theorem ResU.reb_own_le {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
@@ -135,17 +109,13 @@ theorem ResU.reb_own_le {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ 
 
 /-- *"Every cell of `ρ` is in `f`"*: at every location `ρ` carries a cell, `f`
 carries one over the same value, and over the same witness wherever `ρ`'s cell
-is not `own`.  `own` is excluded on the `ρ` side exactly where `▷◁` excludes it
-(`CellU.compatR_iff`), an `own` cell having no witness to compare.
-`[about ours: `[TR]` 6.54's closing line (p. 18) at one resource; it is the
-conclusion shape of `ResU.witFlat_cell`, named so that the closure lemmas can
-be stated]` -/
+is not `own`.
+`[about ours: `[TR]` 6.54's closing line (p. 18) at one resource]` -/
 def ResU.Under (f ρ : ResU Loc Val) : Prop :=
   ∀ l ζ, ρ.get l = some ζ → ∃ φ, f.get l = some φ ∧ ζ.erase = φ.erase ∧
     (ζ.kind ≠ Kind.own → φ.kind ≠ Kind.own ∧ ζ.wit = φ.wit)
 
-/-- A `○`-factor lies under the composite: `○` keeps the left operand's value,
-and its witness where that operand is not `own`. -/
+/-- A `○`-factor lies under the composite. -/
 theorem ResU.Under.of_factor {X z f : ResU Loc Val} (h : ResU.CompR X z f) :
     ResU.Under f X := by
   intro l ζ hζ
@@ -159,8 +129,7 @@ theorem ResU.Under.of_factor {X z f : ResU Loc Val} (h : ResU.CompR X z f) :
       fun hne => ⟨(CellU.CompR.nonown_left hC hne).1,
                   (CellU.CompR.nonown_left hC hne).2.symm⟩⟩
 
-/-- Lying under `f` survives `○`: the composite takes its value from either
-operand and its witness from one that is not `own`. -/
+/-- Lying under `f` survives `○`. -/
 theorem ResU.Under.compR {X Y Z f : ResU Loc Val} (h : ResU.CompR X Y Z)
     (hX : ResU.Under f X) (hY : ResU.Under f Y) : ResU.Under f Z := by
   intro l ζ hζ
@@ -179,7 +148,7 @@ theorem ResU.Under.compR {X Y Z f : ResU Loc Val} (h : ResU.CompR X Y Z)
       cases Option.some.inj hφ'
       exact ⟨(hw₂ hn₂).1, hwe.trans (hw₂ hn₂).2⟩
 
-/-- …and `⨀`, by induction along the fold. -/
+/-- Lying under `f` survives `⨀`. -/
 theorem ResU.Under.bigComp {σs : List (ResU Loc Val)} {b f : ResU Loc Val} :
     BigComp CellU.CompatR CellU.CompR σs b → (∀ σ ∈ σs, ResU.Under f σ) →
       ResU.Under f b := by
@@ -192,11 +161,7 @@ theorem ResU.Under.bigComp {σs : List (ResU Loc Val)} {b f : ResU Loc Val} :
           exact ResU.Under.compR hc (hs σ List.mem_cons_self)
             (ih hrest (fun τ hm => hs τ (List.mem_cons_of_mem _ hm)))
 
-/-- **`dom(ex(ρ″)_○) ⊆ dom(ex(ρ′)_○)` strengthened to cells**, with `ResU.Under`
-in place of the domain inclusion: the walk's own-or-mut part is a part of `ρ′` (`ResU.witFlat_cell`), and
-each entry of its `mut` family is a `○`-factor of `ex(ρ′)_○` (`ExW.wit_le`,
-`ExW.functional`), so both halves lie under `⦇ρ′⦈_○` and `○` carries that to the
-walk.
+/-- `dom(ex(ρ″)_○) ⊆ dom(ex(ρ′)_○)` at cells, as `ResU.Under`.
 `[about ours: the domain inclusion of `[TR]` 6.54's closing line, at cells]` -/
 theorem ExW.under_le {X ρ' eX eS aS f : ResU Loc Val}
     (hXY : ∀ m ψ, X.get m = some ψ → ψ.kind ≠ Kind.imm → ρ'.get m = some ψ)
@@ -245,23 +210,12 @@ theorem ExW.under_le {X ρ' eX eS aS f : ResU Loc Val}
         exact ResU.Under.of_factor hz'
       exact ResU.Under.compR hσ hnmU hbU
 
-/-- **`[TR]` Lemma 6.54 at its closing line.**  Every cell of `ag(ρ)` sits in
-`⦇ρ′⦈_○` at its own location over the same value, and — where it is not `own` —
-over the same witness, **except** at a location where the source carries an
-`own` cell, where the witness is the reborrow's own escrow.
-
-That exception is the `own` clause of `reb_α` and nothing else: `reb_α` reads
-the witness off the source cell at its `imm` and `mut` clauses, and at the `own`
-clause manufactures it from `π(ℓ)/ℓ`, which `⦇ρ′⦈_○` — where that location is
-still an `own` cell — does not carry.
-
-The three printed bullets enter as in `ResU.ag_dom_of_reb`; what changes is that
-each is spent at `ResU.Under` rather than at a domain inclusion, so the `mut`
-disjunct goes through `AgW.mut_wit_le` and `ExW.wit_le` as `○`-factors and the
-`ρ″ ≤ ρ′` disjunct through 6.20 (`AgW.split`) and `ExW.under_le`.
-`[about ours: `[TR]` 6.54's closing line (p. 18), which its displayed conclusion
-states only for domains and its own first bullet's *"every immutable borrow in
-`ρ` is in `⦇ρ′⦈_○`"* states for cells]` -/
+/-- `[TR]` Lemma 6.54 at its closing line: every cell of `ag(ρ)` sits in
+`⦇ρ′⦈_○` at its own location over the same value, and, where it is not `own`,
+over the same witness, except where the source carries an `own` cell (`reb_α`'s
+`own` clause).
+`[about ours: `[TR]` 6.54's closing line (p. 18) at cells, as its first bullet's
+*"every immutable borrow in `ρ` is in `⦇ρ′⦈_○`"* states it]` -/
 theorem ResU.ag_cell_of_reb {β : Life} {ρ' ρ A f : ResU Loc Val}
     (hreb : ResU.Reb β ρ' ρ) (hagρ : AgW ρ A) (hfl : ResU.FlatR ρ' f)
     {l : Loc} {ψ : CellU Loc Val} (hg : A.get l = some ψ) :
@@ -273,7 +227,6 @@ theorem ResU.ag_cell_of_reb {β : Life} {ρ' ρ A f : ResU Loc Val}
   have hR : ∀ ψ₁ ψ₂ ψ : CellU Loc Val, CellU.CompR ψ₁ ψ₂ ψ → CellU.CompatR ψ₁ ψ₂ :=
     fun _ _ ψ hc => ⟨ψ, hc⟩
   obtain ⟨aS, eS, hagS, hexS, hcS⟩ := hfl
-  -- The image's own cells: under `⦇ρ′⦈_○`, or at a source `own` cell.
   have hrho : ∀ (m : Loc) (χ : CellU Loc Val), ρ.get m = some χ →
       ∃ φ, f.get m = some φ ∧ χ.erase = φ.erase ∧
         ((φ.kind ≠ Kind.own ∧ χ.wit = φ.wit) ∨
@@ -391,10 +344,7 @@ theorem ResU.ag_cell_of_reb {β : Life} {ρ' ρ A f : ResU Loc Val}
           cases Option.some.inj hφ'
           exact Or.inl ⟨(hw₂ hn₂).1, hwe.trans (hw₂ hn₂).2⟩
 
-/-- **`[TR]` Lemma 6.54's conclusion, against a named `⦇ρ′⦈_○`.**  The displayed
-conclusion — a domain inclusion — read off `ResU.ag_cell_of_reb`, which carries
-the closing line's cells.  `ResU.six54` below is this with `⦇ρ′⦈_○` supplied by
-the printed `✓`.
+/-- `[TR]` Lemma 6.54's displayed conclusion, against a named `⦇ρ′⦈_○`.
 `[about ours: `[TR]` 6.54's displayed conclusion with `⦇ρ′⦈_○` and `ag(ρ)` named
 by their graphs (G4)]` -/
 theorem ResU.ag_dom_of_reb {β : Life} {ρ' ρ A f : ResU Loc Val}
@@ -404,9 +354,7 @@ theorem ResU.ag_dom_of_reb {β : Life} {ρ' ρ A f : ResU Loc Val}
   obtain ⟨φ, hφ, -, -⟩ := ResU.ag_cell_of_reb hreb hagρ hfl hg
   exact ⟨φ, hφ⟩
 
-/-- **What the printed `✓` of 6.54 delivers.**  `✓(ℓ ↦ imm(α, ρ′, v))` unfolds
-through `ag`'s `imm` row to `ℓ ↦ imm(α, ρ′, v) ○ ⦇ρ′⦈_○`, so it says in
-particular that `⦇ρ′⦈_○` — the object 6.54's conclusion names — is defined.
+/-- `✓(ℓ ↦ imm(α, ρ′, v))` gives `⦇ρ′⦈_○`.
 `[about ours: the presupposition of `[TR]` 6.54's conclusion, read off its
 printed hypothesis]` -/
 theorem ResU.flatR_of_valid_single_imm {l : Loc} {s : LSet} {v : Val}
@@ -416,10 +364,8 @@ theorem ResU.flatR_of_valid_single_imm {l : Loc} {s : LSet} {v : Val}
   obtain ⟨ev, av, p, hev, hav, hp, -⟩ := AgW.single_imm_inv hag
   exact ⟨p, av, ev, hav, hev, ResU.CompR.comm hp⟩
 
-/-- **`ex(ρ)_◐ = ∅` when `ρ` carries `imm` cells only** — the printed
-*"noting `dom(ρ|own,mut) = ∅`"* of 6.55's second display, which is what
-collapses `ex(ρ_f)● ● ex(ρ)●` to `ex(ρ_f)●`.  The image of `reb_α` is such a
-`ρ` (`ResU.reb_imm_image`).
+/-- `ex(ρ)_◐ = ∅` when `ρ` carries `imm` cells only: the *"noting
+`dom(ρ|own,mut) = ∅`"* of 6.55's second display.
 `[about ours: the walk at an argument with no own or mut cell]` -/
 theorem ExW.empty_of_all_imm {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} {ρ : ResU Loc Val}
@@ -441,21 +387,11 @@ theorem ExW.empty_of_all_imm {R : CellU Loc Val → CellU Loc Val → Prop}
   · rw [hres Kind.own (by simp), hres Kind.mut (by simp)]
     exact ResU.comp_empty_right _
 
-/-- **6.55's first display, and 6.30 with 6.36 on it.**  From the printed
-`ρ_f # ℓ ↦ imm(α, ρ′, v)` alone:
-`⦇ρ_f ● ρ_i⦈ = ex(ρ_f)● ● (ag(ρ_f) ○ ρ_i ○ ⦇ρ′⦈_○)`, whence
-`ex(ρ_f)● ▸◂ ag(ρ_f)`, `ex(ρ_f)● ▸◂ ⦇ρ′⦈_○` and `ag(ρ_f) ▷◁ ⦇ρ′⦈_○` — the last
-being the printed first bullet's *"We have `ag(ρ_f) ▷◁ ⦇ρ′⦈_○`"*.
-
-Step for step: 6.18 and 6.20 (`ExS.split`, `AgW.split`) cut the display at
-`ρ_f ● ρ_i`; `AgW.single_imm_inv` is *"unfolding the definitions of `ex`
-and `ag`"* at `ρ_i`, which is where `⦇ρ′⦈_○` appears; 6.10 (`ResU.Valid.split`)
-gives `✓ρ_f` and with it `ex(ρ_f)● ▸◂ ag(ρ_f)`; 6.36 (`ExS.immFree`) and 6.30
-(`ResU.CompatS.of_compR_left`), applied twice, peel `ρ_i` and then `⦇ρ′⦈_○` off
-the `○`; and 6.3 at `○` (`ResU.CompR.assoc`) reassociates
-`ag(ρ_f) ○ (⦇ρ′⦈_○ ○ ρ_i)` to expose `ag(ρ_f) ○ ⦇ρ′⦈_○`.
-`[about ours: `[TR]` 6.55's first display (p. 18) and the three `▸◂`/`▷◁` its
-next sentence reads off it, with every named object carried as its graph]` -/
+/-- 6.55's first display, and 6.30 with 6.36 on it.  From
+`ρ_f # ℓ ↦ imm(α, ρ′, v)`: `⦇ρ_f ● ρ_i⦈ = ex(ρ_f)● ● (ag(ρ_f) ○ ρ_i ○ ⦇ρ′⦈_○)`,
+whence `ex(ρ_f)● ▸◂ ag(ρ_f)`, `ex(ρ_f)● ▸◂ ⦇ρ′⦈_○` and `ag(ρ_f) ▷◁ ⦇ρ′⦈_○` (the
+first bullet's *"We have `ag(ρ_f) ▷◁ ⦇ρ′⦈_○`"*).
+`[about ours: `[TR]` 6.55's first display (p. 18), objects as graphs]` -/
 theorem ResU.frame_flat_facts {ρf ρ' ρc : ResU Loc Val} {l₀ : Loc} {s : LSet}
     {v : Val} {hs : ρ'.InStratum s.join}
     (hcomp : ResU.CompS ρf (ResU.single l₀ (CellU.immOf s v ρ' hs)) ρc)
@@ -483,15 +419,12 @@ theorem ResU.frame_flat_facts {ρf ρ' ρc : ResU Loc Val} {l₀ : Loc} {s : LSe
   exact ⟨e₁, a₁, p, hef, haf, ⟨av, ev, hav, hev, ResU.CompR.comm hp⟩,
     hcf.1, h3, hυ.1⟩
 
-/-- **6.55's second bullet**: `ex(ρ_f)● ▸◂ ag(ρ)`.
+/-- 6.55's second bullet: `ex(ρ_f)● ▸◂ ag(ρ)`.
 
 *"Since `ex(ρ_f)● ▸◂ ⦇ρ′⦈_○`, and `ex(ρ_f)●|imm = ∅`, we have that
 `dom(ex(ρ_f)●) ∩ dom(⦇ρ′⦈_○) = ∅`.  By unfolding the definition of `▸◂`, it
 suffices to show `dom(ex(ρ_f)●) ∩ dom(ag(ρ)) = ∅`, which is implied by
-`dom(ag(ρ)) ⊆ dom(⦇ρ′⦈_○)`."*  The first sentence is 6.36 (`ExS.immFree`) with
-`ResU.CompatS.disjoint_of_immFree`; the last is 6.54
-(`ResU.ag_dom_of_reb`); `ResU.Compat.of_disjoint` is *"unfolding the
-definition of `▸◂`"*.
+`dom(ag(ρ)) ⊆ dom(⦇ρ′⦈_○)`."*
 `[about ours: `[TR]` 6.55's second bullet (p. 18), with `dom` written
 pointwise]` -/
 theorem ResU.frame_compatS_ag {β : Life} {ρ' ρ ρf e₁ f A : ResU Loc Val}
@@ -508,20 +441,13 @@ theorem ResU.frame_compatS_ag {β : Life} {ρ' ρ ρf e₁ f A : ResU Loc Val}
         rw [h] at hφ
         exact absurd hφ (by simp)
 
-/-- **6.55's first bullet**: `ag(ρ_f) ▷◁ ag(ρ)`.
+/-- 6.55's first bullet: `ag(ρ_f) ▷◁ ag(ρ)`.
 
 *"For any location `ℓ ∈ dom(ag(ρ_f)) ∩ dom(ag(ρ))`, it suffices to show
 `ag(ρ_f)(ℓ) ▷◁ ag(ρ)(ℓ)`.  We have `ag(ρ_f) ▷◁ ⦇ρ′⦈_○`.  This follows by
 unfolding reb, and noting `ρ` and `ρ′` differ only by potentially changing from
 own or mut to imm, but witnesses and values always stay the same."*
-
-Run here exactly so.  `ag(ρ_f) ▷◁ ⦇ρ′⦈_○` is `ResU.frame_flat_facts`; the
-transfer from `⦇ρ′⦈_○` to `ag(ρ)` is `ResU.ag_cell_of_reb`, which is 6.54's
-closing line; and the one place the transfer does not carry itself — a location
-where `ρ′` has an `own` cell, where the reborrow's witness is the escrow and
-`⦇ρ′⦈_○` still has the `own` cell — is `EscrowAgree`, the sentence, at
-`ag(ρ_f)`.  `▷◁` looks at value and witness and nothing else
-(`CellU.compatR_iff`), which is why these two facts are the whole bullet.
+At a location where `ρ′` has an `own` cell the last sentence is `EscrowAgree`.
 `[about ours: `[TR]` 6.55's first bullet (p. 18), with `ag(ρ_f)`, `ag(ρ)` and
 `⦇ρ′⦈_○` named by their graphs]` -/
 theorem ResU.frame_compatR_ag {β : Life} {ρ' ρ A aF f : ResU Loc Val}
@@ -557,9 +483,7 @@ theorem ResU.CompS.erase_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ
     obtain rfl := Option.some.inj f
     exact (CellU.CompS.erase hC).1
 
-/-- **`▸◂` passes to `●`-factors.**  A factor's cell sits inside the composite's
-at the same location with the same tag, value and witness, and `▶◀` looks at
-nothing else (`CellU.compatS_iff`).
+/-- `▸◂` passes to `●`-factors.
 `[about ours: the step `[TR]` 6.61's proof takes when it composes `⨀π₁` with
 `⨀π₂` under `ρ₁ ▸◂ ρ₂`]` -/
 theorem ResU.CompatS.of_factors {b₁ z₁ ρ₁ b₂ z₂ ρ₂ : ResU Loc Val}
@@ -575,8 +499,7 @@ theorem ResU.CompatS.of_factors {b₁ z₁ ρ₁ b₂ z₂ ρ₂ : ResU Loc Val}
   · rw [← ResU.CompS.erase_left h₁ e₁ hφ₁, ← ResU.CompS.erase_left h₂ e₂ hφ₂, hv]
   · rw [← w₁, ← w₂, hw]
 
-/-- `Res_α` is closed under `●`, cellwise — `CellU.CompS.inStratum` at every
-location. -/
+/-- `Res_α` is closed under `●`. -/
 theorem ResU.CompS.inStratum {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {α : Life} (h₁ : ρ₁.InStratum α) (h₂ : ρ₂.InStratum α) : ρ.InStratum α := by
   intro l ψ e
@@ -589,9 +512,7 @@ theorem ResU.CompS.inStratum {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ�
     cases Option.some.inj e
     exact (CellU.CompS.inStratum hC α).mpr ⟨h₁ l _ f₁, h₂ l _ f₂⟩
 
-/-- **A sub-list of a `⨀` folds, and to a factor of it.**  `[TR]` Lemmas 6.2
-and 6.3 carried along the fold, as `BigComp.mem_factor` carries them for a
-single member.
+/-- A sub-list of a `⨀` folds, to a factor of it.
 `[about ours: `[TR]` 6.2 and 6.3 along the fold, at a sub-list]` -/
 theorem BigComp.sublist_factor {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
@@ -621,14 +542,9 @@ theorem BigComp.sublist_factor {R : CellU Loc Val → CellU Loc Val → Prop}
                 (ResU.Comp.assoc hR hC.assoc x b'' z b).mp ⟨_, hz, hcx⟩
               exact ⟨y, z, BigComp.cons hb'' hy, hyz⟩
 
-/-- **The sentence `[TR]` 6.61's proof argues for, derived.**  *"Any overlapping
-locations of `ρ′₁` and `ρ′₂` are in `(ρ₁ ● ρ₂)|imm`."*  A location of both
-images is a location of both sources (`ResU.reb_dom_subset`); the printed
-`ρ₁ ▸◂ ρ₂` makes both source cells `imm`; and `reb_α`'s `imm` clause then hands
-each image cell back at that source cell's value and witness
-(`ResU.reb_imm_cell_kw`).
-`[about ours: the step `[TR]` 6.61's proof takes at an overlap, derived from
-`reb_α` rather than assumed]` -/
+/-- `[TR]` 6.61's proof: *"Any overlapping locations of `ρ′₁` and `ρ′₂` are in
+`(ρ₁ ● ρ₂)|imm`."*
+`[about ours: the step `[TR]` 6.61's proof takes at an overlap]` -/
 theorem ResU.reb_overlap {α : Life} {ρ₁ ρ₂ ρ'₁ ρ'₂ : ResU Loc Val}
     (hreb₁ : ResU.Reb α ρ₁ ρ'₁) (hreb₂ : ResU.Reb α ρ₂ ρ'₂)
     (hcompat : ResU.CompatS ρ₁ ρ₂) {l : Loc} {ψ₁ ψ₂ : CellU Loc Val}

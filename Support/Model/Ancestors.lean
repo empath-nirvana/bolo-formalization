@@ -15,9 +15,7 @@ import Support.Model.Walks
 /-!
 # Support — Model — Ancestors
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the immutable ancestor of a cell of the aliasable walk: every cell of `ag(ρ)` sits beneath an `imm` cell, carried across `↭` — the step of Lemma 6.48's printed proof that 6.59 reaches for.
+`[about ours]`.  The immutable ancestor of a cell of the aliasable walk: every cell of `ag(ρ)` sits beneath an `imm` cell, carried across `↭` — the step of Lemma 6.48's printed proof that 6.59 reaches for.
 -/
 
 noncomputable section
@@ -34,8 +32,7 @@ theorem CellU.imm_eta {ψ : CellU Loc Val} (h : ψ.kind = Kind.imm) :
   · exact ⟨s, by simpa using hs, by simp⟩
   · exact absurd h (by simp)
 
-/-- **`ex(χ)_○ ○ ag(χ)` is a factor of `ag(ρ)` wherever `ρ(ℓ) = imm(_, _, χ)`** —
-the `imm` half of the aliasable walk's two families, `AgW.mut_wit_le`'s twin. -/
+/-- `ex(χ)_○ ○ ag(χ)` is a factor of `ag(ρ)` wherever `ρ(ℓ) = imm(_, _, χ)`. -/
 theorem AgW.imm_wit_le {ρ σ : ResU Loc Val} (h : AgW ρ σ) {l : Loc}
     {ψ : CellU Loc Val} (e : ρ.get l = some ψ) (hk : ψ.kind = Kind.imm) :
     ∃ ev av p z, ExR ψ.wit ev ∧ AgW ψ.wit av ∧ ResU.CompR ev av p ∧
@@ -55,10 +52,8 @@ theorem AgW.imm_wit_le {ρ σ : ResU Loc Val} (h : AgW ρ σ) {l : Loc}
           (ResU.Comp.comm_of_laws hR ResU.compLawsR hσ)
       exact ⟨ev, av, q.2, z', hex, hag, hc, hz'⟩
 
-/-- **`○` does not invent an `imm` cell.**  If the composite is `imm(ᾱ, v, χ)`
-then one of the operands is an `imm` cell over **the same value and the same
-witness**: clauses (1), (2) and (5) return an operand, and (3) and (4) return a
-`mut` cell.  The witness travels because `▶◀` and clause (5) both demand it.
+/-- If a `○` composite is `imm(ᾱ, v, χ)`, one operand is an `imm` cell over the
+same value and witness.
 `[about ours: `[TR]` p. 5's `○` read backwards at an `imm` result]` -/
 theorem CellU.CompR.imm_source {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     {s : LSet} {u : Val} {χ : ResU Loc Val} {hh : χ.InStratum s.join}
@@ -111,8 +106,8 @@ theorem ResU.CompR.imm_source {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR ρ
     · exact Or.inl ⟨s₁, h₁, f₁.trans (congrArg some he)⟩
     · exact Or.inr ⟨s₂, h₂, f₂.trans (congrArg some he)⟩
 
-/-- …and along `⨀`: an `imm` cell of the fold comes from a member of the family,
-over the same value and the same witness. -/
+/-- An `imm` cell of a `⨀` comes from a member of the family, over the same
+value and witness. -/
 theorem BigComp.imm_source :
     ∀ {L : List (ResU Loc Val)} {b : ResU Loc Val},
       BigComp CellU.CompatR CellU.CompR L b →
@@ -133,10 +128,8 @@ theorem BigComp.imm_source :
           · obtain ⟨τ, hm, s', h', e'⟩ := ih hrest e
             exact ⟨τ, List.mem_cons_of_mem _ hm, s', h', e'⟩
 
-/-- **`○` does not invent a non-`imm` cell.**  If the composite is not `imm`
-then one of the operands is not `imm`, over the same value and the same witness:
-clause (2) and clause (5) return an `imm` cell, and every other clause returns an
-operand or, at clause (3), a `mut` over both operands' shared value and witness.
+/-- If a `○` composite is not `imm`, one operand is not `imm`, over the same
+value and witness.
 `[about ours: `[TR]` p. 5's `○` read backwards at a non-`imm` result]` -/
 theorem CellU.CompR.nonimm_source {ψ₁ ψ₂ ψ : CellU Loc Val}
     (h : CellU.CompR ψ₁ ψ₂ ψ) (hk : ψ.kind ≠ Kind.imm) :
@@ -180,7 +173,7 @@ theorem ResU.CompR.nonimm_source {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR
     · exact Or.inl ⟨ξ₁, f₁, k₁, w₁, e₁⟩
     · exact Or.inr ⟨ξ₂, f₂, k₂, w₂, e₂⟩
 
-/-- …and along `⨀`. -/
+/-- The same along `⨀`. -/
 theorem BigComp.nonimm_source :
     ∀ {L : List (ResU Loc Val)} {b : ResU Loc Val},
       BigComp CellU.CompatR CellU.CompR L b →
@@ -201,9 +194,8 @@ theorem BigComp.nonimm_source :
             exact ⟨τ, List.mem_cons_of_mem _ hm, ξ', e',
               k', w'.trans w, er'.trans er⟩
 
-/-- **An `imm` operand survives `○`**: the composite is an `imm` cell over the
-same value and the same witness.  Clauses (1), (2) and (5) are the only ones
-with an `imm` operand, and each returns one. -/
+/-- An `imm` operand of `○` gives an `imm` composite over the same value and
+witness. -/
 theorem CellU.CompR.imm_left_eq {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     {s : LSet} {u : Val} {χ : ResU Loc Val} {hh : χ.InStratum s.join}
     (e : ψ₁ = CellU.immOf s u χ hh) :
@@ -230,8 +222,7 @@ theorem CellU.CompR.imm_left_eq {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.Comp
       exact ⟨s', hh', rfl⟩
   | mutImm s' v ρ hh' b hb P hP => exact absurd e.symm CellU.immOf_ne_mutOf
 
-/-- The same at a location of a `○`: an `imm` cell of a `○`-factor is an `imm`
-cell of the composite, over the same value and the same witness. -/
+/-- The same at a location of a `○`. -/
 theorem ResU.CompR.imm_left_get {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR ρ₁ ρ₂ ρ)
     {m : Loc} {s : LSet} {u : Val} {χ : ResU Loc Val} {hh : χ.InStratum s.join}
     (hg : ρ₁.get m = some (CellU.immOf s u χ hh)) :
@@ -246,16 +237,7 @@ theorem ResU.CompR.imm_left_get {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR 
       CellU.CompR.imm_left_eq hC (Option.some.inj (f₁.symm.trans hg))
     exact ⟨s', h', f.trans (congrArg some he)⟩
 
-/-- **`ag(ρ)` closes under the witnesses of its own `imm` cells.**  If
-`ag(ρ)(m) = imm(ᾱ, v, χ)` then `⦇χ⦈_○` is a `○`-factor of `ag(ρ)` — not only
-when the `imm` cell is one of `ρ`'s own (`AgW.imm_wit_le`), but wherever in the
-walk it arose.
-
-`CellU.CompR.imm_source` says an `imm` cell of a `○` comes from an operand over
-the same witness, `ExR.immFree` (6.36 at `○`) rules out the exclusive halves of
-the `imm` family, and the rest is the walk's own induction: `ρ|imm` is
-`AgW.imm_wit_le`, and each family entry is an induction hypothesis carried up by
-`BigComp.mem_factor` and `ResU.Comp.factor_trans`.
+/-- If `ag(ρ)(m) = imm(ᾱ, v, χ)` then `⦇χ⦈_○` is a `○`-factor of `ag(ρ)`.
 `[about ours: `AgW.imm_wit_le` at a cell of the walk rather than a cell of
 `ρ`]` -/
 theorem AgW.flat_imm_wit_le {ρ σ : ResU Loc Val} (h : AgW ρ σ) :
@@ -323,9 +305,7 @@ theorem AgW.flat_imm_wit_le {ρ σ : ResU Loc Val} (h : AgW ρ σ) :
         exact ⟨ev, av, pp, y, hev, hav, hcc, hy⟩
     · exact ihw q hq'
 
-/-- **`⦇ρ⦈`'s `imm` cell at `m` is `ag(ρ)`'s.**  `ex(ρ)●` is `imm`-free (6.36)
-and `▶◀` holds only between two `imm` cells, so the exclusive walk is silent
-wherever the flattening carries an `imm` cell.
+/-- `⦇ρ⦈`'s `imm` cell at `m` is `ag(ρ)`'s.
 `[about ours: `⦇ρ⦈ ≜ ex(ρ)● ● ag(ρ)` at an `imm` cell]` -/
 theorem ResU.ag_eq_flat_at_imm {ρ e a σ : ResU Loc Val} (he : ExS ρ e)
     (hc : ResU.CompS e a σ) {m : Loc} {ψ : CellU Loc Val}
@@ -349,11 +329,8 @@ theorem ResU.ag_eq_flat_at_imm {ρ e a σ : ResU Loc Val} (he : ExS ρ e)
   · exact f₂.trans (congrArg some (Option.some.inj (f'.symm.trans hg)))
   · rw [hen] at f₁; exact absurd f₁ (by simp)
 
-/-- **`↭`'s first clause hands you the borrow's whole walk.**  If `⦇ρ⦈` carries
-`imm(ᾱ, v, χ)` at `m` then `⦇χ⦈_○` is a `○`-factor of `ag(ρ)`.  Applied to two
-resources whose flattenings carry *the same* cell there — which is what `↭`'s
-first clause says — `ExR.functional` and `AgW.functional` make the two `⦇χ⦈_○`
-the same resource, not merely corresponding ones.
+/-- If `⦇ρ⦈` carries `imm(ᾱ, v, χ)` at `m` then `⦇χ⦈_○` is a `○`-factor of
+`ag(ρ)`.
 `[about ours: `AgW.flat_imm_wit_le` reached from `⦇ρ⦈` rather than from
 `ag(ρ)`]` -/
 theorem ResU.flat_imm_wit_factor {ρ e a σ : ResU Loc Val} (he : ExS ρ e)
@@ -364,13 +341,8 @@ theorem ResU.flat_imm_wit_factor {ρ e a σ : ResU Loc Val} (he : ExS ρ e)
   AgW.flat_imm_wit_le ha m s u χ hh
     (ResU.ag_eq_flat_at_imm he hc hg (CellU.kind_immOf _ _ _ _))
 
-/-- **The ancestor transfer.**  If `ag(ρ₂)` carries `imm(ᾱ, u, χ)` at `m` and
-`ρ₂ ↭ ρ₃`, then `ag(ρ₃)` factors through `⦇χ⦈_○` — the **same** witness `χ`.
-
-`↭`'s first clause is what pins the witness (`ResU.UpdImm` binds `χ` outside the
-`⇔`), and `ResU.flat_imm_wit_factor` is `[TR]` p. 5's `ag` row read backwards on
-the other side.  The `imm` cell of `ag(ρ₂)` is the flattening's cell at `m`
-because `ex(ρ₂)_●` is `imm`-free (6.36) and `▶◀` relates `imm` cells only.
+/-- The ancestor transfer: if `ag(ρ₂)` carries `imm(ᾱ, u, χ)` at `m` and
+`ρ₂ ↭ ρ₃`, then `ag(ρ₃)` factors through `⦇χ⦈_○` at the same witness `χ`.
 `[about ours: `[TR]` 6.48's proof, the sentence *"by the update hypothesis, we
 also have `ag(ρ₃)(ℓ′) = ag(ρ₂)(ℓ′)`"*]` -/
 theorem ResU.upd_ag_imm_wit_factor {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : ResU Loc Val}
@@ -411,9 +383,7 @@ theorem OptComp.functional {C : CellU Loc Val → CellU Loc Val → CellU Loc Va
       obtain ⟨ψ', e', hc'⟩ := h'
       rw [e, e', hC ψ₁ ψ₂ ψ ψ' hc hc']
 
-/-- `S ○ own(v) = S` read off the tag.  `CellU.compR_own_right`  is
-the same at an explicit `own(v)`; this is it at `S.kind = own`, which is the form
-`[TR]` 6.48's `own` bullet has.
+/-- `S ○ own(v) = S` at `S.kind = own`, the form of `[TR]` 6.48's `own` bullet.
 `[about ours: `CellU.compR_own_right` at a tag rather than a cell]` -/
 theorem CellU.compR_own_kind_right {A S y : CellU Loc Val} (h : CellU.CompR A S y)
     (hk : S.kind = Kind.own) : y = A := by
