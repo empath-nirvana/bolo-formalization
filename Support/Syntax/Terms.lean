@@ -3,9 +3,7 @@ import Paper.S1_Syntax.Definitions
 /-!
 # Support — Syntax — Terms
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-value inversion lemmas, shifting and substitution on de Bruijn terms (single and parallel), and the names of `[TR]` p. 3's derived forms and of the first de Bruijn variables.
+`[about ours]`.  Value inversion lemmas, shifting and substitution on de Bruijn terms (single and parallel), and the names of `[TR]` p. 3's derived forms and of the first de Bruijn variables.
 -/
 
 noncomputable section

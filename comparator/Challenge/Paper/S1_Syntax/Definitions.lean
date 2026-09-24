@@ -10,17 +10,12 @@ namespace BoCa
 
 abbrev Loc := Nat
 
-/-- The four NULLARY productions of `[TR]` p. 1's `Prim`.  The fifth,
-    `store v`, is `store` applied to `v` — `Prim ∋ p ::= … ∣ store v`
-    and `Expr ∋ e ::= … ∣ e₂ e₁` derive the same string, and the grammar
-    identifies them, so `store v` is `Expr.app (.prim .store) v` and `IsVal`
-    says it is a value (`Val.storeV`). -/
+/-- The four nullary productions of `[TR]` p. 1's `Prim`; `store v` is row 1.15. -/
 inductive Prim where
   | alloc | free | load | store
   deriving DecidableEq, Repr
 
-/-- `[TR]` p. 1's `Expr`, carrying its `Val` productions too — the grammar is
-    one grammar and `e ::= v` says so. -/
+/-- `[TR]` p. 1's `Expr`, carrying its `Val` productions (`e ::= v`, row 1.17). -/
 inductive Expr where
   | var     (i : Nat)                 -- x
   | unit                              -- ()
@@ -38,10 +33,9 @@ inductive Expr where
   deriving Repr
 
 /-- `[TR]` p. 1's `Val`, as the subset of `Expr` its production `e ::= v` makes
-    it.  The eight clauses are the eight printed `Val` productions, `Λ.e` folded
-    into `λx.e` and `p` split by whether the `Prim` production carries a value:
-    `prim` at the four nullary schemes, `storeV` at `store v`, which is the
-    application the grammar derives it as. -/
+    it: one clause per printed `Val` production, `Λ.e` folded into `λx.e`
+    (row 1.8) and `store v` as the application the grammar derives it as.
+    `[about ours]` -/
 inductive IsVal : Expr → Prop where
   | unit                                                  : IsVal .unit
   | pair {a b : Expr} (h₁ : IsVal a) (h₂ : IsVal b)       : IsVal (.pair a b)
@@ -77,27 +71,23 @@ end BoCa.Val
 
 namespace BoCa
 
-/-- `[TR]` p. 1's production `e ::= v` — the INCLUSION, not a constructor. -/
+/-- `[TR]` p. 1's production `e ::= v`: the inclusion. -/
 abbrev Expr.val (v : Val) : Expr := v.1
 
 end BoCa
 
 namespace BoCa.Lifetime
 
-/-- Lifetime variables.  Nat-indexed rather than named: freshness (`LifeCtx.freshVar`) is then
-    "one more than the largest in scope", and the pretty-printer recovers
-    `'a`, `'b`, … for the tests. -/
 abbrev LifeVar := Nat
 
-/-- `Life`, verbatim from the grammar. -/
 inductive Life where
-  /-- `'a` — a lifetime variable.  ([TR] prints `'`; §12.8.) -/
+  /-- `'a`. -/
   | var (a : LifeVar)
-  /-- `⊤` — the longest lifetime. -/
+  /-- `⊤`. -/
   | top
-  /-- `@a ⊔ @b` — join: the *longer* of the two. -/
+  /-- `@a ⊔ @b`. -/
   | join (a b : Life)
-  /-- `@a ⊓ @b` — meet: the *shorter* of the two. -/
+  /-- `@a ⊓ @b`. -/
   | meet (a b : Life)
   deriving DecidableEq, Repr, Inhabited
 
@@ -110,37 +100,22 @@ end BoCa.Lifetime
 namespace BoCa
 open BoCa.Lifetime
 
-/-- `T ::= 1 | T₁ ⊕ T₂ | T₁ ⊗ T₂ | T₁ ⊸ T₂ | Ref T | Imm @a T | Mut @a T
-          | [@a]T | ∀'a ⊏ @b. T | Unk`.
-
-    `all` is `∀`; the name avoids the keyword.  Its binder is *named* (a
-    `LifeVar`) rather than de Bruijn, because `Life` has no binding structure
-    of its own and the paper's own `∀'a ⊏ @b. T` is named. -/
+/-- `all` is `∀`; the name avoids the keyword. -/
 inductive Ty where
   | unit
   | sum    (T₁ T₂ : Ty)
   | tensor (T₁ T₂ : Ty)
   | lolli  (T₁ T₂ : Ty)
   | ref    (T : Ty)
-  /-- `Imm @a T` — an immutable borrow at lifetime `@a`. -/
+  /-- `Imm @a T`. -/
   | imm    (a : Life) (T : Ty)
-  /-- `Mut @a T` — a **mutable** borrow at lifetime `@a` ([CONF] Fig. 9,
-      p. 415:10; [TR] §1 p. 1).  "If we keep mutation, we can still keep
-      `forget` as long as we drop `dupl`, a combination that is called a
-      mutable borrow" ([CONF] p. 415:10).
-
-      So the *type* is the same shape as `Imm`, and everything about it is in
-      what the operations do **not** offer: there is no `copy` at `Mut`, which
-      is what makes it exclusive. -/
+  /-- `Mut @a T`. -/
   | mut    (a : Life) (T : Ty)
-  /-- `[@a] T` — the outlives modality at lifetime `@a`. -/
+  /-- `[@a] T`. -/
   | box    (a : Life) (T : Ty)
   /-- `∀'x ⊏ @b. T`. -/
   | all    (x : LifeVar) (b : Life) (T : Ty)
-  /-- `Unk` — the distinguished unknown of §2.4 ([TR] §1 p. 1; [CONF] Fig. 8).
-      "there is *no* view at which it would be safe to access the payload, so
-      we map these types to a new, distinguished unknown type, `Unk`, for which
-      the only operation that is defined is `forget`" ([CONF] p. 415:9). -/
+  /-- `Unk`. -/
   | unk
   deriving DecidableEq, Repr, Inhabited
 

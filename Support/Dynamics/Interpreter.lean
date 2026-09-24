@@ -4,9 +4,7 @@ import Support.Syntax.Terms
 /-!
 # Support — Dynamics — Interpreter
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-an executable interpreter — memories as association lists, a step function, a fuelled run — which `[TR]` does not print (it gives a relation) and which no result of the paper uses.
+`[about ours]`.  An executable interpreter — memories as association lists, a step function, a fuelled run — which `[TR]` does not print (it gives a relation) and which no result of the paper uses.
 -/
 
 noncomputable section
@@ -16,7 +14,7 @@ namespace BoCa
 /-!
 ### 3.10 · `Mem ∋ µ : Loc ⇀ Val` (the executable counterpart) · [TR] p. 3 · `[repair]`
 
-The `next` field is not in the print and makes `BoCa.step`'s allocation deterministic where `alloc↦` is nondeterministic in `ℓ`. Adjudicated at convention W2 (`docs/adjudications.md`): [TR] p. 3's `alloc↦` is nondeterministic in `ℓ` and a total function cannot implement it, so the executable machine allocates at `µ.next`; `docs/adjudications.md` D8 records that nothing bridges the two. The printed map is implemented separately as `BoCa.BoLo.Heap`, on which every `wp` theorem is proved, so the difference is confined to an artifact neither document prints
+The `next` field makes `BoCa.step`'s allocation deterministic where `alloc↦` is nondeterministic in `ℓ` (`docs/adjudications.md` W2, D8). The printed map is `BoCa.BoLo.Heap`.
 -/
 structure Mem where
   cells : List (Loc × Val)
@@ -53,7 +51,7 @@ inductive Step where
 /-!
 ### 3.37 · — no printed counterpart; the print gives a relation — · [TR] p. 4 · `[repair]`
 
-A deterministic executable machine where the print gives a relation; it adds the `K; e` and `injᵢ K` congruences. Nothing in the `wp` development depends on it. Every difference is adjudicated: determinism by `docs/adjudications.md` W2 and D8, the two congruences by `docs/adjudications.md` §12.42, evaluation order by §12.1. That closes the one difference §12.42 had ruled ours when it narrowed `BoCa.BoLo.Head.seq` and the executable machine did not follow
+A deterministic executable machine where the print gives a relation, with the `K; e` and `injᵢ K` congruences. Nothing in the `wp` development depends on it. `docs/adjudications.md` W2, D8 (determinism), §12.42 (the congruences), §12.1 (evaluation order).
 -/
 /-- Apply a primitive value to one argument.
 
@@ -80,9 +78,6 @@ def delta (μ : Mem) : Expr → Val → Step
       | none   => .stuck .useAfterFree
   | _, _ => .stuck .badPrimArg
 
-/-!
-Row 3.37, continued.
--/
 /-- One step of call-by-value reduction.
 
     Evaluation order follows the evaluation contexts of the technical report
@@ -91,26 +86,12 @@ Row 3.37, continued.
       K ::= [] | (K, e) | (v, K) | let (x,y) = K in e
           | case K {inj₁ x. e₁ | inj₂ y. e₂} | e K | K v
 
-    Pairs are **left-to-right** (`(K,e)` before `(v,K)`), but application is
-    **argument-first / right-to-left**: the frame `e K` puts the hole in the
-    argument while the function is still an arbitrary expression, and only once
-    the argument is a value `v` does the frame `K v` evaluate the function.
-    This matches ⊸E, whose premises are argument-then-function and whose split
-    is `Γ₁, Γ₂` with `Γ₁` typing the argument.
+    Pairs are left-to-right (`(K,e)` before `(v,K)`); application is
+    argument-first: the frame `e K` evaluates the argument, then `K v` the
+    function.  It adds the frames `K; e` and `injᵢ K` (§12.42).
 
-    (The order makes no difference to any Fig. 2 program — in all of them the
-    function is already a value — but the `Kont` grammar settles the question,
-    so `step` follows it.)
-
-    Two places where this `step` is deliberately more permissive than the
-    report's `Kont` grammar, which appears to be incomplete: the report has no
-    frame for `K; e` or for `injᵢ K`, so under a literal reading `free x; y`
-    would be stuck. We keep the obvious congruence rules.
-
-    A pair of values IS the value pair, so there is no administrative step from
-    one to the other and no rule that takes it: `.value` is returned directly.
-    The same holds of `injᵢ v` and of `store v`, the last being why the `app`
-    branch can answer `.value`.
+    A pair of values is the value pair, so `.value` is returned directly; the
+    same holds of `injᵢ v` and of `store v`.
 
     `seq` fires at `()` and nowhere else, as `1↦` prints it. -/
 def step (μ : Mem) : Expr → Step
@@ -159,8 +140,6 @@ def step (μ : Mem) : Expr → Step
     | .next μ' e'         => .next μ' (.case e' e₁ e₂)
     | .stuck r            => .stuck r
 
-  -- frame `e K` first: the argument is evaluated while the function is still an
-  -- arbitrary expression; the frame `K v` then evaluates the function.
   | .app f a => match step μ a with
     | .value v    => match step μ f with
                      | .value w    => match w.val with
@@ -180,9 +159,6 @@ inductive Outcome where
   | timeout
   deriving Repr
 
-/-!
-Row 3.37, continued.
--/
 def run : Nat → Mem → Expr → Outcome
   | 0,     _, _ => .timeout
   | n + 1, μ, e =>
@@ -191,9 +167,6 @@ def run : Nat → Mem → Expr → Outcome
     | .next μ' e' => run n μ' e'
     | .stuck r    => .stuck r
 
-/-!
-Row 3.37, continued.
--/
 def eval (e : Expr) : Outcome := run 1000 Mem.empty e
 
 end BoCa

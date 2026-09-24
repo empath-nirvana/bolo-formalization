@@ -3,9 +3,7 @@ import Paper.S1_Syntax.Definitions
 /-!
 # Support — Lifetimes — Terms
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-lifetime terms and contexts: the order and lattice operations on `Life`, lookup and extension of contexts, well-formedness, fresh variables and printing.
+`[about ours]`.  Lifetime terms and contexts: the order and lattice operations on `Life`, lookup and extension of contexts, well-formedness, fresh variables and printing.
 -/
 
 noncomputable section
@@ -41,12 +39,12 @@ def join (α β : Nat) : Nat := min α β
 /-- `⊓ ≜ max` — the meet is the *shorter* of the two. -/
 def meet (α β : Nat) : Nat := max α β
 
-/-- `α ⊏ β` — "α is outlived by β", i.e. β is strictly longer.  This is the
-    `⊏̇ ≜ >` of the carrier ([CONF] Fig. 11, p. 415:12); it is STRICT.  §2. -/
+/-- `α ⊏ β` — "α is outlived by β": β is strictly longer.  The carrier's strict
+    `⊏̇ ≜ >` ([CONF] Fig. 11, p. 415:12). -/
 def Lt (α β : Nat) : Prop := β < α
 
 /-- `α ⊑ β` — the lattice order of [CONF] Fig. 11's carrier, whose strict part
-    is `Lt`.  §2. -/
+    is `Lt`. -/
 def Le (α β : Nat) : Prop := β ≤ α
 
 end BoCa.Lifetime.SLife
@@ -79,13 +77,8 @@ namespace BoCa.Lifetime
 
 /-- `Δ ⊨ @a`, decided.  The semantic definition ([TR] p. 3) is
     `Δ ⊨ @a ≜ ∀δ ∈ ⟦Δ⟧. @aδ defined`; this is the decidable check that every
-    variable of `@a` is bound by `Δ`.
-
-    **This is an approximation, and it is deliberate.**  It is *sound*: every
-    `δ ∈ ⟦Δ⟧` has `dom(Δ) ⊆ dom(δ)`, so a `Δ`-closed `@a` is everywhere
-    defined (`LifeCtx.defines_of_wf`).  It is *incomplete* only in the vacuous
-    case `⟦Δ⟧ = ∅`, where the semantic `Δ ⊨ @a` holds for every `@a`,
-    including open ones. -/
+    variable of `@a` is bound by `Δ`.  It implies the semantic judgment
+    (`LifeCtx.defines_of_wf`) and differs from it only when `⟦Δ⟧ = ∅`. -/
 def Life.wf (Δ : LifeCtx) : Life → Bool
   | .var x    => (Δ.find? x).isSome
   | .top      => true

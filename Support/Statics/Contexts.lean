@@ -1,9 +1,7 @@
 /-!
 # Support — Statics — Contexts
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-typing contexts as lists of slots with a liveness bit, and their splitting.
+`[about ours]`.  Typing contexts as lists of slots with a liveness bit, and their splitting.
 -/
 
 noncomputable section
@@ -17,9 +15,7 @@ structure Slot (τ : Type) where
 
 abbrev Ctx (τ : Type) := List (Slot τ)
 
-/-- `Γ = Γ₁, Γ₂` — a genuine partition of the live slots, positions preserved.
-    Exchange is free (positions are independent), weakening and contraction are
-    not expressible. -/
+/-- `Γ = Γ₁, Γ₂` — a partition of the live slots, positions preserved. -/
 inductive Ctx.Split {τ : Type} : Ctx τ → Ctx τ → Ctx τ → Prop where
   | nil : Ctx.Split [] [] []
   | left  {Γ Γ₁ Γ₂ : Ctx τ} {T : τ} : Ctx.Split Γ Γ₁ Γ₂ →

@@ -7,9 +7,7 @@ import Support.Syntax.Terms
 /-!
 # Support — Dynamics — Machine
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the machines' plumbing: frame composition and the reflexive-transitive closure `→*` for both machines, and for `[TR]` §3's printed machine the inversion of its steps at `inj₁ e` and `e₁; e₂`, the saturated primitives, and the closed terms `alloc ()`, `free (alloc ())`, `inj₁ (free (alloc ()))` and `free (alloc ()); ()`.
+`[about ours]`.  The machines' plumbing: frame composition and the reflexive-transitive closure `→*` for both machines, and for `[TR]` §3's printed machine the inversion of its steps at `inj₁ e` and `e₁; e₂`, the saturated primitives, and the closed terms `alloc ()`, `free (alloc ())`, `inj₁ (free (alloc ()))` and `free (alloc ()); ()`.
 -/
 
 noncomputable section
@@ -66,8 +64,7 @@ theorem Step1.plug {μ μ' : Heap} {e e' : Expr} (K : Kont) (h : Step1 μ e μ' 
   exact ⟨K.comp K', a, a', (Kont.plug_comp K K' a).symm ▸ rfl,
     (Kont.plug_comp K K' a').symm ▸ rfl, hh⟩
 
-/-- Reduction is a congruence for the seven printed frames — what `wp-bind`
-needs, and all it needs. -/
+/-- Reduction is a congruence for the seven printed frames. -/
 theorem Steps.plug {μ μ' : Heap} {e e' : Expr} (K : Kont) (h : Steps μ e μ' e') :
     Steps μ (K.plug e) μ' (K.plug e') := by
   induction h with
@@ -132,7 +129,7 @@ theorem steps_alloc (μ : Heap) (v : Val) (ℓ : Loc) (h : μ ℓ = none) :
     Step1 μ (.app (.val (.prim .alloc)) (.val v)) (μ.upd ℓ v) (.val (.loc ℓ)) :=
   Step1.head (Head.alloc μ v ℓ h)
 
-/-- `store ℓ v` steps in ONE step, the nested application and all.
+/-- `store ℓ v` takes one step.
 `[about ours: `store↦` of `[TR]` p. 4, read at `[TR]` p. 1's `e₂ e₁`]` -/
 theorem steps_store (μ : Heap) (ℓ : Loc) (v w : Val) (h : μ ℓ = some w) :
     Step1 μ (.app (.app (.val (.prim .store)) (.val (.loc ℓ))) (.val v))
@@ -145,11 +142,10 @@ def wAlloc : Expr := .app (.val (.prim .alloc)) (.val .unit)
 /-- `free (alloc ())` — a redex, not a value, and closed. -/
 def wFreeAlloc : Expr := .app (.val (.prim .free)) wAlloc
 
-/-- `inj₁ (free (alloc ()))` — the `injᵢ K` gap, at a component no reading makes a
-value. -/
+/-- `inj₁ (free (alloc ()))` — a redex under `inj₁`. -/
 def wInj : Expr := .inj₁ wFreeAlloc
 
-/-- `(free (alloc ())); ()` — the `K; e` gap. -/
+/-- `(free (alloc ())); ()` — a redex left of `;`. -/
 def wSeq : Expr := .seq wFreeAlloc (.val .unit)
 
 /-- `Δ; • ⊢ alloc () : Ref 1`, by `⊸E` on the `alloc` axiom over `1I`. -/
@@ -261,8 +257,7 @@ theorem Step1.plug {μ μ' : Heap} {e e' : Expr} (K : Kont) (h : Step1 μ e μ' 
   exact ⟨K.comp K', a, a', (Kont.plug_comp K K' a).symm ▸ rfl,
     (Kont.plug_comp K K' a').symm ▸ rfl, hh⟩
 
-/-- **The bind lemma at the level of the machine.**  Reduction is a congruence
-    for every evaluation context, which is exactly what `wp-bind` needs. -/
+/-- Reduction is a congruence for every evaluation context. -/
 theorem Steps.plug {μ μ' : Heap} {e e' : Expr} (K : Kont) (h : Steps μ e μ' e') :
     Steps μ (K.plug e) μ' (K.plug e') := by
   induction h with
@@ -296,9 +291,7 @@ end BoCa.BoLo
 namespace BoCa.TR3
 open BoCa.BoLo (Heap)
 
-/-- **The printed `→*` is contained in `BoLo.Steps`.**  So every `TR3.wp`
-implies `Fig16.BoLo.wp`, and each rule below is at least as strong as its
-counterpart there.
+/-- The printed `→*` is contained in `BoLo.Steps`.
 `[about ours: the two machines, `[TR]` §3's and convention W2's]` -/
 theorem Steps.toWp {μ μ' : Heap} {e e' : Expr} (h : Steps μ e μ' e') :
     BoCa.BoLo.Steps μ e μ' e' := by
@@ -333,8 +326,7 @@ theorem Kont.isVal_of_plug : ∀ (K : Kont) {a : Expr}, IsVal (K.plug a) → IsV
 theorem Head.not_isVal {μ μ' : Heap} {e e' : Expr} (h : Head μ e μ' e') : ¬ IsVal e := by
   cases h <;> intro hv <;> cases hv
 
-/-- A value takes no step: no head reduction has a value on the left, and a
-    frame is a value only when what sits in its hole is. -/
+/-- A value takes no step. -/
 theorem no_step_val {μ μ' : Heap} {w : Val} {e' : Expr} : ¬ Step1 μ (.val w) μ' e' := by
   rintro ⟨K, a, a', hE, -, hh⟩
   exact hh.not_isVal (K.isVal_of_plug (hE ▸ w.2))

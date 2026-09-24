@@ -10,9 +10,12 @@ import Support.Statics.Contexts
 /-!
 # Support — Statics — Presupposed
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-the judgments `[TR]` p. 2 presupposes: `⊨ Δ` carried as `Δ.Ok` (sufficient, `sat_of_ok`), `Δ ⊢ T` as `Ty.wfB`/`Ty.scopedB`, `Δ ⊢ Γ` as `Ctx.ScopedB`, and `Δ; Γ ⊢ e : T` under them (`DerivesWf`), with the facts about lifetime interpretation and fresh variables they need.
+`[about ours]`.  `Δ.Ok` (sufficient for `⊧ Δ`, `sat_of_ok`), `Ty.wfB`/`Ty.scopedB`
+(`Δ ⊢ T`), `Ctx.ScopedB` (`Δ ⊢ Γ`) and `DerivesWf`, with the facts about lifetime
+interpretation and fresh variables they need.  `DerivesWf` is p. 2's typing rules with
+p. 2's `Δ ⊢ T` consulted at binders and eliminated types; the Fundamental Property takes
+`⊧ Δ` (as `Δ.Ok`, sufficient) and `Δ ⊢ Γ` (`Ctx.ScopedB`) as hypotheses, which p. 2's
+typing box does not print (`docs/adjudications.md` §C.26).
 -/
 
 noncomputable section
@@ -85,10 +88,10 @@ def LifeCtx.Ok (Δ : LifeCtx) : Prop := okB Δ.entries = true
 
 instance (Δ : LifeCtx) : Decidable Δ.Ok := inferInstanceAs (Decidable (_ = true))
 
-/-- **`⊨ Δ` survives the `∀` rule's binder.**  `[TR]` p. 2 reads
+/-- `⊨ Δ` survives the `∀` rule's binder.  `[TR]` p. 2 reads
 `∆, ('a ⊏ @b) ⊢ T` under the same presupposition as its conclusion, and the
-rule's other premise is `∆ ⊧ @b`; `okB`'s new entry asks exactly those two
-against a binder outside `dom(∆)`.
+rule's other premise is `∆ ⊧ @b`; `okB`'s new entry asks those two against a
+binder outside `dom(∆)`.
 `[about ours: `LifeCtx.Ok` at [TR] p. 2's `∀` rule's extension]` -/
 theorem LifeCtx.Ok.extend {Δ : LifeCtx} {x : LifeVar} {u : Life}
     (hΔ : Δ.Ok) (hx : Δ.find? x = none) (hu : u.wf Δ = true) :
@@ -115,7 +118,7 @@ theorem Life.wf_mono {t : List (LifeVar × Life)} {x : LifeVar} {u : Life} :
   | meet a b iha ihb =>
     intro h; simp only [Life.wf, Bool.and_eq_true] at h ⊢; exact ⟨iha h.1, ihb h.2⟩
 
-/-- Inserting a binding for a DIFFERENT variable leaves a lookup unfound.
+/-- Inserting a binding for a different variable leaves a lookup unfound.
     `[about ours: `assocFind` under the `∀` rule's extension]` -/
 theorem assocFind_none_insert {β : Type} {y x : LifeVar} {u : β} :
     ∀ {t₁ t₂ : List (LifeVar × β)}, x ≠ y → assocFind y (t₁ ++ t₂) = none →
@@ -165,7 +168,7 @@ theorem Life.wf_insert {x : LifeVar} {u : Life} :
   | meet a b iha ihb =>
       intro t₁ t₂ h; simp only [Life.wf, Bool.and_eq_true] at h ⊢; exact ⟨iha h.1, ihb h.2⟩
 
-/-- In a well-scoped context every bound is closed under the *whole* context. -/
+/-- In a well-scoped context every bound is closed under the whole context. -/
 theorem okB_bound_wf : ∀ {t : List (LifeVar × Life)}, okB t = true →
     ∀ {y : LifeVar} {w : Life}, assocFind y t = some w → Life.wf ⟨t⟩ w = true := by
   intro t
@@ -299,16 +302,14 @@ end BoCa.Lifetime
 namespace BoCa
 open BoCa.Lifetime
 
-/-- **`Δ ⊢ T`, decided.**  Nine of the ten constructors, as [TR] p. 2 prints
+/-- `Δ ⊢ T`, decided.  Nine of the ten constructors, as [TR] p. 2 prints
 them; `Unk` has no rule there, so no type mentioning it passes.
 
-Two clauses say more than `BoCa.WfTy` records, and both say what the page
-writes.  The `∀` rule's premise is `Δ, ('a ⊏ @b) ⊢ T`, an extension and not a
-shadowing, so `'a ∉ dom(Δ)` is asked here; definition
-row 2.25 records that `WfTy.all` carries no such premise.  And `Δ ⊨ @a` is
-asked as `Life.wf`, which is the sound half of it: the semantic relation is
-weaker only at an unsatisfiable `Δ`, which p. 2's judgment box excludes by
-"Presumes ⊨ Δ" and which no constructor of `WfTy` carries (row 2.19).
+Two clauses say more than `BoCa.WfTy` records.  The `∀` rule's premise is
+`Δ, ('a ⊏ @b) ⊢ T`, an extension, so `'a ∉ dom(Δ)` is asked here (row 2.25).
+`Δ ⊨ @a` is asked as `Life.wf`, which implies it and differs only at an
+unsatisfiable `Δ`, which p. 2's box for `Δ ⊢ T` excludes by "Presumes ⊨ Δ"
+(row 2.19).
 `[about ours: the decidable sufficient condition for [TR] p. 2's `Δ ⊢ T`]` -/
 def Ty.wfB : Ty → LifeCtx → Bool
   | .unit,         _ => true
@@ -322,11 +323,9 @@ def Ty.wfB : Ty → LifeCtx → Bool
   | .mut a T,      Δ => a.wf Δ && T.wfB Δ
   | .all y b T,    Δ => (Δ.find? y).isNone && b.wf Δ && T.wfB (Δ.extend y b)
 
-/-- `'x` is a BINDER of `T` — a `∀` former's own variable, at any depth.  This
-    is not `LFree`, which is about occurrences: `Ty.wfB`'s `∀` clause asks the
-    binder to be outside `dom(Δ)` (row 2.25, ours, since [TR] p. 2 writes the
-    premise's context as the extension `Δ, ('a ⊏ @b)`), so what an extension
-    can collide with is binders and not free occurrences.
+/-- `'x` is a binder of `T` — a `∀` former's own variable, at any depth (not
+    `LFree`, which is about occurrences).  `Ty.wfB`'s `∀` clause asks the binder
+    to be outside `dom(Δ)` (row 2.25), so an extension can collide with binders.
     `[about ours: the Barendregt side of `Ty.wfB`'s `∀` clause]` -/
 def Ty.bindsB : Ty → LifeVar → Bool
   | .unit,         _ => false
@@ -340,13 +339,10 @@ def Ty.bindsB : Ty → LifeVar → Bool
   | .mut _ T,      x => T.bindsB x
   | .all y _ T,    x => (y == x) || T.bindsB x
 
-/-- **`T` is well-SCOPED in `Δ`** — `Ty.wfB` minus the formation question.
-    Clause for clause the same except at `Unk`, which `Ty.wfB` refuses because
-    [TR] p. 2 prints no formation rule for it — while p. 3's axiom table types
-    `forget : Unk ⊸ 1`, and `Imm̲ 'b (T₁ ⊸ T₂) ≜ Unk` puts `Unk` inside
-    `withload`'s own type at every function payload.  Scoping is all the
-    Barendregt convention needs: a binder fresh for `Δ` is free in no
-    `Δ`-scoped type, and `Unk` binds and mentions nothing.
+/-- `T` is well-scoped in `Δ` — `Ty.wfB` except at `Unk`, which `Ty.wfB` refuses
+    because [TR] p. 2 prints no formation rule for it, while p. 3's axiom table
+    types `forget : Unk ⊸ 1` and `Imm̲ 'b (T₁ ⊸ T₂) ≜ Unk` puts `Unk` inside
+    `withload`'s type at every function payload.
     `[about ours: the scoping half of [TR] p. 2's `Δ ⊢ T`]` -/
 def Ty.scopedB : Ty → LifeCtx → Bool
   | .unit,         _ => true
@@ -391,8 +387,7 @@ theorem Ty.scopedB_of_wfB : ∀ {T : Ty} {Δ : LifeCtx},
       intro Δ h; simp only [Ty.wfB, Ty.scopedB, Bool.and_eq_true] at h ⊢
       exact ⟨⟨h.1.1, h.1.2⟩, ih h.2⟩
 
-/-- Scoping survives an insertion the type does not bind, exactly as `Ty.wfB`
-    does and for the same two reasons. -/
+/-- Scoping survives an insertion the type does not bind. -/
 theorem Ty.scopedB_insert (x : LifeVar) (u : Life) :
     ∀ (T : Ty) (t₁ t₂ : List (LifeVar × Life)),
       T.bindsB x = false → T.scopedB ⟨t₁ ++ t₂⟩ = true →
@@ -449,7 +444,7 @@ end BoCa
 namespace BoCa.Lifetime
 open BoCa.Lifetime
 
-/-- **A lifetime `Δ` closes mentions no variable `Δ` does not bind.**  This is
+/-- A lifetime `Δ` closes mentions no variable `Δ` does not bind.  This is
 what [TR]'s Barendregt convention gets from `Δ ⊨ @b` at a binder taken fresh:
 `'a ∉ dom(Δ)` and `Δ ⊨ @b` together say `@b` does not mention `'a`. -/
 theorem Life.mentions_false_of_wf {Δ : LifeCtx} {x : LifeVar}
@@ -472,7 +467,7 @@ theorem Life.mentions_false_of_wf {Δ : LifeCtx} {x : LifeVar}
       simp only [Life.wf, Bool.and_eq_true] at h
       simp [Life.mentions, iha h.1, ihb h.2]
 
-/-- **In a well-scoped `Δ`, no bound mentions a variable `Δ` does not bind.**
+/-- In a well-scoped `Δ`, no bound mentions a variable `Δ` does not bind.
 `AllISide`'s second conjunct, off `okB_bound_wf`. -/
 theorem LifeCtx.Ok.bound_mentions_false {Δ : LifeCtx} {x : LifeVar} (hΔ : Δ.Ok)
     (hx : Δ.find? x = none) {y : LifeVar} {u : Life} (hy : Δ.find? y = some u) :
@@ -484,9 +479,8 @@ end BoCa.Lifetime
 namespace BoCa
 open BoCa.Lifetime
 
-/-- `Δ ⊢ Γ` at the scoping half — `Ty.scopedB` at every LIVE slot, a consumed slot being out
-    of scope (convention L4).  This is the presupposition
-    `BoCa.Fig16.LogRel.allISide_of_scopedB` reads `AllISide`'s third conjunct off.
+/-- `Δ ⊢ Γ` at the scoping half — `Ty.scopedB` at every live slot, a consumed slot being out
+    of scope (convention L4).
     `[about ours: [TR] p. 2's `Δ ⊢ T` lifted to a positional context]` -/
 def Ctx.ScopedB (Δ : LifeCtx) (Γ : Ctx Ty) : Prop :=
   ∀ s ∈ Γ, s.live = true → s.ty.scopedB Δ = true
@@ -545,16 +539,14 @@ theorem Ctx.ScopedB.cons {Δ : LifeCtx} {Γ : Ctx Ty} {T : Ty} {b : Bool}
   · exact h s hm' hl
 
 /-- `Δ ⊢ Γ` survives the `∀` rule's extension, at a binder none of the live
-    slots binds — the Barendregt side `Ty.scopedB`'s `∀` clause makes load-bearing
-    (`Ty.bindsB`).  `Δ.find? x = none`, which `Derives.allI` carries, says the
-    binder is fresh for `Δ`; this says it is fresh for `Γ`'s binders too. -/
+    slots binds (`Ty.bindsB`). -/
 theorem Ctx.ScopedB.extend {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {u : Life}
     (hb : ∀ s ∈ Γ, s.live = true → s.ty.bindsB x = false) (h : Ctx.ScopedB Δ Γ) :
     Ctx.ScopedB (LifeCtx.extend Δ x u) Γ :=
   fun s hm hl => Ty.scopedB_extend (hb s hm hl) (h s hm hl)
 
-/-- The presupposition at `∀I`'s premise, assembled: the rule's new slot is
-    consumed, so it asks nothing, and `Γ` moves across the extension. -/
+/-- `Δ ⊢ Γ` at `∀I`'s premise: the rule's new slot is consumed, and `Γ` moves
+    across the extension. -/
 theorem Ctx.ScopedB.allI {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {b : Life} {S : Ty}
     (hb : ∀ s ∈ Γ, s.live = true → s.ty.bindsB x = false) (h : Ctx.ScopedB Δ Γ) :
     Ctx.ScopedB (LifeCtx.extend Δ x b) (⟨S, false⟩ :: Γ) :=

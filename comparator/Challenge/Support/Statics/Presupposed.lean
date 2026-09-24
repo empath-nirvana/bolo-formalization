@@ -23,16 +23,14 @@ end BoCa.Lifetime.LifeCtx
 namespace BoCa
 open BoCa.Lifetime
 
-/-- **`Δ ⊢ T`, decided.**  Nine of the ten constructors, as [TR] p. 2 prints
+/-- `Δ ⊢ T`, decided.  Nine of the ten constructors, as [TR] p. 2 prints
 them; `Unk` has no rule there, so no type mentioning it passes.
 
-Two clauses say more than `BoCa.WfTy` records, and both say what the page
-writes.  The `∀` rule's premise is `Δ, ('a ⊏ @b) ⊢ T`, an extension and not a
-shadowing, so `'a ∉ dom(Δ)` is asked here; definition
-row 2.25 records that `WfTy.all` carries no such premise.  And `Δ ⊨ @a` is
-asked as `Life.wf`, which is the sound half of it: the semantic relation is
-weaker only at an unsatisfiable `Δ`, which p. 2's judgment box excludes by
-"Presumes ⊨ Δ" and which no constructor of `WfTy` carries (row 2.19).
+Two clauses say more than `BoCa.WfTy` records.  The `∀` rule's premise is
+`Δ, ('a ⊏ @b) ⊢ T`, an extension, so `'a ∉ dom(Δ)` is asked here (row 2.25).
+`Δ ⊨ @a` is asked as `Life.wf`, which implies it and differs only at an
+unsatisfiable `Δ`, which p. 2's box for `Δ ⊢ T` excludes by "Presumes ⊨ Δ"
+(row 2.19).
 `[about ours: the decidable sufficient condition for [TR] p. 2's `Δ ⊢ T`]` -/
 def Ty.wfB : Ty → LifeCtx → Bool
   | .unit,         _ => true
@@ -46,11 +44,9 @@ def Ty.wfB : Ty → LifeCtx → Bool
   | .mut a T,      Δ => a.wf Δ && T.wfB Δ
   | .all y b T,    Δ => (Δ.find? y).isNone && b.wf Δ && T.wfB (Δ.extend y b)
 
-/-- `'x` is a BINDER of `T` — a `∀` former's own variable, at any depth.  This
-    is not `LFree`, which is about occurrences: `Ty.wfB`'s `∀` clause asks the
-    binder to be outside `dom(Δ)` (row 2.25, ours, since [TR] p. 2 writes the
-    premise's context as the extension `Δ, ('a ⊏ @b)`), so what an extension
-    can collide with is binders and not free occurrences.
+/-- `'x` is a binder of `T` — a `∀` former's own variable, at any depth (not
+    `LFree`, which is about occurrences).  `Ty.wfB`'s `∀` clause asks the binder
+    to be outside `dom(Δ)` (row 2.25), so an extension can collide with binders.
     `[about ours: the Barendregt side of `Ty.wfB`'s `∀` clause]` -/
 def Ty.bindsB : Ty → LifeVar → Bool
   | .unit,         _ => false
@@ -64,13 +60,10 @@ def Ty.bindsB : Ty → LifeVar → Bool
   | .mut _ T,      x => T.bindsB x
   | .all y _ T,    x => (y == x) || T.bindsB x
 
-/-- **`T` is well-SCOPED in `Δ`** — `Ty.wfB` minus the formation question.
-    Clause for clause the same except at `Unk`, which `Ty.wfB` refuses because
-    [TR] p. 2 prints no formation rule for it — while p. 3's axiom table types
-    `forget : Unk ⊸ 1`, and `Imm̲ 'b (T₁ ⊸ T₂) ≜ Unk` puts `Unk` inside
-    `withload`'s own type at every function payload.  Scoping is all the
-    Barendregt convention needs: a binder fresh for `Δ` is free in no
-    `Δ`-scoped type, and `Unk` binds and mentions nothing.
+/-- `T` is well-scoped in `Δ` — `Ty.wfB` except at `Unk`, which `Ty.wfB` refuses
+    because [TR] p. 2 prints no formation rule for it, while p. 3's axiom table
+    types `forget : Unk ⊸ 1` and `Imm̲ 'b (T₁ ⊸ T₂) ≜ Unk` puts `Unk` inside
+    `withload`'s type at every function payload.
     `[about ours: the scoping half of [TR] p. 2's `Δ ⊢ T`]` -/
 def Ty.scopedB : Ty → LifeCtx → Bool
   | .unit,         _ => true

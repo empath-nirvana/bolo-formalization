@@ -6,9 +6,7 @@ import Support.Dynamics.Machine
 /-!
 # Support — Dynamics — PrintedWp
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-`[TR]` p. 6's `wp` over `[TR]` §3's printed machine (`TR3.wp`), and the `∀`-wand `wp-ramify` reads.
+`[about ours]`.  `[TR]` p. 6's `wp` over `[TR]` §3's printed machine (`TR3.wp`), and the `∀`-wand `wp-ramify` reads.
 -/
 
 noncomputable section
@@ -24,17 +22,14 @@ abbrev WRes : Type := ResU BoCa.Loc BoCa.Val
 /-- `SProp ≜ Res → ℙ` at those. -/
 abbrev WProp : Type := SPropU BoCa.Loc BoCa.Val
 
-/-- **`wp(e){Q̂}`** — `[TR]` p. 6's last-but-one row, on the printed carrier and
-over the printed machine:
+/-- `wp(e){Q̂}` — `[TR]` p. 6's last-but-one row, over the printed machine:
 
     wp(e){Q̂}(ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v.
                      (⟦ρ_f ● ρ⟧, e) ↦* (⟦ρ_f ● ρ′ ● ρ⁺⟧, v)
                    ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺|own = ∅ ∧ Q̂(v)(ρ′)
 
-Character for character `Fig16.BoLo.wp` with `TR3.Steps` for
-`BoLo.Steps`; the partial `●`s and `⟦−⟧`s are bound and related by their graphs
-(convention G4).  `[as printed]` (`[TR]` p. 6's
-row; the printed compositions and lowerings appear as their graphs — G4) -/
+`Fig16.BoLo.wp` with `TR3.Steps` for `BoLo.Steps`; the partial `●`s and `⟦−⟧`s
+appear as their graphs (G4).  `[as printed]` -/
 def wp (e : Expr) (Q : Val → WProp) : WProp := fun ρ =>
   ∀ ρf : WRes, ResU.Hash ρf ρ →
     ∃ (ρ' ρp fρ fρ' fρ'p π : WRes) (v : Val) (μ μ' : Heap),
@@ -48,8 +43,8 @@ def wp (e : Expr) (Q : Val → WProp) : WProp := fun ρ =>
       Q v ρ'
 
 /-- `∀v. P̂(v) ─⋆ Q̂(v)` — the ramification wand.  `[TR]` Lemma 6.146 prints
-`(P̂ –⋆ Q̂)`, and this is the reading `Fig16.BoLo.wp_ramify` gives it: the only
-well-typed one at `P̂, Q̂ : Val → SProp`.
+`(P̂ –⋆ Q̂)`, and this is the reading `Fig16.BoLo.wp_ramify` gives it at
+`P̂, Q̂ : Val → SProp`.
 `[about ours: the reading of 6.146's `(P̂ –⋆ Q̂)`]` -/
 def wandAll (P Q : Val → WProp) : WProp := all fun v => wand (P v) (Q v)
 

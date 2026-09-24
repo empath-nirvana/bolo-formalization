@@ -4,9 +4,7 @@ import Support.Lifetimes.Terms
 /-!
 # Support — Lifetimes — Substitution
 
-`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
-paper's definitions and results need in Lean and the paper leaves implicit:
-substitution of lifetimes into lifetime terms and types, with the capture and range bounds it needs.
+`[about ours]`.  Substitution of lifetimes into lifetime terms and types, with the capture and range bounds it needs.
 -/
 
 noncomputable section
