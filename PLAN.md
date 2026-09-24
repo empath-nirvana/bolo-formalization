@@ -1,0 +1,195 @@
+# Plan: a paper-shaped repository for *From Linearity to Borrowing*
+
+This repository re-organises the Lean mechanisation in `borrow_lang` (branch
+`mathlib-natdual`, commit `970a9d0`) by the sections of `[TR]`
+(`3764117-supplement.pdf`), carrying only what the paper's results depend on.
+Declarations are **moved, not re-proved**: each keeps its source name, its
+statement and its proof, and `scripts/check-bridge.sh` checks that it
+elaborates to the same type (and, for a definition, the same value) as its
+source.
+
+Toolchain and Mathlib are the source's: `lean-toolchain` is copied,
+`lakefile.toml` pins the same Mathlib `rev`, and `.lake/packages` is a symlink to
+`borrow_lang/.lake/packages` (not committed; recreate it with
+`ln -s ../../borrow_lang/.lake/packages .lake/packages` after cloning).
+
+## Layout
+
+```
+Paper/                                 what the paper prints, in its order
+  S1_Syntax/Definitions.lean           [TR] §1, p. 1
+  S2_Statics/Definitions.lean          [TR] §2, pp. 2–3
+  S3_Dynamics/Definitions.lean         [TR] §3, pp. 3–4
+  S4_LogicalRelation/Definitions.lean  [TR] §4, p. 4   (literal and typed-world readings)
+  S5_Model/Definitions.lean            [TR] §5, pp. 4–6
+  S6_1_StandardLemmas/Lemmas.lean      [TR] §6.1 ─┐
+  S6_2_NonStandardLemmas/Definitions.lean   Definitions 6.1, 6.2, 6.3
+  S6_2_NonStandardLemmas/Lemmas.lean   [TR] §6.2  │
+  S6_3_FrameAndAntiFrame/Lemmas.lean   [TR] §6.3  │ skeletons in Stage 1:
+  S6_4_StandardEntailments/Lemmas.lean [TR] §6.4  │ banner + the list of results
+  S6_5_NonStandardEntailments/…        [TR] §6.5  │ and the declaration planned
+  S6_6_ReborrowingEntailments/…        [TR] §6.6  │ for each
+  S6_7_WeakestPreconditionRules/…      [TR] §6.7  │
+  S6_8_FundamentalProperty/Lemmas.lean [TR] §6.8 ─┘
+  CONF/Results.lean                    [CONF] 3.1–3.3 (skeleton)
+  LiteralReadings/                     measurements of printed definitions read literally
+Support/                               [about ours]: what makes the paper tree go
+Bridge/Names.csv                       every declaration here → its source declaration
+Bridge/Plan.csv                        every declaration of the closure → its target file (both stages)
+scripts/                               bridge, axiom and hygiene checks
+tools/extract/                         the generator that produced Paper/, Support/ and Bridge/
+```
+
+`tools/extract/run.sh` regenerates every Lean file here from the source
+repository and builds; the Lean files are its output and are not edited by
+hand.  `tools/extract/cfg.json` holds the placement decisions below, and
+`tools/extract/banners.py` the section banners.
+
+Each `Definitions.lean` opens with a banner transcribing its section's display
+from `[TR]`, then gives the printed items as rows of the source's
+`docs/definition-inventory.md`, in printed order as far as definition-before-use
+allows.  Each row carries: its number, the printed form, the page, a tag
+(`[as printed]`, `[encoding]`, `[repair]`, `[about ours]`) and the inventory's
+note — which for a `[repair]` row is the adjudication with the paper's sentences
+that ground it.  The source docstring follows, then the Lean.
+
+## How the content was selected
+
+1. `scripts`-style dump of the source environment (`lake env lean` over `BoCa`):
+   every constant, its module, source range, and the constants its type **and
+   proof** use.
+2. Roots: every Lean name cited in a row of `docs/paper-inventory.md` or
+   `docs/definition-inventory.md` (the "Lean" column for the latter), minus the
+   legacy carriers.
+3. Closure over the dependency graph, at the level of source *units* (a
+   declaration with its constructors, fields and auxiliaries; a `mutual`
+   block), plus three dependencies the proof terms do not record: notation a
+   unit's text uses, lemmas a tactic names (`simp [h]`, `rw [h]`, `unfold h`),
+   and `@[simp]` lemmas about carried objects (a `rfl` simp lemma leaves no
+   trace in the term that uses it).
+
+The closure is **2,129 units, 33,321 lines of declarations**; no declaration of
+the legacy carriers is in it.
+
+| stage | units | declaration lines |
+|---|---|---|
+| 1 (this commit): [TR] §§1–5 definitions and what they need | 455 | 3,119 |
+| 2: §6, [CONF] §3, the remaining literal readings, their support | 1,674 | 30,202 |
+
+`Bridge/Plan.csv` lists every unit with its source location, stage and target.
+The Stage 2 targets there are **tentative**: they come from the inventory rows
+(the first cited declaration of a `6.x` row is taken as the result itself), and
+Stage 2 re-derives placement by the same layering that places Stage 1.
+
+### Left behind
+
+| source module(s) | why |
+|---|---|
+| `Resource`, `Model`, `BoLo`, `Flatten`, `LogRel`, `Compat`, `Surgery`, `Ledger` | the old unstratified carrier `ResI` and everything stated over it; no cited result depends on them |
+| `*Tests`, `TestCore`, `Programs` | test suites and example programs |
+| `Wp` except the machine | the old carrier's `wp` and its rules; the machine (`BoLo.Kont`, `Head`, `Step1`, `Steps`, `Heap`) is carried because `Fig16.BoLo.wp` runs it |
+| `Surplus` | not reached by any cited result |
+| unreached declarations of the carried modules (e.g. `Fig16` 237 units, `Fig16LogRel` 129, `Reborrow` 49, `Derives` 24, `TR3` 25) | examples, superseded variants and helpers no cited result uses |
+| `vercheck/`, `BorrowLang/`, `FutureWork/`, the checker | out of scope |
+
+`tools/extract/plan.py` prints the per-module counts of what is left behind.
+
+## Stage 1 — what is here, and what builds
+
+`lake build` builds `Paper` and `Support` with no errors and no `sorry`.
+
+| file | units |
+|---|---|
+| `Paper/S1_Syntax/Definitions.lean` | 31 |
+| `Paper/S2_Statics/Definitions.lean` | 34 |
+| `Paper/S3_Dynamics/Definitions.lean` | 22 |
+| `Paper/S4_LogicalRelation/Definitions.lean` | 36 |
+| `Paper/S5_Model/Definitions.lean` | 200 |
+| `Paper/S6_2_NonStandardLemmas/Definitions.lean` | 10 |
+| `Paper/LiteralReadings/S4_LogicalRelation.lean` | 3 |
+| `Support/…` (11 files) | 119 |
+
+Checks, all passing:
+
+* `scripts/check-bridge.sh` — 1,573 declarations compared with their source; 0
+  mismatches (kind, type, and value for definitions; auxiliary declarations are
+  compared through the declarations that use them).
+* `scripts/check-hygiene.sh` — no `sorry`/`axiom`/`native_decide`/`implemented_by`/
+  `opaque`/`partial`/`unsafe` outside comments; `#print axioms` of all 1,985
+  constants ⊆ `[propext, Classical.choice, Quot.sound]`.
+
+## Design decisions that depart from the brief, and why
+
+1. **§2 imports §3.**  The axiom table of p. 3 names `swap`, `copy`, `forget`,
+   `withbor`, `withload`, `withswap`; `[TR]` defines them as terms on p. 4, in
+   §3.  They stay in §3's file, and §3's file needs nothing from §2.
+2. **Definitions 6.1–6.3 are in `S6_2_NonStandardLemmas/Definitions.lean`**, where
+   `[TR]` prints them (pp. 9, 13, 17), not in §5 where the inventory lists them
+   (rows 5.61, 5.65, 5.66).  Nothing in §§1–5 uses them.
+3. **The typed world's `wp` (row 5.33's repair) is in §4's file.**  Its worlds
+   (`Typed.TW`) are defined through value shapes (`Typed.vShape`), which read
+   lifetimes through §4's `atLife` (row 4.15), so it cannot precede §4.  §5's
+   file has the printed `wp`.
+4. **`[about ours]` declarations inside `Definitions.lean`.**  When a
+   declaration the paper does not print is both defined through a printed row
+   and needed by a later printed row of the same section (the finite map, the
+   lifetime set `℘⁺(Life)`, the stratum embeddings, the cell constructors'
+   equations), no file order puts it in `Support/`.  Such declarations are kept
+   inline, each run marked `[about ours]`, and so are the `@[simp]` equations
+   of a printed object, which go with it: 94 units in §5, 31 in the other four
+   files.
+5. **Theorem-valued inventory rows.**  Rows whose Lean is a theorem about a
+   definition (the clause equations `vDen_unit` … `vDen_unk`, `Cell_eq`,
+   `compS_immOf`, `SPropS.toU_range`, `noOwn_compS`, `Sim.refl`,
+   `supported_iff`) are in `Definitions.lean` where they cost nothing further.
+   Eight cost more — their proofs reach §6 machinery — and move in Stage 2, to a
+   `Remarks.lean` after §6: `BigComp.perm` (5.56), `vDen_mut_supported` and
+   `vDen_mut_of_supported` (4.16), `MutImmGap.inRel_same` (4.17, literal),
+   `sem_iff` (4.18), `wp_eq_wpU` (5.62), `Sim.trans` and `upd_iff_sim` (5.65).
+   Row 5.67 ([CONF]'s prose characterisation of `✓`, whose theorems include
+   Lemma 6.36 itself) moves with §6.
+6. **Names are unchanged in Stage 1** (`BoCa.Fig16.ResU.Comp`, …), so the bridge
+   is by name.  Two private lemmas, `BoCa.Fig16.cast_left`/`cast_right`, are
+   public here because their users landed in another file.  Numbered names
+   (`TR.lemma_6_60`, with the paper's own name as a second alias) are for §6's
+   results, in Stage 2.
+7. **`Support/` files are layered by what they need.**  A topic whose
+   declarations sit on both sides of a paper file is split, and the part is
+   named for the paper file it follows (`Support/Model/Base`,
+   `Support/Model/AfterS5`, …).
+8. **The executable interpreter** (`BoCa.Mem`, `step`, `run`; rows 3.10, 3.37)
+   is in `Support/Dynamics/Interpreter.lean`: the paper gives a relation, and no
+   result uses the interpreter.
+9. **Every file is wrapped in `noncomputable section`**, which marks nothing
+   that compiles; and a file whose declarations come from a source module that
+   imported Mathlib imports Mathlib.
+10. **Citations in comments** (`docs/boca-rules.md` §12.67, `BoCa/Fig16.lean` §3,
+    …) are to the source repository at `970a9d0`; its `docs/` is not copied.
+    Sentences of inventory notes that record history (deletions, migrations,
+    earlier scorings) are dropped.
+
+## Stage 2 — proposed
+
+1. **Remaining definitions' remarks**: the eight deferred theorem rows and
+   row 5.67, into `Paper/S4_LogicalRelation/Remarks.lean` and
+   `Paper/S5_Model/Remarks.lean`, ordered after the §6 files they use.
+2. **§6.1–§6.2** (lemmas 6.1–6.63; `Fig16.lean` §20–§20e, `Reborrow.lean`,
+   `Ancestor.lean`), with `Support/Model/*` for the walks, the functional-walk
+   apparatus and the reborrow surgery.  This is the largest block (≈ 2,500 lines
+   of results, ≈ 11,000 of support).
+3. **§6.3–§6.6** (6.64–6.134): the frame rules and the entailments over
+   `Fig16.BoLo`, and `↺V₁–↺V₃` from `Fig16LogRel` §2.
+4. **§6.7** (6.135–6.150): `Fig16Wp.lean`, `RebWp.lean`, with each rule's
+   `TR3.…` re-proof over the printed machine beside it, and the stuck-form
+   measurements into `LiteralReadings`.
+5. **§6.8 and [CONF] §3** (6.151–6.176, 3.1–3.3): the compatibility lemmas, the
+   typed world (`Support/TypedWorld/*`, ≈ 8,800 lines), the Fundamental Property
+   at `SemX`, adequacy; `ViewWitness` and `DefectB`'s refutations into
+   `LiteralReadings`.
+
+For each result: the printed statement and a compact transcription of the
+printed proof in the comment, the moved declaration, a numbered alias, the
+library's tag, and the lists `CLAUDE.md` asks for (unspent printed hypotheses,
+unused uniqueness results, untranscribed run-up lemmas) carried over from the
+source docstrings.  Each stage ends with `lake build`, `check-bridge.sh` and
+`check-hygiene.sh` passing.

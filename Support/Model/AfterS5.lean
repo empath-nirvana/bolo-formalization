@@ -1,0 +1,108 @@
+import Paper.S5_Model.Definitions
+
+/-!
+# Support — Model — AfterS5
+
+`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
+paper's definitions and results need in Lean and the paper leaves implicit:
+facts about the model's definitions: extensionality, the stratum embeddings, and the equations of the cell constructors.  Declaration names are the source repository's (`borrow_lang` at
+`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+-/
+
+noncomputable section
+
+namespace BoCa.Fig16
+variable {Loc Val : Type}
+
+/-- The lifetime set of an `imm` cell. -/
+def CellU.lsOf : CellU Loc Val → Option LSet
+  | .imm i => some i.ls
+  | _ => none
+
+@[simp] theorem CellU.lsOf_immOf (s : LSet) (v : Val) (ρ : ResU Loc Val)
+    (h : ρ.InStratum s.join) : CellU.lsOf (CellU.immOf s v ρ h) = some s := rfl
+
+@[simp] theorem CellU.lsOf_ownOf (v : Val) :
+    CellU.lsOf (CellU.ownOf (Loc := Loc) v) = none := rfl
+
+@[simp] theorem CellU.lsOf_mutOf (b : Life) (v : Val) (ρ : ResU Loc Val)
+    (h : ρ.InStratum b) (P : Val → SPropS Loc Val b) (hw : P v ⟨ρ, h⟩) :
+    CellU.lsOf (CellU.mutOf b v ρ h P hw) = none := rfl
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+
+@[inherit_doc] scoped notation:max "↓" a => Life.down a
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+variable {Loc Val : Type}
+
+theorem MutU.ext {m n : MutU Loc Val} (hb : m.β = n.β) (hv : m.v = n.v)
+    (hρ : m.ρ ≍ n.ρ) (hP : m.P ≍ n.P) : m = n := by
+  obtain ⟨b₁, v₁, ρ₁, P₁, w₁⟩ := m
+  obtain ⟨b₂, v₂, ρ₂, P₂, w₂⟩ := n
+  simp only at hb hv hρ hP
+  subst hb; subst hv
+  simp only [heq_eq_eq] at hρ hP
+  subst hρ; subst hP; rfl
+
+/-- Every cell of `Cell` is an `own`, an `imm` or a `mut`, in the form §7
+gives them.  With the three distinctness lemmas and the two injectivity lemmas
+above, this is a constructor set for `Cell`. -/
+theorem CellU.rep (ψ : CellU Loc Val) :
+    (∃ v : Val, ψ = ownOf v) ∨
+    (∃ (s : LSet) (v : Val) (ρ : ResU Loc Val) (h : ρ.InStratum s.join),
+        ψ = immOf s v ρ h) ∨
+    (∃ (b : Life) (v : Val) (ρ : ResU Loc Val) (h : ρ.InStratum b)
+        (P : Val → SPropS Loc Val b) (hw : P v ⟨ρ, h⟩), ψ = mutOf b v ρ h P hw) := by
+  cases ψ with
+  | own v => exact Or.inl ⟨v, rfl⟩
+  | imm i =>
+      refine Or.inr (Or.inl ⟨i.ls, i.v, i.ρ.toU, i.ρ.toU_inStratum, ?_⟩)
+      show CellU.imm i = CellU.imm _
+      exact congrArg CellU.imm (ImmU.ext rfl rfl (by
+        simp only [heq_eq_eq]
+        exact (Res.toRes_toS i.ρ).symm))
+  | «mut» m =>
+      refine Or.inr (Or.inr ⟨m.β, m.v, m.ρ.toU, m.ρ.toU_inStratum,
+        fun v r => m.P v r.toRes, ?_, ?_⟩)
+      · show m.P m.v (ResS.toRes ⟨m.ρ.toU, m.ρ.toU_inStratum⟩)
+        rw [show ResS.toRes ⟨m.ρ.toU, m.ρ.toU_inStratum⟩ = m.ρ from Res.toRes_toS m.ρ]
+        exact m.hw
+      · show CellU.mut m = CellU.mut _
+        refine congrArg CellU.mut (MutU.ext rfl rfl ?_ ?_)
+        · simp only [heq_eq_eq]; exact (Res.toRes_toS m.ρ).symm
+        · simp only [heq_eq_eq]
+          funext v r
+          show m.P v r = m.P v r.toS.toRes
+          rw [Res.toRes_toS]
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+
+/-- `ᾱ ∖ β̄ = γ̄`, as a graph: the difference of two lifetime sets need not be
+an `LSet` (it may be empty), so it is not a total operation on `LSet`. -/
+def LSet.Diff (s t u : LSet) : Prop := ∀ x, u.mem x ↔ (s.mem x ∧ ¬ t.mem x)
+
+/-- `ᾱ ∖ β̄ = ∅`. -/
+def LSet.DiffEmpty (s t : LSet) : Prop := ∀ x, s.mem x → t.mem x
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16.BoLo
+
+@[inherit_doc] scoped notation "⌜" p "⌝" => pure p
+
+@[inherit_doc] scoped infixr:35 " ⋆ " => sep
+
+@[inherit_doc] scoped infixr:27 " ─⋆ " => wand
+
+@[inherit_doc] scoped prefix:max "!ₛ" => bang
+
+end BoCa.Fig16.BoLo
+
+end

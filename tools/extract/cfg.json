@@ -1,0 +1,95 @@
+{
+ "legacy": [
+  "Resource",
+  "ResourceTests",
+  "Model",
+  "BoLo",
+  "BoLoTests",
+  "Flatten",
+  "FlattenTests",
+  "WpTests",
+  "LogRel",
+  "LogRelTests",
+  "Compat",
+  "Ledger",
+  "Surgery",
+  "SurgeryTests",
+  "LifeTests",
+  "TestCore",
+  "Programs"
+ ],
+ "secdir": {
+  "1": "Paper/S1_Syntax",
+  "2": "Paper/S2_Statics",
+  "3": "Paper/S3_Dynamics",
+  "4": "Paper/S4_LogicalRelation",
+  "5": "Paper/S5_Model"
+ },
+ "row_target": {
+  "5.61": "Paper/S6_2_NonStandardLemmas/Definitions",
+  "5.65": "Paper/S6_2_NonStandardLemmas/Definitions",
+  "5.66": "Paper/S6_2_NonStandardLemmas/Definitions",
+  "4.17": "Paper/LiteralReadings/S4_LogicalRelation",
+  "3.10": "SUPPORT",
+  "3.37": "SUPPORT"
+ },
+ "stage1_skip_rows": [
+  "5.67",
+  "4.19"
+ ],
+ "topic": {
+  "BoCa.Syntax": "Syntax",
+  "BoCa.Subst": "Syntax",
+  "BoCa.Notation": "Syntax",
+  "BoCa.Ty": "Syntax",
+  "BoCa.Life": "Lifetimes",
+  "BoCa.Derives": "Statics",
+  "BoCa.Wp": "Dynamics/Machine",
+  "BoCa.TR3": "Dynamics/Machine",
+  "BoCa.Fig16": "Model",
+  "BoCa.Reborrow": "Model",
+  "BoCa.Ancestor": "Model",
+  "BoCa.Fig16Wp": "Model",
+  "BoCa.Fig16LogRel": "LogicalRelation",
+  "BoCa.TypedWorld": "TypedWorld",
+  "BoCa.TypedWp": "TypedWorld",
+  "BoCa.TypedRel": "TypedWorld",
+  "BoCa.TypedImage": "TypedWorld",
+  "BoCa.TypedFundamental": "TypedWorld",
+  "BoCa.TypedReborrow": "TypedWorld",
+  "BoCa.DefectB": "LiteralSupport",
+  "BoCa.Adequacy": "Adequacy",
+  "BoCa.RebWp": "Model",
+  "BoCa.ViewWitness": "LiteralSupport",
+  "BoCa.TypedViewWitness": "LiteralSupport"
+ },
+ "order": [
+  "Paper/S1_Syntax/Definitions",
+  "Paper/S3_Dynamics/Definitions",
+  "Paper/S2_Statics/Definitions",
+  "Paper/S5_Model/Definitions",
+  "Paper/S6_2_NonStandardLemmas/Definitions",
+  "Paper/S4_LogicalRelation/Definitions",
+  "Paper/LiteralReadings/S4_LogicalRelation"
+ ],
+ "topic_ranges": [
+  [
+   "BoCa.Syntax",
+   270,
+   999999,
+   "Dynamics/Interpreter"
+  ]
+ ],
+ "no_mathlib": [
+  "BoCa.Syntax",
+  "BoCa.Life",
+  "BoCa.Ty",
+  "BoCa.Notation",
+  "BoCa.Derives",
+  "BoCa.Subst",
+  "BoCa.Wp"
+ ],
+ "mod_priority": {
+  "BoCa.TR3": -1
+ }
+}
