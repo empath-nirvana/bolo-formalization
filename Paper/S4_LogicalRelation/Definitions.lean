@@ -266,11 +266,9 @@ theorem vDen_imm (a : Lifetime.Life) (T : Ty) :
 /-!
 ### 4.9 · `𝒱⟦Mut @a T⟧δ(v) ≜ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦ Mut @aδ 𝒱⟦T⟧δ` · [TR] p. 4 · `[repair]`
 
-On the printed carrier the cell stores the PREDICATE, which is what Fig. 16 row 5 prints, and only the `atLife` hoist of row 4.8 is an encoding step. The OLD carrier is divergent here: its `mut` clause stores a type CODE, with `BoCa.LogRel.vDen_mut_ptoMut` only a one-way bridge back. Note also that the printed clause silently carries Fig. 16 row 5's stratum typing, and row 4.17 proves it EMPTY at `Mut @a (Imm @b 1)` — `exact` here does not mean inhabited  **Repair at the typed world (`docs/adjudications.md` §12.70).**  The cell stores `𝒱⟦T⟧` at the records strictly longer-lived than its lifetime, and the family lies in `Res_b` at every list — [TR] p. 4's `P̂ : Val → SProp_β`, 6.65's `P̂ ⊧ [β]P̂`, [CONF] 415:20 and 415:25's stratification, lifted to the list — so the stored predicate stays equal along `BoCa.Fig16.LogRel.Typed.Ext`. `BoCa.Fig16.LogRel.vDen_mut` stays as the literal reading
+On the printed carrier the cell stores the PREDICATE, which is what Fig. 16 row 5 prints, and only the `atLife` hoist of row 4.8 is an encoding step. Note also that the printed clause silently carries Fig. 16 row 5's stratum typing, and row 4.17 proves it EMPTY at `Mut @a (Imm @b 1)` — `exact` here does not mean inhabited  **Repair at the typed world (`docs/adjudications.md` §12.70).**  The cell stores `𝒱⟦T⟧` at the records strictly longer-lived than its lifetime, and the family lies in `Res_b` at every list — [TR] p. 4's `P̂ : Val → SProp_β`, 6.65's `P̂ ⊧ [β]P̂`, [CONF] 415:20 and 415:25's stratification, lifted to the list — so the stored predicate stays equal along `BoCa.Fig16.LogRel.Typed.Ext`. `BoCa.Fig16.LogRel.vDen_mut` stays as the literal reading
 -/
-/-- **The `Mut` clause, on the nose.**  `ResI` could not state this: its `mut`
-cell holds a `TyConj`, so `LogRel.vDen_mut` reads `ℓ ↦ M α ⟨T⟩` and
-`LogRel.vDen_mut_ptoMut` is a one-way bridge.  Here the cell holds `P̂` itself. -/
+/-- **The `Mut` clause, on the nose.**  The cell holds `P̂` itself. -/
 theorem vDen_mut (a : Lifetime.Life) (T : Ty) :
     vDen (.mut a T) δ v =
       atLife δ a (fun α => ex fun ℓ => ⌜v = .loc ℓ⌝ ⋆ ptoMut ℓ α (vDen T δ)) := rfl

@@ -340,7 +340,7 @@ theorem no_step_val {μ μ' : Heap} {w : Val} {e' : Expr} : ¬ Step1 μ (.val w)
   exact hh.not_isVal (K.isVal_of_plug (hE ▸ w.2))
 
 /-- …and the converse.  `wp(v){Q̂} ⊨ Q̂(v)` needs the run to be trivial, which it
-    is because a value takes no step; that is `steps_val` below. -/
+    is because a value takes no step. -/
 theorem steps_val_inv {μ μ' : Heap} {w : Val} {e' : Expr}
     (h : Steps μ (.val w) μ' e') : μ' = μ ∧ e' = .val w := by
   cases h with

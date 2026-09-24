@@ -180,10 +180,9 @@ theorem wp_inj₂ (v : Val) (Q : Val → WProp) :
     Entails (wp (.val (.inj₂ v)) Q) (wp (.inj₂ (.val v)) Q) :=
   Entails.refl _
 
-/-- **`𝒱⟦Mut @a T⟧δ` depends on `T` only through `𝒱⟦T⟧δ`.**  The exact
-contradictory of `LogRel.vDen_mut_payload_det`, and the reason `Ty.MutClosed`
-and `Ty.NoCapture` are not needed on this carrier.
-`[about ours: the substitutivity `LogRel`'s code-valued cell denies]` -/
+/-- **`𝒱⟦Mut @a T⟧δ` depends on `T` only through `𝒱⟦T⟧δ`**, because the printed
+`mut` cell stores the payload predicate.
+`[about ours: the substitutivity of the printed `mut` clause]` -/
 theorem vDen_mut_congr {δ₁ δ₂ : LSub} {a₁ a₂ : Lifetime.Life} {T₁ T₂ : Ty}
     (ha : a₁.interp δ₁ = a₂.interp δ₂) (hT : vDen T₁ δ₁ = vDen T₂ δ₂) :
     vDen (.mut a₁ T₁) δ₁ = vDen (.mut a₂ T₂) δ₂ := by
@@ -335,7 +334,7 @@ theorem hash_empty : ResU.Hash (Loc := BoCa.Loc) (Val := BoCa.Val)
 premise the two refutations below need: `1E` and `⊕I` are only refuted at an
 `e₁` that is not already a value, and this is one — `[TR]` p. 2's `⊸E` types it
 at `1` (`TR3.derives_wFreeAlloc`) and the printed `alloc↦`, `free↦` and the
-printed frame `e K` run it to `()` (`TR3.run_free_alloc`).
+printed frame `e K` run it to `()`.
 `[about ours: `[TR]` p. 4's `ℰ⟦1⟧` over `TR3.Steps`, the printed machine]` -/
 theorem tr3_eDen_freeAlloc (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty := by
@@ -416,7 +415,7 @@ so the condition has one carrier and not two.  `⊓β̄` is a member of `β̄`
 (`Fig16.LSet.meet_mem`) and is bounded by every other
 (`Fig16.LSet.meet_least`), so bounding the meet and bounding every member are
 the same ask; `ImmAt` fixes the licence to the index, which is what `reb_α`
-establishes, and `CtxLicence` is the licence `Δ ⊢ Γ ⊐ @a` supplies.  At a
+establishes.  At a
 FIXED `α` this is far weaker than asking `⊔β̄ ⊑ ⊓β̄`: the set `{1, 5}` is not
 flat and satisfies it at `7`.
 `[about ours: the slot condition, as `LifeMembers` at one licence]` -/
@@ -490,14 +489,9 @@ def tyLife (δ : LSub) : Ty → TyLife
 
 /-- **The non-circular slot condition, at the three-valued index.**  `ImmAt` at
 the lifetime `T` declares — which is what `reb_α` establishes inside its OWN
-definition (`reb_immAt`), with no appeal to 6.60.  A type the judgment reaches
-and which declares nothing carries no `imm` cell at all, which
-`noImm_of_tyLife_free` reads off the denotation.  A type the judgment does not
-reach is asked nothing.
-
-Contrast `TyBounded`, which at an `Imm` slot coincides with 6.60's conclusion
-there (`Circ` in the session notes); `ImmAt` is strictly stronger
-(`immBound_not_immAt`) and is proved upstream of the lemma. -/
+definition, with no appeal to 6.60.  A type the judgment reaches and which
+declares nothing carries no `imm` cell at all.  A type the judgment does not
+reach is asked nothing. -/
 def TyAt (δ : LSub) (T : Ty) (ρ : WRes) : Prop :=
   match tyLife δ T with
   | .bounded β => ImmAt β ρ
@@ -505,7 +499,7 @@ def TyAt (δ : LSub) (T : Ty) (ρ : WRes) : Prop :=
   | .unreached => True
 
 /-- `⊛_{x∈dom(Γ)}` again, with each live slot's denotation conjoined with
-`TyBounded` at that slot's own type.  Same `⋆`-structure as `gSep`, so it
+`TyAt` at that slot's own type.  Same `⋆`-structure as `gSep`, so it
 splits the same way. -/
 noncomputable def gSepB (Δ : LifeCtx) (δ : LSub) : Ctx Ty → List Val → WProp
   | [],     _      => emp
@@ -585,7 +579,7 @@ constructor for constructor, with `AllISide` a premise of `allI`,
 `Withbor1Side` a premise of `withbor1Ax`, `Withbor2Side` a premise of
 `withbor2Ax`, `Withbor3Side` a premise of `withbor3Ax` and `WithloadSide` a
 premise of `withloadAx`; every other constructor is as `Derives` has it, so a
-`DerivesIn` derivation is a `Derives` derivation (`DerivesIn.derives`) whose
+`DerivesIn` derivation is a `Derives` derivation whose
 `∀I`, `withbor1`, `withbor2`, `withbor3` and `withload` nodes meet their side.
 `[about ours: `BoCa.Derives`, with a premise added at five constructors]` -/
 inductive DerivesIn : LifeCtx → Ctx Ty → Expr → Ty → Prop where
@@ -704,11 +698,11 @@ Its five sides are of two kinds, and only one of them is about the carrier.
 * The **freshness** half — `AllISide`'s three conjuncts and the `¬ LFree`
   conjuncts of `Withbor1Side`, `Withbor2Side`, `Withbor3Side` and
   `WithloadSide` — is [TR] p. 2's own `Δ ⊢ T` at a binder outside `dom(Δ)`:
-  `allISide_of_wfB` and the four beside it derive all of them from `Ty.wfB`
-  and `Lifetime.LifeCtx.Ok`, and `BoCa.wfTy_of_wfB` ties `Ty.wfB` to the
-  transcribed `BoCa.WfTy`.  `Derives` consumes that judgment at no
+  `allISide_of_scopedB` and the four beside it derive all of them from
+  `Ty.scopedB` and `Lifetime.LifeCtx.Ok`, and `BoCa.wfTy_of_wfB` ties `Ty.wfB` to
+  the transcribed `BoCa.WfTy`.  `Derives` consumes that judgment at no
   constructor (definition row 2.19), which is why the
-  sides are not among its premises: `allI_fresh_refuted` is a `Derives.allI`
+  sides are not among its premises: `not_everyDerivationWf` is a `Derives.allI`
   node whose bound mentions its own binder.
 * `WithloadSide`'s escrow is [TR] 6.150's own inheritance from 6.55.
 

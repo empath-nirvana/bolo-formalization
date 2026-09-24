@@ -428,7 +428,7 @@ theorem vDen_applyLSub : ∀ (T : Ty) (σ : Lifetime.LSubst) (δ δ' : LSub),
         (by rw [ih σ δ δ' (fun y hy => h y (Or.inr hy))])
   | «mut» a T ih =>
       -- The printed cell holds `𝒱⟦T⟧δ`, so the payload has to be reproduced only
-      -- denotationally; this is the case `ResI` cannot do without `Ty.MutClosed`.
+      -- denotationally.
       intro σ δ δ' h; funext v
       simp only [Ty.applyLSub]
       rw [vDen_mut, vDen_mut]

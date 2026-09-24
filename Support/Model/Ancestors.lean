@@ -137,7 +137,6 @@ theorem BigComp.imm_source :
 then one of the operands is not `imm`, over the same value and the same witness:
 clause (2) and clause (5) return an `imm` cell, and every other clause returns an
 operand or, at clause (3), a `mut` over both operands' shared value and witness.
-This is `CellU.CompR.mut_source` with `own` cells allowed alongside.
 `[about ours: `[TR]` p. 5's `○` read backwards at a non-`imm` result]` -/
 theorem CellU.CompR.nonimm_source {ψ₁ ψ₂ ψ : CellU Loc Val}
     (h : CellU.CompR ψ₁ ψ₂ ψ) (hk : ψ.kind ≠ Kind.imm) :

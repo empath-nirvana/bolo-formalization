@@ -287,7 +287,7 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.BoLo.reborrow_star`, aliases `TR.lemma_6_125`, `TR.«↺⋆»`, tag `[as printed]`.
 
-**Note.** `Fig16.BoLo.reborrow_star`, on the printed carrier, `[as printed]`. The printed proof is one citation, *"By theorem 6.61"*, and `Fig16.ResU.six61` produces `ρ′₁ ● ρ′₂` **and** its membership in `reb_α(ρ₁ ● ρ₂)`, which is why the print calls the remaining obligations immediate. At the literal `imm` clause of `reb_α` the row carried `RebSurv`, 6.61's `ImmSurvives` at its sources; at the subset clause (definition row 5.28, `docs/adjudications.md` §12.67(b)) it carries nothing
+**Note.** `Fig16.BoLo.reborrow_star`, on the printed carrier, `[as printed]`. The printed proof is one citation, *"By theorem 6.61"*, and `Fig16.ResU.six61` produces `ρ′₁ ● ρ′₂` **and** its membership in `reb_α(ρ₁ ● ρ₂)`, which is why the print calls the remaining obligations immediate. At the subset clause of `reb_α` (definition row 5.28, `docs/adjudications.md` §12.67(b)) the row carries no added hypothesis
 -/
 /-- **`[TR]` Lemma 6.125** (`↺⋆`, p. 33): `↺_α P ⋆ ↺_α Q ⊨ ↺_α (P ⋆ Q)`, along
 the printed proof's one citation.  `ResU.six61` delivers both `ρ′₁ ● ρ′₂` and
@@ -348,7 +348,7 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.BoLo.reborrow_weak`, aliases `TR.lemma_6_127`, `TR.«↺-weak»`, tag `[as printed]`.
 
-**Note.** `Fig16.BoLo.reborrow_weak`, on the printed carrier, `[as printed]`. **The printed proof, step for step.**  `π′` is `π` with its domain restricted to `dom(ρ′₁)`; `π′ ⊆ π` is `List.filter_sublist`; the second bullet is `Fig16.BigComp.leS_of_sublist` chained onto H2 by `Fig16.ResU.Le.trans`; the first bullet is H1 unchanged. **The closing sentence** — *"By inspection of `F`, we observe that all usages of `π` are of the form `π(ℓ)`. Since `π(ℓ) = π′(ℓ)`, we obtain `F(ℓ,v,ρ,ρ′₁,ρ″,π′)`"* — has a `π → π′` half, which is `rfl`, and a `ρ′ → ρ′₁` half: `F` reads its image only at `ℓ`, where `ρ′₁(ℓ)` is a `●`-factor of `ρ′(ℓ)`, and a factor of `imm(s̄, v, χ)` is `imm` over a subset (`Fig16.ResU.factor_imm_sub`), which the clauses admit (`Fig16.ResU.RebAt.factor`, with `Fig16.immOf_sub_singleton` at the `own` and `mut` clauses). At the literal `imm` clause the row carried `SplitAgree`; at the subset clause (definition row 5.28, `docs/adjudications.md` §12.67(b)) it carries nothing
+**Note.** `Fig16.BoLo.reborrow_weak`, on the printed carrier, `[as printed]`. **The printed proof, step for step.**  `π′` is `π` with its domain restricted to `dom(ρ′₁)`; `π′ ⊆ π` is `List.filter_sublist`; the second bullet is `Fig16.BigComp.leS_of_sublist` chained onto H2 by `Fig16.ResU.Le.trans`; the first bullet is H1 unchanged. **The closing sentence** — *"By inspection of `F`, we observe that all usages of `π` are of the form `π(ℓ)`. Since `π(ℓ) = π′(ℓ)`, we obtain `F(ℓ,v,ρ,ρ′₁,ρ″,π′)`"* — has a `π → π′` half, which is `rfl`, and a `ρ′ → ρ′₁` half: `F` reads its image only at `ℓ`, where `ρ′₁(ℓ)` is a `●`-factor of `ρ′(ℓ)`, and a factor of `imm(s̄, v, χ)` is `imm` over a subset (`Fig16.ResU.factor_imm_sub`), which the clauses admit (`Fig16.ResU.RebAt.factor`, with `Fig16.immOf_sub_singleton` at the `own` and `mut` clauses). At the subset clause (definition row 5.28, `docs/adjudications.md` §12.67(b)) the row carries no added hypothesis
 -/
 /-- **`[TR]` Lemma 6.127** (`↻-weak`, p. 33): `↻_α (P ⋆ Q) ⊨ ↻_α P`.
 

@@ -71,6 +71,16 @@ theorem ResU.compat_comm_iff (C : CellU Loc Val → CellU Loc Val → Prop)
     ResU.Compat C ρ₁ ρ₂ ↔ ResU.Compat C ρ₂ ρ₁ :=
   ⟨ResU.Compat.comm hC, ResU.Compat.comm hC⟩
 
+/-- `[TR]` Lemma 6.1 at `▶◀`.  `[as printed]` -/
+theorem ResU.compatS_comm_iff (ρ₁ ρ₂ : ResU Loc Val) :
+    ResU.CompatS ρ₁ ρ₂ ↔ ResU.CompatS ρ₂ ρ₁ :=
+  ResU.compat_comm_iff _ (fun _ _ a => a.symm) ρ₁ ρ₂
+
+/-- `[TR]` Lemma 6.1 at `⋈`.  `[as printed]` -/
+theorem ResU.compatR_comm_iff (ρ₁ ρ₂ : ResU Loc Val) :
+    ResU.CompatR ρ₁ ρ₂ ↔ ResU.CompatR ρ₂ ρ₁ :=
+  ResU.compat_comm_iff _ (fun _ _ a => a.symm) ρ₁ ρ₂
+
 end BoCa.Fig16
 
 alias TR.lemma_6_1 := BoCa.Fig16.ResU.compat_comm_iff
@@ -166,7 +176,7 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.comp_empty_right`, alias `TR.lemma_6_4`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.comp_empty_right`, on the printed carrier — in the schema, so both `●` and `○`, definedness and value together. `PCM.op_emp` is its value half alone
+**Note.** `Fig16.ResU.comp_empty_right`, on the printed carrier — in the schema, so both `●` and `○`, definedness and value together.
 -/
 /-- **`[TR]` Lemma 6.4** (p. 7): `ρ ◐ ∅ = ρ`.  Definedness and value together,
 in the schema, hence at both `●` and `○`.  `[as printed]` -/
@@ -253,13 +263,13 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.compS_defined_iff`, alias `TR.lemma_6_9`, tag `[as printed]` `[variant: …]`.
 
-**Note.** `Fig16.ResU.compS_defined_iff`, on the printed carrier. Which half is definitional should be said plainly: `ResU.Comp` carries the printed guard as its first conjunct, so the forward direction is that conjunct and nothing more; the content is the converse, which builds the composite from `▶◀` alone through `Fig16.CellU.compS_defined_iff` at every overlapping location. `Fig16.ResU.compR_defined_iff` is the `○` twin, which the paper does not state
+**Note.** `Fig16.ResU.compS_defined_iff`, on the printed carrier. Which half is definitional should be said plainly: `ResU.Comp` carries the printed guard as its first conjunct, so the forward direction is that conjunct and nothing more; the content is the converse, which builds the composite from `▶◀` alone, cell by cell at every overlapping location (`Fig16.ResU.compS_spec`). `Fig16.ResU.compR_defined_iff` is the `○` twin, which the paper does not state
 -/
 /-- `ρ₁ ▶◀ ρ₂` iff `ρ₁ ● ρ₂` is defined — `[TR]` Lemma 6.9 (p. 7, 600 dpi),
 whose own proof is "By definition".  `ResU.Comp` carries the printed guard as
 its first conjunct, so the forward direction is that conjunct and nothing more.
 The content is the converse — building the composite from `▶◀` alone, which
-goes through `CellU.compS_defined_iff` at every overlapping location.
+goes through `ResU.compS_spec`, cell by cell at every overlapping location.
 Stated on this file's carrier, which is Fig. 16 on the settled reading of the
 `fin` mark (§12.33, and the `[variant: …]` at `Res`).  `[as printed]` -/
 theorem ResU.compS_defined_iff (ρ₁ ρ₂ : ResU Loc Val) :
@@ -482,7 +492,7 @@ theorem ExR.functional {ρ σ σ' : ResU Loc Val} (h : ExR ρ σ) (h' : ExR ρ �
 
 /-- **`ag(ρ)` is single-valued**, so `[TR]` p. 5's `ag(ρ)` and `[CONF]`
 Fig. 18a's `A⦇ρ⦈` name `AgW` unambiguously.  Both comprehensions are families
-over `ResU.Sites` lists, so both are pinned up to order and `BigComp.permR`
+over `ResU.Sites` lists, so both are pinned up to order and `BigComp.sites`
 closes each `◯`; the two outer `○`s are `ResU.CompR.functional`.  `ag` is
 always at `○`, so the schema hypotheses are discharged here rather than taken.
 `[about ours: the print's `ag(ρ)` is a term and `AgW` is its graph (G4); this is
@@ -1469,15 +1479,15 @@ theorem ResU.Lower.split_left {ρ₁ ρ₂ ρ₁₂ : ResU Loc Val} {m : Loc →
 
 **Lean.** `BoCa.Fig16.ResU.Lower.split`, alias `TR.lemma_6_7`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.Lower.split`, on the printed carrier, as one Kleene equality: both sides are partial terms, so the printed `=` is the `↔` between the two graphs at an arbitrary common result `m`, the shape of 6.18 and 6.20. `∪` is `Fig16.MemUnion`, the union of two partial maps written in `OptComp`'s shape, whose overlap clause `v₁ = v₂ ∧ o = some v₁` **asserts** the agreement the printed proof's last sentence establishes — a reading that left the overlap open would be weaker than the print; `Fig16.MemUnion.iff_ext` is the four-conjunct extensional form of the same relation, one rewrite away. The hypotheses are the print's: `Fig16.ResU.Hash ρ₁ ρ₂` verbatim, and `Fig16.ResU.CompS ρ₁ ρ₂ ρ₁₂` naming `ρ₁ ● ρ₂` (G4), whose first conjunct is `#`'s own `▸◂`. The forward half needs no `#` and is carved out as `Fig16.ResU.Lower.split_left`, tagged `[restricted: …]`. `Fig16.LowerExample.split_overlap` runs the lemma on a `#`-pair that genuinely shares a location, so the row is not vacuous at the case the printed proof spends its last sentence on.
+**Note.** `Fig16.ResU.Lower.split`, on the printed carrier, as one Kleene equality: both sides are partial terms, so the printed `=` is the `↔` between the two graphs at an arbitrary common result `m`, the shape of 6.18 and 6.20. `∪` is `Fig16.MemUnion`, the union of two partial maps written in `OptComp`'s shape, whose overlap clause `v₁ = v₂ ∧ o = some v₁` **asserts** the agreement the printed proof's last sentence establishes — a reading that left the overlap open would be weaker than the print. The hypotheses are the print's: `Fig16.ResU.Hash ρ₁ ρ₂` verbatim, and `Fig16.ResU.CompS ρ₁ ρ₂ ρ₁₂` naming `ρ₁ ● ρ₂` (G4), whose first conjunct is `#`'s own `▸◂`. The forward half needs no `#` and is carved out as `Fig16.ResU.Lower.split_left`, tagged `[restricted: …]`. `Fig16.LowerExample.split_overlap` runs the lemma on a `#`-pair that genuinely shares a location, so the row is not vacuous at the case the printed proof spends its last sentence on.
 -/
 /-- **`[TR]` Lemma 6.7** (p. 7): if `ρ₁ # ρ₂` then `⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁⟧ ∪ ⟦ρ₂⟧`.
 Both sides are partial terms, so — as with 6.18 and 6.20 — the printed
 `=` is the Kleene equality of the two, which is this `↔` at an arbitrary common
 result `m`: the left-hand side is defined with value `m` exactly when the right
 is.  `MemUnion` is the union of partial maps on the right, and its overlap
-clause carries the agreement the printed proof's last sentence establishes;
-`MemUnion.iff_ext` is its extensional reading.  The forward half is
+clause carries the agreement the printed proof's last sentence establishes.
+The forward half is
 `ResU.Lower.split_left`, which needs no `#`; the printed `#` is spent on the
 converse, where `✓(ρ₁ ● ρ₂)` — `#`'s second conjunct — is what makes the
 left-hand side defined at all.

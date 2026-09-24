@@ -42,7 +42,7 @@ namespace BoCa
     second component the **old** one.  [CONF] Fig. 2c (p. 415:4) is the
     decisive witness: `let x = alloc v; let (x′,y) = swap x (); free x′; y` is
     stated to return `v`, and it does so only under Fig. 3b's body.
-    `Examples.lean` and `PaperTests` §2 run it.
+    `Paper/Examples/Programs.lean` runs it (`BoCa.Programs.fig2c`).
 
     Three things matter about the term ([CONF] p. 415:5): it returns the
     reference as well as the payload, threading it so it can be reused; it
@@ -227,9 +227,8 @@ end BoCa.Lifetime
 namespace BoCa
 open BoCa.Lifetime
 
-/-- `Δ ⊢ T ⊐ @a` — the seven rules of [TR] §2 p. 2.  Split exactly as
-    `Ty.outlivesRules` is split, and for the same reason: `Ty.outlivesAll`
-    reads these rules at `@a := ⊤` as a predicate rather than as a judgment.
+/-- `Δ ⊢ T ⊐ @a` — the seven rules of [TR] §2 p. 2.  `Outlives` below is
+    this inductive, at the index the judgment names.
 
     The three absences are the mechanism, not an oversight: no rule for `⊸`
     (an opaque closure may capture a borrow), none for `∀` (a thunk, same

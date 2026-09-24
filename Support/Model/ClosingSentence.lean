@@ -102,8 +102,8 @@ theorem ExR.split_of_compS {ρ₁ ρ₂ ρ₁₂ w : ResU Loc Val}
 /-- **The witness `reb_α` fabricates at an `own` cell is a `●`-factor of the
 source.**  `[TR]` p. 5 sets it to `π(ℓ)/ℓ`; `π(ℓ)` is one piece of the family the
 filled `⨀` folds, `ρ ≥ ⨀_{ℓ} π(ℓ)` puts the fold below `ρ`, and `ρ/ℓ ≤ ρ`
-(`ResU.del_compS`) takes the last step.  With `ResU.flatR_le_of_compS` this puts
-`⦇π(ℓ)/ℓ⦈_○` inside `⦇ρ⦈_○`, which is what the `mut` clause gets for free from
+(`ResU.del_compS`) takes the last step.  This puts `⦇π(ℓ)/ℓ⦈_○` inside
+`⦇ρ⦈_○`, which is what the `mut` clause gets for free from
 `ExW.wit_le` and `AgW.mut_wit_le`.
 `[about ours: `[TR]` p. 5's `π(ℓ)/ℓ` against `ρ ≥ ⨀_{ℓ} π(ℓ)`]` -/
 theorem ResU.reb_own_wit_le {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
@@ -131,12 +131,11 @@ theorem ResU.reb_own_wit_le {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α
 `ρᵢ ○ ⦇ρ′ᵢ⦈_○` (`AgW.single_imm_inv`), so a `○`-factor of `⦇ρ′ᵢ⦈_○` composes
 onto it and changes nothing.
 
-This is the chain step `ResU.reb_flatR_absorb` runs on, stated on its own.  That
-lemma's `iff` form places a factor inside `ag(ρ_reb) ○ ag(ρᵢ)`, where at a
-reborrowed `ℓ` the `imm({β}, …)` absorbs it and nothing about the factor
+An `iff` form placing the factor inside `ag(ρ_reb) ○ ag(ρᵢ)` would lose it: at
+a reborrowed `ℓ` the `imm({β}, …)` absorbs it and nothing about the factor
 survives; this form keeps the factor.  `[TR]` 6.59's *"both get the borrow from
 `ρᵢ`"* is spent through it at the ancestor's raised subtree.
-`[about ours: `ResU.reb_flatR_absorb`'s chain step, exposed as a factor]` -/
+`[about ours: a `○`-factor of `⦇ρ′ᵢ⦈_○` against `ag(ρᵢ)`]` -/
 theorem ResU.absorbed_of_factor_flatR {ρ'i a₂ : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (ha₂ : AgW (ResU.single l₀ (CellU.immOf s v ρ'i hs)) a₂)
@@ -163,7 +162,7 @@ payload (`ExW.wit_le`, `AgW.mut_wit_le`), and at an `own` source cell it is
 `π(ℓ)/ℓ`, a `●`-factor of the source (`ResU.reb_own_wit_le`), which
 `ExR.split_of_compS` and `AgW.split` carry into the two walks.  Each half is
 then a `○`-factor of `⦇ρ′ᵢ⦈_○`, and `ResU.absorbed_of_factor_flatR` closes it.
-`[about ours: `ResU.reb_flatR_absorb`'s `imm`-family step, at one cell]` -/
+`[about ours: the `imm`-family step of `[TR]` 6.59's closing sentence, at one cell]` -/
 theorem ResU.reb_wit_absorbs {β : Life} {ρ'i ρ a₂ : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -243,7 +242,7 @@ This is what an ancestor in the **walk** needs that `ResU.reb_wit_absorbs` does
 not give on its own: an `imm` cell of `ag(ρ_reb)` need not be one of `ρ_reb`'s
 own cells — it can be raised — and this splits the walk so that either case is
 covered.
-`[about ours: `ResU.reb_flatR_absorb`'s decomposition of `ag(ρ_reb)`]` -/
+`[about ours: a decomposition of `ag(ρ_reb)` for `[TR]` 6.59's closing sentence]` -/
 theorem ResU.reb_ag_split {β : Life} {ρ'i ρ areb a₂ : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -481,8 +480,8 @@ goal's side — with no appeal to the reborrow at all.
 
 `ResU.CompR.imm_source` is what makes this a **case split rather than a
 guess**: an `imm` cell of a `○` comes from one of the operands, over the same
-value and the same witness.  The other branch, where the cell is `ag(ρ_reb)`'s,
-is `ResU.reb_flatR_absorb`'s.
+value and the same witness.  The other branch is where the cell is
+`ag(ρ_reb)`'s.
 `[about ours: the attribution branch of `[TR]` 6.59 where `ag(R)` carries the
 ancestor]` -/
 theorem ResU.reb_attribute_of_side {R aR ai aRi : ResU Loc Val}
@@ -555,14 +554,12 @@ theorem ResU.reb_attribute {β : Life} {ρ'i ρ R aR areb a₂ aRreb aRi : ResU 
 /-- **Off `dom(ρ_reb)`, `ag(ρ_reb)`'s cell is absorbed by `ag(ρᵢ)`'s** — and
 without `ρ # ρᵢ`.
 
-`ResU.reb_ag_absorbed_off_dom` reads `ResU.reb_flatR_absorb`'s `iff`, so it
-needs the composite `ag(ρ_reb) ○ ag(ρᵢ)` to exist before it can say anything;
-that is `✓(ρ ● ρᵢ)`, which is 6.55's corollary and is carried here only under a
-restriction.  `ResU.reb_ag_split` needs no composite: `ag(ρ_reb)` **is**
+Reading this off the composite `ag(ρ_reb) ○ ag(ρᵢ)` would need that composite to
+exist, which is `✓(ρ ● ρᵢ)`, 6.55's corollary.  `ResU.reb_ag_split` needs no
+composite: `ag(ρ_reb)` **is**
 `ρ_reb ○ bi` with `bi ≼ ag(ρᵢ)`, so off `ρ_reb`'s own domain the walk's cell is
 `bi`'s, and `≼` absorbs it.
-`[about ours: `ResU.reb_ag_absorbed_off_dom` without the `#` it was waiting
-on]` -/
+`[about ours: `ag(ρ_reb)` off `dom(ρ_reb)`, without `ρ # ρᵢ`]` -/
 theorem ResU.reb_ag_cell_absorbed_off_dom {β : Life} {ρ'i ρ areb a₂ : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -795,8 +792,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- **`ᾱ ⊆ ᾱ_R ∪ {β}` and `β ∉ ᾱ` give `ᾱ ⊆ ᾱ_R`.**  The `⊆` form of
-`LSet.union_singleton_cancel`: what survives at an ancestor is not that the two
+/-- **`ᾱ ⊆ ᾱ_R ∪ {β}` and `β ∉ ᾱ` give `ᾱ ⊆ ᾱ_R`.**  What survives at an ancestor is not that the two
 sets are equal but that the left one is inside the right one once the `{β}`
 `ρ_reb` contributes is discounted — and *"all components of the composition
 besides for `ρ_reb` outlive `β`"* is exactly `β ∉ ᾱ`. -/
@@ -951,11 +947,10 @@ theorem ResU.simFormAt_congr {σ₁ σ₂ τ₁ τ₂ : ResU BoCa.Loc BoCa.Val} 
       h.2 ψ (ResU.borrowPart_eq_some.mpr ⟨h₁.symm.trans hg, hk⟩)
     exact ⟨φ, h₂.trans hφ, hsim⟩
 
-/-- **`ResU.SixFiftyNineResidual` at Definition 6.3's paragraph.**  Every binder,
-hypothesis and conclusion is `ResU.SixFiftyNineResidual`'s; the single difference
-is that `χ` is bound by `ResU.SubKeep` rather than by `ResU.Sub`.
-`[about ours: `ResU.SixFiftyNineResidual` with Definition 6.3's third bullet
-read through the paragraph below it]` -/
+/-- **The `ℓ ∈ dom(ρ_reb)` half of `[TR]` 6.59's closing sentence**, with `χ`
+bound by `ResU.SubKeep`.
+`[about ours: 6.59's residual half, with Definition 6.3's third bullet read
+through the paragraph below it]` -/
 def ResU.SixFiftyNineResidualKeep : Prop :=
   ∀ (β : Life) (ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val)
     (l₀ : BoCa.Loc) (s : LSet) (v : BoCa.Val) (hs : ρ'i.InStratum s.join),
@@ -994,10 +989,9 @@ theorem ResU.single_imm_immOnly {ρ'i : ResU BoCa.Loc BoCa.Val} {l₀ : BoCa.Loc
   obtain ⟨-, rfl⟩ := ResU.single_get_eq_some hg
   exact CellU.kind_immOf _ _ _ _
 
-/-- **`ResU.SixFiftyNineOffReb` at Definition 6.3's paragraph.**  Every binder,
-hypothesis and conclusion is `ResU.SixFiftyNineOffReb`'s; the single difference
-is that `χ` is bound by `ResU.SubKeep` rather than by `ResU.Sub`.
-`[about ours: `ResU.SixFiftyNineOffReb` with Definition 6.3's third bullet read
+/-- **The half of `[TR]` 6.59 off `dom(ρ_reb)`**, the case the print calls
+*"immediate"*, with `χ` bound by `ResU.SubKeep`.
+`[about ours: 6.59's off-`dom(ρ_reb)` half, with Definition 6.3's third bullet read
 through the paragraph below it]` -/
 def ResU.SixFiftyNineOffRebKeep : Prop :=
   ∀ (β : Life) (ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val)

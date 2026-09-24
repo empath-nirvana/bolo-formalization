@@ -216,7 +216,7 @@ The print's `⫤⊨` is a typesetting slip for `⊨`, so this is the lemma, not 
 of one: every citation of `wp-val` across `[TR]`'s compatibility proofs is
 forward, no proof turns a hypothesis `wp(v){Q̂}` into `Q̂(v)`, and the converse
 composed with 6.148/6.149 (p. 38) would give free weakening on `⋆` in a linear
-logic.  `BoCa.BoLo.wp_val_not_backwards` machine-checks that the converse fails.
+logic.
 `[as printed]` (`[TR]` p. 36, reading the `⫤⊨` as the `⊨` it was meant to be) -/
 theorem wp_val (v : Val) (Q : Val → WProp) : Entails (Q v) (wp (.val v) Q) := by
   intro ρ hQ ρf hf

@@ -486,7 +486,7 @@ open BoCa.Lifetime
 
 /-- `Δ ⊢ Γ` at the scoping half — `Ty.scopedB` at every LIVE slot, a consumed slot being out
     of scope (convention L4).  This is the presupposition
-    `BoCa.Fig16.LogRel.allISide_of_wfB` reads `AllISide`'s third conjunct off.
+    `BoCa.Fig16.LogRel.allISide_of_scopedB` reads `AllISide`'s third conjunct off.
     `[about ours: [TR] p. 2's `Δ ⊢ T` lifted to a positional context]` -/
 def Ctx.ScopedB (Δ : LifeCtx) (Γ : Ctx Ty) : Prop :=
   ∀ s ∈ Γ, s.live = true → s.ty.scopedB Δ = true

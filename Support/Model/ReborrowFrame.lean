@@ -192,14 +192,12 @@ theorem ResU.Under.bigComp {σs : List (ResU Loc Val)} {b f : ResU Loc Val} :
           exact ResU.Under.compR hc (hs σ List.mem_cons_self)
             (ih hrest (fun τ hm => hs τ (List.mem_cons_of_mem _ hm)))
 
-/-- **`dom(ex(ρ″)_○) ⊆ dom(ex(ρ′)_○)` strengthened to cells.**  `ExW.dom_le`'s
-statement with `ResU.Under` in place of the domain inclusion, and the same
-proof: the walk's own-or-mut part is a part of `ρ′` (`ResU.witFlat_cell`), and
+/-- **`dom(ex(ρ″)_○) ⊆ dom(ex(ρ′)_○)` strengthened to cells**, with `ResU.Under`
+in place of the domain inclusion: the walk's own-or-mut part is a part of `ρ′` (`ResU.witFlat_cell`), and
 each entry of its `mut` family is a `○`-factor of `ex(ρ′)_○` (`ExW.wit_le`,
 `ExW.functional`), so both halves lie under `⦇ρ′⦈_○` and `○` carries that to the
 walk.
-`[about ours: `ExW.dom_le` at `[TR]` 6.54's closing line rather than at its
-displayed domain inclusion]` -/
+`[about ours: the domain inclusion of `[TR]` 6.54's closing line, at cells]` -/
 theorem ExW.under_le {X ρ' eX eS aS f : ResU Loc Val}
     (hXY : ∀ m ψ, X.get m = some ψ → ψ.kind ≠ Kind.imm → ρ'.get m = some ψ)
     (hX : ExR X eX) (heS : ExR ρ' eS) (haS : AgW ρ' aS)

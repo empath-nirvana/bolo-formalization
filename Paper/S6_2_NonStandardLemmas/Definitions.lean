@@ -119,7 +119,7 @@ def ResU.SimForm (σ₁ σ₂ : ResU Loc Val) : Prop :=
 /-!
 ### 5.66 · `ρ ⊟ ρ′ ≜ ρ∣own,mut ● ρ″ where …` — [TR] Definition 6.3, not a p. 5 row · [TR] p. 17 · `[repair]`
 
-The fourth bullet's second sub-case prints `ρ′(ℓ) = imm(ᾱ ∖ β̄, ρᵢ, v)` with a single prime, which its own hypothesis contradicts; `ρ″` is what [TR] Lemma 6.52's proof and the surrounding prose require. Adjudicated at `docs/adjudications.md` §12.34, and `BoCa.Fig16.ResU.SubL` with `BoCa.Fig16.ResU.subClauseL_forces_empty` is the literal reading carried alongside, shown degenerate. The declaration existed with `[variant: …]` from the start; **the row did not**, so the definition layer had no record of it. **The third bullet is also short a clause**, and it is printed one line below the definition: *"removing the lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`"*. Off `dom(ρ′)` every lifetime of `ρ(ℓ)` is one "only in `ρ`", so `ρ″(ℓ) = ρ(ℓ)` and not merely `ℓ ∈ dom(ρ″)`; `BoCa.Fig16.ResU.SubKeep` is the bullet read through that sentence and `BoCa.Fig16.ResU.SubKeep.toSub` the implication. On it `⊟` is a function (`BoCa.Fig16.ResU.SubKeep.functional`) — which is what licenses [TR]'s writing `ρ ⊟ ρ′` as a term — and [TR] 6.52's equation holds of every admissible value (`BoCa.Fig16.ResU.SubKeep.compS`). `BoCa.Fig16.ResU.sub_not_functional` measures the bullet's own glyphs, not `⊟`; adjudicated at `docs/adjudications.md` §12.58, which is the correction to §12.38
+The fourth bullet's second sub-case prints `ρ′(ℓ) = imm(ᾱ ∖ β̄, ρᵢ, v)` with a single prime, which its own hypothesis contradicts; `ρ″` is what [TR] Lemma 6.52's proof and the surrounding prose require. Adjudicated at `docs/adjudications.md` §12.34, and `BoCa.Fig16.ResU.SubL` is the literal reading carried alongside. The declaration existed with `[variant: …]` from the start; **the row did not**, so the definition layer had no record of it. **The third bullet is also short a clause**, and it is printed one line below the definition: *"removing the lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`"*. Off `dom(ρ′)` every lifetime of `ρ(ℓ)` is one "only in `ρ`", so `ρ″(ℓ) = ρ(ℓ)` and not merely `ℓ ∈ dom(ρ″)`; `BoCa.Fig16.ResU.SubKeep` is the bullet read through that sentence and `BoCa.Fig16.ResU.SubKeep.toSub` the implication. On it `⊟` is a function (`BoCa.Fig16.ResU.SubKeep.functional`) — which is what licenses [TR]'s writing `ρ ⊟ ρ′` as a term — and [TR] 6.52's equation holds of every admissible value (`BoCa.Fig16.ResU.SubKeep.compS`). The bullet's own glyphs, without that paragraph, leave `ρ″(ℓ)` undetermined off `dom(ρ′)`; adjudicated at `docs/adjudications.md` §12.58, which is the correction to §12.38
 -/
 /-- The fourth bullet of `[TR]` Definition 6.3 (p. 17), with the second
 sub-case read as a constraint on `ρ″`.
@@ -156,7 +156,7 @@ Row 5.66, continued.
 `ℓ ∈ dom(ρ″)`, without the paragraph one line below that says which cell stands
 there.  That paragraph is part of the definition, so this is an **incomplete
 transcription**, kept beside `ResU.SubKeep` — which is Definition 6.3 — for
-comparison and as what `ResU.sub_not_functional` measures.  Prefer `SubKeep`
+comparison.  Prefer `SubKeep`
 in new work.  `docs/adjudications.md` §12.64.
 `[variant: Definition 6.3's bullets without its paragraph; the last sub-case's
 single prime is read as `ρ″`, see `docs/adjudications.md` §12.34]` -/
@@ -201,7 +201,7 @@ the paragraph printed one line below it** (p. 17):
 At a location `ρ′` does not cover, **every** lifetime of `ρ(ℓ)` is one "only in
 `ρ`", so all of them are kept and `ρ″(ℓ)` is `ρ(ℓ)`.  The bullet's own glyphs
 ask only `ℓ ∈ dom(ρ″)`, and `ResU.Sub` is those glyphs; the difference between
-the two is exactly what `ResU.sub_not_functional` measures, and it is why `⊟`
+the two is what leaves `ResU.Sub` undetermined there, and it is why `⊟`
 can be written as a term — which the print does wherever it occurs.
 
 The fourth bullet is as in `ResU.Sub`, on the `ρ″` reading of its single prime.
@@ -211,7 +211,7 @@ says a thing is: the displayed bullets *together with* the paragraph that
 disambiguates them.  Transcribing the bullets alone is an incomplete
 transcription, not a faithful one, and completing it from the prose is not a
 departure — `ResU.Sub` is the partial reading, kept beside this one for
-comparison and for `ResU.sub_not_functional`.  `docs/adjudications.md` §12.64.
+comparison.  `docs/adjudications.md` §12.64.
 `[as printed]` (`[TR]` p. 17, the four bullets and the paragraph one line below
 them; the fourth bullet's single prime read as `ρ″`, as `ResU.Sub`) -/
 def ResU.SubKeep (ρ ρ' χ : ResU Loc Val) : Prop :=

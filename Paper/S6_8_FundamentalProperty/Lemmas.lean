@@ -767,7 +767,7 @@ does not state]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.allI_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Note.** `LogRel.allI_compat` adds the freshness of `'a` for `Δ`'s bounds, for `@b` and for `Γ`'s live types. `Derives.allI` supplies none of them: `LogRel.AllIGap` is a derivation where the `Γ` condition fails
+**Note.** `LogRel.allI_compat` adds the freshness of `'a` for `Δ`'s bounds, for `@b` and for `Γ`'s live types. `Derives.allI` supplies none of them; `DerivesWf.allI` carries p. 2's presupposition, from which `Fig16.LogRel.allISide_of_scopedB` reads all three, and `Fig16.LogRel.not_everyDerivationWf` is a `Derives` node that no `DerivesWf` node types
 -/
 /-- **`[TR]` Lemma 6.161** (`∀I-compat`, p. 42)
 `[variant: adds the freshness of `'a` for `@b`, for the bounds of `Δ` and for
@@ -874,7 +874,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Literal reading.** `BoCa.Fig16.LogRel.MutPayloadSubst.subst_eq`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Note.** `Fig16.LogRel.allE_compat`, on the printed carrier, `[as printed]`: H1, the printed `Δ ⊨ @a ⊏ @b` as `LifeCtx.EntailsLt`, and the conclusion at `T[@a/'a]` (`Ty.instLife`); the proof's closing `Δ-subst` is `Fig16.LogRel.vDen_instLife`. Both have one cause, the code-valued `mut` invariant: `MutGap` refutes the lemma without the second, `RenameGap` refutes the α-invariance the first stands in for, and `vDen_mut_payload_det` mentions no binder, so no change to how `∀` binds retires `MutClosed`. A de Bruijn binder retires `NoCapture` alone.
+**Note.** `Fig16.LogRel.allE_compat`, on the printed carrier, `[as printed]`: H1, the printed `Δ ⊨ @a ⊏ @b` as `LifeCtx.EntailsLt`, and the conclusion at `T[@a/'a]` (`Ty.instLife`); the proof's closing `Δ-subst` is `Fig16.LogRel.vDen_instLife`.
 -/
 /-- **`[TR]` Lemma 6.162** (`∀E-compat`, p. 42) `[as printed]`:
 
@@ -2285,7 +2285,7 @@ table's `•` gives.
 Twenty-seven of the twenty-eight constructors close from their
 compatibility lemmas with nothing threaded.  The twenty-eighth is `withload`, whose 6.175 spends 6.150, and
 6.150 inherits `RebEscrow` from 6.55: that is `esc`.  Our carrier admits a
-configuration at which `esc` is refused (`ViewWitness.withloadEscrow_refused`),
+configuration at which the literal conclusion is refused without `esc` (`ViewWitness.fundamentalProperty_refused`),
 so the row is not closed by this theorem. -/
 theorem fundamental (esc : WithloadEscrow) :
     ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty),

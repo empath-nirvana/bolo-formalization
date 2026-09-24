@@ -98,7 +98,7 @@ The Lean returns `(x, z)`, the OLD payload ([CONF] Fig. 3b, p. 415:4), where [TR
     second component the **old** one.  [CONF] Fig. 2c (p. 415:4) is the
     decisive witness: `let x = alloc v; let (x′,y) = swap x (); free x′; y` is
     stated to return `v`, and it does so only under Fig. 3b's body.
-    `Examples.lean` and `PaperTests` §2 run it.
+    `Paper/Examples/Programs.lean` runs it (`BoCa.Programs.fig2c`).
 
     Three things matter about the term ([CONF] p. 415:5): it returns the
     reference as well as the payload, threading it so it can be reused; it
@@ -396,7 +396,7 @@ open BoCa.Lifetime
 /-!
 ### 2.19 · `Δ ⊢ T` — "Presumes ⊨ Δ" (boxed judgment form) · [TR] p. 2 · `[encoding]`
 
-Named choice: the presupposition `⊨ Δ` (`BoCa.Lifetime.LifeCtx.Sat`) is carried by no constructor. No `BoCa.Derives` constructor has a `BoCa.WfTy` premise, so the judgment is never consumed by the statics — which is where [TR] Lemma 6.151's binder freshness goes missing: `BoCa.Fig16.LogRel.allISide_of_wfB` and the four beside it read that freshness off this judgment, at the decidable half `BoCa.Ty.wfB` (`BoCa.wfTy_of_wfB` is the soundness), and `BoCa.Fig16.LogRel.allI_fresh_refuted` is the `∀I` node where the statics do not supply it. `BoCa.Ty.wfB` asks the `∀` rule's `Δ, ('a ⊏ @b)` to be an extension, which this rule does not (row 2.25), and asks `Δ ⊨ @a` at `BoCa.Lifetime.Life.wf`, which is the sound half of it — weaker only at the `⟦Δ⟧ = ∅` this row's own presupposition excludes
+Named choice: the presupposition `⊨ Δ` (`BoCa.Lifetime.LifeCtx.Sat`) is carried by no constructor. No `BoCa.Derives` constructor has a `BoCa.WfTy` premise, so the judgment is never consumed by the statics; [TR] Lemma 6.151's binder freshness is read off the presupposition that p. 2's judgment box carries: `BoCa.DerivesWf` asks `Δ ⊢ T` at its scoping half `BoCa.Ty.scopedB`, and `BoCa.Fig16.LogRel.allISide_of_scopedB` reads the freshness off it (`BoCa.wfTy_of_wfB` is the soundness of the decidable `BoCa.Ty.wfB` against this judgment). `BoCa.Fig16.LogRel.not_everyDerivationWf` is a `∀I` node of `BoCa.Derives` that no `BoCa.DerivesWf` node types. `BoCa.Ty.wfB` asks the `∀` rule's `Δ, ('a ⊏ @b)` to be an extension, which this rule does not (row 2.25), and asks `Δ ⊨ @a` at `BoCa.Lifetime.Life.wf`, which is the sound half of it — weaker only at the `⟦Δ⟧ = ∅` this row's own presupposition excludes
 
 ### 2.20 · `Δ ⊢ 1` · [TR] p. 2 · `[as printed]`
 
@@ -511,9 +511,8 @@ One premise, as printed; strict, so `Δ ⊢ Imm @a T ⊐ @a` is underivable — 
 
 One premise, as printed. Seven rules printed, seven in the Lean; no rule for ⊸, ∀ or `Unk` in either
 -/
-/-- `Δ ⊢ T ⊐ @a` — the seven rules of [TR] §2 p. 2.  Split exactly as
-    `Ty.outlivesRules` is split, and for the same reason: `Ty.outlivesAll`
-    reads these rules at `@a := ⊤` as a predicate rather than as a judgment.
+/-- `Δ ⊢ T ⊐ @a` — the seven rules of [TR] §2 p. 2.  `Outlives` below is
+    this inductive, at the index the judgment names.
 
     The three absences are the mechanism, not an oversight: no rule for `⊸`
     (an opaque closure may capture a borrow), none for `∀` (a thunk, same

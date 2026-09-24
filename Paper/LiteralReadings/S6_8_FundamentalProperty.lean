@@ -96,7 +96,7 @@ def FundamentalPropertyOverRules : Prop :=
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
 /-- **`Δ; Γ ⊨ e : T` with the slot conditions.**  Input: `𝒢⟦Γ⟧δ(γ)` carrying
-`TyBounded` at each live slot.  Output: `TyBounded` at `T`, so the induction
+`TyAt` at each live slot.  Output: `TyAt` at `T`, so the induction
 feeds itself instead of having to recover the fact from the denotation.
 `[restricted: to `gDenB` contexts — `[TR]` p. 4's `𝒢⟦Γ⟧δ` with a scope
 condition of the kind its own `dom(Γ) ⊆ dom(δ)` already is]` -/
@@ -105,8 +105,8 @@ def SemArising (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=
     wp (substAll γ e) (fun v ρ' => vDen T δ v ρ' ∧ TyAt δ T ρ') ρ
 
 /-! Lemma 6.151 (Fundamental Property), literal reading, continued. -/
-/-- The projection adequacy uses: at `ρ = ∅` the input condition is
-`gSepB_dead`, so the restriction costs nothing there. -/
+/-- The projection adequacy uses: at `ρ = ∅` the input condition holds of the
+empty context, so the restriction costs nothing there. -/
 theorem sem_of_semArising {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty}
     (h : SemArising Δ Γ e T) :
     ∀ δ γ ρ, Δ.Models δ → gDenB Δ δ Γ γ ρ → wp (substAll γ e) (vDen T δ) ρ :=
@@ -394,8 +394,7 @@ issue and the two frames the proof binds with, `(K,e)` and `(v,K)`, are never
 reached.  `[TR]`'s own last step — `wp-val` at the *expression* `(v₁,v₂)`, which
 `[CONF]` Fig. 1 takes silently because its grammar derives `(v₁,v₂)` both
 through `v` and through `(e₁,e₂)` — is `wp-val` at the value, the two being one
-term here.  This row used to be refuted over the printed machine, and the
-refutation was our encoding's and not the print's.
+term here.
 `[about ours: 6.155's own last step, over `TR3.Steps`, the printed machine]` -/
 theorem tensorI_step_on_TR3 (Q : Val → WProp) {ρ : WRes}
     (h : Q (Val.pair Val.unit Val.unit) ρ) :

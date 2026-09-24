@@ -161,7 +161,7 @@ variable (Loc Val : Type)
 /-!
 ### 5.4 · `Imm_α ≜ {(ᾱ : ℘⁺(Life), v : Val, ρ : Res_⊔ᾱ) ∣ ⊓ᾱ ⊐ α}` · [TR] p. 4, strata row 4 · `[encoding]`
 
-`℘⁺(Life)` is `BoCa.Fig16.LSet` — a set bundled with its min and max so `⊔ᾱ` and `⊓ᾱ` stay total and choice-free; `BoCa.Fig16.LSet.exists_of_bounded` shows the printed side condition admits exactly the `LSet`s, so the SET `Imm_α` is unchanged
+`℘⁺(Life)` is `BoCa.Fig16.LSet` — a set bundled with its min and max so `⊔ᾱ` and `⊓ᾱ` stay total and choice-free; every `ᾱ` the printed side condition admits has a greatest element, so it is an `LSet` with the same members and meet, and the SET `Imm_α` is unchanged
 -/
 /-- `Imm_α ≜ {(ᾱ : ℘⁺(Life), v : Val, ρ : Res_{⊔ᾱ}) | ⊓ᾱ ⊐ α}`, one layer.
 The printed side condition is the field `hls`; it is part of the *type*, as
@@ -170,7 +170,7 @@ printed, not a hypothesis carried alongside.
 The binder is `LSet`, which is `℘⁺(Life)` at the sets where `⊓ᾱ` is defined
 (G2).  That is the same set of inhabitants: `⊓` is `max`, so an `ᾱ` without a
 greatest element has no `⊓ᾱ` and satisfies no condition of the form `⊓ᾱ ⊐ α`,
-and `LSet.exists_of_bounded` is the converse — every `ᾱ` that does satisfy it
+and conversely every `ᾱ` that does satisfy it has a greatest element and so
 is an `LSet` with the same members and the same meet — so the *set* `Imm_α` is
 the printed one, though the binder is not `℘⁺(Life)` glyph for glyph.
 `[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
@@ -288,7 +288,7 @@ abbrev Mut (α : Life) : Type := MutF Loc Val α (fun β _ => Cell Loc Val β)
 /-!
 ### 5.8 · `ψ ∈ Cell ≜ ⋃_α Cell_α` · [TR] p. 4, strata row 8 · `[encoding]`
 
-The union is an inductive whose payloads are the already-built strata; `BoCa.Fig16.CellU.inStratum_iff` and `BoCa.Fig16.CellU.exists_stratum` prove it is exactly `⋃_α Cell_α`. Splitting the payloads into `ImmU`/`MutU` is ours — no row of either document is an unstratified `Imm` or `Mut`
+The union is an inductive whose payloads are the already-built strata, so each cell is in `Cell_α` at the stratum its payload was built at, and it is exactly `⋃_α Cell_α`. Splitting the payloads into `ImmU`/`MutU` is ours — no row of either document is an unstratified `Imm` or `Mut`
 -/
 /-- `imm(ᾱ, v, ρ)` as an element of the union.  `[CONF]` **does** print an
 unstratified `Imm` — p. 415:19 (300 dpi) has `Imm ≈ ℘(Life) × Val × Res`,
@@ -333,8 +333,7 @@ structure MutU : Type where
 Row 5.8, continued.
 -/
 /-- `ψ ∈ Cell ≜ ⋃_α Cell_α`.  The union is realised directly, its payloads
-being the already-constructed strata; the stratum equivalences and
-`CellU.exists_stratum` are the proof that this is `⋃_α Cell_α` and not
+being the already-constructed strata, so that this is `⋃_α Cell_α` and not
 something larger or smaller.
 `[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 inductive CellU : Type where
@@ -1215,7 +1214,7 @@ def CellU.wit : CellU Loc Val → ResU Loc Val
 /-!
 ### 5.20 · `ex(ρ)_◖ ≜ ρ∣own ◖ ρ∣mut ◖ ⨀{ex(ρ′)_◖ ∣ ∃ℓ. ρ(ℓ) = mut(_,_,ρ′,_)}` · [TR] p. 5, operation row 11 · `[repair]`
 
-The printed comprehension is a SET and the Lean composes a FAMILY indexed by locations. On the set reading two `mut` cells with equal witnesses compose once, [TR] Lemma 6.18 is false, and a resource with two mutable borrows of one cell would be admitted (`BoCa.Fig16.WalkNeg.set_reading_would_admit`); declared at `docs/adjudications.md` §12.36. Adjudicated at `docs/adjudications.md` §12.36 with convention G6: one reading of the printed set-builder makes a printed lemma false, since on the set reading [TR] Lemma 6.18 fails at two `mut` cells with equal witnesses, and the crux is compiled rather than asserted. [CONF] Fig. 18a writes the same row as `cod(ρ∣mut)`
+The printed comprehension is a SET and the Lean composes a FAMILY indexed by locations. On the set reading two `mut` cells with equal witnesses compose once, which cannot be reconciled with [TR] Lemma 6.18, and a resource with two mutable borrows of one cell would be admitted; declared at `docs/adjudications.md` §12.36. Adjudicated at `docs/adjudications.md` §12.36 with convention G6: one reading of the printed set-builder cannot be reconciled with a printed lemma, since on the set reading [TR] Lemma 6.18 cannot be taken at two `mut` cells with equal witnesses. [CONF] Fig. 18a writes the same row as `cod(ρ∣mut)`
 -/
 mutual
 
@@ -1450,7 +1449,7 @@ def CellU.CompatS (ψ₁ ψ₂ : CellU Loc Val) : Prop :=
 /-!
 ### 5.15 · `ψ₁ ● ψ₂ ≜ imm(ᾱ₁ ∪ ᾱ₂, v, ρ)` when both are `imm` at the same `v`, ρ · [TR] p. 5, operation row 6 · `[as printed]`
 
-Given both ways, as a function of the ▸◂ proof and as a graph; `BoCa.Fig16.CellU.compS_defined_iff` says the domain is exactly ▸◂, and `BoCa.Fig16.LSet.union` is round set union with the bounds recomputed (`BoCa.Fig16.LSet.ext`: no extra data)
+Given both ways, as a function of the ▸◂ proof and as a graph; the domain is exactly ▸◂ (at resources, `BoCa.Fig16.ResU.compS_defined_iff`), and `BoCa.Fig16.LSet.union` is round set union with the bounds recomputed (`BoCa.Fig16.LSet.ext`: no extra data)
 -/
 /-- `ψ₁ ● ψ₂ = ψ` — the printed equation as a graph, so that the resource-level
 schema can be instantiated at it.  `[as printed]` (as a graph — G4) -/
@@ -1526,7 +1525,7 @@ abbrev ExS (ρ σ : ResU Loc Val) : Prop := ExW CellU.CompatS CellU.CompS ρ σ
 /-!
 ### 5.28 · `reb_α(ρ) ≜ {ρ′ ∣ @ρ ⊐ α ∧ ∃π : dom(ρ′) → Res. ρ ≥ ⨀_● π(ℓ) ∧ …}` · [TR] p. 5, operation row 19 · `[repair]`
 
-Membership in the printed set; `π` is an association list with `Nodup` keys pinned to `dom(ρ′)`, which IS the printed function, and `ρ ≥ x` is `BoCa.Fig16.ResU.Le` from [CONF] p. 415:24 fn. 1 since [TR] uses ≥ with no defining row (row 5.54). **The `imm` clause is read at a subset**: where the print has `ρ(ℓ) = imm(_,_,_) ⇒ ρ′(ℓ) = ρ(ℓ)`, `BoCa.Fig16.ResU.RebAt` has `ρ′(ℓ) = imm(t̄, v, χ)` for a nonempty `t̄ ⊆ s̄` at `ρ(ℓ) = imm(s̄, v, χ)`, same value and witness. Adjudicated at `docs/adjudications.md` §12.67(b): [CONF] 415:24 — *"`ρ′` must be just like a subresource of the original resource `ρ` … its imm locations are preserved at their original lifetimes"* — and [TR] 6.57's proof, which prints `ρ∣dom(ρ′ᵢ∣imm) ≤ ρ′ᵢ∣imm` (`≤`, not `=`); at this reading [TR] 6.61's *"the only interesting cases are locations `ℓ` that are in both `ρ′₁` and `ρ′₂`"* holds (`BoCa.Fig16.ResU.six61_imm_at`). The literal `ρ′(ℓ) = ρ(ℓ)` is recorded there with its cost: 6.61, 6.125 and 6.127 needed the added hypotheses `ImmSurvives`, `RebSurv` and `SplitAgree`, since a `●`-factor of an `imm` cell is `imm` over a subset
+Membership in the printed set; `π` is an association list with `Nodup` keys pinned to `dom(ρ′)`, which IS the printed function, and `ρ ≥ x` is `BoCa.Fig16.ResU.Le` from [CONF] p. 415:24 fn. 1 since [TR] uses ≥ with no defining row (row 5.54). **The `imm` clause is read at a subset**: where the print has `ρ(ℓ) = imm(_,_,_) ⇒ ρ′(ℓ) = ρ(ℓ)`, `BoCa.Fig16.ResU.RebAt` has `ρ′(ℓ) = imm(t̄, v, χ)` for a nonempty `t̄ ⊆ s̄` at `ρ(ℓ) = imm(s̄, v, χ)`, same value and witness. Adjudicated at `docs/adjudications.md` §12.67(b): [CONF] 415:24 — *"`ρ′` must be just like a subresource of the original resource `ρ` … its imm locations are preserved at their original lifetimes"* — and [TR] 6.57's proof, which prints `ρ∣dom(ρ′ᵢ∣imm) ≤ ρ′ᵢ∣imm` (`≤`, not `=`); at this reading [TR] 6.61's *"the only interesting cases are locations `ℓ` that are in both `ρ′₁` and `ρ′₂`"* holds (`BoCa.Fig16.ResU.six61_imm_at`). At the literal `ρ′(ℓ) = ρ(ℓ)`, 6.61, 6.125 and 6.127 need added hypotheses, since a `●`-factor of an `imm` cell is `imm` over a subset
 -/
 /-- The body of `reb_α`'s `∀ ℓ ∈ dom(π), v, ρ″`, at one location `ℓ` and the
 piece `p = π(ℓ)` the family gives it.
@@ -1624,7 +1623,7 @@ Row 5.28, continued.
 /-- `ρ′ ∈ reb_α(ρ)` — `[TR]` p. 5's last row, as membership in the set it prints.
 
 The four printed conjuncts, in order: `@ρ ⊐ α`, written at `ResU.AtLife`'s graph
-so that nothing is chosen (`ResU.reb_at_iff` is the same condition at `ResU.at`);
+so that nothing is chosen;
 `π : dom(ρ′) → Res` as a list of `(location, resource)` pairs whose first
 projection is `dom(ρ′)` without repetition, the idiom the walks use for the
 printed comprehensions; `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)`, the iterated **strict**
@@ -1716,7 +1715,7 @@ theorem ResU.exists_atLife (ρ : ResU Loc Val) : ∃ a, ρ.AtLife a := by
 Row 5.11, continued.
 -/
 /-- `@ρ` as a function.  The choice is of the covering list, not of the value:
-the value is unique by `AtLife.unique`.  `[as printed]` (the function form of
+the value is unique, since `ResU.AtLife` is a greatest lower bound.  `[as printed]` (the function form of
 def. 14; `Classical.choose` picks the covering list) -/
 noncomputable def ResU.at (ρ : ResU Loc Val) : Life := Classical.choose ρ.exists_atLife
 
@@ -2187,7 +2186,7 @@ def ResU.Hash (ρ₁ ρ₂ : ResU Loc Val) : Prop :=
 /-!
 ### 5.60 · `⦇ρ⦈(ℓ)` — an application of a partial term · [TR] p. 5, row 18 · `[repair]`
 
-"Some flattening of ρ carries ψ at ℓ" — false when `⦇ρ⦈` is undefined, single-valued by `BoCa.Fig16.ResU.Flat.functional`. This is exactly where [TR]'s guarded ↭ and [CONF]'s unguarded one come apart (`BoCa.Fig16.ResU.upd_of_not_valid`). Adjudicated at convention G4 and at the declaration: the print applies a partial term and says nothing about the undefined case, so a reading must be chosen; the one taken is stated, proved single-valued by `BoCa.Fig16.ResU.Flat.functional`, and identified as exactly where the two printed readings of ↭ part company
+"Some flattening of ρ carries ψ at ℓ" — false when `⦇ρ⦈` is undefined, single-valued by `BoCa.Fig16.ResU.Flat.functional`. This is exactly where [TR]'s guarded ↭ and [CONF]'s unguarded one come apart. Adjudicated at convention G4 and at the declaration: the print applies a partial term and says nothing about the undefined case, so a reading must be chosen; the one taken is stated, proved single-valued by `BoCa.Fig16.ResU.Flat.functional`, and identified as exactly where the two printed readings of ↭ part company
 -/
 /-- `⦇ρ⦈(ℓ) = ψ` — the printed partial-value equation, as `↭` uses it.  `⦇−⦈` is
 a graph here (G4), so this says some flattening of `ρ` carries `ψ` at `ℓ`; it is

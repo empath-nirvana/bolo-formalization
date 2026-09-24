@@ -94,8 +94,6 @@ theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
 /-- The refutations are not vacuous: an owned cell has `∅` as an admissible
 frame, so `wp` really is false at a resource `[TR]` p. 6's row reaches.
-Contrast `Fig16.BoLo.wp_ptoOwn`, which inhabits the same row at a
-value.
 `[about ours: an inhabited instance of the refutations]` -/
 theorem wp_stuck_false_nonvacuous (l : BoCa.Loc) (w : Val) (Q : Val → WProp) :
     ¬ wp wSeq Q (ResU.single l (CellU.ownOf w)) := by
@@ -120,7 +118,7 @@ theorem wp_lt_fig16 (l : BoCa.Loc) :
     refine Fig16.BoLo.wp_free l .unit _ _ ⟨_, PMap.empty,
       ResU.comp_empty_right _, rfl, ?_⟩
     -- `inj₁ ()` IS the value `inj₁ ()`, so `wp-val` lands the run with no
-    -- step in between: `Wp.Head.injV₁` is gone and nothing replaced it.
+    -- step in between.
     exact Fig16.BoLo.wp_val (.inj₁ .unit) _ _ trivial
   · exact wp_inj₁_false
       (ResU.hash_symm (ResU.hash_empty_right (ResU.valid_single_own l .unit)))
@@ -479,9 +477,9 @@ The printed statement, the printed proof and the adjudication are in `Paper/S6_7
 /-- **The `DeepReborrow` configuration fails `RebEscrow`'s escrow half.**
 `ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)` reborrows at `β` to `rebA β = 0↦imm({β}, 𝓋, 1↦own(𝓋))`
 — the `own` clause of `reb_β`, whose witness `reb_β` fabricates — while
-`ag(comp)`, the aliasable walk of the very composite the refutation is taken at,
+`ag(comp)`, the aliasable walk of the very composite the measurement is taken at,
 carries `0↦imm({β}, 𝓋, ∅)` there.  `∅ ≠ 1↦own(𝓋)`, which is exactly what
-`Fig16.EscrowAgree` forbids.  The refutation is written at the same `β`-indexed
+`Fig16.EscrowAgree` forbids.  The measurement is written at the same `β`-indexed
 `P̂` the rule above takes, so the escrow conjunct is the whole of what
 separates the two results.
 `[about ours: the `DeepReborrow` witness measured against this rule's added
@@ -567,8 +565,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 variable (α β : Life) (v u w : BoCa.Val)
 
 /-- **`ρ″ = 0↦own(v) ⊎ 1↦own(u)` reborrows at any `β ⊏ ⊤` to `rebA β`.**  The
-`own` clause of `reb_β`, with witness `π(0)/0 = 1↦own(u)`.  Mirrors
-`RebExample.reb_own`. -/
+`own` clause of `reb_β`, with witness `π(0)/0 = 1↦own(u)`. -/
 theorem reb_rho2_rebA (hβ : (⊤ : Life) ⊐ β) :
     ResU.Reb β (rho2 v u) (rebA β v u) := by
   refine ⟨rho2_stratum v u β,
@@ -683,7 +680,7 @@ variable (α β : Life) (v u w : BoCa.Val)
 
 This is a fact about what is missing here, not about `[TR]` 6.150.  Its printed
 proof (p. 39) spends the three composition lemmas, which are unstated on this
-carrier, so what is refuted below is a strictly weaker transcription than the
+carrier, so what is refused below is a strictly weaker transcription than the
 one the paper proves.
 
 The configuration is `DeepReborrow` — a valid composite holding a shallow view
@@ -694,7 +691,7 @@ not the witness) and which our frame calculus quantifies over.  The escrow our
 `reb_α` leaves is not pinned, because the lemma that pins it — 6.53, whose proof
 asserts *"witnesses and values always stay the same"* — is not transcribed.
 `Fig16.BoLo.RebEscrow` is that escrow taken as a hypothesis, and
-`Fig16.BoLo.deepReborrow_not_rebEscrow` refutes it at this very configuration, so
+`Fig16.BoLo.deepReborrow_not_rebEscrow` refuses it at this very configuration, so
 the rule below and `Fig16.BoLo.wp_reborrow` stand together.
 `[about ours: our own `↺` row, written without 6.53/6.55/6.61, at one resource
 our `✓` admits — not a claim about the paper's rule.]` -/
