@@ -10,7 +10,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | `proved*` | proved at a restriction stated in the theorem, tagged `[restricted: …]`; the record names the restriction |
 | `variant` | a Lean theorem whose statement differs from the print in a way particular to that result (an added hypothesis, a direction, two results fused), tagged `[variant: …]`; the record says how |
 
-**Tags of a definition row.** `[as printed]`, `[encoding]`, `[repair]` (the Lean departs from the print on purpose; the row's comment gives the reading and the sentences of the paper that ground it, and `docs/adjudications.md` the full argument), `[about ours]` (not printed; needed by Lean).
+**Tags of a definition row.** `[as printed]`, `[encoding]`, `[repair]` (the Lean reads the print differently; the row's comment cites the `docs/adjudications.md` entry that argues the reading), `[about ours]` (not printed; needed by Lean).
 
 `[TR]` numbers Definitions and Lemmas in two sequences: Definitions 6.1, 6.2 and 6.3 are definition rows 5.61, 5.65 and 5.66, listed under *Definitions* below.
 
@@ -425,7 +425,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 
 ## Repaired definitions
 
-Every definition row tagged `[repair]`: the library's reading departs from the print, and the row's comment in its file gives the adjudication and the sentences of the paper that ground it.  The headline results additionally hold at the typed world, the repair of rows 4.4–4.14 and 5.33 recorded in `Paper/S4_LogicalRelation/Definitions.lean` and `Paper/S5_Model/Definitions.lean` and declared in `Support/TypedWorld/`.
+Every definition row tagged `[repair]`, with the printed text it reads differently; the row's comment cites its `docs/adjudications.md` entry.  The headline results are stated at the typed world, the repair of rows 4.4–4.14 and 5.33 (§12.69–§12.72), declared in `Support/TypedWorld/`.
 
 * **1.8** `Val ::= … ∣ Λ.e` — `Paper/S1_Syntax/Definitions.lean`
 * **2.10** ⊸E: `Δ; Γ₁ ⊢ e₁ : T₁`, `Δ; Γ₂ ⊢ e₂ : T₁ ⊸ T₂` / `Δ; Γ₁,Γ₂ ⊢ e₁ e₂ : T₂` — `Paper/S2_Statics/Definitions.lean`

@@ -9,8 +9,7 @@ The files follow `[TR]` section by section.  Each printed definition and each
 numbered result sits in the file for its section, in printed order as far as Lean's
 definition-before-use allows, under a comment that quotes what is printed and gives
 its page.  `Paper/INDEX.md` lists every numbered result and every printed definition
-with its file and Lean declaration.  The development was carried out in an earlier
-working repository and moved here unchanged in statement and proof.
+with its file and Lean declaration.
 
 ## Headline results
 
@@ -25,10 +24,13 @@ def FundamentalProperty : Prop :=
     DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemX Δ Γ e T
 ```
 
-If `Δ; Γ ⊢ e : T` as `[TR]` p. 2 reads it (`DerivesWf`: the typing rules, with the
-judgments `⊨ Δ` and `Δ ⊢ Γ` that p. 2's boxes presuppose carried as `Δ.Ok` and
-`Ctx.ScopedB`), then `Δ; Γ ⊨ e : T` (`SemX`: `[TR]` p. 4's judgment at the repaired
-definitions described below).  There is no other hypothesis.  The proof is the
+`DerivesWf` is `[TR]` p. 2's typing rules, with p. 2's well-formedness judgment
+`Δ ⊢ T` consulted at binders and eliminated types.  The two further hypotheses are
+`⊧ Δ`, carried as `Δ.Ok` (sufficient, `LifeCtx.sat_of_ok`), and `Δ ⊢ Γ`, carried as
+`Ctx.ScopedB`.  p. 2's typing box prints no presupposition; p. 2 prints
+`Presumes ⊧ Δ` only on the boxes of `Δ ⊢ T` and `Δ ⊢ T ⊐ @a`
+(`docs/adjudications.md` §C.26).  The conclusion `SemX` is `[TR]` p. 4's
+`Δ; Γ ⊨ e : T` at the repaired definitions described below.  The proof is the
 printed one: induction on the derivation, each case closed by its compatibility
 lemma, `[TR]` Lemmas 6.152–6.176.
 
@@ -41,22 +43,22 @@ theorem adequacy (e : Expr) (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.uni
 ```
 
 Every closed program that `[TR]` p. 2 types at `1` runs, from the empty memory, to
-`()` and the empty memory: it terminates and frees everything it allocates.  It is
-`[CONF]` Corollary 3.3 at `SemX` (`Fig16.LogRel.Typed.corollary33`, from Theorem 3.2,
+`()` and the empty memory: it terminates and frees everything it allocates.  At the
+empty contexts `Δ.Ok` and `Ctx.ScopedB` hold, so this is `[CONF]` Corollary 3.3 at
+`SemX` (`Fig16.LogRel.Typed.corollary33`, from Theorem 3.2,
 `Fig16.LogRel.Typed.theorem32`) composed with the Fundamental Property.  Neither
 document prints a proof of Theorem 3.2 or Corollary 3.3; the proofs here are ours
 (`docs/adjudications.md` §A.1).
 
-**Why its trust base is `[TR]` §§1–3 only.**  The statement of `adequacy` mentions
-the syntax (§1), the typing judgment `DerivesWf` (§2) and the machine `BoLo.Steps`
+**The trust base of `adequacy` is `[TR]` §§1–3.**  The statement mentions the
+syntax (§1), the typing judgment `DerivesWf` (§2) and the machine `BoLo.Steps`
 (§3), and nothing else.  The model — resources, the logic, `wp`, the logical
 relation and the typed world of `[TR]` §§4–6, with every repair made there — is
-used by the proof and does not occur in the statement.  A reader who accepts the
-statement therefore has to check only §§1–3 against the paper, and those
-declarations are copied verbatim into `comparator/Challenge/` so that they can be
-read in one place.  Two things there differ from the print and are part of what is
-trusted: the typing rules and axiom terms as the library reads them, and the two
-evaluation frames `K; e` and `injᵢ K` that `BoLo.Steps` adds (see below).
+used by the proof and does not occur in the statement.  Those §§1–3 declarations are
+copied verbatim into `comparator/Challenge/`.  Two things there differ from the
+print and are part of what is trusted: the typing rules and axiom terms as the
+library reads them, and the two evaluation frames `K; e` and `injᵢ K` that
+`BoLo.Steps` adds (see below).
 
 Every declaration's `#print axioms` is within `[propext, Classical.choice,
 Quot.sound]`.  `Paper/` and `Support/` contain no `sorry`, `axiom`, `native_decide`,
@@ -81,10 +83,10 @@ real programs, and that adequacy is a statement about their runs.
   of p. 415:9 (`aliasLoad`), the nested `withswap` of p. 415:10 (`swapTwo`) and
   `greet` of Fig. 10b (`greetProg`) — each closed off by allocating the
   references it borrows.  `allocFree_steps` gives one run step by step on
-  `BoLo.Steps` itself.  The interpreter allocates deterministically and is not
-  proved to agree with `BoLo.Steps` (`docs/adjudications.md` D8); its runs
-  illustrate, and the adequacy instances are the theorems.
-* `Model.lean` — `[TR]` Lemmas 6.7 and 6.20 run at two resources that share an
+  `BoLo.Steps`.  The interpreter allocates deterministically and is not
+  proved to agree with `BoLo.Steps` (`docs/adjudications.md` D8); the adequacy
+  instances are the theorems.
+* `Model.lean` — `[TR]` Lemmas 6.7 and 6.20 at two resources that share an
   `imm` location, and inhabitants of hypotheses that rows of §6.2 bind or add.
 
 ## Building and checking
@@ -137,8 +139,7 @@ checks, without trusting this build, that `Paper` proves exactly the statement i
 those in `comparator/Challenge/`, using only the three standard axioms; it replays the
 exported proof in the Lean kernel and in the independent nanoda kernel.  A pass
 certifies the end-to-end statement above.  `comparator/README.md` gives the commands
-(it needs comparator, lean4export and nanoda built locally) and says precisely what
-is trusted.
+(it needs comparator, lean4export and nanoda built locally) and says what is trusted.
 
 Both checks also run on GitHub: `.github/workflows/ci.yml` (build, hygiene, axiom
 audit) on every push, and `.github/workflows/comparator.yml` (the judge) on pushes to
@@ -165,9 +166,8 @@ scripts/                      the hygiene and axiom checks
 ```
 
 A **record** for a numbered result gives its number, page and status, the printed
-statement, the printed proof transcribed compactly in its own order, the Lean
-declaration with its tag, and a note on how the declaration reads the statement.
-The tags are `[as printed]`; `[encoding]` (a representation choice that changes
+statement, the printed proof transcribed compactly in its own order, and the Lean
+declaration with its tag.  The tags are `[as printed]`; `[encoding]` (a representation choice that changes
 nothing, such as de Bruijn indices or a graph for a partial function);
 `[restricted: …]` and `[variant: …]` (the statement differs, and the tag says how);
 `[repair]` (a definition read differently from the display, see below); and
@@ -177,90 +177,67 @@ where `[TR]` names the rule, `TR.«name»` (`TR.«Imm Frame»`, `TR.«wp-bind»`
 
 ## Where the mechanisation departs from the printed text
 
-Lean needs every definition to mean exactly one thing.  In a number of places the
-printed text admits more than one reading, the two documents print different
-versions, or the literal reading of a definition does not support a step a printed
-proof takes.  In each such place the mechanisation adopts a reading, grounded where
-possible in the paper's own prose, and records it where the definition is
-transcribed (tag `[repair]`) and in `docs/adjudications.md`, which gives for each the
-printed form, the sentences that ground the reading, the reading adopted and what
-the literal reading admits.  `Paper/INDEX.md` (*Repaired definitions*) lists every
-such row.  The main groups (section numbers are those of `docs/adjudications.md`):
+Where the printed text admits more than one reading, the two documents print
+different versions, or the literal reading of a definition does not support a step a
+printed proof takes, the mechanisation adopts a reading, tags the declaration
+(`[repair]`, `[variant: …]`, `[restricted: …]`) and argues it in
+`docs/adjudications.md`: the printed form, the sentences that ground the reading,
+the reading adopted and what the literal reading admits.  `Paper/INDEX.md`
+(*Repaired definitions*) lists every repaired row.  The main groups, by section of
+`docs/adjudications.md`:
 
 **In the trust base of `adequacy` (`[TR]` §§1–3).**
 
-* *Typing rules.*  `⊸E`'s printed conclusion `e₁ e₂` is read as `e₂ e₁`, the function
-  on the left as in the grammar and the β-rule (§12.2); `∀E` applies a lifetime by `e ()`, following
-  `Λ.e ≜ λ_.e` (§12.14, §12.27); `∀I`'s extended context `Δ, ('a ⊏ @b)` carries the
-  freshness `'a ∉ dom(Δ)` that extending a partial map requires (§12.44); the
-  premise `Δ ⊨ Γ ⊐ @a` of `[l]I`, which `[TR]` does not define, is `[CONF]` Fig. 7's
-  pointwise lift (§12.6, §C.25); the conclusions of `⊑Imm`/`⊑Mut`, printed at
-  `@b` in `[TR]`, are at `@a` as in `[CONF]` Figs. 7/9 and `[TR]` Lemmas 6.167/6.168
-  (§12.4); the `@aδ` clauses are `[CONF]`
-  Fig. 11's homomorphic interpretation (§12.7); the `Imm̲` metafunction takes
-  `[CONF]` Fig. 9's `Mut` clause and a `Unk` clause (§12.10, §12.11).
-* *The axiom table.*  The terms of `swap`, `withbor` and `withload` are `[CONF]`
-  Figs. 3b, 14 and 15's, which match the types both documents print (§12.20); the
-  `∀` binders of the axiom types are schematic (§12.45), and `⊓Δ` is the meet over
-  `dom(Δ)` (§12.15).
-* *The machine.*  `[TR]` p. 2 types `e₁; e₂` at any `e₁ : 1` and `injᵢ e` at any
-  `e`, and p. 3 prints no evaluation frame `K; e` or `injᵢ K`.  `BoLo.Steps` adds
-  those two frames (§12.42, D6).  The printed machine is kept as `TR3.Steps`, and
-  every `wp` rule of `[TR]` §6.7 is proved over it as well (`TR3.wp_*`).
+* *Typing rules.*  `⊸E`'s conclusion read as `e₂ e₁` (§12.2); `∀E` as `e ()`
+  (§12.14, §12.27); `∀I`'s freshness `'a ∉ dom(Δ)` (§12.44); `[l]I`'s premise
+  `Δ ⊨ Γ ⊐ @a` as `[CONF]` Fig. 7's pointwise lift (§12.6, §C.25); `⊑Imm`/`⊑Mut`
+  at `@a` (§12.4); the `@aδ` clauses as `[CONF]` Fig. 11's (§12.7); the `Imm̲`
+  metafunction's `Mut` and `Unk` clauses (§12.10, §12.11).
+* *The axiom table.*  The terms of `swap`, `withbor` and `withload` are `[CONF]`'s
+  (§12.20); the axiom types' `∀` binders are schematic (§12.45); `⊓Δ` is the meet
+  over `dom(Δ)` (§12.15).
+* *The machine.*  `BoLo.Steps` adds the frames `K; e` and `injᵢ K` (§12.42, D6).
+  The printed machine is kept as `TR3.Steps`, and every `wp` rule of `[TR]` §6.7 is
+  proved over it as well (`TR3.wp_*`).
 
 **In the model (`[TR]` §§4–6), not in the trust base.**
 
-* The second clause of `↭` is read with `imm` where p. 5 prints `mut`, following
-  `[CONF]` Fig. 18b (§12.39); both printed readings of `↭` are kept, and they agree
-  inside `wp` (D3).
-* The comprehensions of the walks `ex` and `ag` are read as families indexed by
-  locations (§12.36, G6); `▷◁`'s second disjunct as the domain of `○` (§12.35);
-  `Res_α` carries the `fin` mark `[TR]` prints on `Res` (§12.33, D10); `Life`'s
-  order follows `[CONF]` Fig. 11's labelling (§12.3, G5).
-* `ℓ ↦ Imm α P̂` bounds `α` by `⊓β̄`, the borrows outstanding at the location, and
-  `reb_α`'s `imm` clause keeps a subset of them, following `[CONF]` p. 415:24's
-  *"its imm locations are preserved at their original lifetimes"* (§12.66, §12.67).
-* Definition 6.3's `ρ ⊟ ρ′` is pinned by the paragraph printed below it
-  (§12.34, §12.38, §12.58).
-* **The typed world** (§12.69–§12.73).  At the literal reading of `[TR]` p. 4's
-  logical relation, the Fundamental Property is proved here from an added
-  hypothesis, `WithloadEscrow`; `SemX` reads rows 4.4–4.14 and 5.33 so that it holds
-  with none: an `Imm` payload is read at its observable view, as `[CONF]`'s *"there
-  is no view at which it would be safe to access the payload"* and `Imm̲`'s `Unk`
-  clauses describe (§12.69); borrow payloads are stratified by a record list
-  (§12.70); the `Imm` clause carries the type the world recorded at the cell
-  (§12.71); `⊸`/`∀` are Kripke over the record list, and `wp` ranges over the typed
-  worlds the printed proofs' operations produce (§12.72).  The declarations are in
-  `Support/TypedWorld/`.  Both readings are kept: the literal Fundamental Property,
-  `Fig16.LogRel.fundamentalProperty` at `Sem` from `WithloadEscrow`, sits beside the
-  headline.
-
-Where a Lean statement differs from a printed one — an added hypothesis, a
-restriction — its record says so in its tag, and `Paper/INDEX.md` gives the status
-(`proved*`, `variant`).
+* `↭`'s second clause with `imm` for p. 5's `mut` (§12.39); both printed readings of
+  `↭` are kept, and agree inside `wp` (D3).
+* The walks' comprehensions as families indexed by locations (§12.36, G6); `▷◁`'s
+  second disjunct as the domain of `○` (§12.35); `Res_α` finite (§12.33, D10);
+  `Life`'s order as `[CONF]` Fig. 11 labels it (§12.3, G5).
+* `ℓ ↦ Imm α P̂` bounded by `⊓β̄`, and a subset in `reb_α`'s `imm` clause
+  (§12.66, §12.67).
+* Definition 6.3's `ρ ⊟ ρ′` read with the paragraph printed below it (§12.34,
+  §12.38, §12.58).
+* **The typed world** (§12.69–§12.73, `Support/TypedWorld/`): the `Imm` payload at
+  its observable view (§12.69); borrow payloads stratified by a record list
+  (§12.70); the `Imm` clause carrying the recorded type (§12.71); `⊸`/`∀` Kripke over
+  the record list, and `wp` over the typed worlds the printed proofs' operations
+  produce (§12.72).  At the literal logical relation the Fundamental Property is
+  proved from an added hypothesis, `WithloadEscrow`
+  (`Fig16.LogRel.fundamentalProperty`, at `Sem`).
 
 **What the literal readings admit.**  `Paper/LiteralReadings/` builds, for each
 repaired reading that matters to a result, the configuration at which the literal
 reading and the printed step cannot be reconciled on this carrier, with every
 hypothesis discharged in Lean.  Among them: over the printed machine, the closed
 terms `inj₁ (free (alloc ()))` and `free (alloc ()); ()`, both typed by p. 2, take no
-step (`TR3.stuck_wInj`, `TR3.stuck_wSeq`), so `[CONF]` Corollary 3.3's conclusion is
-not reachable there for them (`TR3.corThree_unreachable`); under `α ⊑ ⊔β̄`,
-`𝒱⟦Mut @a (Imm @b 1)⟧` is empty at the cell and lifetime set
-`Fig16.LogRel.MutImmCell` builds; and at the literal logical relation, a `withload` node
-of this carrier at which the Fundamental Property's conclusion at `Sem` is refused
-without `WithloadEscrow` (`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`),
-a configuration that is not a typed world (`ViewWitness.excluded`).  These are
-measurements of what a reading admits on this carrier; nothing else depends on them.
+step (`TR3.stuck_wInj`, `TR3.stuck_wSeq`, `TR3.corThree_unreachable`); under
+`α ⊑ ⊔β̄`, `𝒱⟦Mut @a (Imm @b 1)⟧` is empty at the cell `Fig16.LogRel.MutImmCell`
+builds; and at the literal logical relation, a `withload` node at which the
+Fundamental Property at `Sem` is refused without `WithloadEscrow`
+(`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`), a configuration that is
+not a typed world (`ViewWitness.excluded`).  Nothing else depends on them.
 
 ## What is not done
 
 * **`[TR]` Lemma 6.40** has no declaration; its record in
   `Paper/S6_2_NonStandardLemmas/Lemmas.lean` says so.
-* **Statements were transcribed from the PDFs' text layer**, with symbols the
-  extraction garbled restored by hand; glyph questions were checked against
-  rendered pages.  A
-  transcription error in a quoted statement would not be caught by Lean; the Lean
-  statements are what the checks certify.
+* **Quoted statements were transcribed from the PDFs' text layer**, with symbols the
+  extraction garbled restored by hand against rendered pages.  A transcription error
+  in a quoted statement would not be caught by Lean; the Lean statements are what the
+  checks certify.
 * Several results hold at a stated restriction or with an added hypothesis
   (`proved*`, `variant` in `Paper/INDEX.md`); each record names it.

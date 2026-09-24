@@ -37,7 +37,7 @@ and `scripts/check-hygiene.sh` permits exactly it.  `Challenge.lean` does NOT im
 declarations the statement reaches, each copied from the file of this repository
 its path names (`Challenge/Paper/S1_Syntax/Definitions.lean` from
 `Paper/S1_Syntax/Definitions.lean`, and so on), under the same namespaces, `open`s
-and names, one module per file.  The module split is not cosmetic: Lean reuses a pattern-matching auxiliary
+and names, one module per file.  The module split matters: Lean reuses a pattern-matching auxiliary
 (`f.match_1`) across definitions of the same shape, which ones are candidates
 depends on module boundaries, and comparator compares those auxiliaries too.  For
 the same reason `Lifetime.Life.depth` and `Ty.wfB`, which the statement does not
