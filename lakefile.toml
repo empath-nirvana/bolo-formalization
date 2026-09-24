@@ -1,4 +1,4 @@
-name = "borrow_lang_paper"
+name = "bolo_formalization"
 defaultTargets = ["Paper", "Support"]
 
 [[require]]

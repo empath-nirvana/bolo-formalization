@@ -111,7 +111,7 @@
       "configFile": "lakefile.toml"
     }
   ],
-  "name": "borrow_lang_paper",
+  "name": "bolo_formalization",
   "lakeDir": ".lake",
   "fixedToolchain": false
 }

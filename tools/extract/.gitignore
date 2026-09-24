@@ -1,5 +1,0 @@
-dump.tsv
-*.json
-!cfg.json
-plan.out
-__pycache__/
