@@ -13,13 +13,7 @@ import Support.Statics.Contexts
 # [TR] §4 Logical Relation — remarks on the definitions
 
 Row 4.16's two directions between the `Mut` clause and `Supported`, and row
-4.18's `sem_iff` (the judgment at `∅` is the judgment).
-
-These are theorems about printed definitions — definition rows of
-`Paper/INDEX.md` whose Lean is a theorem — whose proofs use results
-of `[TR]` §6, so they cannot sit with the definitions.  Each carries the row's
-number, printed form, page, tag and note.  A row's theorem that a §6 result's Lean
-needs is declared in that result's file, and the row here says where.
+4.18's `sem_iff`.  Theorems about definition rows whose proofs use `[TR]` §6.
 -/
 
 noncomputable section
@@ -32,14 +26,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
 ### 4.16 · — no printed counterpart — · [TR] p. 4 · `[repair]`
-
-Fig. 16 row 5's `P̂ : Val → SProp_β` as a predicate, because the model file encodes `SProp_β` as a SUBSET of `SProp` rather than a type. Forced by putting the real predicate in the `mut` cell; it makes visible the side condition the printed `Mut` clause carries silently. Adjudicated at definition row 4.16: Fig. 16 row 5's `P̂ : Val → SProp_β` is a TYPE, and the carrier encodes `SProp_β` as a subset of `SProp` (`BoCa.Fig16.SPropS.toU_range`), so on this carrier the condition is not enforceable by typing and has to be re-expressed as a predicate to be stated at all. [TR] p. 4 writes the relation with the unsubscripted `SProp` while printing both `SProp` and `SProp_α`, so which stratum 𝒱 inhabits is a condition the print carries silently. Both directions are proved
 -/
-/-- **The `Mut` clause carries the paper's implicit stratum typing.**  A
-resource in `𝒱⟦Mut @a T⟧δ` exhibits a `β ⊒ @aδ` at which `𝒱⟦T⟧δ` is a
-`Val → SProp_β`, and a value and a resource satisfying it.
-`[about ours: what Fig. 16 row 5's two printed conditions give back on this
-carrier]` -/
+/-- A resource in `𝒱⟦Mut @a T⟧δ` exhibits a `β ⊒ @aδ` at which `𝒱⟦T⟧δ` is a
+`Val → SProp_β`, and a value and a resource satisfying it.  `[about ours]` -/
 theorem vDen_mut_supported {δ : LSub} {a : Lifetime.Life} {T : Ty} {v : Val} {ρ : WRes}
     (h : vDen (.mut a T) δ v ρ) :
     ∃ α β w σ, a.interp δ = some α ∧ α ⊑ β ∧ Supported β (vDen T δ) ∧ vDen T δ w σ := by
@@ -51,14 +40,7 @@ theorem vDen_mut_supported {δ : LSub} {a : Lifetime.Life} {T : Ty} {v : Val} {�
   · rw [← hofS]
     exact ⟨hσ, hw⟩
 
-/-!
-Row 4.16, continued.
--/
-/-- **…and that is all it carries.**  Given the stratum typing, a witness for
-`𝒱⟦T⟧δ` builds the cell, so the clause is inhabited.  Together with
-`vDen_mut_supported` this is an exact characterisation.
-`[about ours: the converse of `vDen_mut_supported`, at the cell Fig. 16 row 5
-prints]` -/
+/-- The converse of `vDen_mut_supported`.  `[about ours]` -/
 theorem vDen_mut_of_supported {δ : LSub} {a : Lifetime.Life} {T : Ty}
     {α β : Life} {w : Val} {σ : WRes} (ha : a.interp δ = some α) (hab : α ⊑ β)
     (hs : Supported β (vDen T δ)) (hw : vDen T δ w σ) (ℓ : BoCa.Loc) :
@@ -76,7 +58,8 @@ theorem vDen_mut_of_supported {δ : LSub} {a : Lifetime.Life} {T : Ty}
 /-!
 ### 4.18 · — no printed counterpart — · [TR] p. 4 · `[about ours]`
 
-Row 4.14 evaluated at ∅, as a `Prop`. Forced by `!P ≜ emp ∧ P`: a persistent proposition holds exactly when it holds of ∅, so this is a faithful re-presentation and not a second judgment — but every compatibility lemma of §6.8 is stated at it, so `BoCa.Fig16.LogRel.sem_iff` is what keeps that block about the printed object. It is proved, both directions. A `Prop`-level re-presentation of row 4.14 at ∅, carrying its own correctness lemma: [TR] p. 6 prints `!P ≜ emp ∧ P`, `emp ≜ ⌜⊤⌝` and `⌜PMeta⌝(ρ) ≜ ρ = ∅ ∧ PMeta`, so the judgment holds of ρ only at ρ = ∅ and evaluating there loses nothing. The risk the note above names is discharged by the proof of `BoCa.Fig16.LogRel.sem_iff`, which runs both ways
+Row 4.14 evaluated at `∅`, as a `Prop`; a persistent proposition holds exactly
+when it holds of `∅`.  The §6.8 compatibility lemmas are stated at it.
 -/
 theorem sem_iff {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty} :
     Sem Δ Γ e T ↔
