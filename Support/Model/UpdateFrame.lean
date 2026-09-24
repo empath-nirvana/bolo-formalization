@@ -127,6 +127,25 @@ theorem compS_reassoc' {a b c bc x : WRes} (h₁ : ResU.CompS b c bc)
     (h₂ : ResU.CompS a bc x) : ∃ ab, ResU.CompS a b ab ∧ ResU.CompS ab c x :=
   (ResU.CompS.assoc a b c x).mp ⟨bc, h₁, h₂⟩
 
+/-- `(ρ₁ ● ρ₂) ● ρ₃ = (ρ₁ ● ρ₃) ● ρ₂` — the exchange of the last two factors,
+`[TR]` Lemmas 6.2 and 6.3 together. -/
+theorem compS_exch {a b c ab x : WRes} (h₁ : ResU.CompS a b ab)
+    (h₂ : ResU.CompS ab c x) : ∃ ac, ResU.CompS a c ac ∧ ResU.CompS ac b x := by
+  obtain ⟨bc, hbc, hx⟩ := compS_reassoc h₁ h₂
+  exact compS_reassoc' (ResU.CompS.comm hbc) hx
+
+/-- `ρ₁ ● (ρ₂ ● ρ₃) = ρ₂ ● (ρ₁ ● ρ₃)`. -/
+theorem compS_lcomm {a b c bc x : WRes} (h₁ : ResU.CompS b c bc)
+    (h₂ : ResU.CompS a bc x) : ∃ ac, ResU.CompS a c ac ∧ ResU.CompS b ac x := by
+  obtain ⟨ab, hab, hx⟩ := compS_reassoc' h₁ h₂
+  obtain ⟨ac, hac, hx'⟩ := compS_exch hab hx
+  exact ⟨ac, hac, ResU.CompS.comm hx'⟩
+
+/-- `∀v. P̂(v) ─⋆ Q̂(v)` — the ramification wand.  `[TR]` 6.146 prints
+`(P̂ –⋆ Q̂)` and H2 of its own proof reads `(∀ (P̂ –⋆ Q̂))(ρ₂)` at 500 dpi, which
+is also the only well-typed reading at `P̂, Q̂ : Val → SProp`. -/
+def wandAll (P Q : Val → WProp) : WProp := all fun v => wand (P v) (Q v)
+
 end BoCa.Fig16.BoLo
 
 end

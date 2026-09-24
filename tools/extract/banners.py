@@ -443,3 +443,51 @@ SUPPORT_WHAT.update({
  "Support/TypedWorld/FrameRules": "`[TR]` Theorems 6.64, 6.65 and 6.66 at `wpTS`, with the record list carried",
  "Support/TypedWorld/ReborrowShapes": "`[TR]` Lemmas 6.131 and 6.132 at the shape relation `vShape`",
 })
+
+banners["Paper/S6_7_WeakestPreconditionRules/Lemmas"] = """/-!
+# [TR] §6.7 Weakest Precondition Rules  (physical pp. 35–40), Lemmas 6.135–6.150
+
+The rules of `wp` (`[TR]` p. 6, row 5.33): `wp-bind` (6.135), `wp-val` (6.136), the
+head steps `wp1`, `wp⊗`, `wp⊕`, `wp⊸` (6.137–6.140), the memory rules `wp-alloc`,
+`wp-free`, `wp-load`, `wp-load-I`, `wp-store` (6.141–6.145), `wp-ramify` (6.146),
+`wp[]` (6.147), the two forget rules (6.148, 6.149) and the reborrowing rule
+`↺ rule` (6.150).
+
+**Two machines.**  The library's `wp` runs the machine of `[TR]` §3 with the two
+frames rows 3.30 and 3.31 add (`Paper/S3_Dynamics/Definitions.lean` records the
+repair); `TR3.wp` (`Support/Dynamics/PrintedWp.lean`) runs `[TR]` §3's printed
+machine, at its seven printed frames.  Each rule's re-proof over the printed
+machine, `TR3.wp_…`, sits beside the rule (6.150 has none), and what the printed
+machine costs at its stuck forms — `inj₁ e` and `e₁; e₂` with no frame to reduce
+under — is measured in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`.
+""" + RESULTS_READING + TYPED_NOTE + "-/\n"
+
+banners["Paper/LiteralReadings/S6_7_WeakestPreconditionRules"] = """/-!
+# Literal readings — [TR] §6.7
+
+* 6.135 (`wp-bind`), over `[TR]` §3's printed machine: the closed, well-typed terms
+  `inj₁ (free (alloc ()))` and `free (alloc ()); ()` are stuck there
+  (`stuck_wInj`, `stuck_wSeq`), `TR3.wp` is false at such a term
+  (`wp_inj₁_false`, `wp_seq_false`, with `wp_stuck_false_nonvacuous`), and
+  `TR3.wp` is strictly below the library's `wp` (`wp_lt_fig16`);
+* 6.150 (`↺ rule`): `DefectB.wp_reborrow_unreconciled_at_split_view`, the
+  entailment written without the hypothesis `RebEscrow`, measured at a configuration
+  built in `BoCa/DefectB.lean` (moved here with it), and `defectB_not_rebEscrow`,
+  that configuration outside `RebEscrow` — the two stand together.
+""" + LITERAL_READING + "-/\n"
+
+banners["Paper/LiteralReadings/S6_6_ReborrowingEntailments"] = banners["Paper/LiteralReadings/S6_6_ReborrowingEntailments"].replace(
+"""* 6.130: `reborrow_emp_outside_stratum`, a resource outside `Res_α` against
+  `↺_α emp` — the hypothesis the Lean adds is not free;""",
+"""* 6.130: `reborrow_emp_outside_stratum`, a resource outside `Res_α` against
+  `↺_α emp` — the hypothesis the Lean adds is not free — at the resource
+  `RebExample` builds;""")
+
+SUPPORT_WHAT.update({
+ "Support/Dynamics/Machine": "the machines' plumbing: frame composition and the reflexive-transitive closure `→*` for both machines, and for `[TR]` §3's printed machine the inversion of its steps at `inj₁ e` and `e₁; e₂`, the saturated primitives, and the closed terms `alloc ()`, `free (alloc ())`, `inj₁ (free (alloc ()))` and `free (alloc ()); ()`",
+ "Support/Dynamics/PrintedWp": "`[TR]` p. 6's `wp` over `[TR]` §3's printed machine (`TR3.wp`), and the `∀`-wand `wp-ramify` reads",
+ "Support/Model/ReborrowRule": "what `[TR]` 6.150 names and does not prove: the hypothesis `RebEscrow` (6.55's two inputs at the reborrows `↺_β P̂` names), a lifetime below two given ones, and `ρ⁺|own = ∅` through the pieces of `ρᵢ ● ρ⁺′`",
+ "Support/Model/SubtractionKeep": "Lemma 6.52 at `SubKeep`, the form 6.150 spends",
+ "Support/Model/UpdateSymmetry": "`↭` is symmetric, and `ρ ↭ ρ` read off validity",
+ "Support/TypedWorld/Reborrow": "`[TR]` Theorem 6.150 at `wpTS` (source `BoCa/TypedReborrow.lean`): the chooser `RebChooseTW` that replaces `RebEscrow`, and the rule",
+})

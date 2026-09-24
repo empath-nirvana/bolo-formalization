@@ -61,6 +61,18 @@ def EscrowAgree (χ ρ σ : ResU Loc Val) : Prop :=
     χ.get l = some (CellU.ownOf v) → ρ.get l = some ψ → σ.get l = some ψf →
       ψ.kind ≠ Kind.own → ψf.kind ≠ Kind.own → ψf.wit = ψ.wit
 
+/-- **…and it asks nothing where `[TR]` p. 18's sentence is already true.**  The
+conjunct is quantified over the `own` cells of the source alone, so at a source
+with none — where `reb_α` reads every witness off the cell it reborrows — it
+holds of any image and any frame whatever.  That is exactly the scope
+`docs/boca-rules.md` §12.41 gives it.
+`[about ours: the added hypothesis is empty off the `own` clause]` -/
+theorem escrowAgree_of_no_own {χ : ResU Loc Val}
+    (h : ∀ l ψ, χ.get l = some ψ → ψ.kind ≠ Kind.own) (ρ σ : ResU Loc Val) :
+    EscrowAgree χ ρ σ := by
+  intro l v ψ ψf hχ _ _ _ _
+  exact absurd rfl (h l _ hχ)
+
 /-- **The image of `reb_α` carries `imm` cells only** — `[TR]`'s
 `ρ|own,mut = ∅`, which 6.52's and 6.53's proofs both open with.  Derived from
 `reb_α`, not assumed: at an `imm` source cell the image cell is `imm`

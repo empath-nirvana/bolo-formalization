@@ -1,5 +1,6 @@
 import Support.Dynamics.Interpreter
 import Support.Dynamics.Machine
+import Support.Dynamics.PrintedWp
 import Support.Lifetimes.Interpretation
 import Support.Lifetimes.Substitution
 import Support.Lifetimes.Terms
@@ -27,14 +28,17 @@ import Support.Model.Propositions
 import Support.Model.Reborrow
 import Support.Model.ReborrowFrame
 import Support.Model.ReborrowLowering
+import Support.Model.ReborrowRule
 import Support.Model.RelaxedWalks
 import Support.Model.Restriction
 import Support.Model.Singletons
 import Support.Model.Strata
 import Support.Model.Subtraction
+import Support.Model.SubtractionKeep
 import Support.Model.Surgery
 import Support.Model.Update
 import Support.Model.UpdateFrame
+import Support.Model.UpdateSymmetry
 import Support.Model.Walks
 import Support.Model.WalkSplitting
 import Support.Statics.Contexts
@@ -42,6 +46,7 @@ import Support.Syntax.Terms
 import Support.TypedWorld.FrameRules
 import Support.TypedWorld.Images
 import Support.TypedWorld.Invariant
+import Support.TypedWorld.Reborrow
 import Support.TypedWorld.ReborrowShapes
 import Support.TypedWorld.Records
 import Support.TypedWorld.Relation

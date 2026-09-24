@@ -95,6 +95,10 @@ for u in sel:
     elif u in EXTRA and EXTRA[u][1] == "beside": pre[u] = RESULTS[EXTRA[u][0]]["file"]
     elif u in sel1: pre[u] = TGT1[u] if TGT1[u].startswith("Paper") else None
     else: pre[u] = None
+    for m, rx, f in CFG.get("literal_patterns", []):   # the configuration a literal reading builds
+        if pre[u] is None and u[0] == m and any(re.fullmatch(rx, o) for o in owners_of(u)) and not any(
+                u[0] == m2 and any(re.fullmatch(rx2, o) for o in owners_of(u)) for m2, rx2, t in CFG["topic_rules"]):
+            pre[u] = f
     if pre[u] and pre[u].startswith("Paper") and pre[u] not in ORDER:
         raise Exception("no order for " + pre[u])
 
@@ -153,6 +157,7 @@ def users_in(u, f):
     for x in sel:
         if tgt[x] == f and x in RU and HOME[x] == f and x != u and u in closure(x): out.add(RU[x])
         if tgt[x] == f and x in REMARK and HOME[x] == f and x != u and u in closure(x): out.add(REMARK[x])
+        if tgt[x] == f and x in EXTRA and x not in RU and x != u and u in closure(x): out.add(EXTRA[x][0])
     return sorted(out, key=nrow)
 def al_txt(al):
     if not al: return ""

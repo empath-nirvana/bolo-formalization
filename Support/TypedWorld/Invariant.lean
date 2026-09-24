@@ -13,6 +13,7 @@ import Support.Model.Ancestors
 import Support.Model.Cells
 import Support.Model.Composition
 import Support.Model.Empty
+import Support.Model.Entailments
 import Support.Model.FlatteningCells
 import Support.Model.Lifetimes
 import Support.Model.Outlives
@@ -2661,6 +2662,13 @@ theorem lineage_list {r : FrameRec} (hR : vShape r.T r.δ r.v r.R) (hadm : AdmWf
   have hfin : {d | Desc r d}.Finite := Set.Finite.of_finite_image himg hinj
   refine ⟨hfin.toFinset.toList, fun d => ?_⟩
   simp
+
+/-- The source memory, from `#`. -/
+theorem lower_of_hash {ρf ρ fρ : WRes} (hf : ResU.Hash ρf ρ) (hc : ResU.CompS ρf ρ fρ) :
+    ∃ μ, ResU.Lower fρ μ := by
+  obtain ⟨σ, μ, hσ, -, hμ⟩ := hash_lower hf
+  cases ResU.CompS.functional hσ hc
+  exact ⟨μ, hμ⟩
 
 end BoCa.Fig16.LogRel.Typed
 

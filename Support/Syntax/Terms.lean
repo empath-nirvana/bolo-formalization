@@ -32,6 +32,18 @@ theorem IsVal.inj₂_inv {a : Expr} (h : IsVal (.inj₂ a)) : IsVal a := by case
 @[simp] theorem isVal_inj₂_iff {a : Expr} : IsVal (.inj₂ a) ↔ IsVal a :=
   ⟨IsVal.inj₂_inv, .inj₂⟩
 
+/-- A value whose root is an application is `store v`: its function part is the
+    primitive `store` and its argument is a value. -/
+theorem IsVal.app_fun {f a : Expr} (h : IsVal (.app f a)) : f = .prim .store := by
+  cases h; rfl
+
+theorem IsVal.app_arg {f a : Expr} (h : IsVal (.app f a)) : IsVal a := by
+  cases h; assumption
+
+@[simp] theorem isVal_app_iff {f a : Expr} :
+    IsVal (.app f a) ↔ f = .prim .store ∧ IsVal a :=
+  ⟨fun h => ⟨h.app_fun, h.app_arg⟩, fun h => h.1 ▸ .storeV h.2⟩
+
 def Expr.shift (d : Nat) (c : Nat) : Expr → Expr
   | .var i         => if i < c then .var i else .var (i + d)
   | .unit          => .unit
@@ -93,6 +105,19 @@ def Val.subst (j : Nat) (s : Val) (v : Val) : Val := ⟨v.1.subst j s, v.2.subst
 
 @[simp] theorem Val.val_subst (j : Nat) (s v : Val) :
     (Val.subst j s v).val = v.val.subst j s := rfl
+
+end BoCa
+
+namespace BoCa.Val
+
+/-- The inclusion lands in `IsVal`, at the spelling `Expr.val v` rather than
+    `v.val`, so that `h ▸ Val.isVal v` rewrites where a term was written with
+    the inclusion. -/
+theorem isVal (v : Val) : IsVal (Expr.val v) := v.2
+
+end BoCa.Val
+
+namespace BoCa
 
 def load'  : Expr := .val (.prim .load)
 

@@ -273,7 +273,7 @@ file sits just before the first paper file that needs it.
      `wpTS`/`𝒱X`/`vShape` (6.64–6.66, 6.113's stratified `I-mono`, 6.131, 6.132).
      They stay in `Support/TypedWorld/`, with a heading pointing back to the record,
      and the record names them under *Typed-world version*.  Pulling them in brings
-     most of the typed world with them (≈ 6,100 lines); `Support/TypedWorld/` is split
+     most of the typed world with them (≈ 6,500 lines); `Support/TypedWorld/` is split
      by source module — `Images`, `Invariant`, `Wp`, `RelationFacts`, `FrameRules`,
      `ReborrowShapes` (and in 2e `Reborrow`, `Compatibility`) — after stage 1's
      `Records`, `World`, `Relation`.
@@ -298,11 +298,29 @@ file sits just before the first paper file that needs it.
    declarations compared, 0 mismatches; `check-hygiene.sh` 0 forbidden keywords,
    3,496 constants within `[propext, Classical.choice, Quot.sound]`.
 
-Still to come, in this order:
+4. **§6.7 — done (2d).**  Lemmas 6.135–6.150, 16 records, 34 aliases (6.139 is
+   schematic in `i`, as 6.72).  Beside each rule is its re-proof over `[TR]` §3's
+   printed machine, `TR3.wp_…` (6.150 has none; `TR3.wp` itself is in
+   `Support/Dynamics/PrintedWp`), and the shared steps `wp_head` (6.137–6.140) and
+   `wp_frame_noOwn` (6.148, 6.149).  The typed-world versions `wpTS_…` and
+   `wpTS_reborrow` are named in the records and sit in `Support/TypedWorld/Wp` and
+   `Support/TypedWorld/Reborrow`.  `Paper/LiteralReadings/S6_7_…` holds the printed
+   machine's stuck forms and `TR3.wp` at them (under 6.135), and 6.150's `DefectB`
+   configuration with `defectB_not_rebEscrow`; the whole of `BoCa/DefectB.lean`
+   that those need moves into that file (`cfg.json`'s `literal_patterns`), except
+   the two facts about `∅` the typed world uses (`Support/Model/Empty`).  Likewise
+   `RebExample`, the resource 6.130's literal reading is measured at, moves into
+   `Paper/LiteralReadings/S6_6_…`.  New support: `Support/Model/ReborrowRule`
+   (`RebEscrow` and the pieces 6.150 names), `SubtractionKeep`, `UpdateSymmetry`.
+   The generator names the layer after the last paper file `@After:END`, so adding a
+   literal-readings file does not rename it.
 
-4. **§6.7** (6.135–6.150): `Fig16Wp.lean`, `RebWp.lean`, with each rule's
-   `TR3.…` re-proof over the printed machine beside it, and the stuck-form
-   measurements into `LiteralReadings`.
+   Checks at the end of 2d: `lake build` clean; `check-bridge.sh` 3,073
+   declarations compared, 0 mismatches; `check-hygiene.sh` 0 forbidden keywords,
+   3,824 constants within `[propext, Classical.choice, Quot.sound]`.
+
+Still to come:
+
 5. **§6.8 and [CONF] §3** (6.151–6.176, 3.1–3.3): the compatibility lemmas, the
    typed world (`Support/TypedWorld/*`, ≈ 8,800 lines), the Fundamental Property
    at `SemX`, adequacy; `ViewWitness` and `DefectB`'s refutations into

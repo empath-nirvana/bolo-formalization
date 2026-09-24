@@ -1,4 +1,5 @@
 import Paper.S5_Model.Definitions
+import Support.Model.Prelude
 
 /-!
 # Support — Model — CellFacts
@@ -10,6 +11,27 @@ facts about the cell constructors: injectivity and distinctness of `own`/`imm`/`
 -/
 
 noncomputable section
+
+namespace BoCa.Fig16.PMap
+variable {Loc A B : Type}
+
+/-- `Loc` is infinite.  **Ours** — neither document states it (§3). -/
+def Infinite (Loc : Type) : Prop := ∀ d : List Loc, ∃ l : Loc, l ∉ d
+
+/-- The step `[TR]` Lemma 6.141 (`wp-alloc`, p. 37) takes without justification:
+a finite map over an infinite `Loc` misses a location.  This is what the `fin`
+mark buys.
+`[about ours: the existence of a fresh location, which 6.141's proof uses in one
+unjustified step; 6.141 itself is a `wp` rule and is not stated here]` -/
+theorem exists_fresh (h : Infinite Loc) (p : PMap Loc A) : ∃ l, p.get l = none := by
+  obtain ⟨d, hd⟩ := p.finite
+  obtain ⟨l, hl⟩ := h d
+  refine ⟨l, ?_⟩
+  cases e : p.get l with
+  | none => rfl
+  | some ψ => exact absurd (hd l (by rw [e]; intro h'; simp at h')) hl
+
+end BoCa.Fig16.PMap
 
 namespace BoCa.Fig16
 variable {Loc Val : Type}

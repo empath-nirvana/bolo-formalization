@@ -3,16 +3,26 @@ import Paper.S2_Statics.Definitions
 import Paper.S3_Dynamics.Definitions
 import Paper.S5_Model.Definitions
 import Paper.S6_1_StandardLemmas.Lemmas
+import Paper.S6_2_NonStandardLemmas.Lemmas
+import Support.Dynamics.Machine
 import Support.Lifetimes.Interpretation
 import Support.LogicalRelation.ClosingSubstitutions
 import Support.Model.Algebra
 import Support.Model.AlgebraInstances
+import Support.Model.CellFacts
 import Support.Model.Cells
+import Support.Model.Composition
+import Support.Model.Entailments
+import Support.Model.Flattening
 import Support.Model.FlatteningCells
 import Support.Model.Outlives
 import Support.Model.Prelude
+import Support.Model.Propositions
 import Support.Model.Singletons
+import Support.Model.UpdateFrame
+import Support.Model.UpdateSymmetry
 import Support.Model.WalkSplitting
+import Support.Syntax.Terms
 import Support.TypedWorld.Images
 import Support.TypedWorld.Invariant
 import Support.TypedWorld.Records
@@ -439,6 +449,395 @@ theorem ext_of_same {ls ls' : List SRec} (h : ∀ x, x ∈ ls' ↔ x ∈ ls) (ρ
       obtain ⟨t, ht⟩ := mem_rsOf.mp hr
       exact mem_rsOf.mpr ⟨t, (h _).mpr ht⟩,
     fun _ _ x _ => (h x).symm⟩
+
+/-!
+### Lemma 6.136 (wp-val) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.136 (wp-val).
+-/
+/-- **`[TR]` 6.136** (`wp-val`) at `wpTS`. -/
+theorem wpTS_val (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
+    Entails (Q ls v) (wpTS ls (.val v) Q) := by
+  intro ρ hQ ρf fρ ps hf hc hT htg
+  obtain ⟨μ, hμ⟩ := lower_of_hash hf hc
+  exact ⟨ρ, PMap.empty, fρ, fρ, ρ, v, μ, μ, ps, ls, ResU.hash_symm hf, hc,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hf hc)), hμ,
+    ResU.comp_empty_right fρ, hμ, Steps.refl _ _, ResU.comp_empty_right ρ,
+    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
+    fun _ => Iff.rfl, fun _ => Iff.rfl, hQ⟩
+
+/-!
+### Lemma 6.137 (wp1) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.137 (wp1).
+-/
+/-- One deterministic head step in front of a `wpTS` (6.137–6.140). -/
+theorem wpTS_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (ls : List SRec)
+    (Q : List SRec → Val → WProp) : Entails (wpTS ls e' Q) (wpTS ls e Q) := by
+  intro ρ hw ρf fρ ps hf hc hT htg
+  obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉, hA, hB,
+    hT', htg', hps, hls, hC⟩ := hw ρf fρ ps hf hc hT htg
+  exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇,
+    .more (Step1.head (h μ)) h₈, h₉, hA, hB, hT', htg', hps, hls, hC⟩
+
+/-! Lemma 6.137 (wp1), typed-world version, continued. -/
+/-- **`[TR]` 6.137** (`wp1`) at `wpTS`. -/
+theorem wpTS_1 (ls : List SRec) (e : Expr) (Q : List SRec → Val → WProp) :
+    Entails (wpTS ls e Q) (wpTS ls (.seq (.val .unit) e) Q) :=
+  wpTS_head (fun μ => .seq μ e) ls Q
+
+/-!
+### Lemma 6.138 (wp⊗) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.138 (wp⊗).
+-/
+/-- **`[TR]` 6.138** (`wp⊗`) at `wpTS`. -/
+theorem wpTS_tensor (ls : List SRec) (v₁ v₂ : Val) (e : Expr) (Q : List SRec → Val → WProp) :
+    Entails (wpTS ls ((e.subst 0 (v₂.shift 1 0)).subst 0 v₁) Q)
+      (wpTS ls (.letpair (.val (.pair v₁ v₂)) e) Q) :=
+  wpTS_head (fun μ => .letpair μ v₁ v₂ e) ls Q
+
+/-!
+### Lemma 6.139 (wp⊕) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.139 (wp⊕).
+-/
+/-- **`[TR]` 6.139** (`wp⊕`) at `wpTS`, both summands. -/
+theorem wpTS_sum₁ (ls : List SRec) (v : Val) (e₁ e₂ : Expr) (Q : List SRec → Val → WProp) :
+    Entails (wpTS ls (e₁.subst 0 v) Q) (wpTS ls (.case (.val (.inj₁ v)) e₁ e₂) Q) :=
+  wpTS_head (fun μ => .case₁ μ v e₁ e₂) ls Q
+
+/-! Lemma 6.139 (wp⊕), typed-world version, continued. -/
+theorem wpTS_sum₂ (ls : List SRec) (v : Val) (e₁ e₂ : Expr) (Q : List SRec → Val → WProp) :
+    Entails (wpTS ls (e₂.subst 0 v) Q) (wpTS ls (.case (.val (.inj₂ v)) e₁ e₂) Q) :=
+  wpTS_head (fun μ => .case₂ μ v e₁ e₂) ls Q
+
+/-!
+### Lemma 6.140 (wp⊸) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.140 (wp⊸).
+-/
+/-- **`[TR]` 6.140** (`wp⊸`) at `wpTS`. -/
+theorem wpTS_lolli (ls : List SRec) (b : Expr) (v : Val) (Q : List SRec → Val → WProp) :
+    Entails (wpTS ls (b.subst 0 v) Q) (wpTS ls (.app (.val (.lam b)) (.val v)) Q) :=
+  wpTS_head (fun μ => .beta μ b v) ls Q
+
+/-!
+### Lemma 6.141 (wp-alloc) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.141 (wp-alloc).
+-/
+/-- **`[TR]` 6.141** (`wp-alloc`) at `wpTS`: the post-world is `TW.alloc`'s. -/
+theorem wpTS_alloc (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
+    Entails (all fun l : BoCa.Loc => wand (ptoOwn l v) (Q ls (.loc l)))
+      (wpTS ls (.app (.val (.prim .alloc)) (.val v)) Q) := by
+  intro ρ h ρf σ ps hf hσ hT htg
+  obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
+  obtain ⟨τ, hτ, hval⟩ := id hμ
+  obtain ⟨l, hl⟩ := PMap.exists_fresh loc_infinite τ
+  have hμl : μ l = none := (lower_eq_none_iff hval).mpr hl
+  have hρl : ρ.get l = none :=
+    ((ResU.Comp.eq_none_iff hσ l).mp (get_eq_none_of_flat hτ hl)).2
+  obtain ⟨x, hx⟩ := (ResU.compS_defined_iff ρ (ResU.single l (CellU.ownOf v))).mpr
+    (compatS_single_of_get_none hρl)
+  obtain ⟨σ', hσ'x, hfx, hlow'⟩ := hash_compS_own hσ hμ hμl hx
+  obtain ⟨y, hy, hyσ'⟩ := (ResU.CompS.assoc ρf ρ (ResU.single l (CellU.ownOf v)) σ').mp
+    ⟨x, hx, hσ'x⟩
+  cases ResU.CompS.functional hy hσ
+  have hT' : TW σ' ps (rsOf ls) := TW.alloc hT hμ hμl hyσ' (hash_valid_comp hfx hσ'x)
+  exact ⟨x, PMap.empty, σ', σ', x, .loc l, μ, BoCa.BoLo.Heap.upd μ l v, ps, ls,
+    ResU.hash_symm hfx, hσ'x,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hfx hσ'x)),
+    hμ, ResU.comp_empty_right σ', hlow',
+    Steps.one (Step1.head (Head.alloc μ v l hμl)), ResU.comp_empty_right x,
+    updV_compS_own hx (hash_valid hf).2 (hash_valid hfx).2,
+    noOwn_empty, hT', tagged_of_ag (fun a ha => alloc_ag hyσ' ha) htg,
+    fun _ => Iff.rfl, fun _ => Iff.rfl, h l _ x rfl hx⟩
+
+/-!
+### Lemma 6.142 (wp-free) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.142 (wp-free).
+-/
+/-- **`[TR]` 6.142** (`wp-free`) at `wpTS`: the post-world is `TW.free`'s. -/
+theorem wpTS_free (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → Val → WProp) :
+    Entails (sep (ptoOwn l v) (Q ls v))
+      (wpTS ls (.app (.val (.prim .free)) (.val (.loc l))) Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hQ⟩ ρf σ ps hf hσ hT htg
+  obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
+  have h₂ : ResU.Hash ρf ρ₂ :=
+    ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
+  obtain ⟨σ₂, hσ₂, hσ₂σ⟩ :=
+    (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v)) σ).mp
+      ⟨ρ, ResU.CompS.comm hcρ, hσ⟩
+  obtain ⟨hlv, μ₂, hlow₂, hupd, hnone⟩ := lower_compS_own_inv hσ₂σ hμ
+  have hdel : BoCa.BoLo.Heap.del μ l = μ₂ := by
+    funext k
+    by_cases e : k = l
+    · subst e; rw [BoCa.BoLo.Heap.del_same, hnone]
+    · rw [BoCa.BoLo.Heap.del_other e, hupd, BoCa.BoLo.Heap.upd_other e]
+  have hT' : TW σ₂ ps (rsOf ls) :=
+    TW.free hT (ResU.CompS.comm hσ₂σ) (hash_valid_comp h₂ hσ₂)
+  refine ⟨ρ₂, PMap.empty, σ₂, σ₂, ρ₂, v, μ, μ₂, ps, ls,
+    ResU.hash_symm h₂, hσ₂,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp h₂ hσ₂)),
+    hμ, ResU.comp_empty_right σ₂, hlow₂, ?_, ResU.comp_empty_right ρ₂,
+    (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2 (hash_valid hf).2).symm,
+    noOwn_empty, hT',
+    tagged_of_ag (fun a ha => (own_cell_ag (ResU.CompS.comm hσ₂σ) a).mpr ha) htg,
+    fun _ => Iff.rfl, fun _ => Iff.rfl, hQ⟩
+  rw [← hdel]
+  exact Steps.one (Step1.head (Head.free μ l v hlv))
+
+/-!
+### Lemma 6.143 (wp-load) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.143 (wp-load).
+-/
+/-- **`[TR]` 6.143** (`wp-load`) at `wpTS`. -/
+theorem wpTS_load (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → Val → WProp) :
+    Entails (sep (ptoOwn l v) (wand (ptoOwn l v) (Q ls v)))
+      (wpTS ls (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf σ ps hf hσ hT htg
+  obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
+  have hρ : ρ.get l = some (CellU.ownOf v) := by
+    rw [ResU.Comp.get_of_right_none hcρ (ResU.compatS_single_own hcρ.1),
+      ResU.single_get_self]
+  have hlv : μ l = some v :=
+    lower_get_own hμ (by
+      rw [ResU.Comp.get_of_left_none hσ (get_eq_none_of_compatS_own
+        (ResU.CompatS.symm hf.1) hρ)]
+      exact hρ)
+  exact ⟨ρ, PMap.empty, σ, σ, ρ, v, μ, μ, ps, ls,
+    ResU.hash_symm hf, hσ,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hf hσ)),
+    hμ, ResU.comp_empty_right σ, hμ,
+    Steps.one (Step1.head (Head.load μ l v hlv)), ResU.comp_empty_right ρ,
+    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
+    fun _ => Iff.rfl, fun _ => Iff.rfl, hwand _ ρ rfl (ResU.CompS.comm hcρ)⟩
+
+/-!
+### Lemma 6.144 (wp-load-I) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.144 (wp-load-I).
+-/
+/-- **`[TR]` 6.144** (`wp-load-I`) at `wpTS`. -/
+theorem wpTS_load_I (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WProp)
+    (Q : List SRec → Val → WProp) :
+    Entails
+      (sep (ptoImm l α P)
+        (all fun v =>
+          wand (ptoImm l α (fun v' => sep (pure (v = v')) (P v))) (Q ls v)))
+      (wpTS ls (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
+  rintro ρ ⟨ρ₁, ρR, hcρ, ⟨s, v, σ, hs, rfl, hP, hα⟩, hR⟩ ρf τ ps hf hτ hT htg
+  have hcell : ptoImm l α (fun v' => sep (pure (v = v')) (P v))
+      (ResU.single l (CellU.immOf s v σ hs)) :=
+    ⟨s, v, σ, hs, rfl, (pure_sep_biEntails rfl (P v)).2 σ hP, hα⟩
+  have hQ : Q ls v ρ := hR v _ ρ hcell (ResU.CompS.comm hcρ)
+  obtain ⟨μ, hμ⟩ := lower_of_hash hf hτ
+  obtain ⟨χ, hχ, heχ⟩ := compS_get_erase hcρ (ResU.single_get_self l _)
+  obtain ⟨χ', hχ', heχ'⟩ := compS_get_erase (ResU.CompS.comm hτ) hχ
+  have hlv : μ l = some v := by
+    rw [lower_get hμ hχ', heχ', heχ]
+    rfl
+  exact ⟨ρ, PMap.empty, τ, τ, ρ, v, μ, μ, ps, ls,
+    ResU.hash_symm hf, hτ,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hf hτ)),
+    hμ, ResU.comp_empty_right τ, hμ,
+    Steps.one (Step1.head (Head.load μ l v hlv)), ResU.comp_empty_right ρ,
+    (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
+    fun _ => Iff.rfl, fun _ => Iff.rfl, hQ⟩
+
+/-!
+### Lemma 6.145 (wp-store) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.145 (wp-store).
+-/
+/-- **`[TR]` 6.145** (`wp-store`) at `wpTS`: the post-world is `TW.store`'s. -/
+theorem wpTS_store (ls : List SRec) (l : BoCa.Loc) (v₁ v₂ : Val) (Q : List SRec → Val → WProp) :
+    Entails (sep (ptoOwn l v₁) (wand (ptoOwn l v₂) (Q ls .unit)))
+      (wpTS ls (.app (.val (.storeV (.loc l))) (.val v₂)) Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf σ ps hf hσ hT htg
+  obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
+  have h₂ : ResU.Hash ρf ρ₂ :=
+    ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
+  obtain ⟨σ₂, hσ₂, hσ₂σ⟩ :=
+    (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v₁)) σ).mp
+      ⟨ρ, ResU.CompS.comm hcρ, hσ⟩
+  obtain ⟨hlv, μ₂, hlow₂, hupd, hnone⟩ := lower_compS_own_inv hσ₂σ hμ
+  obtain ⟨x, hx⟩ := (ResU.compS_defined_iff ρ₂ (ResU.single l (CellU.ownOf v₂))).mpr
+    (compatS_single_of_get_none (ResU.compatS_single_own hcρ.1))
+  obtain ⟨σ', hσ'x, hfx, hlow'⟩ := hash_compS_own hσ₂ hlow₂ hnone hx
+  have hstep : BoCa.BoLo.Heap.upd μ l v₂ = BoCa.BoLo.Heap.upd μ₂ l v₂ := by
+    funext k
+    by_cases e : k = l
+    · subst e; rw [BoCa.BoLo.Heap.upd_same, BoCa.BoLo.Heap.upd_same]
+    · rw [BoCa.BoLo.Heap.upd_other e, BoCa.BoLo.Heap.upd_other e, hupd,
+        BoCa.BoLo.Heap.upd_other e]
+  obtain ⟨y, hy, hyσ'⟩ := (ResU.CompS.assoc ρf ρ₂ (ResU.single l (CellU.ownOf v₂)) σ').mp
+    ⟨x, hx, hσ'x⟩
+  cases ResU.CompS.functional hy hσ₂
+  have hT' : TW σ' ps (rsOf ls) :=
+    TW.store hT (ResU.CompS.comm hσ₂σ) (ResU.CompS.comm hyσ') (hash_valid_comp hfx hσ'x)
+  refine ⟨x, PMap.empty, σ', σ', x, .unit, μ, BoCa.BoLo.Heap.upd μ₂ l v₂, ps, ls,
+    ResU.hash_symm hfx, hσ'x,
+    ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hfx hσ'x)),
+    hμ, ResU.comp_empty_right σ', hlow', ?_, ResU.comp_empty_right x, ?_,
+    noOwn_empty, hT',
+    tagged_of_ag (fun a ha => (own_cell_ag (ResU.CompS.comm hσ₂σ) a).mpr
+      ((own_cell_ag (ResU.CompS.comm hyσ') a).mp ha)) htg,
+    fun _ => Iff.rfl, fun _ => Iff.rfl, hwand _ x rfl hx⟩
+  · rw [← hstep]
+    exact Steps.one (Step1.head (Head.store μ l v₂ v₁ hlv))
+  · exact ResU.UpdV.trans
+      (updV_compS_own (ResU.CompS.comm hcρ) (hash_valid h₂).2 (hash_valid hf).2).symm
+      (updV_compS_own hx (hash_valid h₂).2 (hash_valid hfx).2)
+
+/-!
+### Lemma 6.135 (wp-bind) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.135 (wp-bind).
+-/
+/-- **`[TR]` 6.135** (`wp-bind`) at `wpTS`: the continuation runs at the intermediate
+typed world with the list the first run returned. -/
+theorem wpTS_bind (K : Kont) (e : Expr) (ls : List SRec) (Q : List SRec → Val → WProp) :
+    Entails (wpTS ls e fun ls' v => wpTS ls' (K.plug (.val v)) Q) (wpTS ls (K.plug e) Q) := by
+  intro ρ hw ρf fρ ps hf h₄ hT htg
+  obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hT', htg', hps', hls', hC⟩ := hw ρf fρ ps hf h₄ hT htg
+  obtain ⟨z, hzp, hz⟩ := (hash_shift ρp ρf ρ').mp ⟨fρ', h₂, h₃⟩
+  have hfz : ResU.CompS ρf ρp z := ResU.CompS.comm hzp
+  obtain ⟨z₀, hz₀, hY⟩ := compS_exch h₂ h₆
+  have hzY : ResU.CompS z ρ' fρ'p := by rwa [ResU.CompS.functional hz₀ hfz] at hY
+  obtain ⟨ρ'', ρpp, Y'', Y''p, π'', v', ν, ν', ps'', ls'', k₁, k₂, k₃, k₅, k₆, k₇, k₈,
+    k₉, kA, kB, kT, ktg, kps, kls, kC⟩ := hC z fρ'p ps' hz hzY hT' htg'
+  obtain ⟨hfρ'', -⟩ := ResU.Hash.split hfz (ResU.hash_symm k₁)
+  obtain ⟨F, hF, hFp⟩ := compS_exch hfz k₂
+  obtain ⟨ZZ, hZZ, hZF⟩ := (hash_shift ρpp ρp F).mp ⟨Y'', ResU.CompS.comm hFp, k₃⟩
+  have hZZ' : ResU.CompS ρp ρpp ZZ := ResU.CompS.comm hZZ
+  obtain ⟨ZZ₀, hZZ₀, hFZ₀⟩ := compS_reassoc hFp k₆
+  have hFZ : ResU.CompS F ZZ Y''p := by
+    rwa [ResU.CompS.functional hZZ₀ hZZ'] at hFZ₀
+  have hν : ν = μ' := ResU.Lower.functional k₅ h₇
+  obtain ⟨-, hpρ'⟩ := ResU.Hash.split h₂ (ResU.hash_symm h₃)
+  obtain ⟨d, hd, hfd⟩ := compS_reassoc hfz k₂
+  obtain ⟨-, hdp⟩ := ResU.Hash.split hfd (ResU.hash_symm k₃)
+  obtain ⟨π₀, hπ₀, hpπ₀⟩ := (hash_shift ρp ρ'' ρpp).mpr ⟨d, hd, hdp⟩
+  have hpπ : ResU.Hash ρp π'' := by rwa [ResU.CompS.functional hπ₀ k₉] at hpπ₀
+  obtain ⟨Yn, hYn, -⟩ := hpπ.2
+  obtain ⟨ZZ₁, hZZ₁, hρ''Z₀⟩ := compS_lcomm k₉ hYn
+  have hρ''Z : ResU.CompS ρ'' ZZ Yn := by
+    rwa [ResU.CompS.functional hZZ₁ hZZ'] at hρ''Z₀
+  refine ⟨ρ'', ZZ, F, Y''p, Yn, v', μ, ν', ps'', ls'', ResU.hash_symm hfρ'', hF, hZF,
+    h₅, hFZ, k₇, (h₈.plug K).trans (hν ▸ k₈), hρ''Z, ?_,
+    noOwn_compS hZZ' hB kB, kT, ktg, fun p => (kps p).trans (hps' p),
+    fun x => (kls x).trans (hls' x), kC⟩
+  exact ResU.UpdV.trans hA
+    (updV_frame (ResU.CompS.comm h₉) hYn (ResU.hash_symm hpρ') hpπ kA)
+
+/-- `(P̂ ─⋆ Q̂)` at every list with the same members.  `[about ours: 6.146's wand at the lists
+a run can return]` -/
+def wandAllTS (ls : List SRec) (P Q : List SRec → Val → WProp) : WProp :=
+  fun ρ => ∀ ls', (∀ x, x ∈ ls' ↔ x ∈ ls) → ∀ v, wand (P ls' v) (Q ls' v) ρ
+
+/-!
+### Lemma 6.146 (wp-ramify) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.146 (wp-ramify).
+-/
+/-- **`[TR]` 6.146** (`wp-ramify`) at `wpTS`. -/
+theorem wpTS_ramify (ls : List SRec) (e : Expr) (P Q : List SRec → Val → WProp) :
+    Entails (sep (wpTS ls e P) (wandAllTS ls P Q)) (wpTS ls e Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, hwp, hwand⟩ ρf fρ ps hf hc hT htg
+  obtain ⟨y, hy, hy₁⟩ := (hash_shift ρf ρ₂ ρ₁).mp ⟨ρ, ResU.CompS.comm hcρ, hf⟩
+  obtain ⟨y', hy', hyfρ⟩ := compS_reassoc' (ResU.CompS.comm hcρ) hc
+  cases ResU.CompS.functional hy' hy
+  obtain ⟨ρ', ρp, Y', Y'p, π', v, μ, μ', ps', ls', g₁, g₂, g₃, g₅, g₆, g₇, g₈, g₉,
+    gA, gB, gT, gtg, gps, gls, gC⟩ := hwp y fρ ps hy₁ hyfρ hT htg
+  obtain ⟨W, hW, hfW⟩ := compS_reassoc hy g₂
+  obtain ⟨W₀, hW₀, hWf₀⟩ := (hash_shift ρ' ρ₂ ρf).mp ⟨y, ResU.CompS.comm hy, g₁⟩
+  have hWf : ResU.Hash W ρf := by
+    rwa [ResU.CompS.functional (ResU.CompS.comm hW₀) hW] at hWf₀
+  obtain ⟨-, hWp⟩ := ResU.Hash.split hfW (ResU.hash_symm g₃)
+  obtain ⟨πW, hπW, h₂π₀⟩ := (hash_shift ρ₂ ρ' ρp).mpr ⟨W, hW, hWp⟩
+  have h₂π : ResU.Hash ρ₂ π' := by rwa [ResU.CompS.functional hπW g₉] at h₂π₀
+  obtain ⟨πn, hπn, -⟩ := h₂π.2
+  obtain ⟨Wn, hWn, hWπ₀⟩ := compS_reassoc' g₉ hπn
+  have hWπ : ResU.CompS W ρp πn := by
+    rwa [ResU.CompS.functional hWn hW] at hWπ₀
+  refine ⟨W, ρp, Y', Y'p, πn, v, μ, μ', ps', ls', hWf, hfW, g₃, g₅, g₆, g₇, g₈,
+    hWπ, ?_, gB, gT, gtg, gps, gls, hwand ls' gls v ρ' W gC hW⟩
+  exact updV_frame (ResU.CompS.comm hcρ) hπn
+    ⟨(ResU.CompS.comm hcρ).1, ρ, ResU.CompS.comm hcρ, (hash_valid hf).2⟩ h₂π gA
+
+/-!
+### Lemma 6.147 (wp[]) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.147 (wp[]).
+-/
+/-- **`[TR]` 6.147** (`wp-box`) at `wpTS`. -/
+theorem wpTS_box (ls : List SRec) (α : Life) (e : Expr) (Q : List SRec → Val → WProp) :
+    Entails (box α (wpTS ls e Q)) (wpTS ls e fun ls' v => box α (Q ls' v)) := by
+  rintro ρ ⟨hw, hout⟩ ρf fρ ps hf hc hT htg
+  obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hT', htg', hps, hls, hC⟩ := hw ρf fρ ps hf hc hT htg
+  exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
+    hA, hB, hT', htg', hps, hls, hC, ((outlives_comp h₉ α).mp (updV_outlives hout hA)).1⟩
+
+/-!
+### Lemma 6.148 (wp-M-forget) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.148 (wp-M-forget).
+-/
+/-- A frame with no owned cell passes through a `wpTS` run (6.148/6.149's shared argument). -/
+theorem wpTS_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ) (ls : List SRec) (e : Expr)
+    (Q : List SRec → Val → WProp) : Entails (sep R (wpTS ls e Q)) (wpTS ls e Q) := by
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, hR₁, hwp⟩ ρf fρ ps hf hc hT htg
+  obtain ⟨y, hy, hy₂⟩ := (hash_shift ρf ρ₁ ρ₂).mp ⟨ρ, hcρ, hf⟩
+  obtain ⟨y', hy', hyfρ⟩ := compS_reassoc' hcρ hc
+  cases ResU.CompS.functional hy' hy
+  obtain ⟨ρ'', ρp, Y'', Y''p, π', v', μ, μ', ps', ls', g₁, g₂, g₃, g₅, g₆, g₇, g₈, g₉,
+    gA, gB, gT, gtg, gps, gls, gC⟩ := hwp y fρ ps hy₂ hyfρ hT htg
+  obtain ⟨hfρ'', -⟩ := ResU.Hash.split hy (ResU.hash_symm g₁)
+  obtain ⟨F, hF, hFv⟩ := hfρ''.2
+  obtain ⟨F', hF', hFρ₁⟩ := compS_exch hy g₂
+  cases ResU.CompS.functional hF' hF
+  obtain ⟨Z, hZ, hZF⟩ :=
+    (hash_shift ρp ρ₁ F).mp ⟨Y'', ResU.CompS.comm hFρ₁, g₃⟩
+  obtain ⟨Z', hZ', hFZ⟩ := compS_reassoc hFρ₁ g₆
+  cases ResU.CompS.functional (ResU.CompS.comm hZ') hZ
+  obtain ⟨d, hd, hfd⟩ := compS_reassoc hy g₂
+  obtain ⟨-, hdp⟩ := ResU.Hash.split hfd (ResU.hash_symm g₃)
+  obtain ⟨π'', hπ'', h₁π⟩ := (hash_shift ρ₁ ρ'' ρp).mpr ⟨d, hd, hdp⟩
+  cases ResU.CompS.functional hπ'' g₉
+  obtain ⟨πn, hπn, -⟩ := h₁π.2
+  obtain ⟨ac, hac, hπZ⟩ := compS_lcomm g₉ hπn
+  cases ResU.CompS.functional (ResU.CompS.comm hac) hZ
+  refine ⟨ρ'', Z, F, Y''p, πn, v', μ, μ', ps', ls', ResU.hash_symm hfρ'', hF, hZF,
+    g₅, hFZ, g₇, g₈, hπZ, ?_, noOwn_compS hZ gB (hR ρ₁ hR₁), gT, gtg, gps, gls, gC⟩
+  exact updV_frame hcρ hπn ⟨hcρ.1, ρ, hcρ, (hash_valid hf).2⟩ h₁π gA
+
+/-! Lemma 6.148 (wp-M-forget), typed-world version, continued. -/
+/-- **`[TR]` 6.148** (`wp-M-forget`) at `wpTS`. -/
+theorem wpTS_M_forget (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WProp)
+    (e : Expr) (Q : List SRec → Val → WProp) :
+    Entails (sep (ptoMut l α P) (wpTS ls e Q)) (wpTS ls e Q) := by
+  refine wpTS_frame_noOwn (fun ρ h => ?_) ls e Q
+  obtain ⟨b, v, σ, hs, R, hw, hα, rfl, -⟩ := h
+  exact ResU.restrict_single_other (by simp)
+
+/-!
+### Lemma 6.149 (wp-I-forget) — typed-world version
+
+The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.149 (wp-I-forget).
+-/
+/-- **`[TR]` 6.149** (`wp-I-forget`) at `wpTS`. -/
+theorem wpTS_I_forget (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WProp)
+    (e : Expr) (Q : List SRec → Val → WProp) :
+    Entails (sep (ptoImm l α P) (wpTS ls e Q)) (wpTS ls e Q) := by
+  refine wpTS_frame_noOwn (fun ρ h => ?_) ls e Q
+  obtain ⟨s, v, σ, hs, rfl, -, -⟩ := h
+  exact ResU.restrict_single_other (by simp)
 
 /-- **`ls′` is `ls` with records at `α` added.**  `[about ours]` -/
 def AddAt (ls ls' : List SRec) (α : Life) : Prop :=

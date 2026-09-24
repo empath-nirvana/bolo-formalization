@@ -147,6 +147,16 @@ theorem AgW.single_own (l : Loc) (v : Val) :
   rw [ResU.restrict_single_other (k := Kind.imm) (fun e => Kind.noConfusion e)]
   exact ResU.comp_empty_right _
 
+/-- **The layer is not empty.**  `⦇ℓ ↦ own(v)⦈ = ℓ ↦ own(v)`, hence
+`✓(ℓ ↦ own(v))`. -/
+theorem ResU.flat_single_own (l : Loc) (v : Val) :
+    ResU.Flat (ResU.single l (CellU.ownOf v)) (ResU.single l (CellU.ownOf v)) :=
+  ⟨_, _, ExW.single_own l v, AgW.single_own l v, ResU.comp_empty_right _⟩
+
+theorem ResU.valid_single_own (l : Loc) (v : Val) :
+    ResU.Valid (ResU.single l (CellU.ownOf (Val := Val) v)) :=
+  ⟨_, ResU.flat_single_own l v⟩
+
 end BoCa.Fig16
 
 end

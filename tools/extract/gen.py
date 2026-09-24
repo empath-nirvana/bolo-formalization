@@ -249,7 +249,8 @@ def assign(sel, pre=None, pin=None, latest=False):
                 if not any(lo(u) <= p < H(u) for p in pts): pts.append(H(u) - 1)
             layer = {u: max(p for p in pts if lo(u) <= p < H(u)) for u in us}
             for p in sorted(set(layer.values())):
-                name = "Support/" + t if len(pts) == 1 else "Support/" + t + "@After:" + ORDER[p]
+                name = "Support/" + t if len(pts) == 1 else "Support/" + t + "@After:" + (
+                    "END" if p == len(ORDER) - 1 else ORDER[p])
                 name = CFG.get("support_names", {}).get(name, name)
                 if "@" in name: probs.append(("unnamed support layer", name))
                 for u in us:

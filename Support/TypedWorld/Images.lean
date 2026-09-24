@@ -1609,6 +1609,16 @@ theorem chainInv_rebDeep {W W' c : WRes} {rs : List FrameRec} {r₀ : FrameRec} 
         obtain ⟨ζ, eζ, wζ⟩ := q5 m' S' u' hc' aW haW ψ₂ e₂ k₂
         exact ⟨ζ, eζ, w₂.trans wζ⟩
 
+/-- The cell of `W` at `ℓ` when `ℓ ↦ imm(s, v, σ) ● F = W`: an `imm` cell over `v` and `σ`. -/
+theorem cell_of_compS_single {W F σ : WRes} {l : Loc} {s : LSet} {v : Val}
+    {hs : σ.InStratum s.join} (hW : ResU.CompS (ResU.single l (CellU.immOf s v σ hs)) F W) :
+    ∃ (s' : LSet) (hs' : σ.InStratum s'.join), W.get l = some (CellU.immOf s' v σ hs') := by
+  obtain ⟨ψ, e, k, w, r⟩ := compS_get_left' hW (ResU.single_get_self _ _)
+  obtain ⟨s', hs', hψ⟩ := CellU.imm_eta (k.trans (CellU.kind_immOf _ _ _ _))
+  simp only [CellU.wit_immOf, CellU.erase_immOf] at w r
+  rw [w] at hs'
+  refine ⟨s', hs', by rw [e, hψ]; exact congrArg some (CellU.immOf_congr rfl r w _ _)⟩
+
 end BoCa.Fig16.LogRel.Typed
 
 end

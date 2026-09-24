@@ -223,11 +223,15 @@
   "Support/Model/Walks@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/Walks",
   "Support/Model/Walks@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/RelaxedWalks",
   "Support/Model/CellFacts@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/CellFacts",
-  "Support/Model/CellFacts@After:Paper/LiteralReadings/S6_6_ReborrowingEntailments": "Support/Model/Strata",
   "Support/Model/Propositions@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/Propositions",
   "Support/Model/Propositions@After:Paper/S6_4_StandardEntailments/Lemmas": "Support/Model/Entailments",
   "Support/Model/Surgery@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/Surgery",
-  "Support/Model/Surgery@After:Paper/S5_Model/Remarks": "Support/Model/FrameSurgery"
+  "Support/Model/Surgery@After:Paper/S5_Model/Remarks": "Support/Model/FrameSurgery",
+  "Support/Model/CellFacts@After:END": "Support/Model/Strata",
+  "Support/Model/Update@After:Paper/S6_1_StandardLemmas/Lemmas": "Support/Model/Update",
+  "Support/Model/Outlives@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/Outlives",
+  "Support/Model/Update@After:Paper/S6_6_ReborrowingEntailments/Lemmas": "Support/Model/UpdateSymmetry",
+  "Support/Model/Outlives@After:Paper/S6_6_ReborrowingEntailments/Lemmas": "Support/Model/SubtractionKeep"
  },
  "order2": [
   "Paper/S1_Syntax/Definitions",
@@ -245,10 +249,12 @@
   "Paper/S6_4_StandardEntailments/Lemmas",
   "Paper/S6_5_NonStandardEntailments/Lemmas",
   "Paper/S6_6_ReborrowingEntailments/Lemmas",
+  "Paper/S6_7_WeakestPreconditionRules/Lemmas",
   "Paper/LiteralReadings/S4_LogicalRelation",
   "Paper/LiteralReadings/S6_4_StandardEntailments",
   "Paper/LiteralReadings/S6_5_NonStandardEntailments",
-  "Paper/LiteralReadings/S6_6_ReborrowingEntailments"
+  "Paper/LiteralReadings/S6_6_ReborrowingEntailments",
+  "Paper/LiteralReadings/S6_7_WeakestPreconditionRules"
  ],
  "sections": {
   "S6_1": {
@@ -304,6 +310,15 @@
     120,
     134
    ]
+  },
+  "S6_7": {
+   "file": "Paper/S6_7_WeakestPreconditionRules/Lemmas",
+   "title": "§6.7 Weakest Precondition Rules",
+   "pages": "pp. 35–40",
+   "range": [
+    135,
+    150
+   ]
   }
  },
  "stage2_sections": [
@@ -312,7 +327,8 @@
   "S6_3",
   "S6_4",
   "S6_5",
-  "S6_6"
+  "S6_6",
+  "S6_7"
  ],
  "remark_rows": [
   "5.67"
@@ -566,11 +582,48 @@
    1,
    999999,
    "TypedWorld/Compatibility"
+  ],
+  [
+   "BoCa.TR3",
+   841,
+   999999,
+   "Dynamics/PrintedWp"
+  ],
+  [
+   "BoCa.RebWp",
+   1,
+   336,
+   "Model/ReborrowRule"
+  ],
+  [
+   "BoCa.RebWp",
+   337,
+   385,
+   "Model/Empty"
+  ],
+  [
+   "BoCa.RebWp",
+   386,
+   999999,
+   "Model/ReborrowRule"
   ]
  ],
  "literal_target": {
   "S6_4": "Paper/LiteralReadings/S6_4_StandardEntailments",
   "S6_5": "Paper/LiteralReadings/S6_5_NonStandardEntailments",
-  "S6_6": "Paper/LiteralReadings/S6_6_ReborrowingEntailments"
- }
+  "S6_6": "Paper/LiteralReadings/S6_6_ReborrowingEntailments",
+  "S6_7": "Paper/LiteralReadings/S6_7_WeakestPreconditionRules"
+ },
+ "literal_patterns": [
+  [
+   "BoCa.DefectB",
+   ".*",
+   "Paper/LiteralReadings/S6_7_WeakestPreconditionRules"
+  ],
+  [
+   "BoCa.Fig16",
+   "(_private\\.BoCa\\.Fig16\\.0\\.)?BoCa\\.Fig16\\.RebExample\\..*",
+   "Paper/LiteralReadings/S6_6_ReborrowingEntailments"
+  ]
+ ]
 }
