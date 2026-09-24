@@ -37,35 +37,13 @@ import Support.Model.Walks
 import Support.Statics.Contexts
 
 /-!
-# [TR] §6.2 Non-standard Lemmas  (physical pp. 8–22), Lemmas 6.16–6.63
+# [TR] §6.2 Non-standard Lemmas  (pp. 8–22), Lemmas 6.16–6.63
 
 The flattening `⦇ρ⦈` and its walks `ex`, `ag` (6.16–6.20, 6.30–6.37), the surgery
 lemmas that trade a `mut` or `imm` cell for `ρ_v ● ℓ ↦ own(v)` (6.21–6.29, 6.34,
 6.38, 6.39), cell-level facts (6.40–6.45), the update relation `↭` (6.46–6.51),
 reborrowing (6.52–6.59, 6.61), and the logical relation's outlives lemmas (6.60,
-6.62, 6.63).  Definitions 6.1–6.3, printed on pp. 9, 13 and 17, are in this
-directory's `Definitions.lean`; the theorems about Definition 6.2's `∼` are in its
-`Remarks.lean`.
-
-**How this file reads.**  The numbered results of the subsection, in printed order as
-far as Lean's definition-before-use allows.  Each opens with a record:
-
-* the result's number, page and status (`proved`, `proved*`, `variant`; the
-  legend is in `Paper/INDEX.md`);
-* the printed statement, quoted, with the extraction's garbled symbols restored;
-* the printed proof, transcribed compactly and in its own order, citing the lemmas it
-  cites;
-* the Lean declaration (its docstring carries the tag and its account of the
-  proof),
-  and the numbered alias `TR.lemma_6_N` declared after it;
-* a note on how the declaration reads the printed statement.
-
-A result whose declaration an earlier subsection's printed proof needs is declared
-in that subsection's file, under a heading saying so; its record and alias stay
-here.  A run of declarations the paper does not print, placed in this file only
-because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  `§N` citations are to
-`docs/adjudications.md`.
+6.62, 6.63).  Records as in `Paper/S6_1_StandardLemmas/Lemmas.lean`.
 -/
 
 noncomputable section
@@ -81,16 +59,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** `ρ ● ⦇ρ′⦈` is defined iff `ρ` and `⦇ρ′⦈` have disjoint own-or-mut cells and `imm` cells that agree up to lifetimes.  Unravelling `⦇−⦈`, the cells of `ρ′` are a subset of those of `⦇ρ′⦈`, so the same condition holds of `ρ` and `ρ′`.
 
 **Lean.** `BoCa.Fig16.ResU.CompatS.of_flat`, alias `TR.lemma_6_16`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.CompatS.of_flat`, on the printed carrier. The print's whole proof is "the cells of `ρ′` are a subset of those of `⦇ρ′⦈`"; that is `Fig16.ResU.Flat.get`, **proved** rather than read off — a cell of `ρ` reappears in `⦇ρ⦈` at its own location with the same tag, value and witness. The inclusion is not literal, since `ag`'s `○`s may enlarge a lifetime set, but those three projections are all `▶◀` looks at
 -/
-/-- **`[TR]` Lemma 6.16** (p. 8): if `ρ ● ⦇ρ′⦈` is defined then so is `ρ ● ρ′`.
-Definedness is `▸◂` by Lemma 6.9 (`ResU.compS_defined_iff`) at both ends,
-and `⦇ρ′⦈` is named by its graph.  The proof is the print's: every cell of `ρ′`
-sits at its own location in `⦇ρ′⦈` over the same value and witness
-(`ResU.Flat.get`), and `▶◀` looks at nothing else (`CellU.compatS_iff`), so the
-condition `ρ` satisfies against `⦇ρ′⦈` it satisfies against `ρ′`.
-`[as printed]` (the printed `⦇ρ′⦈` appears as its graph — G4) -/
+/-- `[TR]` Lemma 6.16 (p. 8).  `[as printed]` (G4) -/
 theorem ResU.CompatS.of_flat {ρ ρ' f : ResU Loc Val} (hf : ResU.Flat ρ' f)
     (h : ResU.CompatS ρ f) : ResU.CompatS ρ ρ' := by
   intro l ψ ψ' e e'
@@ -113,11 +83,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By definition.
 
 **Lean.** `BoCa.Fig16.ResU.compatS_single_mut`, alias `TR.lemma_6_42`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.compatS_single_mut`, the `mut` instance of the same fused theorem.
 -/
-/-- **`[TR]` Lemma 6.42** (p. 15): if `ℓ ↦ mut(β,v,ρ′,P̂) ▶◀ ρ` then `ℓ ∉ ρ`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.42 (p. 15).  `[as printed]` -/
 theorem ResU.compatS_single_mut {l : Loc} {b : Life} {v : Val}
     {σ : ResU Loc Val} {hs : σ.InStratum b} {P : Val → SPropS Loc Val b}
     {hw : P v ⟨σ, hs⟩} {ρ : ResU Loc Val}
@@ -140,23 +107,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Let `ρ_o = ℓ ↦ own(v)` and `ρ_m = ℓ ↦ mut(α, v, ρ_v, P̂)`.  By Lemma 6.9 it is enough that `ρ ● ρ_v ● ρ_o` is defined.  `✓(ρ ● ρ_m)` makes `⦇ρ ● ρ_m⦈ = ex(ρ)_● ● (ρ_m ● ex(ρ_v)_●) ● (ag(ρ) ○ ag(ρ_v))` defined; ignoring `ex(ρ)_●` and `ag(ρ)`, `ρ_m ● ⦇ρ_v⦈` is defined, so `ℓ ∉ dom⦇ρ_v⦈`, so `ρ_o ● ⦇ρ_v⦈` is defined, so `ρ_o ● ρ_v` is defined by Lemma 6.16.  Definedness of `ag(ρ) ○ ag(ρ_v)` makes `ρ` and `ρ_v` agree on `imm` cells up to lifetimes, hence `ρ` and `ρ_o ● ρ_v` (`ρ_o` has no `imm` cell); definedness of `ex(ρ)_● ● (ρ_m ● ex(ρ_v)_●)` makes `ρ` and `ρ_m ● ρ_v` have disjoint own-or-mut cells, hence `ρ` and `ρ_o ● ρ_v` (`ρ_o` and `ρ_m` have the same own-or-mut cells).  Together, `ρ` and `ρ_o ● ρ_v` are composable.
 
 **Lean.** `BoCa.Fig16.ResU.compatS_of_hash_mut`, alias `TR.lemma_6_17`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.compatS_of_hash_mut`, on the printed carrier, via 6.9 and 6.16 as the print does. `hs`, `P` and `hP` are `mut(α,v,ρᵥ,P̂)`'s own components, not added conditions.
 -/
-/-- **`[TR]` Lemma 6.17** (p. 8): if `ρ # ℓ ↦ mut(α, v, ρᵥ, P̂)` then
-`ρ ▸◂ ρᵥ ● ℓ ↦ own(v)`.  The right-hand composite is named by its graph, which
-carries its own `▸◂` and adds nothing, `●` being single-valued; `hs`, `P` and
-`hP` are the printed `mut(α, v, ρᵥ, P̂)`'s own components, and `ℓ ↦ −` is
-`ResU.single`, the notation neither document gives a defining row.
-
-Two facts close it.  `ρ ▸◂ ρᵥ` is `ResU.CompatS.of_valid_mut`, which is the
-printed proof from its display onward.  And `ℓ ∉ dom(ρ)` — `[TR]` Lemma 6.42
-(`ResU.compatS_single_mut`) — so at `ℓ`, where the printed `ρₒ` sits, there
-is nothing in `ρ` to test, and everywhere else `ρᵥ ● ℓ ↦ own(v)` is `ρᵥ`.  That
-is the print's "since `ρₒ` contains no imm cells" and "since `ρₒ` and `ρₘ` have
-the same own-or-mut cells", which on this carrier are the same observation about
-the one location `ρₒ` occupies.
-`[as printed]` (the printed `ρᵥ ● ℓ ↦ own(v)` appears as its graph — G4) -/
+/-- `[TR]` Lemma 6.17 (p. 8).  `[as printed]` (G4) -/
 theorem ResU.compatS_of_hash_mut {ρ ρv w : ResU Loc Val} {l : Loc} {α : Life} {v : Val}
     {hs : ρv.InStratum α} {P : Val → SPropS Loc Val α} {hP : P v ⟨ρv, hs⟩}
     (h : ResU.Hash ρ (ResU.single l (CellU.mutOf α v ρv hs P hP)))
@@ -189,9 +141,7 @@ alias TR.lemma_6_17 := BoCa.Fig16.ResU.compatS_of_hash_mut
 `= (ρ₁∣own ● ρ₂∣own) ● (ρ₁∣mut ● ρ₂∣mut) ● (⨀_{mut(_,_,ρ′,_)∈ρ₁} ex(ρ′)_●) ● (⨀_{mut(_,_,ρ′,_)∈ρ₂} ex(ρ′)_●)`
 `= (ρ₁∣own ● ρ₁∣mut ● ⨀_{…∈ρ₁} ex(ρ′)_●) ● (ρ₂∣own ● ρ₂∣mut ● ⨀_{…∈ρ₂} ex(ρ′)_●) = ex(ρ₁)_● ● ex(ρ₂)_●`.
 
-**Lean.** `BoCa.Fig16.ExS.split`, alias `TR.lemma_6_18`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`, ahead of this subsection: the Lean of Lemmas 6.7, 6.8, 6.10, 6.11 and 6.15 there needs it.
-
-**Note.** `Fig16.ExS.split`, on the printed carrier, as one Kleene equality rather than two halves: the `↔` between the two graphs at an arbitrary common result, which is the print's own gloss since `Fig16.ExS.functional` and `Fig16.ResU.Comp.functional` make both sides single-valued. The sole hypothesis is `Fig16.ResU.CompS ρ₁ ρ₂ ρ₁₂`, whose first conjunct is the printed `▸◂`; nothing constrains `ρ₁`, `ρ₂`, `ρ₁₂` or the result further.
+**Lean.** `BoCa.Fig16.ExS.split`, alias `TR.lemma_6_18`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`.
 -/
 alias TR.lemma_6_18 := BoCa.Fig16.ExS.split
 
@@ -207,12 +157,9 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.flatR_idem`, alias `TR.lemma_6_19`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.flatR_idem`, on the printed carrier. The `FlatR` hypothesis is bound and unused — ours is the stronger theorem (convention 5) — so `Fig16.ResU.flatR_single_own` is supplied to show the hypothesis is satisfiable and the row is not vacuous
+**Note.** The `FlatR` hypothesis is unused; `Fig16.ResU.flatR_single_own` inhabits it.
 -/
-/-- **`[TR]` Lemma 6.19** (p. 9): if `⦇ρ⦈_○` is defined then `⦇ρ⦈_○` and
-`⦇ρ⦈_○ ○ ⦇ρ⦈_○` are Kleene-equal.  The two conjuncts are the two halves of
-Kleene equality: the composite is defined, and every value of it is `⦇ρ⦈_○`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.19 (p. 9).  `[as printed]` -/
 theorem ResU.flatR_idem {ρ σ : ResU Loc Val} (_ : ResU.FlatR ρ σ) :
     ResU.CompR σ σ σ ∧ ∀ τ, ResU.CompR σ σ τ → τ = σ :=
   ⟨ResU.compR_self σ, fun _ hτ => ResU.CompR.functional hτ (ResU.compR_self σ)⟩
@@ -228,9 +175,7 @@ alias TR.lemma_6_19 := BoCa.Fig16.ResU.flatR_idem
 
 **Printed proof, transcribed.** `ρ₁ ▸◂ ρ₂` makes the `mut` cells disjoint and the `imm` cells agree up to lifetimes.  With `ρ₁₂ = ρ₁ ● ρ₂`, `ag(ρ₁₂) = ρ₁₂∣imm ○ ◯_{mut(_,_,ρ′,_)∈ρ₁₂} ag(ρ′) ○ ◯_{imm(_,_,ρ′)∈ρ₁₂} ⦇ρ′⦈_○ = (ρ₁∣imm ○ ρ₂∣imm) ○ (◯_{mut∈ρ₁} ag(ρ′) ○ ◯_{mut∈ρ₂} ag(ρ′)) ○ ρ_ag`.  The big composite `ρ_ag` has one component per `imm` cell of `ρ₁₂`, and those are the union up to lifetimes of the `imm` cells of `ρ₁` and of `ρ₂`, so by inclusion–exclusion `ρ_ag = ◯_{ρ₁∖ρ₂} ○ ◯_{ρ₂∖ρ₁} ○ ◯_{ρ₁∩ρ₂}`; by Lemma 6.19 the shared block equals itself composed with itself, so `ρ_ag = ◯_{imm∈ρ₁} ⦇ρ′⦈_○ ○ ◯_{imm∈ρ₂} ⦇ρ′⦈_○`.  Regrouping, `ag(ρ₁ ● ρ₂) = (ρ₁∣imm ○ ◯_{mut∈ρ₁} ag(ρ′) ○ ◯_{imm∈ρ₁} ⦇ρ′⦈_○) ○ (the same for ρ₂) = ag(ρ₁) ○ ag(ρ₂)`.
 
-**Lean.** `BoCa.Fig16.AgW.split`, alias `TR.lemma_6_20`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`, ahead of this subsection: the Lean of Lemmas 6.7, 6.8, 6.10, 6.11 and 6.15 there needs it.
-
-**Note.** `Fig16.AgW.split`, on the printed carrier, the same shape as 6.18: hypothesis at `●`, conclusion composing at `○`, as printed. The print's inclusion-exclusion over `ρ₁∖ρ₂`, `ρ₂∖ρ₁`, `ρ₁∩ρ₂` is `Fig16.ResU.Sites.split_pairs_imm` forward and `Fig16.AgWitsI.assemble` backward; the appeal to 6.19 that duplicates the shared block is `Fig16.BigComp.dupR`, which at `○` needs only `Fig16.ResU.compR_self`. `Fig16.SplitExample.overlap` runs the lemma on two resources that genuinely share an `imm` location, so the row is not vacuous at the case the inclusion-exclusion exists for.
+**Lean.** `BoCa.Fig16.AgW.split`, alias `TR.lemma_6_20`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`.
 -/
 alias TR.lemma_6_20 := BoCa.Fig16.AgW.split
 
@@ -245,11 +190,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By definition.
 
 **Lean.** `BoCa.Fig16.ResU.compatS_single_own`, alias `TR.lemma_6_41`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.compatS_single_own`, on the printed carrier — the `own` instance of `Fig16.ResU.compatS_single_not_imm`, which states 6.41 and 6.42 once for any cell whose tag is not `imm`. The `[as printed]` tag sits on the instance, per the preamble's rule; the fused theorem carries `[variant]`.
 -/
-/-- **`[TR]` Lemma 6.41** (p. 15): if `ℓ ↦ own(v) ▶◀ ρ` then `ℓ ∉ ρ`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.41 (p. 15).  `[as printed]` -/
 theorem ResU.compatS_single_own {l : Loc} {v : Val} {ρ : ResU Loc Val}
     (h : ResU.CompatS (ResU.single l (CellU.ownOf v)) ρ) : ρ.get l = none :=
   ResU.compatS_single_not_imm (by simp) h
@@ -270,21 +212,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** The hypothesis makes `ρ ● ρ_v ● (ℓ ↦ own(v))` defined, which implies `ℓ ∉ dom(ρ)`, which implies `ρ ▸◂ ℓ ↦ mut(α, v, ρ_v, P̂)`.
 
 **Lean.** `BoCa.Fig16.ResU.six21`, alias `TR.lemma_6_21`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six21`, on the printed carrier, `[as printed]`, with the printed `ρ_v ● ℓ ↦ own(v)` as its graph (G4). The printed proof's three steps are the three: `#`'s own `▸◂` puts the `own` cell at `ℓ` (`ResU.compatS_single_own`, then `ResU.Comp.get_of_left_none`), `●` admits no second cell beside an `own` one (`ResU.CompatS.right_eq_none`), and a location free in `ρ` makes the singleton disjoint.
 -/
-/-- **`[TR]` Lemma 6.21** (p. 10): if `ρ # ρ_v ● ℓ ↦ own(v)` then
-`ρ ▸◂ ℓ ↦ mut(α, v, ρ_v, P̂)`.
-
-The printed proof is one line: *"The hypothesis implies the composite
-`ρ ● ρ_v ● (ℓ ↦ own(v))` is well-defined, which implies `ℓ ∉ dom(ρ)`, which
-implies `ρ ▸◂ ℓ ↦ mut(α, v, ρ_v, P̂)` as needed."*  The three steps are the
-three here: `#`'s own `▸◂` puts the `own` cell into `ρ_v ● ℓ ↦ own(v)` at `ℓ`
-(`ResU.compatS_single_own` for `ρ_v(ℓ) = ⊥`, then `ResU.Comp.get_of_left_none`),
-`●` admits no second cell beside an `own` one
-(`ResU.CompatS.right_eq_none`), and a location free in `ρ` makes the singleton
-disjoint from it.  The printed `ρ_v ● ℓ ↦ own(v)` is a partial term and appears
-as its graph `hW` (G4).  `[as printed]` -/
+/-- `[TR]` Lemma 6.21 (p. 10).  `[as printed]` -/
 theorem ResU.six21 {l : Loc} {b : Life} {v : Val} {ρ ρv W : ResU Loc Val}
     {hstr : ResU.InStratum b ρv} {P : Val → SPropS Loc Val b} {hw : P v ⟨ρv, hstr⟩}
     (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W) (h : ResU.Hash ρ W) :
@@ -315,25 +244,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Let `ρ_o = ℓ ↦ own(v)`, `ρ_m = ℓ ↦ mut(α, v, ρ_v, P̂)`.  The hypothesis gives `✓(ρ ● ρ_m)`, i.e. `ρ_hyp ≔ ex(ρ)_● ● ex(ρ_v)_● ● ρ_m ● (ag(ρ) ○ ag(ρ_v))` is defined.  `ρ ▸◂ ρ_v ● ρ_o` is Lemma 6.17, so it remains to show `✓(ρ ● ρ_v ● ρ_o)`, i.e. that `ρ_goal ≔ ex(ρ ● ρ_v)_● ● ρ_o ● ag(ρ ● ρ_v)` is defined.  By Lemma 6.17 `ρ ● ρ_v` is defined, so by Lemmas 6.18 and 6.20 `ρ_goal` is defined iff `(ex(ρ)_● ● ex(ρ_v)_●) ● ρ_o ● (ag(ρ) ○ ag(ρ_v))` is.  Since `ρ_o` contains a single `own` cell, that composite is defined iff the same composite with `ρ_m` for `ρ_o` is, which is `ρ_hyp`.
 
 **Lean.** `BoCa.Fig16.ResU.six22`, alias `TR.lemma_6_22`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six22`, on the printed carrier, `[as printed]`, the printed proof in its own order: 6.17 (`Fig16.ResU.compatS_of_hash_mut`) for the `▸◂` and 6.9 (`Fig16.ResU.compS_defined_iff`) to turn it into the composite, then the two named composites read off by 6.18 (`Fig16.ExS.split`) and 6.20 (`Fig16.AgW.split`) with the `mut` cell's own rows (`Fig16.ExW.single_mut_inv`, `Fig16.AgW.single_mut_inv`). The closing sentence — *"since `ρ_o` contains a single `own` cell"* — is `Fig16.ResU.compatS_congr_of_excl`, spent at both compositions.
 -/
-/-- **`[TR]` Lemma 6.22** (p. 10): if `ρ # ℓ ↦ mut(α, v, ρ_v, P̂)` then
-`ρ # ρ_v ● ℓ ↦ own(v)`.
-
-The printed proof in its own order.  *"We have that `ρ ▸◂ ρ_v ● ρ_o` by theorem
-6.17"* is `ResU.compatS_of_hash_mut`, and 6.9 (`ResU.compS_defined_iff`) turns
-that `▸◂` into the composite, exactly as 6.17's own proof uses 6.9 in the other
-direction.  *"so it only remains to show `✓(ρ ● ρ_v ● ρ_o)`"* is the remaining
-goal.  The two composites the print names are read off by 6.18 (`ExS.split`)
-and 6.20 (`AgW.split`): `ρ_hyp` is `ex(ρ)_● ● (ρ_m ● ex(ρ_v)_●)` against
-`ag(ρ) ○ ag(ρ_v)`, the `mut` cell's own two rows supplying the inner factors
-(`ExW.single_mut_inv`, `AgW.single_mut_inv`); `ρ_goal` is the same with
-`ex(ρ_v)_● ● ρ_o` in place of `ρ_m ● ex(ρ_v)_●`, its `ag` side unchanged
-because `ag(ℓ ↦ own(v)) = ∅`.  The closing sentence is
-`ResU.compatS_congr_of_excl`, spent twice — once at the inner composition and
-once at the outer one, `ResU.compS_agree_off_right` carrying the agreement off
-`ℓ` between them.  `[as printed]` -/
+/-- `[TR]` Lemma 6.22 (p. 10).  `[as printed]` -/
 theorem ResU.six22 {l : Loc} {b : Life} {v : Val} {ρ ρv W : ResU Loc Val}
     {hstr : ResU.InStratum b ρv} {P : Val → SPropS Loc Val b} {hw : P v ⟨ρv, hstr⟩}
     (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W)
@@ -396,18 +308,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Analogous to Lemma 6.22.  `ρ ▸◂ ρ_m` is Lemma 6.21, so it remains to show that `ρ_goal ≔ ex(ρ)_● ● ex(ρ_v)_● ● ρ_m ● (ag(ρ) ○ ag(ρ_v))` is defined given `ρ_hyp ≔ ex(ρ ● ρ_v)_● ● ρ_o ● ag(ρ ● ρ_v)`.  The assumption makes `ρ ● ρ_v` defined, so by Lemmas 6.18 and 6.20 `ρ_hyp`'s definedness is that of `ex(ρ)_● ● ex(ρ_v)_● ● ρ_o ● (ag(ρ) ○ ag(ρ_v))`; since `ρ_o` contains a single `own` cell, replacing it by `ρ_m` preserves definedness, which is `ρ_goal`.
 
 **Lean.** `BoCa.Fig16.ResU.six23`, alias `TR.lemma_6_23`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six23`, on the printed carrier, `[as printed]`. *"Analogous to theorem 6.22"*: the same proof with the two composites exchanged and 6.21 in place of 6.17, closing on the same `Fig16.ResU.compatS_congr_of_excl` run the other way; the `mut` side's walks are built rather than taken apart (`Fig16.ExW.single_mut`, `Fig16.AgW.single_mut`).
 -/
-/-- **`[TR]` Lemma 6.23** (p. 10): if `ρ # ρ_v ● ℓ ↦ own(v)` then
-`ρ # ℓ ↦ mut(α, v, ρ_v, P̂)`.
-
-*"Analogous to theorem 6.22."*  The printed proof is 6.22's with the two
-composites exchanged and 6.21 in place of 6.17 for the `▸◂`: `ρ_hyp` is now the
-`own` side and `ρ_goal` the `mut` side, and the closing sentence is the same
-one, `ResU.compatS_congr_of_excl`, run the other way.  The `mut` side's walks
-are built rather than taken apart, by `ExW.single_mut` and `AgW.single_mut`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.23 (p. 10).  `[as printed]` -/
 theorem ResU.six23 {l : Loc} {b : Life} {v : Val} {ρ ρv W : ResU Loc Val}
     {hstr : ResU.InStratum b ρv} {P : Val → SPropS Loc Val b} {hw : P v ⟨ρv, hstr⟩}
     (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W) (h : ResU.Hash ρ W) :
@@ -476,11 +378,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Combine Lemmas 6.22 and 6.23.
 
 **Lean.** `BoCa.Fig16.ResU.six24`, alias `TR.lemma_6_24`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six24`, on the printed carrier, `[as printed]`; *"combine theorems 6.22 and 6.23"* is the two halves and nothing else. The printed `ρ_v ● ℓ ↦ own(v)` is a partial term and appears as its graph (G4), which is the print's presupposition that it is defined (convention F1). Not vacuous: `Fig16.ResU.hash_empty_single_mut` inhabits the left side.
 -/
-/-- **`[TR]` Lemma 6.24** (p. 10): `ρ # ℓ ↦ mut(α, v, ρ_v, P̂)` iff
-`ρ # ρ_v ● ℓ ↦ own(v)`.  *"Combine theorems 6.22 and 6.23."*  `[as printed]` -/
+/-- `[TR]` Lemma 6.24 (p. 10).  `[as printed]` -/
 theorem ResU.six24 {l : Loc} {b : Life} {v : Val} {ρ ρv W : ResU Loc Val}
     {hstr : ResU.InStratum b ρv} {P : Val → SPropS Loc Val b} {hw : P v ⟨ρv, hstr⟩}
     (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W) :
@@ -503,30 +402,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By unfolding.
 
 **Lean.** `BoCa.Fig16.ResU.six25`, alias `TR.lemma_6_25`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six25`, on the printed carrier, `[as printed]`, as one Kleene equality: both sides are partial terms, so the printed `=` is the `↔` between the two graphs at an arbitrary common memory, the shape of 6.18 and 6.20. *"By unfolding"* splits the other way from its `imm` twin 6.26: at a `mut` cell `ex` carries the cell (`ExW.single_mut_inv`) and `ag` is the witness's alone (`AgW.single_mut_inv`), both at `●`, so no 6.33 is spent where 6.26 must spend it. *"Assuming all resources and composition are defined"* is three hypotheses and each is spent.
 -/
-/-- **`[TR]` Lemma 6.25** (p. 10): assuming all resources and composition are
-defined, `⟦ℓ ↦ mut(α, v, ρ_v, P̂)⟧ = ⟦ρ_v ● ℓ ↦ own(v)⟧`.
-
-*"By unfolding."*  On the left, `ex` at the one `mut` cell is the cell composed
-with `ex(ρ_v)_●` (`ExW.single_mut_inv`) and `ag` is `ag(ρ_v)`
-(`AgW.single_mut_inv`), so `⦇ℓ ↦ mut(α, v, ρ_v, P̂)⦈` is
-`ℓ ↦ mut(α, v, ρ_v, P̂) ● ⦇ρ_v⦈` after 6.3 (`ResU.CompS.assoc`).  On the right,
-6.18 (`ExS.split`) and 6.20 (`AgW.split`) with `ExW.single_own` and
-`AgW.single_own` give `ex(ρ_v)_● ● ℓ ↦ own(v) ● ag(ρ_v)`, and 6.3 with 6.2
-(`ResU.CompS.comm`) moves the cell to the front, leaving `⦇ρ_v⦈` behind it.
-`ℓ ∉ dom(⦇ρ_v⦈)` is the `own` cell's own `▸◂` (`ResU.compatS_single_own`,
-6.41), so the two flattenings differ at `ℓ` and nowhere else, and there
-`⟦mut(α, v, ρ_v, P̂)⟧ = v = ⟦own(v)⟧`.  Unlike its `imm` twin 6.26
-this spends no 6.33: see the section note.
-
-The printed `=` is Kleene equality between two partial terms, so it is the `↔`
-between the two graphs at an arbitrary common memory — the shape of
-6.18, 6.20 and 6.7.  *"Assuming all resources and composition are
-defined"* is `hW`, `hvm` and `hvW`, and each is spent: the composition in both
-directions, and one lowering's guard per direction.
-`[as printed]` (the printed `●` and both `⟦−⟧` appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.25 (p. 10).  `[as printed]` (G4) -/
 theorem ResU.six25 {l : Loc} {b : Life} {v : Val} {ρv W : ResU Loc Val}
     {hstr : ResU.InStratum b ρv} {P : Val → SPropS Loc Val b} {hw : P v ⟨ρv, hstr⟩}
     {m : Loc → Option Val}
@@ -591,19 +468,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By induction on `ρ`, unfolding `ex`, and repeatedly applying Lemma 6.31.
 
 **Lean.** `BoCa.Fig16.ExS.toExR`, alias `TR.lemma_6_32`, tag `[as printed]`.
-
-**Note.** `Fig16.ExS.toExR`, on the printed carrier, `[as printed]`, both walks named by their graphs (G4): definedness of `ex(ρ)●` is the hypothesis `ExS ρ σ`, and the printed `=` is then `Fig16.ExR.functional` against any other value. The printed proof — *"by induction on `ρ`, unfolding `ex`, and repeatedly applying lemma 6.31"* — is the induction the walk is defined by (`ExW.rec`, three motives), with 6.31 as `Fig16.ResU.CompS.toCompR` at the two `◐`s and `Fig16.BigComp.toR` at the `⨀`: the index set, the family and the fold are the same objects and only the mode changes. Needed by 6.29, whose proof reasons about `⦇−⦈` while `ag`'s `imm` row calls `ex(−)_○`.
 -/
-/-- **`[TR]` Lemma 6.32** (p. 12): if `ex(ρ)●` is defined then
-`ex(ρ)● = ex(ρ)_○`.
-
-*"By induction on `ρ`, unfolding `ex`, and repeatedly applying lemma 6.31."*
-Here the induction is the one the walk is defined by, and 6.31 is
-`ResU.CompS.toCompR`: the derivation's index set, family and fold are the same
-objects, and only the two `◐`s and the `⨀` change mode.  Definedness of
-`ex(ρ)●` is the hypothesis `ExS ρ σ` (G4), and the printed `=` is then
-`ExR.functional` against any other value.
-`[as printed]` (both walks appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.32 (p. 11).  `[as printed]` (G4) -/
 theorem ExS.toExR {ρ σ : ResU Loc Val} (h : ExS ρ σ) : ExR ρ σ := by
   refine ExW.rec (motive_1 := fun ρ σ _ => ExR ρ σ)
     (motive_2 := fun ρ w _ => ExWits CellU.CompatR CellU.CompR ρ w) ?mk ?nil ?cons h
@@ -631,20 +497,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By unfolding `⦇−⦈` and `⦇−⦈_○`, and applying Lemmas 6.31 and 6.32.
 
 **Lean.** `BoCa.Fig16.ResU.six33`, alias `TR.lemma_6_33`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six33`, on the printed carrier, `[as printed]` — three lines, as the printed proof is: *"By unfolding `⦇−⦈` and `⦇−⦈_○`, and applying lemmas 6.31 and 6.32."*  6.32 is `Fig16.ExS.toExR`, 6.31 is `Fig16.ResU.CompS.toCompR`, and the two definitions differ only in the order of the two walks, which `Fig16.ResU.CompR.comm` settles. Both flattenings are named by their graphs (G4), so "defined" is the hypothesis `Fig16.ResU.Flat ρ σ`. [TR] 6.39's normal-form display needs it: `ag`'s `imm` family hands back `⦇ρ_v⦈_○` and the display wants `⦇ρ_v⦈ = ex(ρ_v)● ● ag(ρ_v)` so the exclusive half can be split into the outer `●`
 -/
-/-- **`[TR]` Lemma 6.33** (p. 11): if `⦇ρ⦈` is defined then `⦇ρ⦈ = ⦇ρ⦈_○`.
-
-The printed proof: *"By unfolding `⦇−⦈` and `⦇−⦈_○`, and applying lemmas 6.31
-and 6.32."*  6.32 is `ExS.toExR` and 6.31 is `ResU.CompS.toCompR`, and the two
-definitions differ only in the order of the two walks, which `ResU.CompR.comm`
-settles.  Both flattenings are named by their graphs (G4), so "defined" is the
-hypothesis `ResU.Flat ρ σ`.
-
-`[TR]` 6.39's display needs it: `ag`'s `imm` family hands back `⦇ρ_v⦈_○`, and
-the normal form wants `⦇ρ_v⦈ = ex(ρ_v)● ● ag(ρ_v)` so that the exclusive half
-can be split off into the outer `●`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.33 (p. 11).  `[as printed]` -/
 theorem ResU.six33 {ρ σ : ResU Loc Val} (h : ResU.Flat ρ σ) : ResU.FlatR ρ σ := by
   obtain ⟨e, a, he, ha, hc⟩ := h
   exact ⟨a, e, ha, ExS.toExR he, ResU.CompR.comm (ResU.CompS.toCompR hc)⟩
@@ -665,30 +519,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By unfolding.
 
 **Lean.** `BoCa.Fig16.ResU.six26`, alias `TR.lemma_6_26`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six26`, on the printed carrier, `[as printed]`, as one Kleene equality: both sides are partial terms, so the printed `=` is the `↔` between the two graphs at an arbitrary common memory, the shape of 6.18, 6.20 and 6.7. *"Assuming all resources and composition are defined"* is the three hypotheses and nothing beyond them — the printed composition `ρ_v ● ℓ ↦ own(v)` named by its graph (G4), and each `⟦−⟧`'s own guard `✓`; both are spent, one per direction of the `↔`. *"By unfolding"* meets `ag`'s `imm` family, which hands back `ex(ρ_v)_○ ○ ag(ρ_v)`: `Fig16.ResU.six33` (6.33) identifies it with `⦇ρ_v⦈` and `Fig16.ResU.Valid.split` (6.35) is what makes `⦇ρ_v⦈` defined, the same pair 6.38's and 6.39's proofs spend at the same place. `Fig16.AgW.single_imm_inv` and `Fig16.ExW.empty_of_all_imm` evaluate the two walks at the one cell, `Fig16.ResU.compatS_single_own` (6.41) is `ℓ ∉ dom(⦇ρ_v⦈)`, and the two flattenings then differ at `ℓ` alone, where `⟦imm(ᾱ,v,ρ_v)⟧ = v = ⟦own(v)⟧`.
 -/
-/-- **`[TR]` Lemma 6.26** (p. 10): assuming all resources and composition are
-defined, `⟦ℓ ↦ imm(ᾱ, v, ρ_v)⟧ = ⟦ρ_v ● ℓ ↦ own(v)⟧`.
-
-*"By unfolding."*  On the left, `ex(ℓ ↦ imm(ᾱ, v, ρ_v))_● = ∅`
-(`ExW.empty_of_all_imm`) and `ag` at the one cell is
-`ℓ ↦ imm(ᾱ, v, ρ_v) ○ ⦇ρ_v⦈_○` (`AgW.single_imm_inv`).  On the right, 6.18
-(`ExS.split`) and 6.20 (`AgW.split`) with `ExW.single_own` and `AgW.single_own`
-give `ex(ρ_v)_● ● ℓ ↦ own(v) ● ag(ρ_v)`, and 6.3 (`ResU.CompS.assoc`) with 6.2
-(`ResU.CompS.comm`) move the cell to the front.  The two remainders are
-`⦇ρ_v⦈_○` and `⦇ρ_v⦈`, which 6.33 (`ResU.six33`) identifies, `⦇ρ_v⦈` being
-defined by 6.35 (`ResU.Valid.split`) at the printed composition.
-`ℓ ∉ dom(⦇ρ_v⦈)` is the `own` cell's own `▶◀` (`ResU.compatS_single_own`, 6.41),
-so the two flattenings differ at `ℓ` and nowhere else, and there
-`⟦imm(ᾱ, v, ρ_v)⟧ = v = ⟦own(v)⟧`.
-
-The printed `=` is Kleene equality between two partial terms, so it is the `↔`
-between the two graphs at an arbitrary common memory — the shape of
-6.18, 6.20 and 6.7.  *"Assuming all resources and composition are
-defined"* is `hW`, `hvi` and `hvW`, and each is spent: the composition in both
-directions, and one lowering's guard per direction.
-`[as printed]` (the printed `●` and both `⟦−⟧` appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.26 (p. 10).  `[as printed]` (G4) -/
 theorem ResU.six26 {l : Loc} {s : LSet} {v : Val} {ρv W : ResU Loc Val}
     {hs : ρv.InStratum s.join} {m : Loc → Option Val}
     (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W)
@@ -760,11 +592,9 @@ namespace BoCa.Fig16
 
 **Printed proof, transcribed.** Unfolding `↓`, `↓α = α + 1`, and `α < α + 1`, so `α ⊐ α + 1`.
 
-On the printed carrier the statement is `Fig16.Life.down_sqsubset`, `(↓a) ⊏ a`, which is `a ⊐ ↓a` read from the other side; `Life` is `ℕᵒᵈ`, so `↓a = a + 1` and `⊏` is `>` on `ℕ`.
-
 **Lean.** `BoCa.Fig16.Life.down_sqsubset`, alias `TR.lemma_6_63`.
 
-**Note.** `down α ≜ α + 1` and `SLife.Lt a b ≜ b < a`, i.e. `α ⊐ ↓α` as printed
+**Note.** `Life` is `ℕᵒᵈ`, so `↓a = a + 1`, and `(↓a) ⊏ a` is `a ⊐ ↓a`.
 -/
 theorem Life.down_sqsubset (a : Life) : (↓a) ⊏ a := Nat.lt_succ_self _
 
@@ -783,31 +613,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Let `ρ_m = ℓ ↦ mut(α, v, ρ_v, P̂)`.  `⦇ρ ● ρ_m⦈` and `⦇ρ′⦈` have the same borrows, so `⦇ρ′⦈` has a `mut` cell matching `ρ_m`: some `ℓ ↦ mut(α, v′, ρ′_v, P̂) ∈ ⦇ρ′⦈`.  Since `@ρ ⊐ α`, every other borrow in `⦇ρ′⦈` is disjoint from `α`, which by well-formedness of the resource `ρ′` means the cell cannot be in any `ρ″` of a `mut(_, _, ρ″, _)` or `imm(_, _, ρ″)` in `ρ′`.  So `ρ′(ℓ) = mut(α, v′, ρ′_v, P̂)` and `ρ′ = ρ′/ℓ ● ℓ ↦ mut(α, v′, ρ′_v, P̂)`.
 
 **Lean.** `BoCa.Fig16.ResU.six27`, alias `TR.lemma_6_27`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six27`, on the printed carrier, `[as printed]`, with `@ρ ⊐ α` on the unprimed **pre**-resource as printed and the printed `ρ′ = ρ′/ℓ ● …` as its graph (G4). The printed hypothesis is the whole content: `↭` fixes a `mut` cell at `ℓ` in `⦇ρ′⦈` with the printed `α` and `P̂`, but not that it is `ρ′`'s own, and *"by well-formedness of the resource `ρ′` … the cell cannot be in any `ρ″`"* is the strata — a cell raised out of a witness strictly outlives the host that carries it, while `@ρ ⊐ α` makes every host strictly outlive `α`, and no cell at `α` does both. `Fig16.ResU.updV_inStratum` carries `Res_{↓α}` across `↭` and `Fig16.ResU.flat_inStratum_at` is the contradiction.
 -/
-/-- **`[TR]` Lemma 6.27** (p. 10): if `@ρ ⊐ α` and
-`ρ ● ℓ ↦ mut(α, v, ρ_v, P̂) ↭ ρ′` then `ρ′ = ρ′/ℓ ● ℓ ↦ mut(α, v′, ρ′_v, P̂)`.
-
-The printed proof, in its order.  *"`⦇ρ ● ρ_m⦈` and `⦇ρ′⦈` have the same
-borrows"* is the hypothesis; *"there must be a `mut` cell in `⦇ρ′⦈` matching
-`ℓ ↦ mut(α, v, ρ_v, P̂)`"* is `↭`'s clause (2) read forwards at `(ℓ, α, P̂)`,
-the `mut` cell of `ρ ● ρ_m` sitting at `ℓ` in `⦇ρ ● ρ_m⦈` unchanged
-(`ResU.flat_get_of_ne_imm`).
-
-*"Furthermore, since `@ρ ⊐ α`, all borrows in `⦇ρ′⦈` other than … must be
-disjoint from `α`, which by well-formedness of the resource `ρ′` implies that
-the cell cannot be in any `ρ″`"* is the strata.  `ρ ● ρ_m ∈ Res_{↓α}`: the
-frame is in `Res_α` by the printed hypothesis and the borrow is at `α` itself,
-so both clear `↓α`.  `ResU.updV_inStratum` carries that across `↭` to
-`ρ′ ∈ Res_{↓α}`, and then `ResU.flat_inStratum_at` says that at a location
-where `ρ′` carries nothing the flattening carries nothing shorter than `↓α`'s
-successor — that is, nothing at `α`.  The cell is at `α`, so `ρ′` carries a
-cell at `ℓ`, and by `ResU.Flat.get` it is the `mut` cell itself.
-
-*"Hence it must be that `ρ′(ℓ) = mut(α, v′, ρ′_v, P̂)`"* is the last step, and
-`ResU.del_compS` is the printed `ρ′ = ρ′/ℓ ● …` as its graph (G4).
-`[as printed]` -/
+/-- `[TR]` Lemma 6.27 (p. 10).  `[as printed]` -/
 theorem ResU.six27 {l : BoCa.Loc} {α : Life} {v : BoCa.Val}
     {ρ ρv M ρ' : ResU BoCa.Loc BoCa.Val}
     {h : ResU.InStratum α ρv} {P : BoCa.Val → SPropS BoCa.Loc BoCa.Val α}
@@ -864,16 +671,8 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 variable {Loc Val : Type}
 
-/-! `[about ours]` — what the Lean of Lemma 6.28 needs; the paper prints nothing here. -/
-/-- **The two flattenings of `[TR]` 6.28's string of iffs differ at `ℓ` alone.**
-`⦇ρ ● ℓ ↦ mut(α, v, ρ_v, P̂)⦈` is
-`ex(ρ)_● ● (ℓ ↦ mut(α, v, ρ_v, P̂) ● ex(ρ_v)_●) ● (ag(ρ) ○ ag(ρ_v))` and
-`⦇ρ ● ρ_v ● ℓ ↦ own(v)⦈` is the same with `ex(ρ_v)_● ● ℓ ↦ own(v)` in the
-middle — the printed proof's two displays.  The `ag` sides are literally the
-same, because `ag(ℓ ↦ own(v)) = ∅` and `ag` at the `mut` cell is `ag(ρ_v)`, so
-the two composites agree everywhere but `ℓ`, where one has the `mut` cell and
-the other the `own` one.  `[about ours: the two displays of `[TR]` 6.28's
-proof, compared]` -/
+/-! `[about ours]` — for Lemma 6.28. -/
+/-- `[about ours: the two displays of `[TR]` 6.28's proof, compared]` -/
 theorem ResU.flat_mut_own_agree_off {l : Loc} {b : Life} {v : Val}
     {ρ ρv W M O F G : ResU Loc Val} {hs : ResU.InStratum b ρv}
     {P : Val → SPropS Loc Val b} {hw : P v ⟨ρv, hs⟩}
@@ -939,28 +738,9 @@ theorem ResU.flat_mut_own_agree_off {l : Loc} {b : Life} {v : Val}
 
 **Lean.** `BoCa.Fig16.ResU.six28`, alias `TR.lemma_6_28`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.six28`, on the printed carrier, `[as printed]`. The printed string of three iffs: the outer two are *"by unravelling definitions"*, `Fig16.ResU.flat_mut_own_agree_off` each side once — the `ag` sides of the two displays are literally the same, since `ag(ℓ ↦ own(v)) = ∅` and `ag` at the `mut` cell is `ag(ρ_v)`, so the flattenings differ at `ℓ` alone. The middle is *"by exclusivity of `ℓ`"*, where `↭`'s two clauses come apart: the `imm` clause is false at `ℓ` on all four flattenings, and the `mut` clause is true on both sides in the `mut` configuration at the one class `(α, P̂)` the printed cells share and false on both in the `own` one. `Upd` is [CONF] Fig. 18b's unguarded `↭` (`docs/adjudications.md` D3); the print's *"assuming all compositions are defined and valid"* is the four compositions as graphs (G4) and the four `✓`s.
+**Note.** `↭` is `[CONF]` Fig. 18b's unguarded `Upd` (`docs/adjudications.md` D3).
 -/
-/-- **`[TR]` Lemma 6.28** (p. 10): assuming all compositions are defined and
-valid, `ρ ● ℓ ↦ mut(α, v, ρ_v, P̂) ↭ ρ′ ● ℓ ↦ mut(α, v′, ρ′_v, P̂)` iff
-`ρ ● ℓ ↦ own(v) ● ρ_v ↭ ρ′ ● ℓ ↦ own(v′) ● ρ′_v`.
-
-The printed proof is a string of three iffs.  The first and the third are
-*"by unravelling definitions"*: `↭` compares the borrows of the two
-flattenings, and `ResU.flat_mut_own_agree_off` is the unravelling, each side
-once.  The middle one is *"by exclusivity of `ℓ`"*, and it is where the two
-printed clauses of `↭` come apart.  At `ℓ` the `imm` clause is false on all
-four flattenings — the cell there is `mut` or `own`, never `imm` — so it holds
-either way.  The `mut` clause at `ℓ` is true on both sides in the `mut`
-configuration, at the one class `(α, P̂)` the two cells share, and false on
-both sides in the `own` configuration; the printed statement gives the two
-`mut` cells the *same* `α` and `P̂`, which is exactly what makes the clause
-hold in both.  Off `ℓ` the four flattenings agree in pairs, so every clause
-there transfers unchanged.
-
-`↭` is `ResU.Upd`, `[CONF]` Fig. 18b's unguarded reading (`docs/adjudications.md` D3); the
-print's *"assuming all compositions are defined and valid"* is the four
-compositions as graphs (G4) and the four `✓`s.  `[as printed]` -/
+/-- `[TR]` Lemma 6.28 (p. 11).  `[as printed]` -/
 theorem ResU.six28 {l : Loc} {b : Life} {v v' : Val}
     {ρ ρ' ρv ρv' W W' M M' O O' : ResU Loc Val}
     {hs : ResU.InStratum b ρv} {hs' : ResU.InStratum b ρv'}
@@ -1043,33 +823,8 @@ alias TR.lemma_6_28 := BoCa.Fig16.ResU.six28
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-! `[about ours]` — what the Lean of Lemma 6.29 needs; the paper prints nothing here. -/
-/-- **`[TR]` Lemma 6.29's proof through its second sentence.**  Its first two
-sentences are about `⦇ρ′⦈` alone, and what they establish is a pair:
-`⦇ρ′⦈(ℓ) = imm({α}, v, ρ_v)`, and *"all borrows in `⦇ρ′⦈` other than `ρᵢ` must
-be disjoint from `α`"*.
-
-*"By assumption, `⦇ρ ● ρᵢ⦈` and `⦇ρ′⦈` have the same borrows"* is `↭`'s two
-clauses (`ResU.UpdImm`, `ResU.UpdMut`).  *"And by assumption,
-`ρ # ρ_v ● ℓ ↦ own(v)`, so `ℓ ∉ dom(⦇ρ⦈)`"* is 6.18 and 6.20 at that `#`: the
-`own` cell sits in `ex(−)●` at `ℓ`, and `●` there admits no second cell, so
-`ex(ρ)●`, `ag(ρ)`, `ex(ρ_v)●` and `ag(ρ_v)` are all silent at `ℓ` — and by 6.32
-(`ExS.toExR`) so is the `ex(ρ_v)_○` that `ag(ρᵢ)` calls.  *"This implies there
-must be an imm cell in `⦇ρ′⦈` matching `ρᵢ` exactly"* is then `⦇ρ ● ρᵢ⦈(ℓ) = ρᵢ`
-carried across `↭`, the first conjunct.
-
-*"Furthermore, since `@ρ ⊐ α`, all borrows in `⦇ρ′⦈` other than `ρᵢ` must be
-disjoint from `α`"* is the second: `ExW.inStratum` and `AgW.inStratum` on `ρ`
-and on `ρ_v` — `imm({α}, v, ρ_v)` carries `ρ_v ∈ Res_α` as one of its own
-arguments — carried across `↭`, which fixes an `imm` cell outright and a `mut`
-cell's lifetime.
-
-6.29 spends the pair on *"cannot be in any `ρ″`"* at `ℓ`; 6.38's closing
-paragraph spends the second conjunct again, at `ρ′ ● ρ⁺/ℓ`, where the same
-sentence is what keeps the borrow out of `ag(ρ′ ● ρ⁺/ℓ)`.
-
-Stated at `BoCa.Loc`/`BoCa.Val`, as the `Res_α` lemmas it spends are.
-`[about ours: the two facts `[TR]` Lemma 6.29's proof establishes about `⦇ρ′⦈`
+/-! `[about ours]` — for Lemma 6.29. -/
+/-- `[about ours: the two facts `[TR]` Lemma 6.29's proof establishes about `⦇ρ′⦈`
 before it descends to `ρ′`]` -/
 theorem ResU.six29_borrows_off {α : Life} {ρ ρv ρ' W ρρi σ' : ResU BoCa.Loc BoCa.Val}
     {l : BoCa.Loc} {v : BoCa.Val} {hv : ρv.InStratum (LSet.singleton α).join}
@@ -1193,22 +948,8 @@ theorem ResU.six29_borrows_off {α : Life} {ρ ρv ρ' W ρρi σ' : ResU BoCa.L
 **Printed proof, transcribed.** Let `ρᵢ = ℓ ↦ imm({α}, v, ρ_v)`.  `⦇ρ ● ρᵢ⦈` and `⦇ρ′⦈` have the same borrows, and `ρ # ρ_v ● ℓ ↦ own(v)` gives `ℓ ∉ dom(⦇ρ⦈)`, so an `imm` cell of `⦇ρ′⦈` matches `ρᵢ` exactly: `⦇ρ′⦈(ℓ) = imm({α}, v, ρ_v)`.  Since `@ρ ⊐ α`, every other borrow in `⦇ρ′⦈` is disjoint from `α`, which by well-formedness of `ρ′` means the cell cannot be in any `ρ″` of a `mut(_, _, ρ″, _)` or `imm(_, _, ρ″)` in `ρ′`.  So `ρ′(ℓ) = imm({α}, v, ρ_v)` and `ρ′ = ρ′/ℓ ● ℓ ↦ imm({α}, v, ρ_v)`.
 
 **Lean.** `BoCa.Fig16.ResU.six29`, alias `TR.lemma_6_29`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six29`, on the printed carrier, `[as printed]` — all three printed hypotheses verbatim, **nothing added**, the conclusion exactly as printed, and `ρ ● ρ_v ● ℓ ↦ own(v)`, `ρ ● ρᵢ` and `ρ′/ℓ ● ρᵢ` named by their graphs (G4). Stated at `BoCa.Loc`/`BoCa.Val`, as the `Res_α` lemmas it spends are. *"By well-formedness of the resource `ρ′`"* is **Fig. 16's own typing of the two borrow cells and nothing else**: `imm(ᾱ, v, ρ)` carries `ρ : Res_{⊔ᾱ}` and `mut(β, v, ρ, P̂)` carries `ρ : Res_β`, which on this carrier are arguments of `Fig16.CellU.immOf` and `Fig16.CellU.mutOf` and so are present at every cell by construction; `Fig16.BoLo.cell_wit_inStratum` is that sentence read off them. No predicate is added. *"`ℓ ∉ dom(⦇ρ⦈)`"* is 6.18 and 6.20 at the printed `#`, the `own` cell admitting no second cell under `●` at `ℓ`; 6.32 (`Fig16.ExS.toExR`) is what lets `ag(ρᵢ)`'s `ex(ρ_v)_○` be compared with it. *"All borrows … other than `ρᵢ` must be disjoint from `α`"* is `Fig16.BoLo.ExW.inStratum` and `Fig16.BoLo.AgW.inStratum` on `ρ` and on `ρ_v` — `imm({α}, v, ρ_v)` carries `ρ_v ∈ Res_α` itself — carried across `↭`. *"Cannot be in any `ρ″`"* needs **no descent into the nesting**: `Fig16.BoLo.flat_inStratum_inv` is pointwise, so were `ρ′(ℓ)` undefined it would ask nothing at `ℓ` and give `ρ′ ∈ Res_α`, whence `⦇ρ′⦈ ∈ Res_α` and at `ℓ` the false `α ⊐ α`. The cell is then pinned by `Fig16.ResU.Flat.get` (tag, value, witness) and the new `Fig16.ResU.Flat.get_ls_imm` (the lifetime set, `ag`'s `○`s being able only to enlarge it), and `Fig16.ResU.del_compS` is the conclusion. The proof's first two sentences are `Fig16.ResU.six29_borrows_off`, which returns the pair they establish about `⦇ρ′⦈` — the cell at `ℓ`, and *"all borrows … other than `ρᵢ` must be disjoint from `α`"* — because 6.38's closing paragraph spends the second again, at `ρ′ ● ρ⁺/ℓ`, where it is what keeps the borrow out of `ag(ρ′ ● ρ⁺/ℓ)`; 6.29 itself stated only the `●`-decomposition its last sentence gives.
 -/
-/-- **`[TR]` Lemma 6.29** (p. 11): if `@ρ ⊐ α` and `ρ # ρ_v ● ℓ ↦ own(v)` and
-`ρ ● ℓ ↦ imm({α}, v, ρ_v) ↭ ρ′` then `ρ′ = ρ′/ℓ ● ℓ ↦ imm({α}, v, ρ_v)`.
-
-*"Hence it must be that `ρ′(ℓ) = imm({α}, v, ρ_v, _)"*: the two facts
-`ResU.six29_borrows_off` returns are the printed sentence before it, and
-`ResU.flat_imm_at_top` is *"cannot be in any `ρ″`"*.  `ResU.Flat.get` then fixes
-the tag, the value and the witness, and `ResU.Flat.get_ls_imm` fixes the
-lifetime set, `ag`'s `○`s being able only to enlarge it.  The conclusion is
-`ResU.del_compS`.
-
-Stated at `BoCa.Loc`/`BoCa.Val`, as the `Res_α` lemmas it spends are.
-`[as printed]` (`ρ ● ρ_v ● ℓ ↦ own(v)`, `ρ ● ρᵢ` and `ρ′/ℓ ● ρᵢ` appear as their
-graphs — G4) -/
+/-- `[TR]` Lemma 6.29 (p. 11).  `[as printed]` (G4) -/
 theorem ResU.six29 {α : Life} {ρ ρv ρ' W ρρi : ResU BoCa.Loc BoCa.Val}
     {l : BoCa.Loc} {v : BoCa.Val} {hv : ρv.InStratum (LSet.singleton α).join}
     (hα : ρ.InStratum α)
@@ -1262,9 +1003,7 @@ alias TR.lemma_6_29 := BoCa.Fig16.ResU.six29
 
 **Printed proof, transcribed.** Since `ρ∣imm = ∅`, `ρ ▸◂ (ρ₁ ○ ρ₂)` implies `dom(ρ) ∩ dom(ρ₁ ○ ρ₂) = ∅`.  Unfolding `○`, `dom(ρ₁ ○ ρ₂) = dom(ρ₁) ∪ dom(ρ₂)`, so `dom(ρ)` is disjoint from each, and by definition `ρ ▸◂ ρ₁` and `ρ ▸◂ ρ₂`.
 
-**Lean.** `BoCa.Fig16.ResU.CompatS.of_compR_left`, alias `TR.lemma_6_30`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`, ahead of this subsection: the Lean of Lemmas 6.7, 6.8, 6.10, 6.11 and 6.15 there needs it.
-
-**Note.** `Fig16.ResU.CompatS.of_compR_left`, on the printed carrier, `[as printed]`. The bowtie is the **filled** `▸◂` of p. 5's cell-level row, not the half-filled metavariable, and the composition inside it is `○`; both stand in the one statement. `ρ
+**Lean.** `BoCa.Fig16.ResU.CompatS.of_compR_left`, alias `TR.lemma_6_30`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`.
 -/
 alias TR.lemma_6_30 := BoCa.Fig16.ResU.CompatS.of_compR_left
 
@@ -1275,9 +1014,7 @@ alias TR.lemma_6_30 := BoCa.Fig16.ResU.CompatS.of_compR_left
 
 **Printed proof, transcribed.** It suffices that for cells `ψ ▸◂ ψ′`, `ψ ○ ψ′ = ψ ● ψ′`.  Unfolding `ψ ○ ψ′`: either `ψ = ψ′` and `ψ ○ ψ′ = ψ`, or `ψ ≠ ψ′` and, as `ψ ▸◂ ψ′`, `ψ ○ ψ′ = ψ ● ψ′`; the last case is unreachable.  `ψ ○ ψ′` disagrees with `●` only when `ψ = ψ′ = own(_)` or `mut(_, _, _, _)`, which `ψ ▸◂ ψ′` excludes.
 
-**Lean.** `BoCa.Fig16.ResU.compR_iff_compS`, alias `TR.lemma_6_31`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`, ahead of this subsection: the Lean of Lemmas 6.7, 6.8, 6.10, 6.11 and 6.15 there needs it.
-
-**Note.** `Fig16.ResU.compR_iff_compS`, on the printed carrier: under the printed hypothesis `ρ ▶◀ ρ′` the two graphs coincide, which is definedness and value together.
+**Lean.** `BoCa.Fig16.ResU.compR_iff_compS`, alias `TR.lemma_6_31`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`.
 -/
 alias TR.lemma_6_31 := BoCa.Fig16.ResU.compR_iff_compS
 
@@ -1293,37 +1030,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By Lemma 6.11, `ρ # ρ_v` and `ρ # ℓ ↦ own(v)`.  Unfolding these, `ℓ ∉ dom(⦇ρ ● ρ_v⦈)`, and by Lemmas 6.20, 6.18, 6.31 and 6.32 the following are all defined and equal: `⦇ρ ● ρ_v⦈ = ex(ρ ● ρ_v)_● ● ag(ρ ● ρ_v) = ex(ρ)_● ● ex(ρ_v)_● ● (ag(ρ) ○ ag(ρ_v)) = ex(ρ)_● ● (ex(ρ_v)_● ○ ag(ρ) ○ ag(ρ_v)) = ex(ρ)_● ● (ex(ρ_v)_○ ○ ag(ρ) ○ ag(ρ_v)) = ex(ρ)_● ● (⦇ρ_v⦈_○ ○ ag(ρ))`.  The last equality, with `ℓ` outside the domain, completes the proof.
 
 **Lean.** `BoCa.Fig16.ResU.six34`, alias `TR.lemma_6_34`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six34`, on the printed carrier, `[as printed]` — both printed hypotheses, **nothing added**, and the conclusion exactly as printed, with `ρ_v ● ℓ ↦ own(v)` named by its graph (G4). `@ρ_v ⊐ ᾱ` is `CellU.immOf`'s own typing argument `ρ_v : Res_{⊔ᾱ}`, which is where Fig. 16 puts it and where the printed proof leaves it — it is never used again. The printed proof is carried step for step: 6.11 (`Fig16.ResU.Hash.split`) with 6.2 at `#` (`Fig16.ResU.hash_symm`); *"unfolding these, `ℓ ∉ dom(⦇ρ ● ρ_v⦈)`"* as `Fig16.ResU.walks_none_of_hash_own`, the four walks silenced by the `own` cell that `●` admits no second cell beside; then the display's four lines — 6.18 and 6.20 (`Fig16.ResU.Flat.split`), 6.3 (`Fig16.ResU.CompS.assoc`) with 6.31 (`Fig16.ResU.compR_iff_compS`), 6.32 (`Fig16.ExS.toExR`), and Definition 6.1 naming the last line's `⦇ρ_v⦈_○` (`Fig16.ResU.FlatR`). The closing sentence is `Fig16.AgW.single_imm` inserting the one cell where the last line has room for it, and 6.41 (`Fig16.ResU.compatS_single_own`) for the `▸◂`.
 -/
-/-- **`[TR]` Lemma 6.34** (p. 11): if `ρ # ρ_v ● ℓ ↦ own(v)` and `@ρ_v ⊐ ᾱ`
-then `ρ # ℓ ↦ imm(ᾱ, v, ρ_v)`.
-
-Step for step.  *"By lemma 6.11, we have `ρ # ρ_v` and `ρ # ℓ ↦ own(v)`"* is
-`ResU.Hash.split` at the printed composition, with `ResU.hash_symm` (6.2 at `#`)
-putting the operands in the print's order.  *"Unfolding these, we have
-`ℓ ∉ dom(⦇ρ ● ρ_v⦈)`"* is `ResU.walks_none_of_hash_own`, at the four walks the
-display names.
-
-The display then runs: line 2 is Lemmas 6.18 and 6.20 (`ResU.Flat.split`);
-line 3 regroups by Lemma 6.3 (`ResU.CompS.assoc`) and reads the freed `●` at `○`
-by Lemma 6.31 (`ResU.compR_iff_compS`); line 4 is Lemma 6.32 (`ExS.toExR`),
-which is what lets `ex(ρ_v)_●` be the `ex(ρ_v)_○` that `ag`'s `imm` family calls
-for; and line 5 regroups the three `○` factors as `⦇ρ_v⦈_○ ○ ag(ρ)`, which is
-Definition 6.1 and is named here as `ResU.FlatR ρ_v P`.
-
-*"The last equality, with the fact that `ℓ` is not in the domain, is sufficient
-to complete the proof."*  `ex(ρ ● ℓ ↦ imm(ᾱ, v, ρ_v))_●` is `ex(ρ)_●` (6.18 and
-`ExW.empty_of_all_imm`) and `ag(ρ ● ℓ ↦ imm(ᾱ, v, ρ_v))` is
-`ag(ρ) ○ (ℓ ↦ imm(ᾱ, v, ρ_v) ○ ⦇ρ_v⦈_○)` (6.20 and `AgW.single_imm`), so the
-flattening of the conclusion's composite is the last line with the one cell
-inserted at `ℓ` — which composes because `ℓ` is in the domain of none of the
-factors.  `ρ ▸◂ ℓ ↦ imm(ᾱ, v, ρ_v)` is the same absence at `ρ` itself, by
-Lemma 6.41 (`ResU.compatS_single_own`) on the `#` that 6.11 returned.
-
-`@ρ_v ⊐ ᾱ` is `hs`, `CellU.immOf`'s own typing argument; the printed proof does
-not use it again.
-`[as printed]` (the printed `●`s appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.34 (p. 11).  `[as printed]` (G4) -/
 theorem ResU.six34 {l : Loc} {s : LSet} {v : Val} {ρ ρv W : ResU Loc Val}
     {hs : ρv.InStratum s.join}
     (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W)
@@ -1409,9 +1117,7 @@ alias TR.lemma_6_34 := BoCa.Fig16.ResU.six34
 
 **Printed proof, transcribed.** Unfolding `⦇−⦈` and applying Lemmas 6.20 and 6.18, `⦇ρ ● ρ′⦈ = ex(ρ ● ρ′)_● ● ag(ρ ● ρ′) = ex(ρ)_● ● ex(ρ′)_● ● (ag(ρ) ○ ag(ρ′))`, all defined.  Then: `ex(ρ)_● ● ex(ρ′)_● ▸◂ ag(ρ)` by Lemmas 6.30 and 6.36; hence `ex(ρ)_● ▸◂ ag(ρ)`, so `⦇ρ⦈` is defined; `ex(ρ)_● ● ex(ρ′)_● ▸◂ ag(ρ′)` by Lemmas 6.30 and 6.36; hence `ex(ρ′)_● ▸◂ ag(ρ′)`, so `⦇ρ′⦈` is defined.
 
-**Lean.** `BoCa.Fig16.ResU.Valid.split`, alias `TR.lemma_6_35`, tag `[as printed]` — the declaration of Lemma 6.10, in `Paper/S6_1_StandardLemmas/Lemmas.lean`: the same statement, printed twice.
-
-**Note.** `Fig16.ResU.Valid.split` — the **same declaration as 6.10**, 6.10 (p. 7) and 6.35 (p. 12) being the same statement printed twice: p. 5 defines `✓ρ ≜ ⦇ρ⦈ defined`, so "if `✓(ρ₁ ● ρ₂)` then `✓ρ₁` and `✓ρ₂`" and "if `⦇ρ ● ρ′⦈` is defined then `⦇ρ⦈` and `⦇ρ′⦈` are defined" differ only in whether the abbreviation is spelled out. The proof written is this one, the longer printed one: `Fig16.ResU.Flat.split_factors` is its display and its four composability constraints, taking 6.18 and 6.20 through `Fig16.ResU.Flat.split`, then 6.30 and 6.36 (`Fig16.ExS.immFree`) for the first and third bullets and `Fig16.ResU.CompatS.of_compS_left_immFree` for the second and fourth, and 6.9 to turn `▸◂` back into definedness.
+**Lean.** `BoCa.Fig16.ResU.Valid.split`, alias `TR.lemma_6_35`, tag `[as printed]` — the declaration of Lemma 6.10, the same statement printed twice.
 -/
 alias TR.lemma_6_35 := BoCa.Fig16.ResU.Valid.split
 
@@ -1422,9 +1128,7 @@ alias TR.lemma_6_35 := BoCa.Fig16.ResU.Valid.split
 
 **Printed proof, transcribed.** By induction on `ρ` and unfolding `ex`, noting that at each level only `mut` and `own` are kept.
 
-**Lean.** `BoCa.Fig16.ExW.immFree`, alias `TR.lemma_6_36`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`, ahead of this subsection: the Lean of Lemmas 6.7, 6.8, 6.10, 6.11 and 6.15 there needs it.
-
-**Note.** `Fig16.ExW.immFree`, on the printed carrier, by induction on the walk. Generic in `C` under `hC`, and the discharge is **performed**, not merely available: `Fig16.ExS.immFree` at `●` (via `Fig16.CellU.compS_ne_imm`) and `Fig16.ExR.immFree` at `○` (via `Fig16.CellU.compR_ne_imm`), which are the two values the print's schematic `◐` takes; `Fig16.ResU.restrict_imm_empty_iff` is `ρ
+**Lean.** `BoCa.Fig16.ExW.immFree`, alias `TR.lemma_6_36`, tag `[as printed]` — declared in `Paper/S6_1_StandardLemmas/Lemmas.lean`.
 -/
 alias TR.lemma_6_36 := BoCa.Fig16.ExW.immFree
 
@@ -1439,23 +1143,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Unfolding `▸◂`, at a location of `dom(ρ) ∩ dom(ρ₁)` both cells are `imm` over one witness and one value, and similarly for `ρ₂`.  By the definition of `○`, at a location of `dom(ρ) ∩ dom(ρ₁) ∩ dom(ρ₂)` the composite `(ρ₁ ○ ρ₂)(ℓ)` is `imm` over that witness and value, which suffices.
 
 **Lean.** `BoCa.Fig16.ResU.six37`, alias `TR.lemma_6_37`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six37`, on the printed carrier, `[as printed]`, with `ρ₁ ○ ρ₂` named by its graph (G4) whose own first conjunct is the printed `ρ₁ ▷◁ ρ₂`. It is the **same statement as 6.12** (p. 7), printed twice in two notations: 6.12's "`ρ₁ ● ρ₂` … defined" is `▸◂` by Lemma 6.9 (`Fig16.ResU.compS_defined_iff`) and its "`ρ₂ ○ ρ₃` … defined" is `▷◁` by that lemma's `○` twin (`Fig16.ResU.compR_defined_iff`), so the rows agree hypothesis for hypothesis.  6.37's own printed proof — the overlap is `imm` on both sides over one value and one witness, and `○` returns a cell over that same value and witness — is `Fig16.CellU.CompatS.of_compR_left`, which is what `Fig16.ResU.compatS_of_compR` already carries for 6.12. [TR]'s proofs of 6.38 (p. 13), 6.39 (p. 15) and 6.55 (p. 18) cite it; 6.35's does not, it closes on 6.20/6.18/6.30/6.36
 -/
-/-- **`[TR]` Lemma 6.37** (p. 13): if `ρ ▸◂ ρ₁` and `ρ ▸◂ ρ₂` and `ρ₁ ▷◁ ρ₂`
-then `ρ ▸◂ ρ₁ ○ ρ₂`.
-
-`[TR]`'s proof: *"Unfolding the definition of `▸◂`, we have for any
-`ℓ ∈ dom(ρ) ∩ dom(ρ₁)`, `ρ(ℓ) = imm(_, ρ, v)` and `ρ₁(ℓ) = imm(_, ρ, v)`, and
-similarly for `ρ₂`.  By the definition of `○`, if
-`ℓ′ ∈ dom(ρ) ∩ dom(ρ₁) ∩ dom(ρ₂)`, then `(ρ₁ ○ ρ₂)(ℓ) = imm(_, ρ, v)`, which is
-sufficient to complete the proof."*  That is `CellU.CompatS.of_compR_left` at
-the overlap and the two hypotheses off it, which is exactly the proof
-`ResU.compatS_of_compR` carries for 6.12.
-
-`ρ₁ ○ ρ₂` is named by its graph (G4), and `ResU.CompR`'s own first conjunct is
-the printed `ρ₁ ▷◁ ρ₂`, so the three printed hypotheses are all present.
-`[as printed]` (the printed `ρ₁ ○ ρ₂` appears as its graph — G4) -/
+/-- `[TR]` Lemma 6.37 (p. 12).  `[as printed]` (G4) -/
 theorem ResU.six37 {ρ ρ₁ ρ₂ r : ResU Loc Val} (h₁ : ResU.CompatS ρ ρ₁)
     (h₂ : ResU.CompatS ρ ρ₂) (h₁₂ : ResU.CompR ρ₁ ρ₂ r) : ResU.CompatS ρ r :=
   ResU.compatS_of_compR h₁ h₂ h₁₂
@@ -1467,23 +1156,9 @@ alias TR.lemma_6_37 := BoCa.Fig16.ResU.six37
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-!
-### Row 5.67's theorem `BoCa.Fig16.AgW.nonimm_beneath_imm`, ahead of its file
-
-A remark on a printed definition of `[TR]` §5; its proof uses results of §6, and the Lean of Lemmas 6.38, 6.48 and 6.59 in this file needs it, so it is declared here.  The row is recorded in `Paper/S5_Model/Remarks.lean`.
--/
-/-- **Every non-`imm` cell of `ag(ρ)` sits beneath an `imm` cell of `ag(ρ)`.**
-`ag(ρ) = (ρ|imm ○ ⨀ ag(ρᵥ)) ○ ⨀ (ex(ρ′)_○ ○ ag(ρ′))`; the first group carries no
-`own` or `mut` cell of its own and the second carries none either, by the same
-argument one level down — so such a cell enters only through `ex(−)_○` inside
-the `imm` family,
-and the `imm` cell it entered beneath is carried to the top at its own location
-by the same chain of `ag`s.
-
-This is why `[TR]` 6.59's closing step lands on `↭`'s **first** clause, which
-pins an `imm` cell together with its witness, rather than on the second, which
-leaves a `mut` cell's value and witness free.
-`[about ours: where `ag(ρ)`'s `mut` cells come from]` -/
+/-! ### Row 5.67's theorem `BoCa.Fig16.AgW.nonimm_beneath_imm`, declared here for Lemmas 6.38, 6.48 and 6.59; its row is in `Paper/S5_Model/Remarks.lean`. -/
+/-- Every non-`imm` cell of `ag(ρ)` sits beneath an `imm` cell of `ag(ρ)`.  `[about
+ours: where `ag(ρ)`'s `mut` cells come from]` -/
 theorem AgW.nonimm_beneath_imm {ρ σ : ResU Loc Val} (h : AgW ρ σ) :
     ∀ (n : Loc) (φ : CellU Loc Val), σ.get n = some φ → φ.kind ≠ Kind.imm →
       ∃ (m : Loc) (s : LSet) (u : Val) (χ : ResU Loc Val)
@@ -1582,12 +1257,8 @@ theorem AgW.nonimm_beneath_imm {ρ σ : ResU Loc Val} (h : AgW ρ σ) :
           hwξ.trans wa, heξ.trans era, Or.inl ⟨m, hpm⟩⟩
     · exact ihw q hq'
 
-/-! `[about ours]` — what the Lean of Lemma 6.38 needs; the paper prints nothing here. -/
-/-- **`[TR]` Lemma 6.38's first two sentences.**  6.29 with H3, H1 and H6 gives
-H7, `ResU.six38_no_borrow_in_frame` moves the deletion past `ρ′`, and what the
-two together deliver is `ρ′ ● ρ⁺/ℓ # ℓ ↦ imm({α}, v, ρ_v)` — the `#` the rest of
-the printed proof works from.
-`[about ours: `[TR]` Lemma 6.38's proof through its second sentence]` -/
+/-! `[about ours]` — for Lemma 6.38. -/
+/-- `[about ours: `[TR]` Lemma 6.38's proof through its second sentence]` -/
 theorem ResU.six38_steps_one_two {α : Life} {l : BoCa.Loc} {v : BoCa.Val}
     {ρ ρv ρ' ρp W ρρi ρ'ρp : ResU BoCa.Loc BoCa.Val}
     {hv : ρv.InStratum (LSet.singleton α).join}
@@ -1627,9 +1298,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- The reduction, so that the residual above is measured and not asserted:
-`[TR]` Lemma 6.38 follows from it by its own first two sentences.
-`[about ours: `[TR]` Lemma 6.38 reduced to `ResU.SixThirtyEightResidual`]` -/
+/-- `[about ours: `[TR]` Lemma 6.38 reduced to `ResU.SixThirtyEightResidual`]` -/
 theorem ResU.sixThirtyEight_of_residual
     (h : ResU.SixThirtyEightResidual) : ResU.SixThirtyEight := by
   intro α l v ρ ρv ρ' ρp W ρρi ρ'ρp hv hW h1 h2 h3 h4 h5 hρi hpp h6
@@ -1641,26 +1310,11 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **`[TR]` 6.38's step-10 sentence, at the reading its next clause fixes.**
-
-*"By the definition of `ag`, `ℓ′ ∈ dom(ρ′|imm)`, `ℓ′ ∈ dom(ρ⁺/ℓ|imm)`, or
-there are some `ℓ″`, `ρ″_v` such that `(ag(ρ′) ○ ag(ρ⁺/ℓ))(ℓ″) = imm(_,_,ρ″_v)`
-and `ℓ′ ∈ dom(⦇ρ″_v⦈_○)`."*
-
-The first cases are read at `⦇ρ⦈|imm`, not at `ρ|imm`: the clause the sentence
-continues with is *"by H6, `ℓ′ ∈ ⦇ρ⦈|imm`"*, and H6 is an update, which
-compares flattenings.  At that reading the split is exhaustive and holds at one
-walk, which the `ρ|imm` reading does not.
-
-An `imm` cell of the walk sits in `⦇ρ⦈` unchanged, `ex(ρ)_●` being `imm`-free
-(6.36), which is the first case.  A non-`imm` one is in the walk only because
-some `imm` cell's witness carried it there — `ex(ρ″)_○ ○ ag(ρ″)` is the only
-factor of p. 5's `ag` that is not `imm`-valued — and that is
-`AgW.nonimm_beneath_imm`, whose `ex(χ)_○ ○ ag(χ)` is Definition 6.1's
-`⦇χ⦈_○` once commuted.  The sentence composes two walks; `dom` of a composite
-is contained in the union of the operands' domains, so the two-operand form is
-this one twice.
-`[about ours: `[TR]` Lemma 6.38's step-10 sentence, at one walk]` -/
+/-- `[TR]` 6.38's step-10 sentence, *"By the definition of `ag`, `ℓ′ ∈ dom(ρ′|imm)`, `ℓ′
+∈ dom(ρ⁺/ℓ|imm)`, or there are some `ℓ″`, `ρ″_v` such that `(ag(ρ′) ○ ag(ρ⁺/ℓ))(ℓ″)
+= imm(_,_,ρ″_v)` and `ℓ′ ∈ dom(⦇ρ″_v⦈_○)`"*, at one walk, its first cases read at
+`⦇ρ⦈|imm` as the next clause *"by H6, `ℓ′ ∈ ⦇ρ⦈|imm`"* requires. `[about ours:
+`[TR]` Lemma 6.38's step-10 sentence, at one walk]` -/
 theorem AgW.dom_split {ρ A σ : ResU BoCa.Loc BoCa.Val}
     (h : AgW ρ A) (hf : ResU.Flat ρ σ)
     {m : BoCa.Loc} {ψ : CellU BoCa.Loc BoCa.Val} (hg : A.get m = some ψ) :
@@ -1679,34 +1333,7 @@ theorem AgW.dom_split {ρ A σ : ResU BoCa.Loc BoCa.Val}
       exact ⟨av, ev, hag, hex, ResU.CompR.comm hp⟩
     · rw [hpm]; rfl
 
-/-- **`[TR]` Lemma 6.38 from its third sentence on** — `ResU.SixThirtyEightResidual`
-discharged.
-
-Step for step.  The first display is 6.18 and 6.20 through `ResU.Flat.split` at
-`ρ′ ● ρ⁺/ℓ ● ℓ ↦ imm({α}, v, ρ_v)`, with `ExW.empty_of_all_imm` killing the
-borrow's exclusive walk and `AgW.single_imm_inv` opening its aliasable one into
-`ℓ ↦ imm({α}, v, ρ_v) ○ ex(ρ_v)_○ ○ ag(ρ_v)`; 6.35 (`ResU.Valid.split`) with H1
-makes `⦇ρ_v⦈` defined and 6.33 (`ResU.six33`) turns `⦇ρ_v⦈_○` into
-`ex(ρ_v)_● ● ag(ρ_v)`, which 6.31 (`ResU.CompS.toCompR`) puts back at `○`.  The
-second display is the same at `ρ_v ● ℓ ↦ own(v)`, where `ex` keeps the `own`
-cell and `ag(ℓ ↦ own(v)) = ∅`.
-
-*"Applying lemmas 6.30 and 6.36 multiple times"*: 6.3 at `○`
-(`ResU.CompR.assoc`) regroups the chain as
-`(ag(ρ′) ○ ag(ρ⁺/ℓ) ○ ag(ρ_v)) ○ (ℓ ↦ imm({α}, v, ρ_v) ○ ex(ρ_v)_●)`, and 6.30
-(`ResU.CompatS.of_compR_left`) with 6.36 (`ExS.immFree`) peels the three printed
-bullets off it, the third giving `▸◂ ℓ ↦ own(v)` because an `imm`-free resource
-`▸◂` a cell is disjoint from it.
-
-*"By lemma 6.37 with `⦇ρ_v ● ℓ ↦ own(v)⦈` defined from lemma 6.35 with H1"* is
-`ResU.six37` on `ex(W)_● ▸◂ ag(ρ_v)` — the second display's own outer `●` — and
-the closing paragraph; and *"by lemma 6.36, `(ex(ρ_v)_● ● ℓ ↦ own(v))|imm = ∅`"*
-is what turns the remaining `▸◂` into the disjointness the contradiction refutes.
-
-H5 (`ρ⁺|own = ∅`) is unspent, as it is in the printed proof, and the printed
-`ρ′ ● ρ⁺/ℓ # ℓ ↦ imm({α}, v, ρ_v)` is unspent too: `ResU.CompS G ρᵢ (ρ′ ● ρ⁺)`
-and `✓(ρ′ ● ρ⁺)` from H6 already carry the first display.
-`[about ours: `[TR]` Lemma 6.38's proof from "Then in order to show G1" on]` -/
+/-- `[about ours: `[TR]` Lemma 6.38's proof from "Then in order to show G1" on]` -/
 theorem ResU.sixThirtyEightResidual : ResU.SixThirtyEightResidual := by
   classical
   intro α l v ρ ρv ρ' ρp W ρρi ρ'ρp G hv hW h1 h3 h4 h5 hρi hpp h6 hG hGi hGc
@@ -1976,14 +1603,8 @@ namespace BoCa.Fig16
 **Printed proof, transcribed.** By Lemma 6.29 with H3, H1 and H6, (H7) `ρ′ ● ρ⁺ = (ρ′ ● ρ⁺)/ℓ ● ℓ ↦ imm({α}, v, ρ_v)`; by H4 and H7, `ρ′ ● ρ⁺ = ρ′ ● ρ⁺/ℓ ● ℓ ↦ imm({α}, v, ρ_v)`.  For G1 it suffices that `⦇ρ′ ● ρ⁺/ℓ ● ρ_v ● ℓ ↦ own(v)⦈` is defined, which by Lemmas 6.18 and 6.20 is Kleene-equal to `ex(ρ′)_● ● ex(ρ⁺/ℓ)_● ● ex(ρ_v)_● ● ℓ ↦ own(v) ● (ag(ρ′) ○ ag(ρ⁺/ℓ) ○ ag(ρ_v))`.  The same reasoning with H2 gives `⦇ρ′ ● ρ⁺/ℓ ● ℓ ↦ imm({α}, v, ρ_v)⦈ = ex(ρ′)_● ● ex(ρ⁺/ℓ)_● ● (ag(ρ′) ○ ag(ρ⁺/ℓ) ○ ℓ ↦ imm({α}, v, ρ_v) ○ ⦇ρ_v⦈_○)`, defined; Lemma 6.35 with H1 makes `⦇ρ_v⦈` defined, Lemma 6.33 gives `⦇ρ_v⦈ = ⦇ρ_v⦈_○`, and Lemma 6.31 rewrites the last factor as `… ○ ex(ρ_v)_● ○ ag(ρ_v)`.  Lemmas 6.30 and 6.36, applied repeatedly, make `ex(ρ′)_● ● ex(ρ⁺/ℓ)_●` compatible with `ag(ρ′) ○ ag(ρ⁺/ℓ) ○ ag(ρ_v)`, with `ex(ρ_v)_●`, and with `ℓ ↦ imm({α}, v, ρ_v)`, hence with `ℓ ↦ own(v)`.  So it suffices that `ex(ρ_v)_● ● ℓ ↦ own(v) ▸◂ (ag(ρ′) ○ ag(ρ⁺/ℓ) ○ ag(ρ_v))`; by Lemma 6.37, with `⦇ρ_v ● ℓ ↦ own(v)⦈` defined by Lemma 6.35 and H1, that `ex(ρ_v)_● ● ℓ ↦ own(v) ▸◂ (ag(ρ′) ○ ag(ρ⁺/ℓ))`; and by Lemma 6.36, whose `imm` part is empty, that the two domains are disjoint.  Suppose `ℓ′` is in both.  By the definition of `ag`, `ℓ′ ∈ dom(ρ′∣imm)`, `ℓ′ ∈ dom(ρ⁺/ℓ∣imm)`, or `ℓ′ ∈ dom(⦇ρ″_v⦈_○)` for an `imm(_, _, ρ″_v)` at some `ℓ″` of `ag(ρ′) ○ ag(ρ⁺/ℓ)`.  In the first two cases H6 gives `ℓ′ ∈ ⦇ρ⦈∣imm`, contradicting H1; in the third, by the same reasoning about update `ℓ″ ∈ dom(⦇ρ⦈∣imm)`, so `ℓ′ ∈ dom(ag(ρ))`, again contradicting H1.
 
 **Lean.** `BoCa.Fig16.ResU.six38`, alias `TR.lemma_6_38`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six38`, on the printed carrier, `[as printed]` — the six printed hypotheses in the printed order and the printed conclusion (`Fig16.ResU.SixThirtyEight`), with the `●`s named by their graphs (G4); stated at `BoCa.Loc`/`BoCa.Val`, as 6.29 is. **The printed proof, step for step.**  Sentences 1–2 are `Fig16.ResU.six38_steps_one_two`: 6.29 (`Fig16.ResU.six29`) with H3, H1 and H6 gives H7, and `Fig16.ResU.six38_no_borrow_in_frame` is *"by H4 and H7"* — `@ρ′ ⊐ α` puts `ℓ` outside `ρ′`, the cell H7 leaves there being `imm({α},−,−)`, whose `@` is `⊓{α} = α`. They deliver `ρ′ ● ρ⁺/ℓ # ℓ ↦ imm({α}, v, ρ_v)` **and** the composite `ρ′ ● ρ⁺ = ρ′ ● ρ⁺/ℓ ● ℓ ↦ imm(…)` the second sentence names, which is what lets the closing paragraph appeal to H6. From the third sentence on is `Fig16.ResU.SixThirtyEightResidual`, reduced by `Fig16.ResU.sixThirtyEight_of_residual` and discharged by `Fig16.ResU.sixThirtyEightResidual`: the two displays are 6.18 and 6.20 through `Fig16.ResU.Flat.split` at each composite, with `Fig16.ExW.empty_of_all_imm` and `Fig16.AgW.single_imm_inv` evaluating the borrow's two walks, 6.35 (`Fig16.ResU.Valid.split`) with H1 making `⦇ρ_v⦈` defined and 6.33 (`Fig16.ResU.six33`) with 6.31 (`Fig16.ResU.CompS.toCompR`) putting `⦇ρ_v⦈_○` back at `○`; the three bullets are 6.30 (`Fig16.ResU.CompatS.of_compR_left`) with 6.36 (`Fig16.ExS.immFree`) after 6.3 at `○` (`Fig16.ResU.CompR.assoc`) regroups the chain so that `ag(ρ′) ○ ag(ρ⁺/ℓ) ○ ag(ρ_v)` is one factor; and the reduction is 6.37 (`Fig16.ResU.six37`) on `ex(W)_● ▸◂ ag(ρ_v)` and 6.36 again. **The closing paragraph** reads its split at the flattening — `Fig16.AgW.dom_split`, the step-10 sentence at the reading its next clause *"by H6, `ℓ′ ∈ ⦇ρ⦈
 -/
-/-- **`[TR]` Lemma 6.38** (p. 12), proved: `ResU.sixThirtyEight_of_residual`
-is the printed proof's first two sentences and
-`ResU.sixThirtyEightResidual` is the rest of it.
-`[as printed]` (the printed `●`s appear as their graphs — G4; the conclusion's
-`ρ′ ● ρ⁺/ℓ` is asserted to exist rather than presupposed) -/
+/-- `[TR]` Lemma 6.38 (p. 12).  `[as printed]` (G4) -/
 theorem ResU.six38 : ResU.SixThirtyEight :=
   ResU.sixThirtyEight_of_residual ResU.sixThirtyEightResidual
 
@@ -1995,24 +1616,8 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 variable {Loc Val : Type}
 
-/-! `[about ours]` — what the Lean of Lemma 6.39 needs; the paper prints nothing here. -/
-/-- **The `imm` normal form, over the same remainder.**  `[TR]` 6.39's second,
-third and fourth displays: the walks of `ρ ● ℓ↦imm(α, v, ρ_v)` are cut by 6.18
-and 6.20, `ag` at the singleton is `AgW.single_imm_inv`, 6.33
-(`ResU.six33`) turns the `⦇ρ_v⦈_○` it returns into `⦇ρ_v⦈ = ex(ρ_v)_● ● ag(ρ_v)`
-so that the exclusive half can be moved out to the `●`, and 6.31
-(`ResU.compR_iff_compS`) with 6.37 (`ResU.six37`) and 6.3 do the moving:
-
-```
-⦇ρ ● ℓ↦imm(α,v,ρ_v)⦈ = ex(ρ)_● ● (ex(ρ_v)_● ○ (ℓ↦imm(α,v,ρ_v) ○ (ag(ρ) ○ ag(ρ_v))))
-                     = ex(ρ)_● ● ex(ρ_v)_● ● (ℓ↦imm(α,v,ρ_v) ○ (ag(ρ) ○ ag(ρ_v)))
-                     = ℓ↦imm(α,v,ρ_v) ● ex(ρ)_● ● ex(ρ_v)_● ● (ag(ρ) ○ ag(ρ_v))
-```
-
-The last line is the **silencing** step: `ℓ ∉ dom(K)` — carried in as `hnone`,
-where `ResU.flat_own_normal` produces it — gives
-`ℓ ∉ dom(ag(ρ) ○ ag(ρ_v))` and hence `ℓ↦imm(α,v,ρ_v) ▸◂ ag(ρ) ○ ag(ρ_v)`.
-`[about ours: `[TR]` 6.39's second through fourth displays, as a graph — G4]` -/
+/-! `[about ours]` — for Lemma 6.39. -/
+/-- `[about ours: `[TR]` 6.39's second through fourth displays, as a graph — G4]` -/
 theorem ResU.flat_imm_normal {l : Loc} {s : LSet} {v : Val}
     {ρ ρv e₁ e₂ EX a₁ a₂ AG K iw σ' : ResU Loc Val} {hstr : ρv.InStratum s.join}
     (hiw : ResU.CompS ρ (ResU.single l (CellU.immOf s v ρv hstr)) iw)
@@ -2094,26 +1699,9 @@ theorem ResU.flat_imm_normal {l : Loc} {s : LSet} {v : Val}
 
 **Lean.** `BoCa.Fig16.ResU.six39`, alias `TR.lemma_6_39`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.six39`, on the printed carrier, `[as printed]`, with the printed `●`s named by their graphs (G4). The printed proof is transcribed in full: `Fig16.ResU.flat_own_normal` is its first display (6.18 and 6.20 cut the walks, `Fig16.ExW.single_own` and `Fig16.AgW.single_own` evaluate them at `ℓ ↦ own(v)`, 6.3 and 6.2 move the cell to the front) and `Fig16.ResU.flat_imm_normal` is its second through fourth (`Fig16.AgW.single_imm_inv` for `ag` at the singleton, 6.33 for `⦇ρ_v⦈_○ = ⦇ρ_v⦈`, then 6.31, 6.37 and 6.3 to move `ex(ρ_v)_●` out to the `●`), both over **one** remainder `K = ex(ρ)_● ● ex(ρ_v)_● ● (ag(ρ) ○ ag(ρ_v))`. The silencing step *"therefore `ℓ ∉ dom(ag(ρ) ○ ag(ρ_v))`"* is 6.41 (`Fig16.ResU.compatS_single_own`); the closing paragraph is `Fig16.ResU.compS_single_get_ne` and `Fig16.ResU.compS_single_get_self` off the two normal forms, and `↭` transfers through `Fig16.ResU.upd_iff_sim`. `↭` is `Fig16.ResU.UpdV`: the print reads H3 as carrying the definedness of `ρ_if` and `ρ′_if`, and the conclusion's comes from H1 and H2
+**Note.** `↭` is the guarded `UpdV`: the print reads H3 as carrying the definedness of `ρ_if` and `ρ′_if`.
 -/
-/-- **`[TR]` Lemma 6.39** (p. 13): if `ρ # ℓ↦own(v) ● ρ_v` and
-`ρ′ # ℓ↦own(v) ● ρ_v` and `ρ ● ℓ↦imm(α, v, ρ_v) ↭ ρ′ ● ℓ↦imm(α, v, ρ_v)`, then
-`ρ ● ℓ↦own(v) ● ρ_v ↭ ρ′ ● ℓ↦own(v) ● ρ_v`.
-
-The print's closing paragraph — *"now the only difference between `ρ_of` and
-`ρ_if`, as well as `ρ′_of` and `ρ′_if`, is `ℓ↦own(v)` vs `ℓ↦imm(α, v, ρ_v)`, and
-we additionally know `ℓ ∉ dom(ag(ρ) ○ ag(ρ_v))`"* — is
-`ResU.compS_single_get_ne` and `ResU.compS_single_get_self` read off the two
-normal forms over the one remainder `K`.  The two printed equations
-`ρ_of|imm,mut = ρ_if|imm,mut/ℓ` are then the `own` cell's absence from
-`−|imm,mut`, and `↭` transfers because `ResU.upd_iff_sim` puts both sides in the
-printed `dom + ∼` form.
-
-`↭` is `ResU.UpdV`, not `ResU.Upd`: the print reads H3 as carrying the
-definedness of `ρ_if` and `ρ′_if` (*"By H3, we also have … are defined"*), which
-is exactly `UpdV`'s two extra conjuncts, and the conclusion's definedness comes
-from H1 and H2.
-`[as printed]` (the printed `●`s appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.39 (p. 13).  `[as printed]` (G4) -/
 theorem ResU.six39 {l : Loc} {s : LSet} {v : Val}
     {ρ ρ' ρv ov iw iw' : ResU Loc Val} {hstr : ρv.InStratum s.join}
     (hov : ResU.CompS (ResU.single l (CellU.ownOf v)) ρv ov)
@@ -2193,11 +1781,7 @@ alias TR.lemma_6_39 := BoCa.Fig16.ResU.six39
 
 **Printed proof, transcribed.** By the definition of `#`, `ℓ ∉ ⦇ρ⦈`, so the condition follows immediately.
 
-**Untranscribed on the printed carrier.**  This repository carries no declaration for it and no `TR.lemma_6_40`.
-
 **Lean.** None in this repository.
-
-**Note.** No single declaration states 6.40's `#`-iff
 -/
 
 namespace BoCa.Fig16
@@ -2211,12 +1795,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By definition.
 
 **Lean.** `BoCa.Fig16.ResU.compS_single_imm`, alias `TR.lemma_6_43`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.compS_single_imm`, on the printed carrier, at `ℓ ↦ −`. The graph carries definedness and value together, which is the print's equation between partial expressions.
 -/
-/-- **`[TR]` Lemma 6.43** (p. 15):
-`ℓ ↦ imm(ᾱ ∪ β̄, v, ρ′) = ℓ ↦ imm(ᾱ, v, ρ′) ● ℓ ↦ imm(β̄, v, ρ′)`.  As a graph:
-definedness and value together.  `[as printed]` -/
+/-- `[TR]` Lemma 6.43 (p. 15).  `[as printed]` -/
 theorem ResU.compS_single_imm (l : Loc) (s t : LSet) (v : Val) (ρ' : ResU Loc Val)
     (h : ρ'.InStratum s.join) (h' : ρ'.InStratum t.join)
     (h'' : ρ'.InStratum (s ∪ t).join) :
@@ -2252,13 +1832,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By definition.
 
 **Lean.** `BoCa.Fig16.ResU.compatS_single_imm_inv`, alias `TR.lemma_6_44`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.compatS_single_imm_inv`, on the printed carrier.
 -/
-/-- **`[TR]` Lemma 6.44** (p. 16): if
-`ℓ ↦ imm(ᾱ, v₁, ρ′₁) ▶◀ ℓ ↦ imm(β̄, v₂, ρ′₂)` then `v₁ = v₂` and `ρ′₁ = ρ′₂`.
-The witnesses are compared by plain equality in `Res`, which is what the
-stratified constructors buy.  `[as printed]` -/
+/-- `[TR]` Lemma 6.44 (p. 16).  `[as printed]` -/
 theorem ResU.compatS_single_imm_inv {l : Loc} {s t : LSet} {v₁ v₂ : Val}
     {ρ₁ ρ₂ : ResU Loc Val} {h₁ : ρ₁.InStratum s.join} {h₂ : ρ₂.InStratum t.join}
     (h : ResU.CompatS (ResU.single l (CellU.immOf s v₁ ρ₁ h₁))
@@ -2285,16 +1860,9 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.atLife_comp_sqsupset`, alias `TR.lemma_6_45`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.atLife_comp_sqsupset`, on the printed carrier, as one iff. `@` is the **graph**, so the three values are hypotheses rather than applications of a function, which is what keeps the statement free of `Classical.choice`. (The print drops the `@` on `ρ₂` at 600 dpi;
+**Note.** The print drops the `@` on `ρ₂` (600 dpi); it is read.
 -/
-/-- **`[TR]` Lemma 6.45** (p. 16): `@(ρ₁ ● ρ₂) ⊐ α` if and only if `@ρ₁ ⊐ α`
-and `@ρ₂ ⊐ α`.  `@` is the graph, so the three values are hypotheses rather
-than applications of a function — which is what keeps the statement free of
-`Classical.choice`.
-
-The print writes the second conjunct `ρ₂ ⊐ α`, dropping the `@` (600 dpi).
-`⊐` relates lifetimes, so the printed form does not type; its own proof treats
-the two operands symmetrically and the `@` is read.  `[as printed]` -/
+/-- `[TR]` Lemma 6.45 (p. 16).  `[as printed]` -/
 theorem ResU.atLife_comp_sqsupset {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {a a₁ a₂ α : Life} (ha : ρ.AtLife a) (ha₁ : ρ₁.AtLife a₁) (ha₂ : ρ₂.AtLife a₂) :
     a ⊐ α ↔ (a₁ ⊐ α ∧ a₂ ⊐ α) := by
@@ -2356,14 +1924,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 **Printed proof, transcribed.** By unfolding `#` and Lemma 6.3.
 
 **Lean.** `BoCa.Fig16.BoLo.hash_shift`, alias `TR.lemma_6_46`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.hash_shift`, on the printed carrier — the printed "if and only if", both composites named by their graphs (G4), and the print's own proof ("by unfolding `#` and lemma 6.3") is `Fig16.ResU.CompS.assoc` and nothing else.
 -/
-/-- **`[TR]` Lemma 6.46** (p. 16): `ρ₁ # ρ₂ ● ρ₃` if and only if
-`ρ₁ ● ρ₂ # ρ₃`.  Both sides name a partial composite, so each is written as its
-graph (G4); the print's own proof is "by unfolding `#` and lemma 6.3", and that
-is `ResU.CompS.assoc`, whose two sides are exactly the two composites.
-`[as printed]` (the printed composites appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.46 (p. 16).  `[as printed]` (G4) -/
 theorem hash_shift (ρ₁ ρ₂ ρ₃ : WRes) :
     (∃ x, ResU.CompS ρ₂ ρ₃ x ∧ ResU.Hash ρ₁ x) ↔
     (∃ y, ResU.CompS ρ₁ ρ₂ y ∧ ResU.Hash y ρ₃) := by
@@ -2391,11 +1953,9 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.Upd.refl`, alias `TR.lemma_6_47`, tag `[as printed]`; `BoCa.Fig16.ResU.UpdV.refl`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.Upd.refl`, on the printed carrier at `[CONF]` Fig. 18b's unguarded `↭` — literally the printed statement, no hypothesis, and the print's proof is "by definition". `Fig16.ResU.UpdV.refl` is the same at `[TR]` p. 5's guarded reading, where `✓ρ` is part of the relation and so is a hypothesis (`docs/adjudications.md` D3).
+**Note.** `Upd.refl` is at `[CONF]` Fig. 18b's unguarded `↭`; `UpdV.refl` at `[TR]` p. 5's guarded one, where `✓ρ` is a hypothesis (`docs/adjudications.md` D3).
 -/
-/-- **`[TR]` Lemma 6.47** — `ρ ↭ ρ` (p. 16, proved there "by definition"), at
-`[CONF]` Fig. 18b's unguarded `↭`: literally the printed statement, with no
-hypothesis.  `[as printed]` -/
+/-- `[TR]` Lemma 6.47 (p. 16) at `[CONF]` Fig. 18b's unguarded `↭`. `[as printed]` -/
 theorem ResU.Upd.refl (ρ : ResU Loc Val) : ρ.Upd ρ :=
   ⟨fun _ _ _ _ _ => Iff.rfl, fun _ _ _ => Iff.rfl⟩
 
@@ -2406,22 +1966,12 @@ alias TR.lemma_6_47 := BoCa.Fig16.ResU.Upd.refl
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-! Lemma 6.47, continued. -/
-/-- **`[TR]` Lemma 6.47** at `[TR]` p. 5's guarded `↭`.  `ResU.Valid ρ` is that
-row's own `✓ρ₁ ∧ ✓ρ₂` at `ρ₁ = ρ₂ = ρ`, not a condition added here.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.47 at `[TR]` p. 5's guarded `↭`.  `[as printed]` -/
 theorem ResU.UpdV.refl {ρ : ResU Loc Val} (h : ρ.Valid) : ρ.UpdV ρ :=
   ⟨ResU.Upd.refl ρ, h, h⟩
 
-/-!
-### Row 5.67's theorem `BoCa.Fig16.ResU.flat_eq_ag_at`, ahead of its file
-
-A remark on a printed definition of `[TR]` §5; its proof uses results of §6, and the Lean of Lemmas 6.48 and 6.59 in this file needs it, so it is declared here.  The row is recorded in `Paper/S5_Model/Remarks.lean`.
--/
-/-- **Where `ag(ρ)` carries a cell that is not `imm`, `⦇ρ⦈` carries that very
-cell.**  `⦇ρ⦈ ≜ ex(ρ)● ● ag(ρ)` and `▶◀` holds only between two `imm` cells, so
-the exclusive walk is silent there and the outer `●` returns the aliasable
-walk's cell unchanged.
+/-! ### Row 5.67's theorem `BoCa.Fig16.ResU.flat_eq_ag_at`, declared here for Lemmas 6.48 and 6.59; its row is in `Paper/S5_Model/Remarks.lean`. -/
+/-- Where `ag(ρ)` carries a cell that is not `imm`, `⦇ρ⦈` carries that very cell. 
 `[about ours: `⦇ρ⦈` at a non-`imm` cell of `ag(ρ)`]` -/
 theorem ResU.flat_eq_ag_at {ρ e a σ : ResU Loc Val} (_he : ExS ρ e)
     (hc : ResU.CompS e a σ) {n : Loc} {ψ : CellU Loc Val} (hg : a.get n = some ψ)
@@ -2437,18 +1987,11 @@ theorem ResU.flat_eq_ag_at {ρ e a σ : ResU Loc Val} (_he : ExS ρ e)
   · rw [hg] at f₂; rw [f, Option.some.inj f₂]
   · rw [hen] at f₁; exact absurd f₁ (by simp)
 
-/-! `[about ours]` — what the Lean of Lemma 6.48 needs; the paper prints nothing here. -/
-/-- **…and therefore the raised subtree comes across whole.**  A cell of
-`ag(ρ₂)` that is not `imm` sits beneath an `imm` cell of `ag(ρ₂)`
-(`AgW.nonimm_beneath_imm`); that ancestor's witness `χ` is pinned by `↭`, so
-`⦇χ⦈_○` is a `○`-factor of `ag(ρ₃)` as well, and it carries at `n` a cell with
-the **same value and the same witness**.
-
-Those are precisely the two components `↭`'s second clause wildcards, which is
-why `[TR]` 6.48's proof runs this step alongside clause (2) rather than instead
-of it.
-`[about ours: `[TR]` 6.48's proof, *"by the definition of `ag`, there must exist
-`ℓ′, ρ′` …, which implies `ag(ρ₃)(ℓ) = mut(β, v, ρᵢ, Q̂)`"*]` -/
+/-! `[about ours]` — for Lemma 6.48. -/
+/-- A non-`imm` cell of `ag(ρ₂)` reaches `ag(ρ₃)` with the same value and witness,
+through the `imm` ancestor `↭` pins.  `[about ours: `[TR]` 6.48's proof, *"by the
+definition of `ag`, there must exist `ℓ′, ρ′` …, which implies `ag(ρ₃)(ℓ) = mut(β, v,
+ρᵢ, Q̂)`"*]` -/
 theorem ResU.upd_ag_nonimm_transfer {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : ResU Loc Val}
     (h : ResU.Upd ρ₂ ρ₃)
     (he₂ : ExS ρ₂ e₂) (ha₂ : AgW ρ₂ a₂) (hc₂ : ResU.CompS e₂ a₂ σ₂)
@@ -2467,23 +2010,9 @@ theorem ResU.upd_ag_nonimm_transfer {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃
   rw [ResU.CompR.functional hp' hp] at hz
   exact ⟨χ, ev, av, p, z, ξ, hev, hav, hp, hz, hpn, hξk, hξw, hξe⟩
 
-/-- **`[TR]` 6.48's ancestor step, at its printed conclusion.**  p. 16 draws
-`ag(ρ₃)(ℓ) = mut(β, v, ρᵢ, Q̂)` — cell **equality**, not `∼`.  Clause (2) of `↭`
-fixes the lifetime `β` and the invariant `Q̂`; the ancestor step supplies the
-value and the witness, which clause (2) wildcards.  Between them the cell is
-pinned.
-
-The witness needs the trace run on **both** sides.  `AgW.nonimm_beneath_imm`
-returns the raised cell with the target's value and witness, and a `○` composite
-takes its witness from an operand that is not `own` — so the trace pins the
-witness unless the raised cell is itself an `own`, and when it is, `own`'s
-witness is `∅` and the *other* side's trace pins it instead.  `↭` is symmetric
-(`ResU.Upd.symm`), which is what lets the same step run both ways.
-
-This is the conclusion `[TR]` 6.48's `mut ○ mut` bullet and its `own` bullet
-both reach, and the one `[TR]` 6.59's closing sentence reaches for.
-`[about ours: `[TR]` 6.48's proof, *"which implies `ag(ρ₃)(ℓ) = mut(β, v, ρᵢ,
-Q̂)`"*]` -/
+/-- `[TR]` 6.48's ancestor step, at its printed conclusion. p. 16 draws `ag(ρ₃)(ℓ) =
+mut(β, v, ρᵢ, Q̂)` — cell equality, not `∼`.  `[about ours: `[TR]` 6.48's proof,
+*"which implies `ag(ρ₃)(ℓ) = mut(β, v, ρᵢ, Q̂)`"*]` -/
 theorem ResU.upd_ag_mut_eq {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : ResU Loc Val}
     (h : ResU.Upd ρ₂ ρ₃)
     (he₂ : ExS ρ₂ e₂) (ha₂ : AgW ρ₂ a₂) (hc₂ : ResU.CompS e₂ a₂ σ₂)
@@ -2595,16 +2124,9 @@ theorem ResU.upd_ag_mut_eq {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : ResU L
   subst hχ
   exact hgt
 
-/-- **`ag(ρ₂)` and `ag(ρ₃)` agree wherever the cell is not `own`.**  This is
-`[TR]` p. 16's two hard bullets as one statement: at an `imm` cell it is clause
-(1), which pins the cell outright; at a `mut` cell it is the ancestor step
-(`ResU.upd_ag_mut_eq`), clause (2) supplying the lifetime and the invariant and
-the ancestor the value and the witness.
-
-`own` is the one tag `↭` says nothing about directly, and `[TR]` p. 16 handles it
-in its own bullet, by noting that an `own` cell contributes nothing to a `○`.
-`[about ours: `[TR]` 6.48's proof at the aliasable walk, its `imm`, `mut ○ mut`
-and `own` bullets together]` -/
+/-- `ag(ρ₂)` and `ag(ρ₃)` agree wherever the cell is not `own`.  `[about ours: `[TR]`
+6.48's proof at the aliasable walk, its `imm`, `mut ○ mut` and `own` bullets
+together]` -/
 theorem ResU.upd_ag_eq_of_ne_own {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : ResU Loc Val}
     (h : ResU.Upd ρ₂ ρ₃)
     (he₂ : ExS ρ₂ e₂) (ha₂ : AgW ρ₂ a₂) (hc₂ : ResU.CompS e₂ a₂ σ₂)
@@ -2632,10 +2154,7 @@ theorem ResU.upd_ag_eq_of_ne_own {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : 
     exact ResU.ag_eq_flat_at_imm he₃ hc₃ hσ₃ (CellU.kind_immOf _ _ _ _)
   · exact ResU.upd_ag_mut_eq h he₂ ha₂ hc₂ he₃ ha₃ hc₃ hg
 
-/-- **…and at an `own` cell the other walk carries an `own` or nothing.**  `↭`
-says nothing about `own` directly; this is `ResU.upd_ag_eq_of_ne_own` read
-backwards, which is `[TR]` p. 16's own move in its `own` bullet — the trace runs
-in both directions because `↭` is symmetric. -/
+/-- At an `own` cell of `ag(ρ₂)`, `ag(ρ₃)` carries an `own` cell or nothing. -/
 theorem ResU.upd_ag_own_or_none {ρ₂ ρ₃ e₂ a₂ σ₂ e₃ a₃ σ₃ : ResU Loc Val}
     (h : ResU.Upd ρ₂ ρ₃)
     (he₂ : ExS ρ₂ e₂) (ha₂ : AgW ρ₂ a₂) (hc₂ : ResU.CompS e₂ a₂ σ₂)
@@ -2663,27 +2182,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 **Lean.** `BoCa.Fig16.BoLo.updV_frame`, alias `TR.lemma_6_48`, tag `[as printed]`.
 
-**Note.** `Fig16.BoLo.updV_frame`, on the printed carrier, at [TR] p. 5's guarded `↭` as printed; the two printed `#`s are what supply its validity conjuncts on both sides. **The proof is p. 16's, step for step.**  6.18 and 6.20 (`Fig16.ResU.Flat.split`) cut both flattenings into `ex(ρ₁)_● ● ex(ρ_i)_● ● (ag(ρ₁) ○ ag(ρ_i))`, 6.36 (`Fig16.ExS.immFree`) with `Fig16.ResU.CompatS.disjoint_of_immFree` makes the three domains disjoint, and that is the print's three cases at a location. The aliasable case is the one that carries the technique: p. 16 accounts for a `mut` cell of the aliasable walk **by the `imm` cell it sits beneath**, carrying the ancestor across by `↭`'s first clause, which pins an `imm` cell together with its witness. That is `Fig16.ResU.upd_ag_eq_of_ne_own` — clause (1) at an `imm` cell, `Fig16.ResU.upd_ag_mut_eq` at a `mut` one, `Fig16.ResU.upd_ag_own_or_none` at an `own` one — in `Support/Model/Ancestors.lean`, upstream of this file so that 6.48 can use it. `docs/adjudications.md` §12.53 records what leaving p. 16's step unbuilt cost at 6.59.
+**Note.** The aliasable case accounts for a `mut` cell of `ag` by the `imm` cell it sits beneath: `Fig16.ResU.upd_ag_eq_of_ne_own`, in `Support/Model/Ancestors.lean` (`docs/adjudications.md` §12.53).
 -/
-/-- **`[TR]` Lemma 6.48** (p. 16): if `ρ₁ # ρ₂` and `ρ₁ # ρ₃` and `ρ₂ ↭ ρ₃` then
-`ρ₁ ● ρ₂ ↭ ρ₁ ● ρ₃`.  `↭` is `[TR]` p. 5's guarded row, and the two printed `#`s
-are what supply its validity conjuncts on both sides.
-
-The proof is the print's.  6.18 and 6.20 cut both flattenings into
-`ex(ρ₁)_● ● ex(ρ_i)_● ● (ag(ρ₁) ○ ag(ρ_i))`, and 6.36 makes the three domains
-disjoint, which gives the print's three cases at a location:
-
-* `ℓ ∈ dom(ex(ρ₁))` — both composites are `ex(ρ₁)(ℓ)`;
-* `ℓ ∈ dom(ag(ρ₁))` — both are `ag(ρ₁)(ℓ) ○ ag(ρ_i)(ℓ)`, and the two aliasable
-  walks agree there: at an `imm` cell by clause (1), at a `mut` cell by the
-  **ancestor step** (`Fig16.ResU.upd_ag_eq_of_ne_own`, off
-  `Fig16.ResU.upd_ag_mut_eq`), and at an `own` cell by
-  `Fig16.ResU.upd_ag_own_or_none`, an `own` contributing nothing to a `○`;
-* neither — both composites are `⦇ρ_i⦈(ℓ)` itself, and `↭` is the hypothesis.
-
-The second case is where p. 16 accounts for a `mut` cell of the aliasable walk
-**by the `imm` cell it sits beneath**, carrying that ancestor across by `↭`'s
-first clause.  `[as printed]` (the printed composites appear as their graphs — G4) -/
+/-- `[TR]` Lemma 6.48 (p. 16).  `[as printed]` (G4) -/
 theorem updV_frame {ρ₁ ρ₂ ρ₃ ρ₁₂ ρ₁₃ : WRes} (h₁₂ : ResU.CompS ρ₁ ρ₂ ρ₁₂)
     (h₁₃ : ResU.CompS ρ₁ ρ₃ ρ₁₃) (hh₂ : ResU.Hash ρ₁ ρ₂) (hh₃ : ResU.Hash ρ₁ ρ₃)
     (h : ResU.UpdV ρ₂ ρ₃) : ResU.UpdV ρ₁₂ ρ₁₃ := by
@@ -2877,19 +2378,15 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.UpdV.trans`, alias `TR.lemma_6_49`, tag `[as printed]`; `BoCa.Fig16.ResU.Upd.trans`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.UpdV.trans`, at `[TR]` p. 5's guarded relation as printed, with `Fig16.ResU.Upd.trans` the same at `[CONF]` Fig. 18b's unguarded one.
+**Note.** `UpdV.trans` is at `[TR]` p. 5's guarded `↭`, `Upd.trans` at `[CONF]` Fig. 18b's unguarded one (D3).
 -/
-/-- **`[TR]` Lemma 6.49** — `↭` is transitive (p. 17) — at `[CONF]` Fig. 18b's
-unguarded `↭`.  `ResU.UpdV.trans` is the same lemma at `[TR]`'s row.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.49 (p. 17) at `[CONF]` Fig. 18b's unguarded `↭`. `[as printed]` -/
 theorem ResU.Upd.trans {ρ₁ ρ₂ ρ₃ : ResU Loc Val} (h₁ : ρ₁.Upd ρ₂) (h₂ : ρ₂.Upd ρ₃) :
     ρ₁.Upd ρ₃ :=
   ⟨fun l s v χ hs => (h₁.1 l s v χ hs).trans (h₂.1 l s v χ hs),
    fun l b P => (h₁.2 l b P).trans (h₂.2 l b P)⟩
 
-/-! Lemma 6.49, continued. -/
-/-- **`[TR]` Lemma 6.49** at `[TR]` p. 5's guarded `↭`: the guard rides along
-with the hypotheses, so no extra premise is needed.  `[as printed]` -/
+/-- `[TR]` Lemma 6.49 at `[TR]` p. 5's guarded `↭`. `[as printed]` -/
 theorem ResU.UpdV.trans {ρ₁ ρ₂ ρ₃ : ResU Loc Val} (h₁ : ρ₁.UpdV ρ₂)
     (h₂ : ρ₂.UpdV ρ₃) : ρ₁.UpdV ρ₃ :=
   ⟨h₁.1.trans h₂.1, h₁.2.1, h₂.2.2⟩
@@ -2910,16 +2407,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 **Printed proof, transcribed.** Unfolding the update relation: all borrows have the same lifetime before and after updating.
 
 **Lean.** `BoCa.Fig16.BoLo.updV_outlives`, alias `TR.lemma_6_50`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.updV_outlives`, on the printed carrier, `[as printed]` — `@ρ ⊐ α` is `Fig16.BoLo.Outlives`, the printed strict relation at the graph of `@ρ`, and `↭` is [TR] p. 5's guarded row. The printed proof is one sentence and elides two steps, both about `⦇−⦈` rather than about `↭`: `Fig16.BoLo.flat_inStratum` (`@ρ ⊐ α ⇒ @⦇ρ⦈ ⊐ α`, by the mutual induction the walks are defined by) and `Fig16.BoLo.flat_inStratum_inv` (its converse, where `ag`'s `○`s may only *lengthen* an `imm` cell's lifetime set).
 -/
-/-- **`[TR]` Lemma 6.50** (p. 16): if `@ρ ⊐ α` and `ρ ↭ ρ′` then `@ρ′ ⊐ α`.
-`↭` is `[TR]` p. 5's guarded row, whose two validity conjuncts are what name the
-flattenings the relation is about.  The print's own sentence — "all borrows must
-have the same lifetime before and after updating" — is the middle step here:
-clause (1) fixes an `imm` cell of `⦇ρ′⦈` outright and clause (2) fixes a `mut`
-cell's lifetime, while an `own` cell's `@ψ` is `⊤` and `Res_α` asks nothing of
-it at any `α`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.50 (p. 17).  `[as printed]` -/
 theorem updV_outlives {ρ ρ' : WRes} {α : Life} (h : Outlives ρ α)
     (hu : ResU.UpdV ρ ρ') : Outlives ρ' α := by
   have hρ : ρ.InStratum α := h
@@ -2952,22 +2441,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By Lemma 6.20, noting that by the definitions of `○` and `●`, `imm(α, ρᵢ, v) ○ imm(β, ρᵢ, v) = imm(α, ρᵢ, v) ● imm(β, ρᵢ, v)`, the `imm` cell over `ρᵢ` and `v` at the two lifetime sets joined.
 
 **Lean.** `BoCa.Fig16.ResU.six51`, alias `TR.lemma_6_51`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six51`, on the printed carrier, `[as printed]` — the first printed lemma in this run that says what the flattening of a composite **is** at one location, and it is printed immediately before 6.52. The printed proof in full: *"Follows by lemma 6.20, noting that by the definition of `○` and `●`, `imm(ᾱ, ρᵢ, v) ○ imm(β̄, ρᵢ, v) = imm(ᾱ, ρᵢ, v) ● imm(β̄, ρᵢ, v) = imm(ᾱ ∪ β̄, ρᵢ, v)`."*  6.30 (`Fig16.BoLo.flat_compR`) splits the composite's flattening, `Fig16.ResU.Flat.functional` identifies the two halves with the given ones, and `Fig16.CellU.CompR.imm_union` is the cell step — clause (1) when the two cells coincide, clause (2) otherwise. Every flattening is named by its graph (G4), which is what carries the printed `#`'s definedness
 -/
-/-- **`[TR]` Lemma 6.51** (p. 17): if `⦇ρ⦈(ℓ) = imm(ᾱ, ρᵢ, v)` and
-`⦇ρ′⦈(ℓ) = imm(β̄, ρᵢ, v)` and `ρ # ρ′` then `⦇ρ ● ρ′⦈(ℓ) = imm(ᾱ ∪ β̄, ρᵢ, v)`.
-
-The printed proof, in full: *"Follows by lemma 6.20, noting that by the
-definition of `○` and `●`, `imm(ᾱ, ρᵢ, v) ○ imm(β̄, ρᵢ, v) = imm(ᾱ, ρᵢ, v) ●
-imm(β̄, ρᵢ, v) = imm(ᾱ ∪ β̄, ρᵢ, v)`."*  6.30 (`BoLo.flat_compR`) splits the
-composite's flattening, `ResU.Flat.functional` identifies the two halves with
-the given ones, and `CellU.CompR.imm_union` is the cell step.
-
-Every flattening is named by its graph (G4), which is also what carries the
-printed `#`'s definedness: `ρ # ρ′` gives the composite and its flattening, and
-those are the hypotheses `hc` and `hσ₁₂`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.51 (p. 17).  `[as printed]` -/
 theorem ResU.six51 {ρ ρ' ρ₁₂ σ σ' σ₁₂ : ResU BoCa.Loc BoCa.Val}
     (hc : ResU.CompS ρ ρ' ρ₁₂) (hσ : ResU.Flat ρ σ) (hσ' : ResU.Flat ρ' σ')
     (hσ₁₂ : ResU.Flat ρ₁₂ σ₁₂)
@@ -2995,9 +2470,9 @@ alias TR.lemma_6_51 := BoCa.Fig16.ResU.six51
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-! `[about ours]` — what the Lean of Lemma 6.52 needs; the paper prints nothing here. -/
-/-- **The image of `reb_α` lies in `Res_{↓α}`**: its cells are the source's `imm`
-cells, which lie in `Res_α`, or fresh `imm` cells at `{α}` exactly. -/
+/-! `[about ours]` — for Lemma 6.52. -/
+/-- The image of `reb_α` lies in `Res_{↓α}`: its cells are the source's `imm` cells,
+which lie in `Res_α`, or fresh `imm` cells at `{α}` exactly. -/
 theorem ResU.reb_inStratum_down {α : Life} {ρ' ρ : ResU Loc Val}
     (h : ResU.Reb α ρ' ρ) : ρ.InStratum (↓α) := by
   intro l ψ hg
@@ -3009,14 +2484,9 @@ theorem ResU.reb_inStratum_down {α : Life} {ρ' ρ : ResU Loc Val}
     rw [hψ]
     exact Life.down_sqsubset α
 
-/-- **`[TR]` 6.52's H1** (p. 17): at every location the reborrow covers, `ρ⁺`
-carries an `imm` cell over the same value and witness as `ρ_reb`'s, and over a
-lifetime set containing `ρ_reb`'s.
-
-This is the step 6.52's proof takes before it builds `ρ⁺ ⊟ ρ_reb`, and `[TR]`
-6.59's own statement names the result of that construction rather than the
-construction, so the step is stated on its own here.
-`[about ours: the display inside `[TR]` 6.52's proof, named]` -/
+/-- `[TR]` 6.52's H1 (p. 17): at every location the reborrow covers, `ρ⁺` carries an
+`imm` cell over the same value and witness as `ρ_reb`'s, and over a lifetime set
+containing `ρ_reb`'s.  `[about ours: the display inside `[TR]` 6.52's proof, named]` -/
 theorem ResU.six52_H1 {α : Life}
     {ρ'i ρ ρe ρ'' ρp ρρe ρ'p : ResU BoCa.Loc BoCa.Val}
     (hreb : ResU.Reb α ρ'i ρ)
@@ -3132,13 +2602,8 @@ theorem ResU.six52_H1 {α : Life}
       exact hxtω
   exact hle
 
-/-- **`[TR]` 6.52's second conclusion**, at any `χ` the definition admits.
-`ResU.Sub.inStratum`'s two side conditions are the printed *"all parts of the
-resource outlive `α`"* and its exception *"except for the locations in `ρ` that
-are mut or own in `ρ′ᵢ`"*, and neither mentions which `χ` Definition 6.3's
-bullets picked, so the conclusion holds of every one of them.
-`[about ours: `[TR]` 6.52's second conclusion at a `χ` given rather than
-constructed]` -/
+/-- `[TR]` 6.52's second conclusion, at any `χ` the definition admits.  `[about ours:
+`[TR]` 6.52's second conclusion at a `χ` given rather than constructed]` -/
 theorem ResU.six52_sub_inStratum {α : Life}
     {ρ'i ρ ρe ρ'' ρp ρρe ρ'p : ResU BoCa.Loc BoCa.Val}
     (hreb : ResU.Reb α ρ'i ρ)
@@ -3198,16 +2663,9 @@ theorem ResU.six52_sub_inStratum {α : Life}
 
 **Lean.** `BoCa.Fig16.ResU.six52`, alias `TR.lemma_6_52`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.six52`, on the printed carrier, `[as printed]` — both printed conclusions, all four printed hypotheses verbatim, with `@ρ ⊐ α` at the corrected reading (`Fig16.ResU.InStratum`, `docs/adjudications.md` §C.25) and every composite named by its graph (G4). Stated at `BoCa.Loc`/`BoCa.Val`, as the `Res_α` lemmas it spends are. **The equation.**  *"Unfolding reb"* is `Fig16.ResU.reb_src`; *"`⦇ρ ● ρₑ⦈(ℓ) = ⦇ρ′ ● ρ⁺⦈(ℓ) = imm(β_ℓ, ρ_ℓ, v_ℓ)` and `α ∈ β_ℓ`"* is `Fig16.ResU.Flat.get` with `Fig16.ResU.Flat.get_ls_imm` and `↭`'s first clause; *"since `ρ′ ⊐ α` … there is a `β_ℓ⁺ ⊆ β_ℓ`"* is `Fig16.BoLo.flat_compR` with `Fig16.ResU.CompR.lsOf_inv` — `⦇ρ′⦈ ∈ Res_α`, so `α` is in none of its sets and must come from `⦇ρ⁺⦈`; *"there cannot be any borrow that contains `ρ(ℓ)`"* is `Fig16.ResU.flat_imm_at_top_of_no_shorter`, whose hypothesis is 6.50 (`Fig16.BoLo.updV_outlives`) at `↓α`. H1 and the printed *"note that `ρ_reb = ⨀_{ℓ} ρ(ℓ)`"* and *"rewriting with H1 for every `ℓ`"* are all subsumed by `Fig16.ResU.sub_of_le`, which builds at every location at once what the iteration builds one location at a time. **The outlives constraint.**  *"All parts of the resource outlive `α` except for the locations in `ρ` that are mut or own in `ρ′ᵢ`"* is `Fig16.ResU.Sub.inStratum`, stated at `⊟` itself: the exception is `dom(ρ_reb)`, and Definition 6.3's fourth bullet removes exactly `{α}` there, leaving `imm(β̄_ℓ⁺ ∖ {α}, ρ_ℓ, v_ℓ)` — every lifetime of which outlives `α`, `ρ⁺` carrying no borrow shorter than `α` (`Fig16.ResU.reb_inStratum_down` with 6.50 at `↓α`). Off `dom(ρ_reb)` the printed sentence is 6.50 read at one location (`Fig16.ResU.updV_outlives_at`), which needs the walks to keep `Res_α` at one location: a borrow no shorter than `α` has its witness in `Res_α` (`Fig16.CellU.wit_inStratum_of_down`), so the material the walks raise lies in `Res_α` outright and only `ρ(ℓ)` is asked for (`Fig16.ExW.inStratum_at`, `Fig16.AgW.inStratum_at`, `Fig16.ResU.flat_inStratum_at`)
+**Note.** `@ρ ⊐ α` is read as `Fig16.ResU.InStratum` (`docs/adjudications.md` §C.25).
 -/
-/-- **`[TR]` Lemma 6.52** (p. 17): `ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb` and
-`@(ρ⁺ ⊟ ρ_reb) ⊐ α`, at `ρ_reb = ρ|dom(ρ′ᵢ|mut,own)`.
-
-All four printed hypotheses are carried verbatim, with `@ρ ⊐ α` at the corrected
-reading (`ResU.InStratum`, `docs/adjudications.md` §C.25) and `ρ ● ρₑ`, `ρ′ ● ρ⁺`
-and the two `⊟`/`●` composites named by their graphs (G4).  Stated at
-`BoCa.Loc`/`BoCa.Val`, as the `Res_α` lemmas it spends are.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.52 (p. 17).  `[as printed]` -/
 theorem ResU.six52 {α : Life}
     {ρ'i ρ ρe ρ'' ρp ρρe ρ'p : ResU BoCa.Loc BoCa.Val}
     (hreb : ResU.Reb α ρ'i ρ)
@@ -3239,36 +2697,11 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** `dom(ρ) ⊆ dom(ρ′)` and `ρ∣own,mut = ∅`.  At `ℓ ∈ dom(ρ_f) ∩ dom(ρ)`, `ρ_f(ℓ)` can fail to compose with `ρ(ℓ)` only by being `own` or `mut`; but `ρ_f # ℓ ↦ imm(α, ρ′, v)`, unfolded with Lemmas 6.18, 6.20 and 6.30, gives `ex(ρ_f)_● ▸◂ ⦇ρ′⦈_○`, so that overlap never happens.
 
-**Lean.** `BoCa.Fig16.ResU.six53`, alias `TR.lemma_6_53`, tag `[restricted: to `EscrowAgree ρ′ ρ (ag ρ_f)`, the sentence `[TR]`.
+**Lean.** `BoCa.Fig16.ResU.six53`, alias `TR.lemma_6_53`, tag `[restricted: to `Fig16.EscrowAgree ρ′ ρ (ag ρ_f)`]`.
 
-**Note.** `Fig16.ResU.six53`, on the printed carrier, conclusion exactly as printed, `[restricted: to `Fig16.EscrowAgree ρ′ ρ (ag ρ_f)`]` — the sentence `[TR]` p. 18 asserts inside its proof of **6.55** (*"witnesses and values always stay the same"*) and `reb_α` does not carry; `docs/adjudications.md` §12.41. `reb_α` itself is untouched. The hypothesis is at **`ag(ρ_f)`**, not at `ρ_f`: p. 18 asserts the sentence once and spends it twice, and 6.55's first bullet spends it at the aliasable walk, which is the deeper of the two levels — it carries cells where `ρ_f` carries none, and `mut` cells where `ρ_f` would carry `imm`.  6.53's own use comes back from there through `Fig16.AgW.get_imm`. Naming `ag(ρ_f)` costs nothing: `Fig16.ResU.agW_of_hash_left` produces it from the printed `#`.  §12.41 records the four readings tried and why only this one discharges both rows. The printed proof's opening note `dom(ρ) ⊆ dom(ρ′)` is **derived** (`Fig16.ResU.reb_dom_subset`), and its substance — *"the only way for `ρ_f(ℓ)` to not be composable with `ρ(ℓ)` is for `ρ_f(ℓ)` to be own or mut"* — is `Fig16.ResU.frame_cell`, which spends only the printed `#` and carries no added conjunct. The hypothesis is non-vacuous (`Fig16.escrowAgree_self`) and empty off the `own` clause (`Fig16.escrowAgree_of_no_own`, and `Fig16.escrowAgree_walk_of_no_own` in the shape 6.53 and 6.55 take it)  **At the typed world the restriction is discharged at every reborrow 6.150 takes**: `Fig16.LogRel.Typed.rebChooseO_top` and `Fig16.LogRel.Typed.rebChooseO_deep_tw` return `EscrowAgree` at the frame and at the cell for the reborrow they choose, from the tagged world (§12.71)
+**Note.** The added hypothesis is *"witnesses and values always stay the same"*, the sentence `[TR]` p. 18 asserts in the proof of 6.55 and `reb_α` does not carry (`docs/adjudications.md` §12.41); `Fig16.escrowAgree_self` inhabits it. At the repaired `wp`: discharged by `Fig16.LogRel.Typed.rebChooseO_top` and `Fig16.LogRel.Typed.rebChooseO_deep_tw` (§12.71).
 -/
-/-- **`[TR]` Lemma 6.53** (p. 18): if `ρ ∈ reb_β(ρ′)` and `ρf # ℓ ↦ imm(α, ρ′, v)`
-then `ρf ▸◂ ρ`.
-
-`[TR]`'s proof: *"Note `dom(ρ) ⊆ dom(ρ′)`, and `ρ|own,mut = ∅`.  For any
-`ℓ ∈ dom(ρf) ∩ dom(ρ)`, the only way for `ρf(ℓ)` to not be composable with
-`ρ(ℓ)` is for `ρf(ℓ)` to be own or mut.  But since `ρf # ℓ ↦ imm(α, ρ′, v)`, we
-know after unfolding and applying lemmas 6.18 and 6.20 and 6.30, that
-`ex(ρf)● ▸◂ ⦇ρ′⦈_○`, which means overlapping with an own or mut can never
-happen."*
-
-Step for step: the opening note is `ResU.reb_dom_subset`, derived rather than
-assumed; "`ρf(ℓ)` is own or mut" is refuted by `ResU.frame_cell`, which is
-6.18/6.20/6.30 packaged and spends only the printed `#`; and `ρ|own,mut = ∅`
-with the image's shape is `ResU.reb_imm_cell_kw` and `ResU.reb_src`.
-
-What the printed proof does not reach is that `▸◂` between two `imm` cells asks
-for an equal **witness** as well.  At the `imm` and `mut` clauses the witness is
-read off the source cell and both sides get the same one; at the `own` clause
-`reb_α` fabricates it, and that is the branch `hag` closes.  `hag` is the
-sentence at `ag(ρ_f)`, which is the level 6.55 spends it at; 6.53's own use
-comes back from there through `AgW.get_imm`, `ag(ρ_f)` carrying `ρ_f`'s `imm`
-cells at their own locations over their own witnesses.
-
-`[restricted: to `EscrowAgree ρ′ ρ (ag ρ_f)`, the sentence `[TR]` p. 18 asserts
-in the proof of 6.55 and `reb_α` does not carry — `docs/adjudications.md` §12.41.
-The conclusion is the printed one and `reb_α` is untouched]` -/
+/-- `[TR]` Lemma 6.53 (p. 18). `[restricted: to `EscrowAgree ρ′ ρ (ag ρ_f)`, §12.41]` -/
 theorem ResU.six53 {β : Life} {ρ' ρ ρf : ResU Loc Val} {l₀ : Loc}
     {s : LSet} {v : Val} {hs : ρ'.InStratum s.join}
     (hreb : ResU.Reb β ρ' ρ)
@@ -3318,20 +2751,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Unfolding `ρ ∈ reb_β(ρ′)`: `dom(ρ) ⊆ dom(ρ′)`; `ρ∣dom(ρ′∣imm) = ρ′∣imm∣dom(ρ)`; and for every `ℓ ∈ dom(ρ) ∩ dom(ρ′∣own,mut)` there is `ρ″` with `ρ(ℓ) = imm(_, ρ″, _)` and either `ρ″ ≤ ρ′` or `ρ′(ℓ) = mut(_, ρ″, _, _)`, so `dom(⦇ρ″⦈_○) ⊆ dom(⦇ρ′⦈_○)`.  Collecting these, every immutable borrow in `ρ` is in `⦇ρ′⦈_○`, and every witness is also in `⦇ρ⦈_○`.
 
 **Lean.** `BoCa.Fig16.ResU.six54`, alias `TR.lemma_6_54`, tag `[as printed]`.
-
-**Note.** `Fig16.ResU.six54`, on the printed carrier, `[as printed]` — both printed hypotheses verbatim, `ag(ρ)` and `⦇ρ′⦈_○` named by their graphs (G4) and `dom` pointwise. The printed `✓` is spent: it is what makes `⦇ρ′⦈_○` defined (`Fig16.ResU.flatR_of_valid_single_imm`, through `Fig16.AgW.single_imm_inv`), so the conclusion **produces** that object rather than presupposing it, and `Fig16.ResU.FlatR.functional` makes it the only one. **Nothing is added** — in particular `Fig16.EscrowAgree` is not needed here, since 6.54 compares domains and the witness 6.53 has to pin never enters. The three printed bullets are `reb_α`'s own clauses, derived: `Fig16.ResU.reb_dom_subset`, `Fig16.ResU.reb_imm_cell_kw` (the `imm` clause at a subset, definition row 5.28), and `Fig16.ResU.reb_src` with `Fig16.ResU.reb_own_le` for the *"`ρ″ ≤ ρ′`"* disjunct. The printed *"and therefore `dom(⦇ρ″⦈_○) ⊆ dom(⦇ρ′⦈_○)`"* is **proved**, not read off, `⦇−⦈_○` being a walk here: at a `mut` source cell by the factor lemmas `Fig16.ExW.wit_le` and `Fig16.AgW.mut_wit_le`, at the escrow by 6.20 (`Fig16.AgW.split`) for the `ag` half and a factor bound on the exclusive walk for the `ex` half — 6.18 cannot serve there, being at `●` on both sides where `ag`'s third piece calls `ex(−)_○`. The row's **closing line** — *"every immutable borrow in `ρ` is in `⦇ρ′⦈_○`, and every witness is also in `⦇ρ⦈_○`"* — says more than the display, and 6.55's first bullet spends it in that stronger form: `Fig16.ResU.ag_cell_of_reb` carries the cells, not just the domains, with the one exception the `own` clause of `reb_α` creates (there the witness is the escrow and `⦇ρ′⦈_○` still has the source's `own` cell). `Fig16.ResU.ag_dom_of_reb` is the display, read off it. New with it: `Fig16.ResU.Under` with `Fig16.ResU.Under.of_factor`/`.compR`/`.bigComp`, `Fig16.ExW.under_le`, `Fig16.AgW.imm_wit_le`, `Fig16.ResU.reb_imm_image` and `Fig16.ResU.del_compS`
 -/
-/-- **`[TR]` Lemma 6.54** (p. 18): if `ρ ∈ reb_β(ρ′)` and `✓ ℓ ↦ imm(α, ρ′, v)`
-then `dom(ag(ρ)) ⊆ dom(⦇ρ′⦈_○)`.
-
-Both printed hypotheses are carried verbatim, and the printed `✓` is what makes
-`⦇ρ′⦈_○` defined — so the conclusion produces it rather than assuming it, and
-`ResU.FlatR.functional` makes that the only one.  `ag(ρ)` is named by its graph
-(G4).  Nothing is added: `reb_α`'s three clauses are unfolded, not supplemented,
-and `EscrowAgree` is **not** needed here — 6.54 compares domains, and the
-witness 6.53 has to pin never enters.
-`[as printed]` (`ag(ρ)` and `⦇ρ′⦈_○` appear as their graphs — G4; `dom` is
-pointwise) -/
+/-- `[TR]` Lemma 6.54 (p. 18).  `[as printed]` (G4) -/
 theorem ResU.six54 {β : Life} {ρ' ρ A : ResU Loc Val} {l₀ : Loc} {s : LSet} {v : Val}
     {hs : ρ'.InStratum s.join}
     (hreb : ResU.Reb β ρ' ρ)
@@ -3355,36 +2776,12 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** Let `ρᵢ = imm(α, ρ′, v)`.  By Lemma 6.53, `ρ_f ▸◂ ρ`, so it suffices that `⦇ρ_f ● ρ⦈` is defined.  Unfolding the hypothesis with Lemmas 6.20 and 6.18 and the definitions of `ex` and `ag`, `⦇ρ_f ● ρᵢ⦈ = ex(ρ_f)_● ● ex(ρᵢ)_● ● (ag(ρ_f) ○ ag(ρᵢ)) = ex(ρ_f)_● ● (ag(ρ_f) ○ ρᵢ ○ ⦇ρ′⦈_○)`, all defined, and Lemma 6.30 with 6.36 gives `ex(ρ_f)_● ▸◂ ρᵢ ○ ⦇ρ′⦈_○`, `▸◂ ρᵢ` and `▸◂ ⦇ρ′⦈_○`.  Unfolding the goal the same way, with `dom(ρ∣own,mut) = ∅`, `⦇ρ_f ● ρ⦈ = ex(ρ_f)_● ● (ag(ρ_f) ○ ag(ρ))`; by Lemma 6.37 it suffices that `ag(ρ_f) ▷◁ ag(ρ)` and `ex(ρ_f)_● ▸◂ ag(ρ)`, and by Lemma 6.54 `dom(ag(ρ)) ⊆ dom(⦇ρ′⦈_○)`.  First, at a location of both, `ag(ρ_f) ▷◁ ⦇ρ′⦈_○`, and unfolding `reb`, `ρ` and `ρ′` differ only by potentially changing from `own` or `mut` to `imm`, "but witnesses and values always stay the same".  Second, `ex(ρ_f)_● ▸◂ ⦇ρ′⦈_○` with `ex(ρ_f)_●∣imm = ∅` makes their domains disjoint, and `dom(ag(ρ)) ⊆ dom(⦇ρ′⦈_○)`.
 
-**Lean.** `BoCa.Fig16.ResU.six55`, alias `TR.lemma_6_55`, tag `[restricted: to `EscrowAgree ρ′ ρ (ag ρ_f)` — the sentence `[TR]`.
+**Lean.** `BoCa.Fig16.ResU.six55`, alias `TR.lemma_6_55`, tag `[restricted: to `Fig16.EscrowAgree ρ′ ρ (ag ρ_f)` and to `ag(ρ)` being defined]`.
 
-**Note.** `Fig16.ResU.six55`, on the printed carrier, conclusion exactly as printed, `[restricted: to `Fig16.EscrowAgree ρ′ ρ (ag ρ_f)` and to `ag(ρ)` being defined]`. The corollary p. 18 states — *"`ρ # ℓ ↦ imm(α, ρ′, v)`, which follows from setting `ρ_f = ℓ ↦ imm(α, ρ′, v)`"* — is `Fig16.ResU.six55_self`, that substitution and 6.2 at `#`. Every step of the printed proof closes: the first display with 6.30 and 6.36 on it is `Fig16.ResU.frame_flat_facts`; *"noting `dom(ρ
+**Note.** `EscrowAgree` as at 6.53 (§12.41); `ag(ρ)` being defined is presupposed by the printed proof's `ag(ρ_f) ▷◁ ag(ρ)` (F1).  The printed corollary is `Fig16.ResU.six55_self`.
 -/
-/-- **`[TR]` Lemma 6.55** (p. 18): if `ρ ∈ reb_β(ρ′)` and
-`ρ_f # ℓ ↦ imm(α, ρ′, v)` then `ρ_f # ρ`.
-
-The printed proof, step for step.  *"By lemma 6.53, `ρ_f ▸◂ ρ`"* is
-`ResU.six53`, over the same conjunct.  *"It suffices to show that `⦇ρ_f ● ρ⦈` is
-defined"* is `ResU.Flat.split` at `ρ_f ● ρ`, whose factors the printed second
-display names: `ex(ρ_f)●` and `ag(ρ_f)` from `ResU.frame_flat_facts`,
-`ex(ρ)● = ∅` from `ExW.empty_of_all_imm` with `ResU.reb_imm_image` — the
-printed *"noting `dom(ρ|own,mut) = ∅`"* — and `ag(ρ)`.  *"By lemma 6.37 … it
-suffices to show `ag(ρ_f) ▷◁ ag(ρ)` and `ex(ρ_f)● ▸◂ ag(ρ)`"* is `ResU.six37`
-applied to `ResU.frame_compatR_ag` (the first bullet) and
-`ResU.frame_compatS_ag` (the second, which is where 6.54 is spent), with
-`ex(ρ_f)● ▸◂ ag(ρ_f)` the third side of 6.37 and again from
-`ResU.frame_flat_facts`.  6.9 (`ResU.compS_defined_iff`,
-`ResU.compR_defined_iff`) turns each `▸◂`/`▷◁` back into the composite the
-display needs.
-
-`A` names `ag(ρ)` by its graph (G4), and `AgW ρ A` is a genuine restriction: the
-printed proof writes `ag(ρ_f) ▷◁ ag(ρ)`, which presupposes that walk has a
-value, and no printed hypothesis says so.  `ag(ρ_f)` is *not* a restriction —
-`ResU.agW_of_hash_left` produces it from the printed `#`.
-
-`[restricted: to `EscrowAgree ρ′ ρ (ag ρ_f)` — the sentence `[TR]` p. 18 asserts
-inside this very proof, `docs/adjudications.md` §12.41 — and to `ag(ρ)` being
-defined, which the printed proof's own `ag(ρ_f) ▷◁ ag(ρ)` presupposes
-(convention F1).  The conclusion is the printed one and `reb_α` is untouched]` -/
+/-- `[TR]` Lemma 6.55 (p. 18). `[restricted: to `EscrowAgree ρ′ ρ (ag ρ_f)`, §12.41; to
+`ag(ρ)` being defined, F1]` -/
 theorem ResU.six55 {β : Life} {ρ' ρ ρf A : ResU Loc Val} {l₀ : Loc}
     {s : LSet} {v : Val} {hs : ρ'.InStratum s.join}
     (hreb : ResU.Reb β ρ' ρ)
@@ -3412,12 +2809,9 @@ alias TR.lemma_6_55 := BoCa.Fig16.ResU.six55
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-! `[about ours]` — what the Lean of Lemma 6.56 needs; the paper prints nothing here. -/
-/-- **`[TR]` 6.55's corollary** (p. 18): *"As a corollary, `ρ # ℓ ↦ imm(α, ρ′, v)`,
-which follows from setting `ρ_f = ℓ ↦ imm(α, ρ′, v)`."*  That substitution and
-6.2 at `#` (`ResU.hash_symm`) are the whole of it; the printed hypothesis, at
-that `ρ_f`, is `ℓ ↦ imm(α, ρ′, v) # ℓ ↦ imm(α, ρ′, v)`.
-`[restricted: as `ResU.six55`, of which this is the printed instance]` -/
+/-! `[about ours]` — for Lemma 6.56. -/
+/-- `[TR]` 6.55's corollary (p. 18): *"As a corollary, `ρ # ℓ ↦ imm(α, ρ′, v)`, which
+follows from setting `ρ_f = ℓ ↦ imm(α, ρ′, v)`."* `[restricted: as `ResU.six55`]` -/
 theorem ResU.six55_self {β : Life} {ρ' ρ A : ResU Loc Val} {l₀ : Loc}
     {s : LSet} {v : Val} {hs : ρ'.InStratum s.join}
     (hreb : ResU.Reb β ρ' ρ)
@@ -3428,10 +2822,7 @@ theorem ResU.six55_self {β : Life} {ρ' ρ A : ResU Loc Val} {l₀ : Loc}
     ResU.Hash ρ (ResU.single l₀ (CellU.immOf s v ρ' hs)) :=
   ResU.hash_symm (ResU.six55 hreb hesc hagρ hhash)
 
-/-- **`ρ_i # ρ_i` from `✓ρ_i`** — 6.43 (`ResU.compS_single_imm`) at one cell with
-`LSet.union_self`, which is what `[TR]` 6.55's corollary needs of its printed
-hypothesis when `ρ_f` is set to `ρ_i`.
-`[about ours: the printed `✓` of 6.55's corollary, in `#` form]` -/
+/-- `[about ours: the printed `✓` of 6.55's corollary, in `#` form]` -/
 theorem ResU.hash_self_single_imm {l₀ : Loc} {s : LSet} {v : Val}
     {ρ' : ResU Loc Val} {hs : ρ'.InStratum s.join}
     (hval : ResU.Valid (ResU.single l₀ (CellU.immOf s v ρ' hs))) :
@@ -3451,21 +2842,9 @@ theorem ResU.hash_self_single_imm {l₀ : Loc} {s : LSet} {v : Val}
 
 **Printed proof, transcribed.** By Lemma 6.55, `ρ # ℓ ↦ imm(α, ρ′, v)`; by Lemma 6.11, `ρ∣dom(ρ′∣mut,own) # ℓ ↦ imm(α, ρ′, v)`.  Pointwise: unfolding `⟦−⟧`, `⦇−⦈`, `ex` and `ag` and by Lemma 6.20, `⦇ρ∣dom(ρ′∣mut,own) ● ℓ ↦ imm(α, ρ′, v)⦈ = ag(ρ∣dom(ρ′∣mut,own) ● ℓ ↦ imm(α, ρ′, v)) = ag(ρ∣dom(ρ′∣mut,own)) ○ ℓ ↦ imm(α, ρ′, v) ○ ⦇ρ′⦈_○`.  By Lemma 6.54, `dom(⦇ρ∣dom(ρ′∣mut,own)⦈) ⊆ dom(⦇ρ′⦈)`; values and witnesses agree because `ρ∣dom(ρ′∣mut,own) # ℓ ↦ imm(α, ρ′, v)`, so the erasures agree.
 
-**Lean.** `BoCa.Fig16.ResU.six56`, alias `TR.lemma_6_56`.
-
-**Note.** `Fig16.ResU.six56`, on the printed carrier, conclusion exactly as printed, `[restricted: as 6.55, which it spends — to `Fig16.EscrowAgree ρ′ ρ (ag ρ_i)` and to `ag(ρ)` being defined]`. Both printed hypotheses are carried verbatim. The printed `=` is between two partial terms and is carried as one, the `↔` between the two graphs at an arbitrary common result — the shape 6.7 and 6.8 already use (`Fig16.ResU.Lower.congr`); `ρ
+**Lean.** `BoCa.Fig16.ResU.six56`, alias `TR.lemma_6_56`, tag `[restricted: as 6.55, which it spends]`.
 -/
-/-- **`[TR]` Lemma 6.56** (p. 18): if `ρ ∈ reb_β(ρ′)` and `✓(ℓ ↦ imm(α, ρ′, v))`
-then `⟦ρ|dom(ρ′|mut,own) ● ℓ ↦ imm(α, ρ′, v)⟧ = ⟦ℓ ↦ imm(α, ρ′, v)⟧`.
-
-The printed equality is between two partial terms and is carried as one, the
-`↔` between the two graphs at an arbitrary common result — the shape 6.7 and 6.8
-already use (`ResU.Lower.congr`).  `ρ|dom(ρ′|mut,own) ● ρ_i` is named by its
-graph (G4).
-
-`[restricted: as `ResU.six55`, which this spends: to `EscrowAgree ρ′ ρ (ag ρ_i)`
-and to `ag(ρ)` being defined.  The printed `✓` and `ρ ∈ reb_β(ρ′)` are carried
-verbatim and the conclusion is the printed one]` -/
+/-- `[TR]` Lemma 6.56 (p. 19). `[restricted: as `ResU.six55`, which this spends]` -/
 theorem ResU.six56 {β : Life} {ρ' ρ A X : ResU Loc Val} {l₀ : Loc} {s : LSet}
     {v : Val} {hs : ρ'.InStratum s.join} {w : Loc → Option Val}
     (hreb : ResU.Reb β ρ' ρ)
@@ -3558,40 +2937,11 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** Unfolding `reb`, `ρ∣dom(ρ′ᵢ∣imm) ≤ ρ′ᵢ∣imm` and `ρ∣dom(ρ′ᵢ∣imm)∣mut,own = ∅`.  Writing `D = dom(ρ′ᵢ∣imm)` and unfolding `⦇−⦈`, `ex`, `ag` with Lemma 6.20: `⦇ρ∣D ● ρᵢ⦈ = ex(ρ∣D ● ρᵢ)_● ● ag(ρ∣D ● ρᵢ) = ag(ρ∣D ● ρᵢ) = ag(ρ∣D) ○ ag(ρᵢ) = ag(ρ∣D) ○ ρᵢ ○ ⦇ρ′ᵢ⦈_○ = ag(ρ∣D) ○ ⦇ρ′ᵢ∣imm⦈_○ ○ ρᵢ ○ ⦇ρ′ᵢ∣mut,own⦈_○ = ⦇ρ′ᵢ∣imm⦈_○ ○ ρᵢ ○ ⦇ρ′ᵢ∣mut,own⦈_○ = ρᵢ ○ ⦇ρ′ᵢ⦈_○ = ag(ρᵢ) = ⦇ρᵢ⦈`.
 
-**Lean.** `BoCa.Fig16.ResU.six57`, alias `TR.lemma_6_57`.
+**Lean.** `BoCa.Fig16.ResU.six57`, alias `TR.lemma_6_57`, tag `[restricted: to `ag(ρ)` being defined]`.
 
-**Note.** `Fig16.ResU.six57`, on the printed carrier, conclusion exactly as printed, `[restricted: to `ag(ρ)` being defined]`. The printed `ρ ∈ reb_β(ρ′ᵢ)` is carried verbatim and **`Fig16.EscrowAgree` is not needed** — 6.57 spends neither 6.53 nor 6.55. Neither hypothesis says either side of the printed `=` is defined, so it is carried as the Kleene equality, the `↔` between the two graphs at an arbitrary common result; `ρ
+**Note.** `ag(ρ)` being defined is presupposed by the printed display's `ag(ρ|dom(ρ′ᵢ|imm))` (F1).
 -/
-/-- **`[TR]` Lemma 6.57** (p. 18): let `ρᵢ = ℓ ↦ imm(α, ρ′ᵢ, v)`; if
-`ρ ∈ reb_β(ρ′ᵢ)` then `⦇ρ|dom(ρ′ᵢ|imm) ● ρᵢ⦈ = ⦇ρᵢ⦈`.
-
-The printed `=` is between two partial terms and neither hypothesis says either
-is defined, so it is carried as the Kleene equality — the `↔` between the two
-graphs at an arbitrary common result.  `ρ|dom(ρ′ᵢ|imm) ● ρᵢ` is named by its
-graph (G4).
-
-The printed display, step for step: `ex(−)●` is `∅` on both sides, both
-resources carrying `imm` cells only (`ExW.empty_of_all_imm`, with
-`ResU.reb_imm_image`), which is the printed second line; 6.20 (`AgW.split`) is
-the third; and the last six lines carry `ag(ρ|D)` through a split of `⦇ρ′ᵢ⦈_○`
-only to drop it against the `imm` half.  What that does is **absorption**, and
-absorption at `○` is 6.3 with 6.19 (`ResU.CompR.absorb`), so it is done here
-directly and `[TR]` 6.18 is not called at `○`, where it is not printed.
-
-`ρ|D ≤ ρ′ᵢ|imm` is derived (`ResU.restrictDom_compR_restrict`), and the three
-pieces of `ag(ρ|D)` — the restriction itself, the empty `mut` family, and each
-entry of the `imm` family — are each `○`-factors of `ag(ρᵢ)`, so each absorbs it
-and `ResU.CompR.absorb_comp` and `BigComp.absorb` carry that to the whole.
-
-`A` names `ag(ρ)` by its graph (G4), and `AgW ρ A` is what says the printed
-`ag(ρ|dom(ρ′ᵢ|imm))` has a value at all: by 6.20 at
-`ρ = ρ|dom(σ) ● ρ/dom(σ)` it delivers `ag(ρ|D)`, and no printed hypothesis
-delivers it otherwise.
-
-`[restricted: to `ag(ρ)` being defined, which the printed display's
-`ag(ρ|dom(ρ′ᵢ|imm))` presupposes (convention F1).  `ρ ∈ reb_β(ρ′ᵢ)` is carried
-verbatim, the conclusion is the printed one, and `reb_α` is untouched.
-`EscrowAgree` is **not** needed: 6.57 spends neither 6.53 nor 6.55]` -/
+/-- `[TR]` Lemma 6.57 (p. 19). `[restricted: to `ag(ρ)` being defined, F1]` -/
 theorem ResU.six57 {β : Life} {ρ'i ρ A X σ : ResU Loc Val} {l₀ : Loc} {s : LSet}
     {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -3657,34 +3007,11 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** By Lemma 6.56, (H1) `⟦ρ∣dom(ρ′ᵢ∣mut,own) ● ρᵢ⟧ = ⟦ρᵢ⟧`.  `dom(ρ) ⊆ dom(ρ′ᵢ)` by unfolding `reb`, and by Lemma 6.8, rewriting with H1, `⟦ρ ● ρᵢ⟧ = ⟦ρ∣dom(ρ′ᵢ∣imm) ● ρ∣dom(ρ′ᵢ∣mut,own) ● ρᵢ⟧ = ⟦ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ⟧`.  By Lemma 6.57 `⦇ρᵢ⦈ = ⦇ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ⦈`, so `⟦ρᵢ⟧ = ⟦ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ⟧`, which with the equation above gives (H2) `⟦ρ ● ρᵢ⟧ = ⟦ρᵢ⟧`.  The first conclusion is Lemma 6.8 with H2.  By Lemma 6.52, `ρ⁺ = (ρ⁺ ⊟ ρ∣dom(ρ′ᵢ∣mut,own)) ● ρ∣dom(ρ′ᵢ∣mut,own)`; rewriting, `⟦ρ′ ● ρ⁺ ● ρᵢ⟧ = ⟦ρ′ ● (ρ⁺ ⊟ ρ∣dom(ρ′ᵢ∣mut,own)) ● ρ∣dom(ρ′ᵢ∣mut,own) ● ρᵢ⟧`, and by that equation and Lemma 6.8 the second conclusion reduces to H1.
 
-**Lean.** `BoCa.Fig16.ResU.six58_left`, alias `TR.lemma_6_58_left`; `BoCa.Fig16.ResU.six58_right`, alias `TR.lemma_6_58_right`, tag `[restricted: to the **second** of the two printed conclusions; to `[TR]`.
-
-**Note.** `Fig16.ResU.six58_left` and `Fig16.ResU.six58_right`, on the printed carrier, the two printed conclusions exactly as printed. Each `⟦−⟧` equality is between partial terms and is carried as the `↔` between the two graphs at an arbitrary common result, and every composite the statements name appears as its graph (G4). `[restricted: to `Fig16.EscrowAgree ρ′ᵢ ρ (ag ρ_i)` and to `ag(ρ)` being defined, as 6.55/6.56/6.57; and for `six58_right`, to `[TR]` 6.52's equation]`. The printed proof is followed step for step: *"note `dom(ρ) ⊆ dom(ρ′ᵢ)` by unfolding reb"* with `ρ = ρ
+**Lean.** `BoCa.Fig16.ResU.six58_left`, alias `TR.lemma_6_58_left`; `BoCa.Fig16.ResU.six58_right`, alias `TR.lemma_6_58_right`; tag `[restricted: each to one of the two printed conclusions; as 6.55; `six58_right` also to `[TR]` 6.52's equation, as a hypothesis]`.
 -/
-/-- **`[TR]` Lemma 6.58's first conclusion** (p. 19):
-`⟦ρ ● ρ_b ● ρᵢ⟧ = ⟦ρ_b ● ρᵢ⟧`.
-
-The printed proof: *"By lemma 6.56, `⟦ρ|dom(ρ′ᵢ|mut,own) ● ρᵢ⟧ = ⟦ρᵢ⟧` (H1).
-Note `dom(ρ) ⊆ dom(ρ′ᵢ)` by unfolding reb.  By lemma 6.8 and rewriting with H1,
-`⟦ρ ● ρᵢ⟧ = ⟦ρ|dom(ρ′ᵢ|imm) ● ρ|dom(ρ′ᵢ|mut,own) ● ρᵢ⟧ = ⟦ρ|dom(ρ′ᵢ|imm) ● ρᵢ⟧`.
-By lemma 6.57 `⦇ρᵢ⦈ = ⦇ρ|dom(ρ′ᵢ|imm) ● ρᵢ⦈`, … means `⟦ρ ● ρᵢ⟧ = ⟦ρᵢ⟧` (H2).
-To show `⟦ρ ● ρ_b ● ρᵢ⟧ = ⟦ρ_b ● ρᵢ⟧`, by lemma 6.8, it suffices to show
-`⟦ρ ● ρᵢ⟧ = ⟦ρᵢ⟧`, which we have by H2."*
-
-Run here exactly so: `ResU.restrictDom_split` is the note, `ResU.six56` is H1,
-`ResU.six57` is the appeal to 6.57, and `ResU.lower_congr_iff` is 6.8 at both
-applications, with 6.11 (`ResU.Hash.split`) and 6.15
-(`ResU.hash_of_pairwise`) supplying its `#`s from the printed ones.  6.3
-(`ResU.CompS.assoc`) is the rebracketing each display line does.
-
-Of 6.58's six printed hypotheses this conclusion spends three — `ρ ∈ reb_β(ρ′ᵢ)`,
-`ρ_b # ρᵢ`, and the left half of `ρ ● ρ_b ↭ ρ′ ● ρ⁺`, which is `ρ # ρ_b` — so
-the other three are dropped rather than bound (convention 5: ours is the
-stronger statement).
-
-`[restricted: to the **first** of the two printed conclusions, and as 6.55/6.56
-— to `EscrowAgree ρ′ᵢ ρ (ag ρ_i)` and to `ag(ρ)` being defined.  The three
-printed hypotheses this half does not use are dropped]` -/
+/-- `[TR]` Lemma 6.58's first conclusion (p. 19). `[restricted: to the first of the two
+printed conclusions, and as 6.55; the three printed hypotheses this half does not
+use are dropped]` -/
 theorem ResU.six58_left {β : Life} {ρ'i ρ ρb A ρρb X Y : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -3753,25 +3080,9 @@ alias TR.lemma_6_58_left := BoCa.Fig16.ResU.six58_left
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-! Lemma 6.58, continued. -/
-/-- **`[TR]` Lemma 6.58's second conclusion** (p. 19):
-`⟦ρ′ ● ρ⁺ ● ρᵢ⟧ = ⟦ρ′ ● (ρ⁺ ⊟ ρ|dom(ρ′ᵢ|mut,own)) ● ρᵢ⟧`.
-
-The printed proof: *"By lemma 6.52,
-`ρ⁺ = (ρ⁺ ⊟ ρ|dom(ρ′ᵢ|mut,own)) ● ρ|dom(ρ′ᵢ|mut,own)`.  Rewriting with this
-equation … by the previous equation and lemma 6.8, it suffices to show
-`⟦ρ|dom(ρ′ᵢ|mut,own) ● ρᵢ⟧ = ⟦ρᵢ⟧`, which we have by H1."*
-
-6.52's equation is taken here as the named hypothesis `hsplit`, which is the
-only thing the printed proof spends it for; `ResU.six52` discharges it of the
-`χ` it builds; it is not a consequence of `_hsub` alone, whose `ρ″ ≤ ρ|imm`
-does not pin the lifetime sets off `dom(ρ_reb)`.  `_hsub` is not spent: it is what
-makes `χ` the printed `ρ⁺ ⊟ ρ|dom(ρ′ᵢ|mut,own)` rather than an arbitrary
-splitting of `ρ⁺`, so it is carried to keep the conclusion the printed one.
-
-`[restricted: to the **second** of the two printed conclusions; to `[TR]` 6.52's
-equation, taken as a hypothesis at the `χ` the statement binds; and as
-6.55/6.56 — to `EscrowAgree ρ′ᵢ ρ (ag ρ_i)` and to `ag(ρ)` being defined]` -/
+/-- `[TR]` Lemma 6.58's second conclusion (p. 19). `[restricted: to the second of the
+two printed conclusions; to `[TR]` 6.52's equation, taken as a hypothesis at the `χ`
+the statement binds; and as 6.55]` -/
 theorem ResU.six58_right {β : Life} {ρ'i ρ ρ'' ρp χ A ρ'p ρ'χ P Q : ResU Loc Val}
     {l₀ : Loc} {s : LSet} {v : Val} {hs : ρ'i.InStratum s.join}
     (hreb : ResU.Reb β ρ'i ρ)
@@ -3825,17 +3136,10 @@ variable {β : Life} {ρ'i ρ L R Lreb Rreb : ResU BoCa.Loc BoCa.Val}
   {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}
   {es as pS : ResU BoCa.Loc BoCa.Val}
 
-/-! `[about ours]` — what the Lean of Lemma 6.59 needs; the paper prints nothing here. -/
-/-- **Step 2's first branch, at every ancestor at once**: an `imm` cell of
-`ag(L)` is absorbed by the goal's other side.
-
-`↭`'s first clause pins the cell of `ag(L ● ρ_reb)` it sits in
-(`ResU.upd_ag_eq_of_ne_own`), so it stands in `ag(R ● ρ_reb)` too; that walk is
-`(ag(R) ○ bi) ○ ρ_reb`, and `CellU.reb_frame_imm_le` cancels the `{β}` — *"all
-components of the composition besides for `ρ_reb` outlive `β`, neither have the
-immutable borrow at `β` from `ρ_reb`"*.  What is left, `ag(R) ○ bi`, is inside
-`ag(R) ○ ag(ρᵢ)` because `bi ≼ ag(ρᵢ)`: *"and both get the borrow from `ρᵢ`"*.
-`[about ours: `[TR]` 6.59's closing sentence at an `imm` cell of `ag(L)`]` -/
+/-! `[about ours]` — for Lemma 6.59. -/
+/-- Step 2's first branch, at every ancestor at once: an `imm` cell of `ag(L)` is
+absorbed by the goal's other side.  `[about ours: `[TR]` 6.59's closing sentence at
+an `imm` cell of `ag(L)`]` -/
 theorem ResU.reb_frame_absImm
     (hreb : ResU.Reb β ρ'i ρ)
     (hL : L.InStratum β)
@@ -3917,14 +3221,9 @@ variable {β : Life} {ρ'i ρ L R Lreb Rreb : ResU BoCa.Loc BoCa.Val}
   {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}
   {es as pS : ResU BoCa.Loc BoCa.Val}
 
-/-- **Steps 3 and 4, at every ancestor at once**: the whole `⦇κ⦈_○` under an
-`imm` cell of `ag(L)` is a `○`-factor of the goal's other side.
-
-`↭`'s first clause pins the cell **with its witness** (composing with an `imm`
-cell only joins lifetime sets, so the witness survives the `○` with `ag(ρ_reb)`), and `ResU.reb_attribute` then places
-`⦇κ⦈_○` in `ag(R) ○ ag(ρᵢ)` on all three of its branches.  The walks are
-functional, so the `⦇κ⦈_○` it returns is the one the trace started from.
-`[about ours: `[TR]` 6.48's ancestor step run at every ancestor of `ag(L)`]` -/
+/-- Steps 3 and 4, at every ancestor at once: the whole `⦇κ⦈_○` under an `imm` cell of
+`ag(L)` is a `○`-factor of the goal's other side.  `[about ours: `[TR]` 6.48's
+ancestor step run at every ancestor of `ag(L)`]` -/
 theorem ResU.reb_frame_absAnc
     (hreb : ResU.Reb β ρ'i ρ)
     (hupd : ResU.Upd Lreb Rreb)
@@ -3950,10 +3249,8 @@ theorem ResU.reb_frame_absAnc
   cases ResU.CompR.functional hp' hp
   exact (ResU.LeR.left hz).absorb
 
-/-- **`ag(L)` is absorbed by `ag(R) ○ ag(ρᵢ)`.**  The two halves above are
-exactly `AgW.absorb_of_ancestors`' two hypotheses, so the walk is accounted for
-in full: nothing `ag(L)` carries is lost when `ρ_reb` is exchanged for `ρᵢ`.
-`[about ours: `[TR]` 6.59's closing sentence as a `≼` between the two walks]` -/
+/-- `ag(L)` is absorbed by `ag(R) ○ ag(ρᵢ)`.  `[about ours: `[TR]` 6.59's closing
+sentence as a `≼` between the two walks]` -/
 theorem ResU.reb_frame_ag_le
     (hreb : ResU.Reb β ρ'i ρ)
     (hL : L.InStratum β)
@@ -3974,15 +3271,8 @@ theorem ResU.reb_frame_ag_le
     (ResU.reb_frame_absAnc hreb hupd haR hareb hai hexS hagS hfS hcLr hcRr
       hcRi haLr haRr heLr heRr hfL hfR)
 
-/-- **`[TR]` 6.59's closing sentence.**  Each side of the goal absorbs the
-other — the configuration is symmetric in `L` and `R`, and `↭` is symmetric —
-so `ResU.CompR.functional` makes them one resource.
-
-This is the form the step wants: *"`⦇ρᵢ ● ρ_b⦈(ℓ)` and
-`⦇ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρᵢ⦈(ℓ)` each absorb the other at `○`"* — and it comes out
-not at one `ℓ` but at the whole aliasable walk, which is what makes the `∼` the
-print asks for an equality.
-`[about ours: `[TR]` 6.59's closing sentence at the two aliasable walks]` -/
+/-- `[TR]` 6.59's closing sentence.  `[about ours: `[TR]` 6.59's closing sentence at the
+two aliasable walks]` -/
 theorem ResU.reb_frame_ag_eq
     (hreb : ResU.Reb β ρ'i ρ)
     (hL : L.InStratum β) (hR : R.InStratum β)
@@ -4014,22 +3304,9 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **`[TR]` 6.59's two sides have one aliasable walk**, and where it is silent
-so is each side of the update hypothesis.
-
-The first half is `Fig16.ResU.reb_frame_ag_eq` at 6.59's own objects: `ρ = ρ|dom(ρ′ᵢ|imm) ● ρ_reb`
-(`ResU.restrictDom_split`), `ρ⁺ = χ ● ρ_reb` (6.52), so both sides of the
-hypothesis are `ag(−) ○ ag(ρ_reb)` over the same `ag(L)`, `ag(R)` the goal
-composes with `ag(ρᵢ)`; and `ag(ρ|dom(ρ′ᵢ|imm)) ≼ ag(ρᵢ)` (6.57's display) makes
-the goal's left walk `ag(ρᵢ ● ρ_b)` on the nose.
-
-The second half is what the print's *"immediate"* case needs: a location where
-the goal's walk carries nothing is a location outside `dom(ρ_reb)` — `ag(ρᵢ)`
-would stand there otherwise — and off `dom(ρ_reb)` `ag(ρ_reb)` adds nothing
-either (`ResU.reb_ag_cell_absorbed_off_dom`), so every factor of both sides of
-the hypothesis is silent too.
-`[about ours: `[TR]` 6.59's step 4 at the walks, before the print's case
-split]` -/
+/-- `[TR]` 6.59's two sides have one aliasable walk, and where it is silent so is each
+side of the update hypothesis.  `[about ours: `[TR]` 6.59's step 4 at the walks,
+before the print's case split]` -/
 theorem ResU.six59_ag_eq
     {β : Life} {ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val}
     {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}
@@ -4134,24 +3411,10 @@ theorem ResU.six59_ag_eq
   exact ⟨hnone₂ hLag (hnone₂ hDag haDn harebn) habn,
     hnone₂ hRag haρ'n (hnone₂ hPag haχn harebn)⟩
 
-/-- **`[TR]` 6.59's step 6 at a reborrowed `ℓ`, on the printed route.**  Its two
-sides' aliasable walks are equal, so the cells at `ℓ` are equal and `∼`
-is reflexivity — strictly more than the print's `∼` asks.
-
-`ρ_b # ρᵢ`, `ρ′ ● ρ⁺ # ρᵢ` and `ρ⁺ ⊟ ρ_reb` itself go **unspent**: the first two
-are what 6.58 and 6.56 need and this step does not, and the third is what makes
-`χ` the printed `ρ⁺ ⊟ ρ_reb` rather than an arbitrary splitting of `ρ⁺`, so it
-is carried to keep the statement the printed one.  The two hypotheses that are
-spent in its place are 6.52's own conclusions, which 6.59's first sentence
-quotes.
-`[restricted: to `[TR]` 6.52's two conclusions, taken as named hypotheses at the
-`χ` the statement binds — *"By lemma 6.52, `ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb`, and
-`@(ρ⁺ ⊟ ρ_reb) ⊐ β`"* (`[TR]` p. 20, the proof's first sentence).  `ResU.Sub` is
-Definition 6.3's four bullets and its `ρ″ ≤ ρ|imm` does not pin the lifetime sets
-off `dom(ρ_reb)`, so the equation is not a
-consequence of it; `ResU.six52` proves both conclusions of a `χ` it constructs,
-which is what inhabits this hypothesis set.  The conclusion is the printed
-one]` -/
+/-- `[TR]` 6.59's step 6 at a reborrowed `ℓ`. `[restricted: to `[TR]` 6.52's two
+conclusions, taken as named hypotheses at the `χ` the statement binds — *"By lemma
+6.52, `ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb`, and `@(ρ⁺ ⊟ ρ_reb) ⊐ β`"* (p. 20); `ResU.six52`
+inhabits them]` -/
 theorem ResU.six59_residual_at
     {β : Life} {ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val}
     {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}
@@ -4198,9 +3461,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- **…and it holds.**  `[TR]` 6.52's two conclusions at that `χ` are
-`ResU.SubKeep.compS` over `ResU.six52_H1`, and `ResU.six52_sub_inStratum`; the
-rest is `ResU.six59_residual_at`. -/
+/-- …and it holds. -/
 theorem ResU.sixFiftyNineResidualKeep : ResU.SixFiftyNineResidualKeep := by
   intro β ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY l₀ s v hs hreb hce hcp hupd hsb hs'
     hh1 hh2 hsub hXc hYc hfX hfY l hl
@@ -4214,12 +3475,9 @@ end BoCa.Fig16
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-- **`[TR]` 6.59's step 6 at `ℓ ∉ dom(ρ_reb)`.**  The print's *"immediate"*,
-at the objects: the swap leaves `ex(−)_●` alone, and where the goal's aliasable
-walk is silent so is the hypothesis's, so both sides of the goal are their
-exclusive walks — which are the hypothesis's.
-`[restricted: as `ResU.six59_residual_at`, to `[TR]` 6.52's two conclusions at
-the `χ` the statement binds]` -/
+/-- `[TR]` 6.59's step 6 at `ℓ ∉ dom(ρ_reb)`.  `[restricted: as
+`ResU.six59_residual_at`, to `[TR]` 6.52's two conclusions at the `χ` the statement
+binds]` -/
 theorem ResU.six59_offReb_at
     {β : Life} {ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val}
     {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}
@@ -4279,7 +3537,7 @@ end BoCa.Fig16
 
 namespace BoCa.Fig16
 
-/-- **…and it holds**, on 6.52's two conclusions at that `χ`. -/
+/-- …and it holds, on 6.52's two conclusions at that `χ`. -/
 theorem ResU.sixFiftyNineOffRebKeep : ResU.SixFiftyNineOffRebKeep := by
   intro β ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY l₀ s v hs hreb hce hcp hupd hsb hs'
     _hh1 _hh2 hsub hXc hYc hfX hfY l hl
@@ -4300,33 +3558,10 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** Let `ρ_reb = ρ∣dom(ρ′ᵢ∣mut,own)`.  By Lemma 6.52, `ρ⁺ = (ρ⁺ ⊟ ρ_reb) ● ρ_reb` and `@(ρ⁺ ⊟ ρ_reb) ⊐ β`; unfolding `reb`, `ρ = ρ∣dom(ρ′ᵢ∣imm) ● ρ_reb`.  Rewriting the update hypothesis with both: `ρ∣dom(ρ′ᵢ∣imm) ● ρ_reb ● ρ_b ↭ ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρ_reb`.  By Lemma 6.57, `⦇ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ⦈ = ⦇ρᵢ⦈`, which also gives `ag(ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ) = ag(ρᵢ)`.  `⦇ρ_b ● ρᵢ⦈` is defined by hypothesis, and unfolding `⦇−⦈` and `ex` with Lemmas 6.18 and 6.20: `⦇ρᵢ ● ρ_b⦈ = ex(ρᵢ)_● ● ex(ρ_b)_● ● ag(ρᵢ) ○ ag(ρ_b) = ex(ρ_b)_● ● ag(ρᵢ) ○ ag(ρ_b) = ex(ρ_b)_● ● ag(ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ) ○ ag(ρ_b) = ex(ρ_b)_● ● ag(ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ ● ρ_b) = ⦇ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ ● ρ_b⦈`.  Rewriting with this, it suffices that `ρ∣dom(ρ′ᵢ∣imm) ● ρᵢ ● ρ_b ↭ ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρᵢ`: the same `imm`/`mut` domain, and `∼` at every `ℓ` of it.  The rewritten hypothesis gives `⦇ρ∣dom(ρ′ᵢ∣imm) ● ρ_reb ● ρ_b⦈(ℓ) ∼ ⦇ρ′ ● (ρ⁺ ⊟ ρ_reb) ● ρ_reb⦈(ℓ)`.  If `ℓ ∉ dom(ρ_reb)`, the goal is immediate by the hypothesis and unfolding `reb`.  If `ℓ ∈ dom(ρ_reb)`, then since all components of the composition besides `ρ_reb` outlive `β`, neither side has the immutable borrow at `β` from `ρ_reb`, and both get the borrow from `ρᵢ`.
 
-**Lean.** `BoCa.Fig16.ResU.six59`, alias `TR.lemma_6_59`.
-
-**Note.** `Fig16.ResU.six59`, all six printed hypotheses verbatim, the printed conclusion, every composite named by its graph (G4) including the two flattenings.  proved at **Definition 6.3**, i.e. `Fig16.ResU.SubKeep` — its four bullets together with the paragraph one line below them, which is what makes `⊟` a term (`docs/adjudications.md` §12.64). Not a restriction: `Fig16.ResU.Sub` is the bullets without the paragraph, an incomplete transcription. **The printed proof, step for step.**  Steps 1–3 are `Fig16.ResU.six52` — now with its H1 named (`Fig16.ResU.six52_H1`), its outlives conclusion holding of every admissible `χ` (`Fig16.ResU.six52_sub_inStratum`) and its equation of every admissible `χ` on the corrected bullet (`Fig16.ResU.SubKeep.compS`) — with `Fig16.ResU.restrictDom_split` and `Fig16.ResU.six57`; step 4 is `Fig16.ResU.upd_iff_sim`; step 5 is the rewritten hypothesis read at one location; step 6 is the print's one case split, on `ℓ ∈ dom(ρ_reb)`. **The closing sentence** (`Fig16.ResU.reb_frame_ag_eq`) is read at the walks, because at a reborrowed `ℓ` the rewritten hypothesis is `imm({β}, v, χ) ∼ imm({β}, v, χ)` and says nothing: both sides of the hypothesis are `ag(−) ○ ag(ρ_reb)` and both sides of the goal `ag(−) ○ ag(ρᵢ)` over the same `ag(L)` and `ag(R)`, and `ag(ρ_reb) = ρ_reb ○ bi` with `bi ≼ ag(ρᵢ)` (`Fig16.ResU.reb_ag_split`) factors each as `(ag(−) ○ bi) ○ ρ_reb`. `↭`'s first clause pins every `imm` cell of `ag(L)` (`Fig16.ResU.upd_ag_eq_of_ne_own`), *"all components of the composition besides for `ρ_reb` outlive `β`, neither have the immutable borrow at `β` from `ρ_reb`"* cancels the `{β}` (`Fig16.CellU.reb_frame_imm_le`), and 6.48's ancestor step with its attribution (`Fig16.ResU.upd_ag_imm_wit_factor`, `Fig16.ResU.reb_attribute`) puts each such cell's witness's whole `⦇−⦈_○` in `ag(R) ○ ag(ρᵢ)` — *"and both get the borrow from `ρᵢ`"*. Those are the two hypotheses of `Fig16.AgW.absorb_of_ancestors`, which is `Fig16.AgW.nonimm_beneath_imm` stated as an **absorption** rather than a trace: *"this cell has an ancestor"* is not enough, a cell of the walk being several raised cells composed. So `ag(L)` is absorbed whole; the configuration and `↭` are both symmetric, so the two walks absorb each other and `Fig16.ResU.CompR.functional` makes them one — cell **equality** at `ℓ`, more than the printed `∼` asks. `Fig16.CellU.CompR.imm_imm_union` is what lets the ancestor survive the `○` with `ag(ρ_reb)`: two `imm` cells compose over one value and one witness and join only the lifetime sets. **The other case** — *"if `ℓ ∉ dom(ρ_reb)`, then this is immediate, by the hypothesis and unfolding reb"* — is *unfolding reb* at `Fig16.ResU.reb_imm_image`: `ρ_reb` and `ρᵢ` are `imm`-only, so the swap does not move `ex(−)_●` at all (`Fig16.ResU.ex_eq_of_swap_immOnly`), off `dom(ρ_reb)` `ag(ρ_reb)` adds nothing to `ag(ρᵢ)` (`Fig16.ResU.reb_ag_cell_absorbed_off_dom`), and a flattening whose aliasable walk is silent **is** its exclusive walk — so each side of the goal is the corresponding side of the hypothesis and *the hypothesis* transfers. That route needs no `ρ # ρᵢ` and so no restricted row. `Fig16.ResU.six59_ag_eq` is the part of both halves that is common. `Fig16.ResU.SixFiftyNineResidualKeep` and `Fig16.ResU.SixFiftyNineOffRebKeep` are the two halves, both proved, and `Fig16.ResU.six59` composes them. `ρ_b # ρᵢ` and `ρ′ ● ρ⁺ # ρᵢ` are carried and go unspent at step 6. `docs/adjudications.md` §12.47 records four negatives, §12.55 the statement defect that made a non-obligation look like a corner, and §12.58 the third bullet
+**Lean.** `BoCa.Fig16.ResU.six59`, alias `TR.lemma_6_59`, tag `[restricted: to `ResU.SubKeep` — Definition 6.3 with its third bullet read through the paragraph printed below it]` (`docs/adjudications.md` §12.58, §12.64).
 -/
-/-- **`[TR]` Lemma 6.59** (p. 20): let `ρᵢ = ℓ ↦ imm(ᾱ, ρ′ᵢ, v)`; if
-`ρ ∈ reb_β(ρ′ᵢ)`, `ρ ● ρ_b ↭ ρ′ ● ρ⁺`, `@ρ_b ⊐ β`, `@ρ′ ⊐ β`, `ρ_b # ρᵢ` and
-`ρ′ ● ρ⁺ # ρᵢ`, then `ρᵢ ● ρ_b ↭ ρ′ ● (ρ⁺ ⊟ ρ|dom(ρ′ᵢ|mut,own)) ● ρᵢ`.
-
-All six printed hypotheses verbatim, the printed conclusion, and every
-composite named by its graph (G4), the two flattenings included.  It takes no `Prop`
-hypothesis: `ResU.sixFiftyNineResidualKeep` is the `ℓ ∈ dom(ρ_reb)` half and
-`ResU.sixFiftyNineOffRebKeep` the half the print calls *"immediate"*.
-
-The printed proof, step for step: 6.52 (`ResU.six52_H1`,
-`ResU.six52_sub_inStratum`, `ResU.SubKeep.compS`) and `ρ = ρ|dom(ρ′ᵢ|imm) ●
-ρ_reb` (`ResU.restrictDom_split`) rewrite the update hypothesis; 6.57
-(`ResU.six57`, at the walk `ResU.reb_immPart_ag_absorbs`) gives the middle
-display and the rewriting it licenses; the closing
-sentence is `Fig16.ResU.reb_frame_ag_eq`, *"all components … outlive `β`, neither have the immutable
-borrow at `β` from `ρ_reb`"* being `CellU.reb_frame_imm_le` and *"both get the
-borrow from `ρᵢ`"* `ResU.reb_ag_split` with `ResU.reb_attribute`; and the
-*"immediate"* case is unfolding `reb`.
-
-`[restricted: to `ResU.SubKeep` — Definition 6.3 with its third bullet read
-through the paragraph printed below it (`docs/adjudications.md` §12.58) — where
-`ResU.Sub` is that bullet's own glyphs and is strictly weaker
-(`ResU.SubKeep.toSub`)]` -/
+/-- `[TR]` Lemma 6.59 (p. 20). `[restricted: to `ResU.SubKeep` — Definition 6.3 with its
+third bullet read through the paragraph printed below it (§12.58)]` -/
 theorem ResU.six59
     {β : Life} {ρ'i ρ ρb ρ' ρp χ ρρb ρ'p Xi Y σX σY : ResU BoCa.Loc BoCa.Val}
     {l₀ : BoCa.Loc} {s : LSet} {v : BoCa.Val} {hs : ρ'i.InStratum s.join}
@@ -4371,17 +3606,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Lean.** `BoCa.Fig16.LogRel.vDen_outlives`, alias `TR.lemma_6_60`, tag `[as printed]`.
 
-**Note.** `Fig16.LogRel.vDen_outlives`, on the printed carrier, `[as printed]` — induction on `Δ ⊢ T ⊐ @a`, case for case as p. 21 prints it. The `Imm` case is the printed sentence *"`@bδ ⊑ ⊔β̄`. And by the hypothesis, `@bδ ⊐ @aδ`. Therefore `@ρ ⊐ @aδ`"* at the connective's `@bδ ⊑ ⊓β̄` (definition row 5.30, `docs/adjudications.md` §12.67(a)), where `@ρ = ⊓β̄` and the step is one `lt_of_lt_of_le`. **Read as `MutFrame`'s premise** — how 6.173 uses it, [TR] 6.65 spending `P̂ ⊧ [β] P̂` at one point (p. 23) — it is spent in `Fig16.LogRel.withbor2_compat`.
+**Note.** The `Imm` case is at `@bδ ⊑ ⊓β̄` (definition row 5.30, `docs/adjudications.md` §12.67(a)).
 -/
-/-- **`[TR]` Lemma 6.60** (p. 21): "If `Δ ⊢ T ⊐ @a` and `δ ∈ ⟦Δ⟧`, and
-`ρ ∈ 𝒱⟦T⟧δ` then `@ρ ⊐ @aδ`."  Induction on `Δ ⊢ T ⊐ @a`, case for case as
-printed: the `1` and `Ref` cases are `Res_α` at a resource with no borrow cell,
-`⊗` and `⊕` glue, `[@b]` carries the conclusion in its own conjunct, and `Mut`
-reads it off the row's `β ⊒ @bδ`.  The `Imm` case is the printed sentence —
-"`@bδ ⊑ ⊔β̄`.  And by the hypothesis, `@bδ ⊐ @aδ`.  Therefore `@ρ ⊐ @aδ`" — at
-the connective's `@bδ ⊑ ⊓β̄` (`Fig16.BoLo.ptoImm`, `docs/adjudications.md`
-§12.67), where `@ρ = ⊓β̄` and the step is one `lt_of_lt_of_le`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.60 (p. 21).  `[as printed]` -/
 theorem vDen_outlives {Δ : LifeCtx} {δ : LSub} {a : Lifetime.Life} {α : Life}
     (hδ : Δ.Models δ) (ha : a.interp δ = some α) {T : Ty}
     (hT : OutlivesRules Δ a T) :
@@ -4441,28 +3668,9 @@ variable {Loc Val : Type}
 
 **Lean.** `BoCa.Fig16.ResU.six61`, alias `TR.lemma_6_61`, tag `[as printed]`.
 
-**Note.** `Fig16.ResU.six61`, on the printed carrier, `[as printed]`, at `reb_α`'s `imm` clause read at a subset (definition row 5.28, `docs/adjudications.md` §12.67(b)). *"Any overlapping locations of `ρ′₁` and `ρ′₂` are in `(ρ₁ ● ρ₂)∣imm`"* is **derived** (`Fig16.ResU.reb_overlap`) and is the whole of `ρ′₁ ▸◂ ρ′₂`, so the composite the conclusion names is produced rather than presupposed. *"The only interesting cases are locations `ℓ` that are in both `ρ′₁` and `ρ′₂`"*: at an `imm` location of `ρ₁ ● ρ₂` the composite image is `imm` over a subset of the composite's set, at its value and witness, whichever image carries it (`Fig16.ResU.six61_imm_at`, off `Fig16.ResU.six61_side`) — which is what the `imm` clause asks. The witness for the composite is `π₁ ++ π₂` with `π₂`'s entries at locations already in `dom(ρ′₁)` dropped; with it are `Fig16.BigComp.sublist_factor`, `Fig16.ResU.CompatS.of_factors`, `Fig16.ResU.CompS.inStratum` and `Fig16.ResU.CompS.erase_left`
+**Note.** At `reb_α`'s `imm` clause read at a subset (definition row 5.28, `docs/adjudications.md` §12.67(b)).
 -/
-/-- **`[TR]` Lemma 6.61** (p. 22): if `ρ′₁ ∈ reb_α(ρ₁)`, `ρ′₂ ∈ reb_α(ρ₂)` and
-`ρ₁ ▸◂ ρ₂` then `ρ′₁ ● ρ′₂ ∈ reb_α(ρ₁ ● ρ₂)`.
-
-`ρ₁ ● ρ₂` is named by its graph (G4), whose own first conjunct is the printed
-`ρ₁ ▸◂ ρ₂`; `ρ′₁ ● ρ′₂` is **produced**, not assumed, since the printed proof's
-own overlap argument is exactly its definedness (`ResU.reb_overlap`).
-
-The witness for the composite reborrow is `π₁ ++ π₂` with `π₂`'s entries at
-locations already in `dom(ρ′₁)` dropped — at such a location both source cells
-are `imm` and both pieces are the singleton `reb_α`'s `imm` clause forces, so
-either will do.  `BigComp.sublist_factor` folds what is left,
-`ResU.CompatS.of_factors` composes the two folds under the printed `ρ₁ ▸◂ ρ₂`,
-and `ResU.CompS.exchange₄` rebrackets `(⨀π₁ ● ⨀π₂′) ● (…)` to give
-`ρ ≥ ⨀π`.  `ResU.CompS.inStratum` is `@ρ ⊐ α` for the composite.
-
-Then `reb_α`'s three clauses, at each location.  The `own` and `mut` clauses go
-through because a non-`imm` source cell puts the other operand out of the way
-(`ResU.CompS.get_split_of_ne_imm`), and with it the other image.  The `imm`
-clause is `ResU.six61_imm_at`: the composite image is `imm` over a subset of the
-composite source's lifetime set.  `[as printed]` -/
+/-- `[TR]` Lemma 6.61 (p. 22).  `[as printed]` -/
 theorem ResU.six61 {α : Life} {ρ₁ ρ₂ ρ'₁ ρ'₂ ρ : ResU Loc Val}
     (hreb₁ : ResU.Reb α ρ₁ ρ'₁) (hreb₂ : ResU.Reb α ρ₂ ρ'₂)
     (hc : ResU.CompS ρ₁ ρ₂ ρ) :
@@ -4611,9 +3819,8 @@ open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
-/-! `[about ours]` — what the Lean of Lemma 6.62 needs; the paper prints nothing here. -/
-/-- 6.62's fold over `⊛_{x∈dom(Γ)}`: `[]⋆` at each live slot and 6.60 at its
-clause.  On `gSep`, so that it recurses. -/
+/-! `[about ours]` — for Lemma 6.62. -/
+/-- 6.62's fold over `⊛_{x∈dom(Γ)}`: `[]⋆` at each live slot and 6.60 at its clause. -/
 theorem gSep_outlives {Δ : LifeCtx} {δ : LSub} {a : Lifetime.Life} {α : Life}
     (hδ : Δ.Models δ) (ha : a.interp δ = some α) :
     ∀ {Γ : Ctx Ty} {γ : List Val} {ρ : WRes},
@@ -4651,11 +3858,9 @@ theorem gSep_outlives {Δ : LifeCtx} {δ : LSub} {a : Lifetime.Life} {α : Life}
 
 **Lean.** `BoCa.Fig16.LogRel.gDen_box`, alias `TR.lemma_6_62`, tag `[as printed]`.
 
-**Note.** `Fig16.LogRel.gDen_box`, `[as printed]` — "By `[]⋆`, it suffices to show `∀x ∈ dom(Γ). @ρₓ ⊐ @aδ`", each by 6.60 (`Fig16.LogRel.vDen_outlives`), folded over the live slots by `Fig16.LogRel.gSep_outlives`. `Δ ⊢ Γ ⊐ @a` is `Ctx.Outlives`, [CONF] Figs. 6/7's reading of the judgment [TR] leaves undefined (§12.6), carrying [TR] p. 2's own presupposition `Δ ⊨ @a`.
+**Note.** `Δ ⊢ Γ ⊐ @a` is `Ctx.Outlives`, `[CONF]` Figs. 6/7's reading (`docs/adjudications.md` §12.6).
 -/
-/-- **`[TR]` Lemma 6.62** (p. 22): "If `Δ ⊢ Γ ⊐ @a` and `δ ∈ ⟦Δ⟧`, then
-`𝒢⟦Γ⟧δ(γ) ⊨ [@aδ] 𝒢⟦Γ⟧δ(γ)`."  "By `[]⋆`, it suffices to show
-`∀x ∈ dom(Γ). @ρₓ ⊐ @aδ`", each by 6.60.  `[as printed]` -/
+/-- `[TR]` Lemma 6.62 (p. 22).  `[as printed]` -/
 theorem gDen_box {Δ : LifeCtx} {δ : LSub} {a : Lifetime.Life} {α : Life}
     (hδ : Δ.Models δ) (ha : a.interp δ = some α) {Γ : Ctx Ty}
     (hΓ : Ctx.Outlives Δ Γ a)

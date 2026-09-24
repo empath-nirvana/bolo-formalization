@@ -15,33 +15,9 @@ import Support.Model.Singletons
 
 The rules of the lifetime modality `[α]` (6.96–6.107), of the freshness quantifier
 `Иα` (6.108–6.112), of immutable points-to `ℓ ↦I_α P̂` (6.113–6.116) and of mutable
-points-to `ℓ ↦M_α P̂` (6.117–6.119).  Lemma 6.112 is declared in §6.3's file, whose
-printed proofs open with it; its record and aliases are here.
-
-**How this file reads.**  The numbered results of the subsection, in printed order as
-far as Lean's definition-before-use allows.  Each opens with a record:
-
-* the result's number, page and status (`proved`, `proved*`, `variant`; the
-  legend is in `Paper/INDEX.md`);
-* the printed statement, quoted, with the extraction's garbled symbols restored;
-* the printed proof, transcribed compactly and in its own order, citing the lemmas it
-  cites;
-* the Lean declaration (its docstring carries the tag and its account of the
-  proof),
-  and the numbered alias `TR.lemma_6_N` declared after it;
-* a note on how the declaration reads the printed statement.
-
-A result whose declaration an earlier subsection's printed proof needs is declared
-in that subsection's file, under a heading saying so; its record and alias stay
-here.  A run of declarations the paper does not print, placed in this file only
-because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  `§N` citations are to
-`docs/adjudications.md`.
-
-**The typed world.**  A result whose statement the source also proves at the typed
-world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
-4.4–4.14's) — names that declaration in its record under *Typed-world version*; the
-declaration itself is in `Support/TypedWorld/`, where a heading points back here.
+points-to `ℓ ↦M_α P̂` (6.117–6.119).  Lemma 6.112 is declared in §6.3's file; its
+record and aliases are here.  Records as in §6.1's file; *Typed-world version*
+names the statement proved at the typed world, in `Support/TypedWorld/`.
 -/
 
 noncomputable section
@@ -59,11 +35,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Suppose `P ⊨ Q`, and let `P(ρ)` and `@ρ ⊐ α`.  By `P ⊨ Q` and `P(ρ)`, `Q(ρ)`.
 
 **Lean.** `BoCa.Fig16.BoLo.box_mono`, aliases `TR.lemma_6_96`, `TR.«[]-mono»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_mono`, on the printed carrier — the printed premise `P ⊨ Q` alone.
 -/
-/-- **`[TR]` Lemma 6.96** (`[]-mono`, p. 29): from `P ⊨ Q`, `[α]P ⊨ [α]Q`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.96 (`[]-mono`, p. 29).  `[as printed]` -/
 theorem box_mono {α : Life} {P Q : SPropU Loc Val} (h : P ⊨ Q) : box α P ⊨ box α Q :=
   fun ρ k => ⟨h ρ k.1, k.2⟩
 
@@ -83,10 +56,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By inspection.
 
 **Lean.** `BoCa.Fig16.BoLo.box_L`, aliases `TR.lemma_6_97`, `TR.«[]l»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_L`, on the printed carrier.
 -/
-/-- **`[TR]` Lemma 6.97** (`[]l`, p. 29): `[α]P ⊨ P`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.97 (`[]l`, p. 29).  `[as printed]` -/
 theorem box_L (α : Life) (P : SPropU Loc Val) : box α P ⊨ P := fun _ h => h.1
 
 end BoCa.Fig16.BoLo
@@ -107,11 +78,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By inspection.
 
 **Lean.** `BoCa.Fig16.BoLo.box_R`, aliases `TR.lemma_6_98`, `TR.«[]r»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_R`, on the printed carrier — the premise's left side is `[α]P`, as printed.
 -/
-/-- **`[TR]` Lemma 6.98** (`[]r`, p. 29): from `[α]P ⊨ Q`, `[α]P ⊨ [α]Q`.
-The premise's left side is `[α]P`, as printed.  `[as printed]` -/
+/-- `[TR]` Lemma 6.98 (`[]r`, p. 29).  `[as printed]` -/
 theorem box_R {α : Life} {P Q : SPropU Loc Val} (h : box α P ⊨ Q) : box α P ⊨ box α Q :=
   fun ρ k => ⟨h ρ k, k.2⟩
 
@@ -131,10 +99,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Case `⊨`: let `P(ρ)`, `@ρ ⊐ α` and `@ρ ⊐ β`; by lattice laws, `@ρ ⊐ α ⊔ β`.  Case `⫤`: let `P(ρ)` and `@ρ ⊐ α ⊔ β`; by lattice laws, `@ρ ⊐ α` and `@ρ ⊐ β`.
 
 **Lean.** `BoCa.Fig16.BoLo.box_4`, aliases `TR.lemma_6_99`, `TR.«[]4»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_4` — `[α][β]P ⊨ [α ⊔ β]P`, the one `⊨` the print states
 -/
-/-- **`[TR]` Lemma 6.99** (`[]4`, p. 29): `[α][β]P ⊨ [α ⊔ β]P`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.99 (`[]4`, p. 29).  `[as printed]` -/
 theorem box_4 (α β : Life) (P : SPropU Loc Val) : box α (box β P) ⊨ box (α ⊔ β) P := by
   rintro ρ ⟨⟨hP, h₂⟩, h₁⟩
   exact ⟨hP, ResU.InStratum.sup h₁ h₂⟩
@@ -157,11 +123,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Suppose `α ⊒ β`, and let `P(ρ)` and `@ρ ⊐ α`.  By transitivity, `@ρ ⊐ α ⊒ β`; thus `@ρ ⊐ β`.
 
 **Lean.** `BoCa.Fig16.BoLo.box_antitone`, aliases `TR.lemma_6_100`, `TR.«[]⊒»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_antitone`, on the printed carrier. `Life.Sqsubseteq β α` is `β ⊑ α`, the printed `α ⊒ β`.
 -/
-/-- **`[TR]` Lemma 6.100** (`[] ⊒`, p. 29): from `α ⊒ β`, `[α]P ⊨ [β]P`.
-`β ⊑ α` is the printed `α ⊒ β`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.100 (`[] ⊒`, p. 29).  `[as printed]` -/
 theorem box_antitone {α β : Life} (h : β ⊑ α) (P : SPropU Loc Val) :
     box α P ⊨ box β P := fun _ k => ⟨k.1, k.2.mono h⟩
 
@@ -181,12 +144,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Let `P(ρ)`.  Choose `α` to be `↓@ρ`.  By Lemma 6.63, `@ρ ⊐ ↓@ρ`.
 
 **Lean.** `BoCa.Fig16.BoLo.box_ex_R`, aliases `TR.lemma_6_101`, `TR.«[]∃r»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_ex_R` — the witness is `↓@ρ`, as [TR]'s proof chooses.
 -/
-/-- **`[TR]` Lemma 6.101** (`[]∃r`, p. 30): `P ⊨ ∃α. [α]P`.  The witness is
-`↓@ρ`, as [TR]'s proof chooses; `@ρ` is total on this carrier, so no side
-condition is needed.  `[as printed]` -/
+/-- `[TR]` Lemma 6.101 (`[]∃r`, p. 30).  `[as printed]` -/
 theorem box_ex_R (P : SPropU Loc Val) : P ⊨ ex (fun α => box α P) := by
   intro ρ hP
   obtain ⟨a, ha⟩ := ρ.exists_atLife
@@ -211,11 +170,9 @@ variable {Loc Val : Type}
 
 **Literal reading.** `BoCa.Fig16.BoLo.box_all_needs_nonempty`, in `Paper/LiteralReadings/S6_5_NonStandardEntailments.lean`.
 
-**Note.** `Fig16.BoLo.box_all`, `[restricted: to a nonempty index type]` — as 6.88; [TR]'s proof of the `⊨` direction opens "Suppose X ≠ ∅". The printed `⫤⊨` is one declaration. `Fig16.BoLo.box_all_needs_nonempty` is the restriction checked, at any `ρ` outside `Res_⊤` — that is, any `ρ` holding a borrow
+**Note.** `[restricted: to a nonempty index type]` — as 6.88; [TR]'s proof of the `⊨` direction opens "Suppose X ≠ ∅".
 -/
-/-- **`[TR]` Lemma 6.102** (`[]∀`, p. 30): `∀x. [α]P̂(x) ⫤⊨ [α]∀x. P̂(x)`.
-`[restricted: to a nonempty index type; the printed statement omits it and
-[TR]'s own proof of the `⊨` direction opens "Suppose X ≠ ∅"]` -/
+/-- `[TR]` Lemma 6.102 (`[]∀`, p. 30).  `[restricted: to a nonempty index type]` -/
 theorem box_all {A : Type} (hA : Nonempty A) (α : Life) (Φ : A → SPropU Loc Val) :
     all (fun x => box α (Φ x)) ⫤⊨ box α (all Φ) := by
   constructor
@@ -240,11 +197,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Case `⊨`: let `P̂(x)(ρ)` for some `x` and `@ρ ⊐ α`; choose `x`.  Immediate.  Case `⫤`: similar.
 
 **Lean.** `BoCa.Fig16.BoLo.box_ex`, aliases `TR.lemma_6_103`, `TR.«[]∃»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_ex` — a genuine `⫤⊨`, both directions in one declaration
 -/
-/-- **`[TR]` Lemma 6.103** (`[]∃`, p. 30): `∃x. [α]P̂(x) ⫤⊨ [α]∃x. P̂(x)`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.103 (`[]∃`, p. 30).  `[as printed]` -/
 theorem box_ex {A : Type} (α : Life) (Φ : A → SPropU Loc Val) :
     ex (fun x => box α (Φ x)) ⫤⊨ box α (ex Φ) :=
   ⟨fun _ h => h.elim fun x hx => ⟨⟨x, hx.1⟩, hx.2⟩,
@@ -266,12 +220,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Case `⊨`: let `ρ = ρ₁ ● ρ₂` with `P(ρ₁)`, `Q(ρ₂)` and `@(ρ₁ ● ρ₂) ⊐ α`; choose `ρ₁, ρ₂`.  It suffices that `@ρ₁ ⊐ α` and `@ρ₂ ⊐ α`, which follows by Lemma 6.45.  Case `⫤`: similar.
 
 **Lean.** `BoCa.Fig16.BoLo.box_sep`, aliases `TR.lemma_6_104`, `TR.«[]⋆»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_sep`, on the printed carrier — a genuine `⫤⊨`, both directions, through `Fig16.ResU.atLife_comp_sqsupset` (6.45), which is the theorem [TR]'s proof cites. The row prints the same statement twice (600 dpi).
 -/
-/-- **`[TR]` Lemma 6.104** (`[]⋆`, p. 30): `[α](P ⋆ Q) ⫤⊨ [α]P ⋆ [α]Q`, both
-directions.  The row prints the same statement twice (600 dpi).  Both
-directions are `[TR]` Lemma 6.45, which is `outlives_comp`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.104 (`[]⋆`, p. 30).  `[as printed]` -/
 theorem box_sep (α : Life) (P Q : SPropU Loc Val) :
     box α (P ⋆ Q) ⫤⊨ box α P ⋆ box α Q := by
   constructor
@@ -297,11 +247,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Case `⊨`: let `(P(ρ) ∨ Q(ρ)) ∧ @ρ ⊐ α`; it suffices that `(P(ρ) ∧ @ρ ⊐ α) ∨ (Q(ρ) ∧ @ρ ⊐ α)`, which follows by De Morgan's laws.  Case `⫤`: similar.
 
 **Lean.** `BoCa.Fig16.BoLo.box_or`, aliases `TR.lemma_6_105`, `TR.«[]∨»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_or` — a genuine `⫤⊨`
 -/
-/-- **`[TR]` Lemma 6.105** (`[]∨`, p. 30): `[α](P ∨ Q) ⫤⊨ [α]P ∨ [α]Q`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.105 (`[]∨`, p. 30).  `[as printed]` -/
 theorem box_or (α : Life) (P Q : SPropU Loc Val) :
     box α (or P Q) ⫤⊨ or (box α P) (box α Q) :=
   ⟨fun _ h => h.1.elim (fun k => Or.inl ⟨k, h.2⟩) (fun k => Or.inr ⟨k, h.2⟩),
@@ -323,10 +270,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By inspection.
 
 **Lean.** `BoCa.Fig16.BoLo.box_bang`, aliases `TR.lemma_6_106`, `TR.«[]!»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_bang` — a genuine `⫤⊨`
 -/
-/-- **`[TR]` Lemma 6.106** (`[]!`, p. 30): `[α]!P ⫤⊨ ![α]P`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.106 (`[]!`, p. 30).  `[as printed]` -/
 theorem box_bang (α : Life) (P : SPropU Loc Val) :
     box α (!ₛP) ⫤⊨ !ₛ(box α P) :=
   ⟨fun _ h => ⟨h.1.1, h.1.2, h.2⟩, fun _ h => ⟨⟨h.1, h.2.1⟩, h.2.2⟩⟩
@@ -347,13 +292,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By inspection.
 
 **Lean.** `BoCa.Fig16.BoLo.box_ptoOwn`, aliases `TR.lemma_6_107`, `TR.«[]↦»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.box_ptoOwn`, `[as printed]` — no side condition on `α`. An owned cell carries no borrow, so it lies in every stratum, which is the step [TR] 6.121 (p. 32) closes as "`@(ℓ ↦ own(v)) ⊐ α`, which holds by definition". This row read `[restricted: to `α ⊏ ⊤`]` while `@ρ ⊐ α` was transcribed as a single compare of the meet over the codomain; `docs/adjudications.md` §C.25 records the correction
 -/
-/-- **`[TR]` Lemma 6.107** (`[]↦`, p. 30): `ℓ ↦ v ⊨ [α] ℓ ↦ v`.  An owned cell
-carries no borrow, so it lies in every stratum and the entailment needs no side
-condition on `α` — the step `[TR]` 6.121 (p. 32) closes as
-"`@(ℓ ↦ own(v)) ⊐ α`, which holds by definition".  `[as printed]` -/
+/-- `[TR]` Lemma 6.107 (`[]↦`, p. 30).  `[as printed]` -/
 theorem box_ptoOwn (α : Life) (l : Loc) (v : Val) :
     ptoOwn l v ⊨ box α (ptoOwn l v) := by
   rintro ρ rfl
@@ -381,13 +321,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** A table of steps.  Unfold `И`: `∃β. ∀α ⊏ β. [α]P(α) ⊨ ∃β. ∀α ⊏ β. [α]Q(α)`.  Apply `∃L`; choose `β ≔ β ⊓ β′` on the right; fix `α ⊏ β ⊓ β′`: `(∀α ⊏ β. [α]P(α)) ⊨ [α]Q(α)`.  Choose `α ≔ α` on the left: `[α]P(α) ⊨ [α]Q(α)`.  Follows by assumption because `α ⊏ β′`.
 
 **Lean.** `BoCa.Fig16.BoLo.fresh_mono`, aliases `TR.lemma_6_108`, `TR.«И-mono»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.fresh_mono` — the premise is the printed `[α]P̂(α) ⊨ [α]Q̂(α)`, and the bound is `β ⊓ β′`, as [TR]'s proof chooses.
 -/
-/-- **`[TR]` Lemma 6.108** (`⋔-mono`, p. 30): from `∀α ⊏ β′. ([α]P̂(α) ⊨ [α]Q̂(α))`,
-`⋔α. P̂(α) ⊨ ⋔α. Q̂(α)`.  The premise is the printed one — a bi-implication
-between the *boxed* propositions — and the conclusion's bound is `β ⊓ β′`, as
-[TR]'s proof chooses.  `[as printed]` -/
+/-- `[TR]` Lemma 6.108 (`⋔-mono`, p. 30).  `[as printed]` -/
 theorem fresh_mono {β' : Life} {P Q : Life → SPropU Loc Val}
     (h : ∀ α, α ⊏ β' → (box α (P α) ⊨ box α (Q α))) : fresh P ⊨ fresh Q := by
   rintro ρ ⟨β, hβ⟩
@@ -414,12 +349,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** A table of steps.  Unfold `И`: `∃β. ∀α ⊏ β. [α]P(α) ⊨ Q`.  Fix `β` arbitrary: `∀α ⊏ β. [α]P(α) ⊨ Q`.  Choose arbitrary `α ⊏ β ⊓ β′`, always possible since `⊏` is infinitely decreasing: `[α]P(α) ⊨ Q`.  Follows by assumption because `α ⊏ β′`.
 
 **Lean.** `BoCa.Fig16.BoLo.fresh_L`, aliases `TR.lemma_6_109`, `TR.«Иl»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.fresh_L` — the premise is the printed `[α]P̂(α) ⊨ Q`; the eliminated lifetime is `↓(β ⊓ β′)`, [TR]'s "arbitrary `α ⊏ β ⊓ β′`"
 -/
-/-- **`[TR]` Lemma 6.109** (`⋔l`, p. 30): from `∀α ⊏ β′. ([α]P̂(α) ⊨ Q)`,
-`⋔α. P̂(α) ⊨ Q`.  The eliminated lifetime is `↓(β ⊓ β′)`, [TR]'s "arbitrary
-`α ⊏ β ⊓ β′`, always possible `⊏` is infinitely decreasing".  `[as printed]` -/
+/-- `[TR]` Lemma 6.109 (`⋔l`, p. 30).  `[as printed]` -/
 theorem fresh_L {β' : Life} {P : Life → SPropU Loc Val} {Q : SPropU Loc Val}
     (h : ∀ α, α ⊏ β' → (box α (P α) ⊨ Q)) : fresh P ⊨ Q := by
   rintro ρ ⟨β, hβ⟩
@@ -443,13 +374,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** A table of steps.  Unfold `И`: `P ⊨ ∃β. ∀α ⊏ β. [α]P`.  Apply `[]∃R` on the left: `∃β. [β]P ⊨ ∃β. ∀α ⊏ β. [α]P`.  Fix `β`; choose `β ≔ β`: `[β]P ⊨ ∀α ⊏ β. [α]P`.  Fix `α ⊏ β`: `[β]P ⊨ [α]P`.  Apply `[]⊒`.
 
 **Lean.** `BoCa.Fig16.BoLo.fresh_R`, aliases `TR.lemma_6_110`, `TR.«Иr»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.fresh_R` — no hypothesis, as printed. The bound is `@ρ`, total on the printed carrier;
 -/
-/-- **`[TR]` Lemma 6.110** (`⋔r`, p. 30): `P ⊨ ⋔α. P`.  The bound is `@ρ`, which
-is total on this carrier, so the rule carries no side condition — [TR]'s
-own proof goes through 6.101 and 6.100, which are `box_ex_R` and `box_antitone`
-above.  `[as printed]` -/
+/-- `[TR]` Lemma 6.110 (`⋔r`, p. 30).  `[as printed]` -/
 theorem fresh_R (P : SPropU Loc Val) : P ⊨ fresh (fun _ => P) := by
   intro ρ hP
   obtain ⟨a, ha⟩ := ρ.exists_atLife
@@ -471,11 +397,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** A table of steps.  Unfold `И`: `(∃β_P. ∀α_P ⊏ β_P. P(α_P)) ⋆ (∃β_Q. ∀α_Q ⊏ β_Q. Q(α_Q)) ⊨ ∃β. ∀α ⊏ β. (P(α) ⋆ Q(α))`.  Fix `β_P, β_Q`; choose `β ≔ β_P ⊓ β_Q`; fix `α ⊏ β_P ⊓ β_Q`; choose `α_P ≔ α`, `α_Q ≔ α`: `P(α) ⋆ Q(α) ⊨ P(α) ⋆ Q(α)`.
 
 **Lean.** `BoCa.Fig16.BoLo.fresh_sep`, aliases `TR.lemma_6_111`, `TR.«И⋆»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.fresh_sep`, on the printed carrier.
 -/
-/-- **`[TR]` Lemma 6.111** (`⋔⋆`, p. 31): `⋔α. P̂(α) ⋆ ⋔α. Q̂(α) ⊨ ⋔α. (P̂(α) ⋆ Q̂(α))`.
-The bound is `β_P ⊓ β_Q`, as [TR]'s proof chooses.  `[as printed]` -/
+/-- `[TR]` Lemma 6.111 (`⋔⋆`, p. 31).  `[as printed]` -/
 theorem fresh_sep (P Q : Life → SPropU Loc Val) :
     (fresh P ⋆ fresh Q) ⊨ fresh (fun α => P α ⋆ Q α) := by
   rintro ρ ⟨ρ₁, ρ₂, hc, ⟨β₁, h₁⟩, ⟨β₂, h₂⟩⟩
@@ -497,8 +420,6 @@ alias TR.«И⋆» := BoCa.Fig16.BoLo.fresh_sep
 **Printed proof, transcribed.** A chain: `P ⋆ Иα. Q(α) ⊨ ∃β. [β]P ⋆ Иα. Q(α)` by `[]∃r`; `⊨ ∃β. [β][β]P ⋆ Иα. Q(α)` by `[]4`; `⊨ (∃β. ∀α ⊏ β. [α][α]P) ⋆ Иα. Q(α)` by `[]⊒` and monotonicity; `⊨ Иα. [α]P ⋆ Иα. Q(α)` by the definition of `И`; `⊨ Иα. ([α]P ⋆ Q(α))` by `И⋆`.
 
 **Lean.** `BoCa.Fig16.BoLo.fresh_frame`, aliases `TR.lemma_6_112`, `TR.«Иf»`, tag `[as printed]` — declared in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean`, ahead of this subsection: the Lean of Lemmas 6.64 and 6.65 there needs it.
-
-**Note.** `Fig16.BoLo.fresh_frame` — `P ⋆ ⋔α.Q̂(α) ⊨ ⋔α.([α]P ⋆ Q̂(α))`, with the bound `@ρ_P ⊓ β_Q` that [TR]'s chain through 6.101, 6.99, 6.100 and 6.111 computes
 -/
 alias TR.lemma_6_112 := BoCa.Fig16.BoLo.fresh_frame
 alias TR.«Иf» := BoCa.Fig16.BoLo.fresh_frame
@@ -518,11 +439,8 @@ variable {Loc Val : Type}
 **Lean.** `BoCa.Fig16.BoLo.ptoImm_mono`, aliases `TR.lemma_6_113`, `TR.«I-mono»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.ptoImmS_mono`, in `Support/TypedWorld/RelationFacts.lean`.
-
-**Note.** `Fig16.BoLo.ptoImm_mono`, on the printed carrier — the printed premise alone.
 -/
-/-- **`[TR]` Lemma 6.113** (`I-mono`, p. 31): from `∀v. P̂(v) ⊨ Q̂(v)`,
-`ℓ ↦I_α P̂ ⊨ ℓ ↦I_α Q̂`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.113 (`I-mono`, p. 31).  `[as printed]` -/
 theorem ptoImm_mono {l : Loc} {α : Life} {P Q : Val → SPropU Loc Val}
     (h : ∀ v, P v ⊨ Q v) : ptoImm l α P ⊨ ptoImm l α Q := by
   rintro ρ ⟨s, v, σ, hs, rfl, hP, hα⟩
@@ -546,11 +464,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Suppose `α ⊒ β`, and let `ρ = ℓ ↦ imm(β̃, v, ρ′)` with `P̂(v)(ρ′)` and `α ⊑ ⊔β̃`.  Choose `β̃, v, ρ′`; it suffices that `β ⊑ ⊔β̃`, which follows by transitivity, `β ⊑ α ⊑ ⊔β̃`.
 
 **Lean.** `BoCa.Fig16.BoLo.ptoImm_antitone`, aliases `TR.lemma_6_114`, `TR.«I⊒»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.ptoImm_antitone`, on the printed carrier.
 -/
-/-- **`[TR]` Lemma 6.114** (`I ⊒`, p. 31): from `α ⊒ β`, `ℓ ↦I_α P̂ ⊨ ℓ ↦I_β P̂`.
-`β ⊑ α` is the printed `α ⊒ β`.  `[as printed]` -/
+/-- `[TR]` Lemma 6.114 (`I ⊒`, p. 31).  `[as printed]` -/
 theorem ptoImm_antitone {l : Loc} {α β : Life} (h : β ⊑ α) (P : Val → SPropU Loc Val) :
     ptoImm l α P ⊨ ptoImm l β P := by
   rintro ρ ⟨s, v, σ, hs, rfl, hP, hα⟩
@@ -580,16 +495,9 @@ equal-index case, `[CONF]`.
 
 **Literal reading.** `BoCa.Fig16.BoLo.not_iAgreeAtJoin`, in `Paper/LiteralReadings/S6_5_NonStandardEntailments.lean`.
 
-**Note.** `Fig16.BoLo.ptoImm_agree`, on the printed carrier, `[variant: conclusion at `α ⊓ β` where the print has `α ⊔ β`]`, through `Fig16.ResU.compatS_single_imm_inv` (6.44) and `Fig16.ResU.compS_single_imm` (6.43): `●` unions the sets and `⊓(β̄₁ ∪ β̄₂) = ⊓β̄₁ ⊓ ⊓β̄₂`. With `ℓ ↦ Imm α P̂` at `α ⊑ ⊓β̄` (definition row 5.30, `docs/adjudications.md` §12.67(a)) the printed index does not follow: `Fig16.BoLo.not_iAgreeAtJoin` is `Fig16.BoLo.IAgreeAtJoin` refused at cells `{1}` and `{2}`, whose union has meet `2`, not `⊒ 1 ⊔ 2`. `Fig16.BoLo.ptoImm_agree_eq` is the equal-index case, where `α ⊓ α = α ⊔ α` and the printed conclusion is reached — [CONF] 415:13 describes `I Agree` as aliases that "all agree on the lifetime". `℘⁺`'s nonemptiness is `Fig16.LSet`'s own (G2)
+**Note.** `[variant: conclusion at `α ⊓ β` where the print has `α ⊔ β`]`, at `ℓ ↦ Imm α P̂` bounded by `⊓β̄` (definition row 5.30, `docs/adjudications.md` §12.67(a)): `●` unions the lifetime sets, and `⊓(β̄₁ ∪ β̄₂) = ⊓β̄₁ ⊓ ⊓β̄₂`.  `ptoImm_agree_eq` is the equal-index case, where the printed conclusion is reached — [CONF] 415:13 describes `I Agree` as aliases that "all agree on the lifetime".
 -/
-/-- **`[TR]` Lemma 6.115** (`I-ag`, p. 31): `ℓ ↦I_α P̂ ⋆ ℓ ↦I_β Q̂ ⊨
-ℓ ↦I_{α⊓β} (P̂ ∧ Q̂)`.  `▶◀` pins the value and the witness and lets only the
-lifetime sets differ, so `●` unions the sets, and `⊓(β̄₁ ∪ β̄₂) = ⊓β̄₁ ⊓ ⊓β̄₂`
-bounds the composite at the meet of the two indices.
-`[variant: the conclusion's index is `α ⊓ β` where the print has `α ⊔ β`; with
-`ptoImm` at `⊓β̄` (`docs/adjudications.md` §12.67) the union's meet is bounded by
-`α ⊓ β` and not by `α ⊔ β` — `not_iAgreeAtJoin`.  `ptoImm_agree_eq` is the
-equal-index case, `[CONF]` 415:13's aliases that "all agree on the lifetime"]` -/
+/-- `[TR]` Lemma 6.115 (`I-ag`, p. 31).  `[variant: conclusion at `α ⊓ β`]` -/
 theorem ptoImm_agree (l : Loc) (α β : Life) (P Q : Val → SPropU Loc Val) :
     (ptoImm l α P ⋆ ptoImm l β Q) ⊨ ptoImm l (α ⊓ β) (fun v => and (P v) (Q v)) := by
   rintro ρ ⟨ρ₁, ρ₂, hc, ⟨s, v₁, σ₁, h₁, rfl, hP, hα⟩, ⟨t, v₂, σ₂, h₂, rfl, hQ, hβ⟩⟩
@@ -614,10 +522,8 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-! A declaration the record of Lemma 6.115 (I-ag) cites. -/
-/-- **`[TR]` Lemma 6.115 at equal indices**: `ℓ ↦I_α P̂ ⋆ ℓ ↦I_α Q̂ ⊨
-ℓ ↦I_α (P̂ ∧ Q̂)`, where `α ⊓ α = α = α ⊔ α` and the printed conclusion is
-reached.  `[restricted: to `α = β`, the aliases `[CONF]` 415:13 says "all agree
-on the lifetime"]` -/
+/-- `[TR]` Lemma 6.115 at equal indices, where the printed conclusion is reached.
+`[restricted: to `α = β`]` -/
 theorem ptoImm_agree_eq (l : Loc) (α : Life) (P Q : Val → SPropU Loc Val) :
     (ptoImm l α P ⋆ ptoImm l α Q) ⊨ ptoImm l α (fun v => and (P v) (Q v)) := by
   intro ρ h
@@ -632,12 +538,8 @@ theorem ptoImm_agree_eq (l : Loc) (α : Life) (P Q : Val → SPropU Loc Val) :
 **Printed proof, transcribed.** Let `ρ = ℓ ↦ imm(β̃, v, ρ′)` with `P̂(v)(ρ′)` and `α ⊑ ⊔β̃`.  Choose `ρ₁, ρ₂` to be `ρ, ρ`; it suffices that `ρ = ρ ● ρ`, which follows from Lemma 6.43.
 
 **Lean.** `BoCa.Fig16.BoLo.ptoImm_dup`, aliases `TR.lemma_6_116`, `TR.«I-dup»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.ptoImm_dup`, on the printed carrier — through 6.43, which is [TR]'s own proof.
 -/
-/-- **`[TR]` Lemma 6.116** (`I-dup`, p. 31): `ℓ ↦I_α P̂ ⊨ ℓ ↦I_α P̂ ⋆ ℓ ↦I_α P̂`.
-[TR]'s proof cites 6.43, which is `ResU.compS_single_imm`; the lifetime set is
-idempotent under `∪`, so the composite is the same cell.  `[as printed]` -/
+/-- `[TR]` Lemma 6.116 (`I-dup`, p. 31).  `[as printed]` -/
 theorem ptoImm_dup (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
     ptoImm l α P ⊨ ptoImm l α P ⋆ ptoImm l α P := by
   rintro ρ ⟨s, v, σ, hs, rfl, hP, hα⟩
@@ -666,14 +568,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** By inspection, using functional extensionality.
 
 **Lean.** `BoCa.Fig16.BoLo.ptoMut_inv`, aliases `TR.lemma_6_117`, `TR.«M-inv»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.ptoMut_inv`, on the printed carrier — the printed `⫤⊨` as its conclusion, both halves in one declaration.
 -/
-/-- **`[TR]` Lemma 6.117** (`M-inv`, p. 32): from `∀v. P̂(v) ⫤⊨ Q̂(v)`,
-`ℓ ↦M_α P̂ ⫤⊨ ℓ ↦M_α Q̂`, the printed double turnstile as the conclusion.
-[TR]'s proof is "by inspection, using functional extensionality", which is what
-`eq_of_biEntails` does: the cell stores the invariant itself, so the two
-connectives are the same proposition.  `[as printed]` -/
+/-- `[TR]` Lemma 6.117 (`M-inv`, p. 32).  `[as printed]` -/
 theorem ptoMut_inv {l : Loc} {α : Life} {P Q : Val → SPropU Loc Val}
     (h : ∀ v, P v ⫤⊨ Q v) : ptoMut l α P ⫤⊨ ptoMut l α Q := by
   have e : P = Q := funext fun v => eq_of_biEntails (h v)
@@ -698,11 +594,8 @@ variable {Loc Val : Type}
 **Printed proof, transcribed.** Suppose `α ⊒ β`, and let `ρ = ℓ ↦ mut(β₀, v, ρ′, P̂)` for some `β₀ ⊒ α`, `v`, `ρ′`.  Choose `β₀, v, ρ′`; it suffices that `β₀ ⊒ β`, by transitivity `β₀ ⊒ α ⊒ β`.
 
 **Lean.** `BoCa.Fig16.BoLo.ptoMut_antitone`, aliases `TR.lemma_6_118`, `TR.«M⊒»`, tag `[as printed]`.
-
-**Note.** `Fig16.BoLo.ptoMut_antitone`, on the printed carrier.
 -/
-/-- **`[TR]` Lemma 6.118** (`M ⊒`, p. 32): from `α ⊒ β`, `ℓ ↦M_α P̂ ⊨ ℓ ↦M_β P̂`.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.118 (`M ⊒`, p. 32).  `[as printed]` -/
 theorem ptoMut_antitone {l : Loc} {α β : Life} (h : β ⊑ α) (P : Val → SPropU Loc Val) :
     ptoMut l α P ⊨ ptoMut l β P := by
   rintro ρ ⟨b, v, σ, hs, Q, hw, hb, rfl, hd⟩
@@ -717,10 +610,8 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-! A declaration the record of Lemma 6.119 (M-ex) cites. -/
-/-- **`MExcl`** — `ℓ ↦M_α P̂ ⋆ ℓ ↦ _ ⊨ ⊥` at the widest reading of the wildcard.
-`[variant: `[TR]` Lemma 6.119's `_` is an elided value, and this reads it as a
-cell of any kind, so this is strictly stronger; the printed instance is
-`ptoMut_excl_own`]` -/
+/-- `ℓ ↦M_α P̂ ⋆ ℓ ↦ _ ⊨ ⊥` with `_` read as a cell of any kind.
+`[variant: of [TR] Lemma 6.119, whose `_` is an elided value]` -/
 theorem ptoMut_excl (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
     (ptoMut l α P ⋆ ptoAny l) ⊨ bot := by
   rintro ρ ⟨ρ₁, ρ₂, ⟨hc, -⟩, ⟨b, v, σ, hs, Q, hw, -, rfl, -⟩, ψ, rfl⟩
@@ -739,11 +630,9 @@ theorem ptoMut_excl (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
 
 **Also here.** `BoCa.Fig16.BoLo.ptoMut_excl`.
 
-**Note.** `Fig16.BoLo.ptoMut_excl_own`, on the printed carrier — the elided value bound at the theorem, exactly as 6.95; through `Fig16.ResU.compatS_single_mut` (6.42), the theorem [TR]'s proof cites. `Fig16.BoLo.ptoMut_excl` is the wildcard reading and carries the `[variant: …]` tag
+**Note.** The elided value is bound at the theorem, as in 6.95.  `ptoMut_excl` reads `_` as a cell of any kind, `[variant]`.
 -/
-/-- **`[TR]` Lemma 6.119** (`M-ex`, p. 32): `ℓ ↦M_α P̂ ⋆ ℓ ↦ _ ⊨ ⊥`, with the
-elided value bound at the theorem exactly as in 6.95; [TR]'s proof cites 6.42.
-`[as printed]` -/
+/-- `[TR]` Lemma 6.119 (`M-ex`, p. 32).  `[as printed]` -/
 theorem ptoMut_excl_own (l : Loc) (α : Life) (P : Val → SPropU Loc Val) (v : Val) :
     (ptoMut l α P ⋆ ptoOwn l v) ⊨ bot :=
   Entails.trans (sep_mono (Entails.refl _) (ptoAny_of_own l v)) (ptoMut_excl l α P)

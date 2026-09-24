@@ -7,15 +7,7 @@ import Support.Model.Update
 /-!
 # [TR] §6.2 — remarks on Definition 6.2
 
-`ψ ∼ ψ′` (row 5.65): transitivity, and `upd_iff_sim`, the theorem that `[CONF]`
-Fig. 18b's two clauses of `↭` and `[TR]` §6's "same domain, `∼` pointwise" form are
-the same relation.  Lemmas 6.39 and 6.59 read `↭` through it.
-
-These are theorems about printed definitions — definition rows of
-`Paper/INDEX.md` whose Lean is a theorem — whose proofs use results
-of `[TR]` §6, so they cannot sit with the definitions.  Each carries the row's
-number, printed form, page, tag and note.  A row's theorem that a §6 result's Lean
-needs is declared in that result's file, and the row here says where.
+Theorems about `ψ ∼ ψ′` (row 5.65) whose proofs use `[TR]` §6.
 -/
 
 noncomputable section
@@ -23,16 +15,9 @@ noncomputable section
 namespace BoCa.Fig16
 variable {Loc Val : Type}
 
-/-!
-### 5.65 · `ψ ∼ ψ′ ≔ (ψ = mut(α,_,_,P̂) ∧ ψ′ = mut(α,_,_,P̂)) ∨ (ψ = ψ′ = imm(ᾱ,v,ρ))` — [TR] Definition 6.2, not a p. 5 row · [TR] p. 13 · `[as printed]`
-
-[TR] p. 13 prints it and then unfolds `↭` through it at Lemmas 6.39, 6.40, 6.44 and 6.59, always as "dom(⦇ρ₁⦈∣imm,mut) = dom(⦇ρ₂⦈∣imm,mut) and for every ℓ in that domain, ⦇ρ₁⦈(ℓ) ∼ ⦇ρ₂⦈(ℓ)". Read at 1200 dpi: α and P̂ are bound outside the `mut` conjunction and the two `_`s — value and witness — inside each conjunct, while the `imm` disjunct asks for equality outright, which is `BoCa.Fig16.ResU.UpdImm`/`UpdMut`'s asymmetry printed as one relation. `upd_iff_sim` is the bridge and it is a theorem: [CONF] Fig. 18b's two clauses and [TR] §6's `dom + ∼` form are the same relation, both flattenings named (G4). `ResU.borrowPart` is `ρ∣imm,mut`, the same printed coverage gap row 5.51 closes for `ρ∣own,mut`. [TR] Lemma 6.44's proof asserts `∼` is transitive "since imms are required to be equal and muts are required to have" the same lifetime and invariant; `CellU.Sim.trans` is that. **This definition had no row and no Lean declaration before this entry**, which is why [TR] §6's proofs had no printed route to follow
--/
-/-- **`∼` is transitive** — `[TR]` Lemma 6.44's proof says so and why: *"imms
-are required to be equal and muts are required to have"* the same lifetime and
-invariant.  The middle cell cannot be both an `imm` and a `mut`, so the two
-disjuncts cannot be crossed.
-`[about ours: the transitivity of `∼` that `[TR]` Lemma 6.44's proof asserts]` -/
+/-- `∼` is transitive, as `[TR]` Lemma 6.44's proof asserts: *"imms are required
+to be equal and muts are required to have"* the same lifetime and invariant.
+`[about ours]` -/
 theorem CellU.Sim.trans {ψ₁ ψ₂ ψ₃ : CellU Loc Val} (h₁ : CellU.Sim ψ₁ ψ₂)
     (h₂ : CellU.Sim ψ₂ ψ₃) : CellU.Sim ψ₁ ψ₃ := by
   rcases h₁ with ⟨a, P, hA, ⟨v₂, χ₂, h₂', hw₂, e₂⟩⟩ | ⟨s, v, χ, hh, e₁, e₂⟩
@@ -48,13 +33,8 @@ theorem CellU.Sim.trans {ψ₁ ψ₂ ψ₃ : CellU Loc Val} (h₁ : CellU.Sim ψ
       obtain ⟨rfl, rfl, rfl⟩ := CellU.immOf_inj e₃
       exact Or.inr ⟨s, v, χ, hh, e₁, e₄⟩
 
-/-!
-Row 5.65, continued.
--/
-/-- **`↭` is the form `[TR]` §6's proofs unfold it to.**  `[CONF]` Fig. 18b's
-two clauses and `[TR]`'s *"`dom(⦇ρ₁⦈|imm,mut) = dom(⦇ρ₂⦈|imm,mut)` and pointwise
-`∼`"* are the same relation, with both flattenings named (G4).
-`[about ours: `[CONF]` Fig. 18b's `↭` against the form `[TR]` §6's proofs use]` -/
+/-- `[CONF]` Fig. 18b's `↭` is `[TR]` §6's *"`dom(⦇ρ₁⦈|imm,mut) = dom(⦇ρ₂⦈|imm,mut)`
+and pointwise `∼`"*, both flattenings named (G4).  `[about ours]` -/
 theorem ResU.upd_iff_sim {ρ₁ ρ₂ σ₁ σ₂ : ResU Loc Val}
     (h₁ : ResU.Flat ρ₁ σ₁) (h₂ : ResU.Flat ρ₂ σ₂) :
     ResU.Upd ρ₁ ρ₂ ↔ ResU.SimForm σ₁ σ₂ := by

@@ -17,40 +17,18 @@ import Support.Model.Update
 import Support.Model.WalkSplitting
 
 /-!
-# [TR] §6.3 Frame and Anti-Frame  (physical pp. 22–27), Theorems 6.64–6.66
+# [TR] §6.3 Frame and Anti-Frame (pp. 22–27), Theorems 6.64–6.66
 
 The three frame rules at the printed `wp` (`[TR]` p. 6): Imm Frame (6.64), Mut Frame
 (6.65) and Anti Frame (6.66).  Each proof builds a *"fictional"* borrow cell —
 `ℓ ↦ imm({α}, v, ρ_P̂(v))` or `ℓ ↦ mut(α, v, ρ_P̂(v), P̂)` — in place of
 `ℓ ↦ own(v) ● ρ_P̂(v)`, runs `e` against it, and trades it back with the surgery
-lemmas of §6.2 (6.24–6.29, 6.34, 6.38, 6.39).  The printed proofs of 6.64 and 6.65
-open with Lemma 6.112 (`Иf`, §6.5), which is therefore declared in this file, ahead of
-its subsection.
+lemmas of §6.2 (6.24–6.29, 6.34, 6.38, 6.39).  Lemma 6.112 (`Иf`, §6.5), with which
+the proofs of 6.64 and 6.65 open, is declared here.
 
-**How this file reads.**  The numbered results of the subsection, in printed order as
-far as Lean's definition-before-use allows.  Each opens with a record:
-
-* the result's number, page and status (`proved`, `proved*`, `variant`; the
-  legend is in `Paper/INDEX.md`);
-* the printed statement, quoted, with the extraction's garbled symbols restored;
-* the printed proof, transcribed compactly and in its own order, citing the lemmas it
-  cites;
-* the Lean declaration (its docstring carries the tag and its account of the
-  proof),
-  and the numbered alias `TR.lemma_6_N` declared after it;
-* a note on how the declaration reads the printed statement.
-
-A result whose declaration an earlier subsection's printed proof needs is declared
-in that subsection's file, under a heading saying so; its record and alias stay
-here.  A run of declarations the paper does not print, placed in this file only
-because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  `§N` citations are to
-`docs/adjudications.md`.
-
-**The typed world.**  A result whose statement the source also proves at the typed
-world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
-4.4–4.14's) — names that declaration in its record under *Typed-world version*; the
-declaration itself is in `Support/TypedWorld/`, where a heading points back here.
+Records as in `Paper/S6_1_StandardLemmas/Lemmas.lean`.  A record's *Typed-world
+version* names the same result at `wpTS` (row 5.33's repair), declared in
+`Support/TypedWorld/`.
 -/
 
 noncomputable section
@@ -59,13 +37,12 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-### Lemma 6.112 (Иf)'s declaration, ahead of its subsection
+### Lemma 6.112 (Иf), ahead of its subsection
 
-`[TR]` prints Lemma 6.112 (Иf) in §6.5 (p. 31).  The Lean of Lemmas 6.64 and 6.65 in this file needs it, so it is declared here; its statement, printed proof and alias are in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`.
+Printed in §6.5 (p. 31); its record and alias are in `Paper/S6_5_NonStandardEntailments/Lemmas.lean`.
 -/
-/-- **`[TR]` Lemma 6.112** (`⋔f`, p. 31): `P ⋆ ⋔α. Q̂(α) ⊨ ⋔α. ([α]P ⋆ Q̂(α))`.
-[TR] derives it from 6.101, 6.99, 6.100 and 6.111; the bound `@ρ_P ⊓ β_Q` is
-what that chain computes.  `[as printed]` -/
+/-- `[TR]` Lemma 6.112 (`⋔f`, p. 31).  The bound `@ρ_P ⊓ β_Q` is what the printed
+chain 6.101, 6.99, 6.100, 6.111 computes.  `[as printed]` -/
 theorem fresh_frame (P : SPropU Loc Val) (Q : Life → SPropU Loc Val) :
     (P ⋆ fresh Q) ⊨ fresh (fun α => box α P ⋆ Q α) := by
   rintro ρ ⟨ρ₁, ρ₂, hc, hP, ⟨β, hβ⟩⟩
@@ -93,42 +70,12 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Lean.** `BoCa.Fig16.LogRel.wp_I_frame`, aliases `TR.lemma_6_64`, `TR.«Imm Frame»`, tag `[as printed]`.
 
-**Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_I_frameX`, in `Support/TypedWorld/FrameRules.lean`.
+**Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_I_frameX`, in `Support/TypedWorld/FrameRules.lean`, `[variant: `P̂ ≔ 𝒱X⟦T⟧δ`, `TW.immFrame`'s `AdmWf` premise, `Q̂` stable along `Typed.Ext`]` (§12.70, §12.72).
 
-**Note.** `Fig16.LogRel.wp_I_frame`, on the printed carrier, `[as printed]` — [TR] p. 22's display at this file's `wp`, no premise added: the borrow is immutable, so the lender gets the **same** `v` back and there is no `∀v′` and no `P̂ ⊨ [β]P̂`. The printed proof step for step: 6.112 (`Fig16.BoLo.fresh_frame`) pulls `ℓ ↦ v ⋆ P̂(v)` inside the `N`, *"such an `α` always exists"* is `↓β`, and 6.104 splits the box over the `⋆`, its two conjuncts giving H10 and H11 (`Fig16.ResU.CompS.inStratum_right`). The *"fictional"* `ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))` is `Fig16.CellU.immOf` at `Fig16.LSet.singleton`, *"well formed by H10"* being that constructor's own typing argument. H12 is `▸◂` off `ρ`'s decomposition with `✓ρ` by 6.10; H13 and H15 are **6.34** (`Fig16.ResU.six34`); H14 and H16 are 6.11 (`Fig16.ResU.Hash.split`); H17 is 6.15 (`Fig16.ResU.hash_of_pairwise`). H26 is **6.29** with H11, H12 and H21 followed by *"by H24, `ℓ ∉ dom(ρ′)`"* — together `Fig16.ResU.six38_steps_one_two`; **H28 is 6.38** itself (`Fig16.ResU.six38`) with H12, H27, H11, H24, H22 and H21, and it is the step this row waited on. H29–H33 are 6.11 and 6.15 again; H34 is **6.26** under a frame by 6.8 (`Fig16.ResU.lower_swap_imm_own`), spent at both ends of the run; H35 is **6.39** (`Fig16.ResU.six39`), which returns `↭` with both validity conjuncts, so no separate 6.28-style step is needed; H36 applies the returned `─⋆` to the cell and the payload. The seven printed goals are then discharged at `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)` and `ρ⁺ ≔ ρ⁺/ℓ`, in the print's own order.  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_I_frameX` is this proof at `Fig16.LogRel.Typed.wpTS` with the record list carried: entry by `Fig16.LogRel.Typed.TW.immFrame` at the record and its lineage (`Fig16.LogRel.Typed.lineage_list`), tagged at the frame's `α`, exit by `Fig16.LogRel.Typed.TW.immEnd`; `[variant: …]` names `P̂ ≔ 𝒱X⟦T⟧δ`, `TW.immFrame`'s `AdmWf` premise, and `Q̂` stable along `Fig16.LogRel.Typed.Ext` (§12.70, §12.72)
+**Note.** The bare `Q̂` under the inner `─⋆` is the postcondition at the run's own result, as 6.172 (p. 45) applies it.
 -/
-/-- **`[TR]` Theorem 6.64** (`Imm Frame`, physical p. 22):
-
-    ℓ ↦ v ⋆ P̂(v) ⋆ (⋔α. Imm α P̂ ─⋆ wp(e){[α] (ℓ ↦ v ─⋆ P̂(v) ─⋆ Q̂)})  ⊨  wp(e){Q̂}
-
-The immutable-borrow analogue of `AntiFrame`/`MutFrame`: a lender gives up the
-cell and its payload for the length of one run at a fresh `⋔α`, and — because
-the borrow is immutable — gets the **same** value `v` back, not an arbitrary
-`v′`, so no `∀v′` and no premise `P̂ ⊨ [β]P̂` appear (contrast 6.65's `MutFrame`,
-whose payload may change).  The bare `Q̂` under the inner `─⋆` is the
-postcondition at the run's own result, the same reading as at `wp_M_frame`:
-6.172 (p. 45), which cites this rule as `ImmFrame`, applies `Q̂` to the pair the
-run returns.
-`[TR]`'s proof, step for step.  6.112 (`Fig16.BoLo.fresh_frame`) pulls
-`ℓ ↦ v ⋆ P̂(v)` inside the `⋔`; `α ⊏ β` is picked at `↓β`, *"such an `α` always
-exists"*; 6.104 is the `[α]` the `⋆` is split under, and H10 and H11 are its two
-conjuncts at the factors (`ResU.CompS.inStratum_right`).  The *"fictional"*
-`ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))` is `CellU.immOf` at `LSet.singleton α`, *"well
-formed by H10"* being that constructor's own typing argument.  H12 is `▸◂` off
-`ρ`'s own decomposition with `✓ρ` by 6.10 from H3; H13 and H15 are 6.34
-(`ResU.six34`); H14 and H16 are 6.11 (`ResU.Hash.split`); H17 is 6.15
-(`ResU.hash_of_pairwise`).
-
-H18 is the wand at that borrow, and unfolding `wp` under `ρ_f` gives H19-H23.
-H26 is 6.29 with H11, H12 and H21 followed by *"by H24, `ℓ ∉ dom(ρ′)`"* — the
-two together are `ResU.six38_steps_one_two` — and H28 is 6.38 itself
-(`ResU.six38`) with H12, H27, H11, H24, H22 and H21.  H29-H33 are 6.11 and
-6.15 again.  H34 is 6.26 under a frame by 6.8 (`ResU.lower_swap_imm_own`),
-spent at both ends of the run, and H35 is 6.39 (`ResU.six39`).  H36 applies the
-returned `─⋆` to the cell and the payload, and the seven goals are then the
-print's, at `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)` and `ρ⁺ ≔ ρ⁺/ℓ`.
-`[as printed]` (`[TR]` p. 22's display, at this file's `wp` — `Fig16Wp`'s row
-over `BoLo.Steps`, as every §6.7 rule there) -/
+/-- `[TR]` Theorem 6.64 (`Imm Frame`, p. 22).
+`[as printed]` (at this file's `wp`, `Fig16Wp`'s row over `BoLo.Steps`) -/
 theorem wp_I_frame (l : BoCa.Loc) (P : Val → WProp) (v : Val) (e : Expr)
     (Q : Val → WProp) :
     Entails
@@ -298,33 +245,12 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Lean.** `BoCa.Fig16.LogRel.wp_M_frame`, aliases `TR.lemma_6_65`, `TR.«Mut Frame»`, tag `[as printed]`.
 
-**Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_M_frameX`, in `Support/TypedWorld/FrameRules.lean`.
+**Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_M_frameX`, in `Support/TypedWorld/FrameRules.lean`, with the premise `P̂ ⊨ [β]P̂` taken at every record list (§12.70).
 
-**Note.** `Fig16.LogRel.wp_M_frame`, on the printed carrier, `[as printed]` — `[TR]` p. 24's display at this file's `wp`, premise `P̂ ⊨ [β]P̂` included. The printed proof step for step: 6.112 (`Fig16.BoLo.fresh_frame`) pulls `ℓ ↦ v ⋆ P̂(v)` inside the `N`, *"let `α` be some lifetime where `α ⊏ γ ⊓ β`"* is `↓(γ ⊓ β)`, and 6.104 (`Fig16.BoLo.box_sep`) splits the box. `P̂ ⊨ [β]P̂` is what puts `P̂`'s resources in `Res_α`, which is what lets the *"fictional"* `ρ_m` be built at all.  6.24 is spent at H13 and H15, 6.15 (`Fig16.ResU.hash_of_pairwise`) at H17, **6.27 (`Fig16.ResU.six27`) at H26**, 6.25 with 6.8 (`Fig16.ResU.lower_swap_mut_own`) at H33 and 6.28 at H34. The rule's body is 6.65 as printed, premise `P̂ ⊨ [β]P̂` included — `docs/adjudications.md` D9  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_M_frameX`, this proof at `Fig16.LogRel.Typed.wpTS`, entry by `Fig16.LogRel.Typed.TW.mutFold` (`Fig16.LogRel.Typed.ptoMutX_create`) and exit by `Fig16.LogRel.Typed.TW.mutUnfold`; the premise `P̂ ⊨ [β]P̂` is taken at every list, the stratified family's reading (§12.70)
+**Note.** The display's borrow `Mut α P̂` is the cell assertion `ℓ ↦ Mut α P̂` (`ptoMut l α P`), as the proof's `ρ_m` and 6.66's display write it; the premise `P̂ ⊨ [β]P̂` is taken at each value, as `[CONF]` Fig. 13a prints it; the bare `Q̂` is the postcondition at the run's own result, as 6.173 (p. 46) writes it.
 -/
-/-- **`[TR]` Theorem 6.65** (`Mut Frame`, p. 24): if `P̂ ⊨ [β] P̂`, then
-
-    ℓ ↦ v ⋆ P̂(v) ⋆ (⋔α. Mut α P̂ ─⋆ wp(e){[α] ∀v′. ℓ ↦ v′ ─⋆ P̂(v′) ─⋆ Q̂})  ⊨  wp(e){Q̂}
-
-The lender gives up the cell and its payload for the length of one run, at a
-lifetime `⋔α` shorter than everything in hand, and gets back whatever the
-borrower left in the cell together with the promise that it satisfies `P̂` —
-`[CONF]` Fig. 13a's `M FRAME`.  Three readings, none a change:
-
-* `⋔α` is `Fig16.BoLo.fresh`, `[TR]` p. 6's row;
-* the display prints the borrow as `Mut α P̂`, without its `ℓ ↦`; the proof's
-  own `ρ_m = ℓ ↦ mut(α, v, ρ_{P̂(v)}, P̂)` and 6.66's display one page on both
-  write the cell, and that is `ptoMut l α P`;
-* the bare `Q̂` under the inner `─⋆` is the postcondition at the run's own
-  result, as at `wp_M_antiFrame`: 6.173 (p. 46), which cites this rule as
-  `MutFrame`, writes the binder out —
-  `{v″. [α] ∀v′. ℓ ↦ v′ ─⋆ 𝒱⟦T₁⟧δ(v′) ─⋆ 𝒱⟦Ref T₁ ⊗ T₂⟧δ(ℓ, v″)}`.
-
-The premise `P̂ ⊨ [β] P̂` is at each value, as `[CONF]` Fig. 13a prints it
-(`∀v_p. P̂(v_p) ⊨ [β]P̂(v_p)`); it is what lets the proof's `ρ_m` be a
-well-formed `mut` cell at the `α ⊏ β` it picks.
-`[as printed]` (`[TR]` p. 24's display, at this file's `wp` — `Fig16Wp`'s row
-over `BoLo.Steps`, as every §6.7 rule there) -/
+/-- `[TR]` Theorem 6.65 (`Mut Frame`, p. 24).
+`[as printed]` (at this file's `wp`, `Fig16Wp`'s row over `BoLo.Steps`) -/
 theorem wp_M_frame (l : BoCa.Loc) (β : Life) (P : Val → WProp)
     (hP : ∀ v, Entails (P v) (box β (P v))) (v : Val) (e : Expr) (Q : Val → WProp) :
     Entails
@@ -532,38 +458,12 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Lean.** `BoCa.Fig16.LogRel.wp_M_antiFrame`, aliases `TR.lemma_6_66`, `TR.«Anti Frame»`, tag `[as printed]`.
 
-**Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_M_antiFrameX`, in `Support/TypedWorld/FrameRules.lean`.
+**Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_M_antiFrameX`, in `Support/TypedWorld/FrameRules.lean` (§12.70).
 
-**Note.** `Fig16.LogRel.wp_M_antiFrame`, on the printed carrier, `[as printed]` — `[TR]` p. 25's display at this file's `wp`. The printed proof step for step: `ρ_ℓ ● ρ_P̂(v)`, which the print writes without comment, is `Fig16.ResU.compS_own_of_valid_mut` off `✓ρ_m`; 6.24 (`Fig16.ResU.six24`) is spent four times, at H8, H9 and again at H20–H23, with 6.11 (`Fig16.ResU.Hash.split`) and `Fig16.ResU.hash_of_pairwise` for the compatibility list the print gives there; *"note since `ρ_m` is well formed, `ρ''_m` is as well"* is `Fig16.ResU.valid_single_mut_of_wit` by 6.23; H24 is `Fig16.ResU.lower_swap_mut_own`, 6.25 under a frame by 6.8, at both ends of the run; H25 is 6.28 (`Fig16.ResU.six28`). The borrow points-to occurs once positively and once negatively, so those two propositions are incomparable — `docs/adjudications.md` D4  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_M_antiFrameX`, this proof at `Fig16.LogRel.Typed.wpTS`, entry by `Fig16.LogRel.Typed.TW.mutUnfold` and exit by `Fig16.LogRel.Typed.TW.mutFold`; the write is `Fig16.LogRel.Typed.ptoMutX_write` with `Fig16.LogRel.Typed.lifeBound_of_tagged` (§12.70)
+**Note.** The bare `Q̂` under the inner `─⋆` is the postcondition at the run's own result, as the proof's `Q̂(v′)` and 6.174 (p. 47) read it.
 -/
-/-- **`[TR]` Theorem 6.66** (`Anti Frame`, p. 25):
-
-    ℓ ↦ Mut α P̂ ⋆ (∀v. ℓ ↦ v ─⋆ P̂(v) ─⋆
-        wp(e){∃v. ℓ ↦ v ⋆ P̂(v) ⋆ (ℓ ↦ Mut α P̂ ─⋆ Q̂)})  ⊨  wp(e){Q̂}
-
-A holder of the borrow recovers the owned cell and the payload for the length of
-one run and hands the borrow back at the end, which is Pottier's dual of the
-frame rule.  The bare `Q̂` under the inner `─⋆` is the postcondition at the run's
-own result, and that is the reading below: 6.66's own proof discharges it as
-`Q̂(v′)` for the `v′` the run returns, and 6.174 (p. 47), which cites this rule
-as `AntiFrame`, writes the binder out — `{v′. ∃v. ℓ ↦ v ⋆ … ⋆ (… ─⋆ 𝒱⟦−⟧δ(v′))}`.
-6.176 (p. 49) is the other citation, under the name `wp-m-anti-frame`, and the
-one this file spends.
-`[TR]`'s own proof, step for step.  `⋆` and `ℓ ↦ Mut` unfold to H3–H6, and
-`ρ_ℓ ● ρ_P̂(v)` — which the print writes without comment — is
-`ResU.compS_own_of_valid_mut`, off `✓ρ_m`.  6.24 (`Fig16.ResU.six24`) is then
-spent four times, at H8, H9 and again at H20–H23 for the resource the callback
-hands back, and 6.11 (`ResU.Hash.split`) with `ResU.hash_of_pairwise` is the
-compatibility bookkeeping the print lists there.  The two wands give H10, and
-unfolding `wp` at `ρ_a ● ρ_ℓ ● ρ_P̂(v)` gives H11–H15; `∃` and `⋆` give
-H16–H19.  *"Note since `ρ_m` is well formed, `ρ''_m` is as well"* is
-`ResU.valid_single_mut_of_wit`, by 6.23 at the payload's own `own` cell.  H24
-is `ResU.lower_swap_mut_own` — 6.25 under a frame by 6.8 — spent at both ends
-of the run, and H25 is 6.28 (`Fig16.ResU.six28`).  H26 is the inner wand, and
-the six goals are then the print's own list.
-
-`[as printed]` (`[TR]` p. 25's display, at this file's `wp` — `Fig16Wp`'s row
-over `BoLo.Steps`, as every §6.7 rule there) -/
+/-- `[TR]` Theorem 6.66 (`Anti Frame`, p. 25).
+`[as printed]` (at this file's `wp`, `Fig16Wp`'s row over `BoLo.Steps`) -/
 theorem wp_M_antiFrame (l : BoCa.Loc) (α : Life) (P : Val → WProp) (e : Expr)
     (Q : Val → WProp) :
     Entails
