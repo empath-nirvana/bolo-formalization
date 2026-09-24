@@ -5,8 +5,7 @@ import Mathlib
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the carrier's prelude: `min`/`max` arithmetic, the finite-domain predicate, casts, bundled bijections, and the index `ι ∈ {own, imm, mut}` of `ρ∣ι`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the carrier's prelude: `min`/`max` arithmetic, the finite-domain predicate, casts, bundled bijections, and the index `ι ∈ {own, imm, mut}` of `ρ∣ι`.
 -/
 
 noncomputable section

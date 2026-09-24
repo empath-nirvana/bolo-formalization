@@ -13,8 +13,7 @@ import Support.Model.Subtraction
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-what `[TR]` 6.150 names and does not prove: the hypothesis `RebEscrow` (6.55's two inputs at the reborrows `↺_β P̂` names), a lifetime below two given ones, and `ρ⁺|own = ∅` through the pieces of `ρᵢ ● ρ⁺′`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+what `[TR]` 6.150 names and does not prove: the hypothesis `RebEscrow` (6.55's two inputs at the reborrows `↺_β P̂` names), a lifetime below two given ones, and `ρ⁺|own = ∅` through the pieces of `ρᵢ ● ρ⁺′`.
 -/
 
 noncomputable section
@@ -32,7 +31,7 @@ walk, which is the shape 6.55 takes it in (`∀a. ag(ρ_f) = a ⇒ …`) with th
 frame left free — 6.150's proof spends 6.55 at three different frames.
 
 The `b` that indexes `P̂` is the `b` of the reborrow: `↺_β P̂` puts `P̂` under
-the `Иβ` binder (§3), so the predicate read off a reborrow at `β` is `P̂(β)`.
+the `Иβ` binder, so the predicate read off a reborrow at `β` is `P̂(β)`.
 `[about ours: the two added inputs of `Fig16.ResU.six55`, at the reborrows
 `[TR]` 6.150's precondition names]` -/
 def RebEscrow (P : Life → BoCa.Val → WProp) : Prop :=

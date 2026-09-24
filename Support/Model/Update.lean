@@ -14,8 +14,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the update relation `↭` at both printed readings, `reb_α` read at one location, and the form `[TR]` §6 unfolds `↭` to.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the update relation `↭` at both printed readings, `reb_α` read at one location, and the form `[TR]` §6 unfolds `↭` to.
 -/
 
 noncomputable section

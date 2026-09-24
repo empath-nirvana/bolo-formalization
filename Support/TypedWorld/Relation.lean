@@ -14,8 +14,7 @@ import Support.TypedWorld.World
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the repaired logical relation of `[TR]` §4: `vX`, the `Imm`/`Mut` points-to at a record list, the context relation `gDenX` and the judgment `SemX`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the repaired logical relation of `[TR]` §4: `vX`, the `Imm`/`Mut` points-to at a record list, the context relation `gDenX` and the judgment `SemX`.
 -/
 
 noncomputable section
@@ -73,7 +72,7 @@ Row 4.9, continued.
 /-- **`𝒱X full ⟦T⟧(ls)δ(v)`.**  `full = true`: the program's relation.  `full = false`: the
 observable view an `imm` cell's payload is held at — `⊸`/`∀` positions relaxed to `True`.
 `[about ours: [TR] p. 4's Imm clause with its payload read at the observable view, per
-[CONF] 415:10 and 415:15; docs/boca-rules.md §12.69–§12.72]` -/
+[CONF] 415:10 and 415:15; docs/adjudications.md §12.69–§12.72]` -/
 def vX (wpX : WpOp) : Bool → Ty → List SRec → LSub → Val → WProp
   | _, .unit, _, _, v => ⌜v = .unit⌝
   | b, .tensor T₁ T₂, ls, δ, v =>
@@ -126,7 +125,7 @@ Row 4.14 · `Δ; Γ ⊨ e : T ≜ !∀ δ,γ. 𝒟⟦Δ⟧(δ) ─⋆ 𝒢⟦Γ�
 -/
 /-- **`Δ; Γ ⊨ e : T` at the typed world**: `[TR]` p. 4's judgment, `∀δ ∈ 𝒟⟦Δ⟧, γ.
 𝒢⟦Γ⟧δ(γ) ⊨ ℰ⟦T⟧δ(γ(e))`, read at `𝒱X` and the tagged `wpTS`, at every record list.
-`[about ours: [TR] p. 4's judgment at the definitions docs/boca-rules.md §12.69–§12.72 repair]` -/
+`[about ours: [TR] p. 4's judgment at the definitions docs/adjudications.md §12.69–§12.72 repair]` -/
 def SemX (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=
   ∀ δ γ (ls : List SRec) ρ, Δ.Models δ → gDenX ls δ Γ γ ρ →
     wpTS ls (substAll γ e) (fun ls' => vP T ls' δ) ρ

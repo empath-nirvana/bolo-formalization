@@ -33,8 +33,7 @@ import Support.TypedWorld.World
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-stratified record lists and `wp` at a tagged typed world (source `BoCa/TypedWp.lean`): relevance, the Kripke order, the stratified `Mut` clause, tags, and the frame steps that only regroup.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+stratified record lists and `wp` at a tagged typed world: relevance, the Kripke order, the stratified `Mut` clause, tags, and the frame steps that only regroup.
 -/
 
 noncomputable section

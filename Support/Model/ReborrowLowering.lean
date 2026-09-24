@@ -21,8 +21,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the steps of Lemmas 6.56–6.58: absorption at `○` and the domains of reborrows.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the steps of Lemmas 6.56–6.58: absorption at `○` and the domains of reborrows.
 -/
 
 noncomputable section

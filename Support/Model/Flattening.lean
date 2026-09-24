@@ -8,8 +8,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-validity and lowering: the pointwise facts behind Lemmas 6.7, 6.10 and 6.30, and the union of two memories.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+validity and lowering: the pointwise facts behind Lemmas 6.7, 6.10 and 6.30, and the union of two memories.
 -/
 
 noncomputable section
@@ -21,7 +20,7 @@ variable {Loc Val : Type}
 composite is undefined at `ℓ` exactly when both operands are.  Read off `◐`'s
 three pieces, so it holds at every guard and every cell-level operation.
 `[about ours: the step "unfolding ○, dom(ρ₁ ○ ρ₂) = dom(ρ₁) ∪ dom(ρ₂)" of
-`[TR]` Lemma 6.30's proof, at §12's schema and written pointwise, `dom` not
+`[TR]` Lemma 6.30's proof, at the schema and written pointwise, `dom` not
 being an object on this carrier]` -/
 theorem ResU.Comp.eq_none_iff {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
@@ -55,7 +54,7 @@ theorem ResU.Comp.get_of_right_none {R : CellU Loc Val → CellU Loc Val → Pro
   · rw [f₂] at e; exact absurd e (by simp)
   · rw [f₂] at e; exact absurd e (by simp)
 
-/-- `ex(ρ₁)_● ● ex(ρ₂)_●` is `imm`-free: 6.36 (`ExS.immFree`, §18) at each
+/-- `ex(ρ₁)_● ● ex(ρ₂)_●` is `imm`-free: 6.36 (`ExS.immFree`) at each
 factor, and `●` cannot manufacture an `imm` cell out of two non-`imm` ones.
 This is the side condition 6.35's proof hands to 6.30.
 `[about ours: `ResU.ImmFree` is `[TR]` p. 5's `ρ|imm = ∅` written pointwise;
@@ -93,7 +92,7 @@ theorem MemUnion.functional {m₁ m₂ m m' : Loc → Option Val}
 
 /-- **Erasing a composition gives the union of the erasures**, provided the
 cell-level composition composes over a common value — which both `●` and `○` do,
-by `CellU.CompS.erase` and `CellU.CompR.erase` (§13).  The overlap clause is
+by `CellU.CompS.erase` and `CellU.CompR.erase`.  The overlap clause is
 where the print's closing sentence lands: at a location both operands own, the
 one value they share is the value the composite carries. -/
 theorem optUnion_map_erase {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}

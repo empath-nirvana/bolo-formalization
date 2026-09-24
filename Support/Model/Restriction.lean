@@ -6,8 +6,7 @@ import Support.Model.Composition
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`ρ∣dom(σ)` and `ρ/dom(σ)`, the restriction `[TR]` §6 uses and neither document defines.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`ρ∣dom(σ)` and `ρ/dom(σ)`, the restriction `[TR]` §6 uses and neither document defines.
 -/
 
 noncomputable section

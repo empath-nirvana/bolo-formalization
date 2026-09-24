@@ -10,8 +10,7 @@ import Support.Model.Subtraction
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-Lemma 6.52 at `SubKeep`, the form 6.150 spends.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+Lemma 6.52 at `SubKeep`, the form 6.150 spends.
 -/
 
 noncomputable section

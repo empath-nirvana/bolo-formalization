@@ -15,8 +15,8 @@ import Support.Statics.Contexts
 Row 4.16's two directions between the `Mut` clause and `Supported`, and row
 4.18's `sem_iff` (the judgment at `∅` is the judgment).
 
-These are theorems about printed definitions — rows of the source's
-`docs/definition-inventory.md` whose Lean is a theorem — whose proofs use results
+These are theorems about printed definitions — definition rows of
+`Paper/INDEX.md` whose Lean is a theorem — whose proofs use results
 of `[TR]` §6, so they cannot sit with the definitions.  Each carries the row's
 number, printed form, page, tag and note.  A row's theorem that a §6 result's Lean
 needs is declared in that result's file, and the row here says where.
@@ -33,7 +33,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### 4.16 · — no printed counterpart — · [TR] p. 4 · `[repair]`
 
-Fig. 16 row 5's `P̂ : Val → SProp_β` as a predicate, because the model file encodes `SProp_β` as a SUBSET of `SProp` rather than a type. Forced by putting the real predicate in the `mut` cell; it makes visible the side condition the printed `Mut` clause carries silently. Adjudicated at `BoCa/Fig16LogRel.lean` §3's preamble with `BoCa/Fig16.lean` §24: Fig. 16 row 5's `P̂ : Val → SProp_β` is a TYPE, and §24 encodes `SProp_β` as a subset of `SProp` (`BoCa.Fig16.SPropS.toU_range`), so on this carrier the condition is not enforceable by typing and has to be re-expressed as a predicate to be stated at all. [TR] p. 4 writes the relation with the unsubscripted `SProp` while printing both `SProp` and `SProp_α`, so which stratum 𝒱 inhabits is a condition the print carries silently. Both directions are proved
+Fig. 16 row 5's `P̂ : Val → SProp_β` as a predicate, because the model file encodes `SProp_β` as a SUBSET of `SProp` rather than a type. Forced by putting the real predicate in the `mut` cell; it makes visible the side condition the printed `Mut` clause carries silently. Adjudicated at definition row 4.16: Fig. 16 row 5's `P̂ : Val → SProp_β` is a TYPE, and the carrier encodes `SProp_β` as a subset of `SProp` (`BoCa.Fig16.SPropS.toU_range`), so on this carrier the condition is not enforceable by typing and has to be re-expressed as a predicate to be stated at all. [TR] p. 4 writes the relation with the unsubscripted `SProp` while printing both `SProp` and `SProp_α`, so which stratum 𝒱 inhabits is a condition the print carries silently. Both directions are proved
 -/
 /-- **The `Mut` clause carries the paper's implicit stratum typing.**  A
 resource in `𝒱⟦Mut @a T⟧δ` exhibits a `β ⊒ @aδ` at which `𝒱⟦T⟧δ` is a

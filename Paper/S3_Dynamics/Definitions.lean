@@ -40,10 +40,8 @@ printed form, the page, a tag, and the reason the Lean has the shape it has:
 * `[about ours]` — a declaration the paper does not print, placed here only
   because Lean needs it before the next printed row.
 
-Row numbers are those of the source repository's `docs/definition-inventory.md`;
-citations of `docs/…` and `BoCa/…` are to that repository (`borrow_lang` at
-`970a9d0`).  Declaration names are the source's, unchanged, so that
-`Bridge/Names.csv` can check each one against its original.
+Row numbers are those of `Paper/INDEX.md` (*Definitions*); `§N` citations are
+to `docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -84,7 +82,7 @@ The `BoCa.Expr.val` inclusion again; plugs to `.app (plug K e) (.val v)`
     K ::= [ ] | (K,e) | (v,K) | let (x,y) = K in e
         | case K {inj₁ x.e₁ | inj₂ y.e₂} | e K | K v
 
-`BoCa/Wp.lean`'s `Kont` has these and three more (`K; e`, `inj₁ K`, `inj₂ K`).
+`BoCa.BoLo.Kont` has these and three more (`K; e`, `inj₁ K`, `inj₂ K`).
 `[as printed]` -/
 inductive Kont where
   /-- `[ ]` -/
@@ -113,11 +111,11 @@ Rows 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, continued.
 
 ### 3.30 · — no printed counterpart in §3 — · [TR] p. 3 · `[repair]`
 
-Forced because [TR] p. 2's 1E types `e₁; e₂` at any `e₁ : 1` while p. 3 prints no such frame. Adjudicated at `docs/boca-rules.md` §12.42 and `BoCa/TR3.lean` §3 and §3c, and argued rather than asserted: [TR] p. 2's 1E types `e₁; e₂` at any `e₁ : 1` while p. 3 prints no `K; e` frame, so a closed term the printed judgment types is stuck beside its own redex (`BoCa.TR3.stuck_wSeq`); §3f refutes the one reading that would close it, `;` as sugar for `(λ_.e₂) e₁`; and `BoCa.TR3.corThree_unreachable` shows [CONF] Corollary 3.3's conclusion unreachable on the machine as printed
+Forced because [TR] p. 2's 1E types `e₁; e₂` at any `e₁ : 1` while p. 3 prints no such frame. Adjudicated at `docs/adjudications.md` §12.42 and D6, and argued rather than asserted: [TR] p. 2's 1E types `e₁; e₂` at any `e₁ : 1` while p. 3 prints no `K; e` frame, so a closed term the printed judgment types is stuck beside its own redex (`BoCa.TR3.stuck_wSeq`); `docs/adjudications.md` D6 refutes the one reading that would close it, `;` as sugar for `(λ_.e₂) e₁`; and `BoCa.TR3.corThree_unreachable` shows [CONF] Corollary 3.3's conclusion unreachable on the machine as printed
 
 ### 3.31 · — no printed counterpart in §3 — · [TR] p. 3 · `[repair]`
 
-Forced because [TR] p. 2's ⊕I types `injᵢ e` at any `e` while p. 3 prints no `injᵢ K` frame. Adjudicated at `docs/boca-rules.md` §12.42 and `BoCa/TR3.lean` §3a: [TR] p. 2's ⊕I types `injᵢ e` at any `e`, p. 3 prints no `injᵢ K`, `BoCa.TR3.no_step_inj₁` proves `inj₁ e` irreducible for every `e`, and `BoCa.TR3.stuck_wInj` is a closed typed witness. The argument survives both readings of the self-overlapping `Expr` grammar, since what is missing is a FRAME and identifying `v` with the structural production supplies none
+Forced because [TR] p. 2's ⊕I types `injᵢ e` at any `e` while p. 3 prints no `injᵢ K` frame. Adjudicated at `docs/adjudications.md` §12.42 and D6: [TR] p. 2's ⊕I types `injᵢ e` at any `e`, p. 3 prints no `injᵢ K`, `BoCa.TR3.no_step_inj₁` proves `inj₁ e` irreducible for every `e`, and `BoCa.TR3.stuck_wInj` is a closed typed witness. The argument survives both readings of the self-overlapping `Expr` grammar, since what is missing is a FRAME and identifying `v` with the structural production supplies none
 -/
 /-- [TR] §3's evaluation contexts. -/
 inductive Kont where
@@ -230,7 +228,7 @@ open BoCa.BoLo (Heap)
 /-!
 ### 3.11 · the boxed judgments `(µ,e) → (µ′,e′)` and `(µ,e) ↦ (µ′,e′)` · [TR] p. 4 · `[encoding]`
 
-Named choice: `→` is a definition with an ∃ over `K` rather than an inductive, because the index `K[e]` is not a constructor application. `BoCa/Wp.lean`'s doc comments mislabel `Step1` as `↦` and `Steps` as `↦*`, the print's head arrow; `BoCa/TR3.lean`'s comments have it right
+Named choice: `→` is a definition with an ∃ over `K` rather than an inductive, because the index `K[e]` is not a constructor application. `Step1` is the print's `→` and `Steps` its `→*`; the head arrow `↦` is `Head`
 
 ### 3.13 · 1↦: `(µ, (); e) ↦ (µ, e)` · [TR] p. 4 · `[encoding]`
 
@@ -262,7 +260,7 @@ The term is `.app (.val (.prim .load)) (.val (.loc ℓ))` — row 1.10's nullary
 
 ### 3.22 · store↦: `ℓ ∈ dom(µ)` / `(µ, store ℓ v) ↦ (µ[ℓ ↦ v], ())` · [TR] p. 4 · `[encoding]`
 
-One printed rule, one constructor. [TR] p. 1 derives the printed function part `store ℓ` twice — through `Prim ::= … ∣ store v` and through `e₂ e₁` — and a paper grammar identifies the two derivations; so does `BoCa/Syntax.lean` (row 1.17), so the one printed left-hand side is one Lean term. `BoCa/TR3.lean` §0, §3 and §3d carry the argument
+One printed rule, one constructor. [TR] p. 1 derives the printed function part `store ℓ` twice — through `Prim ::= … ∣ store v` and through `e₂ e₁` — and a paper grammar identifies the two derivations; so does `Expr` (row 1.17), so the one printed left-hand side is one Lean term (`docs/adjudications.md` §12.43)
 -/
 /-- The eight head reductions of the `↦` box on `[TR]` p. 4, at the terms
 `[TR]` p. 1's grammar gives them.  `⊕↦` is schematic in `i` and appears as its
@@ -273,7 +271,7 @@ is fresh.  `free↦`'s `μ ⊎ ℓ ↦ v` on the left says the cell is there and
 removed.  `store↦`'s side condition is the printed `ℓ ∈ dom(μ)`, written as the
 value `w` the location holds.
 
-`BoCa/Wp.lean`'s `Head` is these same nine rules under other names, so the two
+`BoCa.BoLo.Head` is these same nine rules under other names, so the two
 machines differ only in `Kont`.  `[as printed]` -/
 inductive Head : Heap → Expr → Heap → Expr → Prop where
   /-- `1↦`:  `(μ, (); e) ↦ (μ, e)`.  The left component is literally `()`. -/
@@ -303,7 +301,7 @@ inductive Head : Heap → Expr → Heap → Expr → Prop where
   /-- `store↦`:  `ℓ ∈ dom(μ)` ⟹ `(μ, store ℓ v) ↦ (μ[ℓ ↦ v], ())`.  Its
       function part `store ℓ` is `[TR]` p. 1's VALUE `store v` and also the
       application `(store) ℓ`; the printed grammar identifies the two and so
-      does `BoCa/Syntax.lean`, so ONE printed rule is ONE constructor. -/
+      does `Expr`, so ONE printed rule is ONE constructor. -/
   | store (μ : Heap) (ℓ : Loc) (v w : Val) (h : μ ℓ = some w) :
       Head μ (.app (.app (.val (.prim .store)) (.val (.loc ℓ))) (.val v))
         (μ.upd ℓ v) (.val .unit)
@@ -317,7 +315,7 @@ Row 3.11, continued.
 -/
 /-- `(μ,e) ↦ (μ',e')  ⟹  (μ, K[e]) → (μ', K[e'])` — the one context rule of the
 `[TR]` p. 4 box, and the whole of `→`.  A `def` rather than an inductive for the
-reason `BoCa/Wp.lean` gives: the index `K[e]` is not a constructor application.
+reason `BoCa.BoLo.Step1` gives: the index `K[e]` is not a constructor application.
 `[as printed]` -/
 def Step1 (μ : Heap) (e : Expr) (μ' : Heap) (e' : Expr) : Prop :=
   ∃ (K : Kont) (a a' : Expr), e = K.plug a ∧ e' = K.plug a' ∧ Head μ a μ' a'
@@ -388,7 +386,7 @@ namespace BoCa
 De Bruijn; [CONF] Fig. 15 calls the same term `dupl`
 -/
 /-- `copy ≜ λx. (x, x)`  — the conference paper calls it `dupl`
-    (docs/boca-rules.md §12.21).  Uses the linear `x` twice. -/
+    (docs/adjudications.md §12.21).  Uses the linear `x` twice. -/
 def copy : Expr := .val (.lam (.pair v0 v0))
 
 /-!
@@ -402,7 +400,7 @@ def forget : Expr := .val (.lam unit')
 /-!
 ### 3.36 · — no printed counterpart; [TR] §1 prints only `let (x,y) = e₁ in e₂` — · [TR] p. 4 · `[repair]`
 
-[TR] p. 4's own `swap` and `withswap` use a unary `let z = e;` that no printed grammar produces; `BoCa.elet` desugars it to `(λz. body) e`. Adjudicated at the `elet` declaration and `docs/boca-rules.md` §12.20: [TR] p. 4's own `swap` and `withswap` are written with a unary `let z = e; e′` that [TR] p. 1's grammar does not produce, so a desugaring is forced rather than chosen, and which one is settled by the print — [TR]'s proof of Lemma 6.169 (p. 44) unfolds that `let` to `(λz. store v₁ v₂; (v₁, z)) (load v₁)`, which is `BoCa.elet` exactly. `BoCa.lam2` on its own would be `plumbing`
+[TR] p. 4's own `swap` and `withswap` use a unary `let z = e;` that no printed grammar produces; `BoCa.elet` desugars it to `(λz. body) e`. Adjudicated at the `elet` declaration and `docs/adjudications.md` §12.20: [TR] p. 4's own `swap` and `withswap` are written with a unary `let z = e; e′` that [TR] p. 1's grammar does not produce, so a desugaring is forced rather than chosen, and which one is settled by the print — [TR]'s proof of Lemma 6.169 (p. 44) unfolds that `let` to `(λz. store v₁ v₂; (v₁, z)) (load v₁)`, which is `BoCa.elet` exactly. `BoCa.lam2` on its own would be `plumbing`
 -/
 /-- `let x = e; body` is sugar for `(λx. body) e` — the grammar in Fig. 1 has no
     `let`, only `e₁; e₂` and `let (x,y) = e₁; e₂`. -/

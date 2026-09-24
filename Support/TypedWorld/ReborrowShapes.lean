@@ -16,8 +16,7 @@ import Support.TypedWorld.World
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`[TR]` Lemmas 6.131 and 6.132 at the shape relation `vShape`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`[TR]` Lemmas 6.131 and 6.132 at the shape relation `vShape`.
 -/
 
 noncomputable section

@@ -8,8 +8,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-restriction `ρ∣ι`, singleton resources `ℓ ↦ ψ`, the order `ρ ≤ ρ′`, and the walks and restrictions of singletons.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+restriction `ρ∣ι`, singleton resources `ℓ ↦ ψ`, the order `ρ ≤ ρ′`, and the walks and restrictions of singletons.
 -/
 
 noncomputable section
@@ -66,7 +65,7 @@ theorem ResU.single_get_eq_some {l l' : Loc} {ψ χ : CellU Loc Val}
 
 /-- `ρ ≼ ρ′` — **`[CONF]` p. 415:24 footnote 1's `≤`, at `○` instead of `●`.**
 The print defines the order only at the strict operator, and uses it there for
-`reb_α`'s partition.  §6's walk arguments use the same order at the **relaxed**
+`reb_α`'s partition.  The walk arguments use the same order at the **relaxed**
 operator throughout — "is a `○`-factor of" — and it was written out inline
 rather than named.
 

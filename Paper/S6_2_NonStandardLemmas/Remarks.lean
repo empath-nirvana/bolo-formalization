@@ -11,8 +11,8 @@ import Support.Model.Update
 Fig. 18b's two clauses of `↭` and `[TR]` §6's "same domain, `∼` pointwise" form are
 the same relation.  Lemmas 6.39 and 6.59 read `↭` through it.
 
-These are theorems about printed definitions — rows of the source's
-`docs/definition-inventory.md` whose Lean is a theorem — whose proofs use results
+These are theorems about printed definitions — definition rows of
+`Paper/INDEX.md` whose Lean is a theorem — whose proofs use results
 of `[TR]` §6, so they cannot sit with the definitions.  Each carries the row's
 number, printed form, page, tag and note.  A row's theorem that a §6 result's Lean
 needs is declared in that result's file, and the row here says where.

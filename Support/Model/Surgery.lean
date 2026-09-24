@@ -23,8 +23,7 @@ import Support.Model.WalkSplitting
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the steps of the surgery lemmas 6.21–6.29, 6.34, 6.38 and 6.39: the normal forms of `⦇ρ ● ℓ ↦ own(v) ● ρ_v⦈` and `⦇ρ ● ℓ ↦ imm(α, v, ρ_v)⦈`, and the `mut` cell against `ρ_v ● ℓ ↦ own(v)`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the steps of the surgery lemmas 6.21–6.29, 6.34, 6.38 and 6.39: the normal forms of `⦇ρ ● ℓ ↦ own(v) ● ρ_v⦈` and `⦇ρ ● ℓ ↦ imm(α, v, ρ_v)⦈`, and the `mut` cell against `ρ_v ● ℓ ↦ own(v)`.
 -/
 
 noncomputable section
@@ -267,7 +266,7 @@ theorem ResU.flat_own_normal {l : Loc} {v : Val} {ρ ρv ov w σ : ResU Loc Val}
 /-- **`ag` at a singleton `imm` cell, forwards.**  `[TR]` p. 5's row has three
 factors there: `ρ|imm` is the cell, the `mut` family is empty, and the `imm`
 family has the one member `ex(ρ_v)_○ ○ ag(ρ_v)`, which Definition 6.1 names
-`⦇ρ_v⦈_○`.  The converse of `AgW.single_imm_inv` (§3).
+`⦇ρ_v⦈_○`.  The converse of `AgW.single_imm_inv`.
 `[about ours: `ag`'s printed row evaluated at one `imm` cell]` -/
 theorem AgW.single_imm {l : Loc} {s : LSet} {v : Val} {χ p σ : ResU Loc Val}
     {hstr : χ.InStratum s.join} (hp : ResU.FlatR χ p)

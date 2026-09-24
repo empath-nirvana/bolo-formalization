@@ -8,8 +8,7 @@ import Support.Dynamics.Machine
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`[TR]` p. 6's `wp` over `[TR]` §3's printed machine (`TR3.wp`), and the `∀`-wand `wp-ramify` reads.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`[TR]` p. 6's `wp` over `[TR]` §3's printed machine (`TR3.wp`), and the `∀`-wand `wp-ramify` reads.
 -/
 
 noncomputable section
@@ -32,9 +31,9 @@ over the printed machine:
                      (⟦ρ_f ● ρ⟧, e) ↦* (⟦ρ_f ● ρ′ ● ρ⁺⟧, v)
                    ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺|own = ∅ ∧ Q̂(v)(ρ′)
 
-Character for character `BoCa/Fig16Wp.lean`'s `wp` with `TR3.Steps` for
+Character for character `Fig16.BoLo.wp` with `TR3.Steps` for
 `BoLo.Steps`; the partial `●`s and `⟦−⟧`s are bound and related by their graphs
-for the reason that file gives (convention G4).  `[as printed]` (`[TR]` p. 6's
+(convention G4).  `[as printed]` (`[TR]` p. 6's
 row; the printed compositions and lowerings appear as their graphs — G4) -/
 def wp (e : Expr) (Q : Val → WProp) : WProp := fun ρ =>
   ∀ ρf : WRes, ResU.Hash ρf ρ →
@@ -49,7 +48,7 @@ def wp (e : Expr) (Q : Val → WProp) : WProp := fun ρ =>
       Q v ρ'
 
 /-- `∀v. P̂(v) ─⋆ Q̂(v)` — the ramification wand.  `[TR]` Lemma 6.146 prints
-`(P̂ –⋆ Q̂)`, and this is the reading `BoCa/Fig16Wp.lean` gives it: the only
+`(P̂ –⋆ Q̂)`, and this is the reading `Fig16.BoLo.wp_ramify` gives it: the only
 well-typed one at `P̂, Q̂ : Val → SProp`.
 `[about ours: the reading of 6.146's `(P̂ –⋆ Q̂)`]` -/
 def wandAll (P Q : Val → WProp) : WProp := all fun v => wand (P v) (Q v)

@@ -27,22 +27,22 @@ carry the logical relation through it: `↺V₁` (6.131, by induction on the typ
 **How this file reads.**  The numbered results of the subsection, in printed order as
 far as Lean's definition-before-use allows.  Each opens with a record:
 
-* the result's number, page and the source inventory's status (`proved`, `proved*`,
-  `variant`; source `docs/paper-inventory.md`);
+* the result's number, page and status (`proved`, `proved*`, `variant`; the
+  legend is in `Paper/INDEX.md`);
 * the printed statement, quoted, with the extraction's garbled symbols restored;
 * the printed proof, transcribed compactly and in its own order, citing the lemmas it
   cites;
-* the Lean declaration, moved from the source with its name, statement and proof
-  unchanged (its docstring carries the source's tag and its account of the proof),
+* the Lean declaration (its docstring carries the tag and its account of the
+  proof),
   and the numbered alias `TR.lemma_6_N` declared after it;
-* the inventory row's note.
+* a note on how the declaration reads the printed statement.
 
 A result whose declaration an earlier subsection's printed proof needs is declared
 in that subsection's file, under a heading saying so; its record and alias stay
 here.  A run of declarations the paper does not print, placed in this file only
 because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
-are to the source repository (`borrow_lang` at `970a9d0`).
+`[about ours]` and names the result it serves.  `§N` citations are to
+`docs/adjudications.md`.
 
 **The typed world.**  A result whose statement the source also proves at the typed
 world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
@@ -56,7 +56,7 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.120 (↺-mono) · `[TR]` p. 32 · inventory `proved`
+## Lemma 6.120 (↺-mono) · `[TR]` p. 32 · `proved`
 
 > P ⊨ Q
 > ──────────────
@@ -64,9 +64,9 @@ variable {Loc Val : Type}
 
 **Printed proof, transcribed.** Suppose `P ⊨ Q`, and let `P(ρ′)` for some `ρ′ ∈ reb_α(ρ)`.  Choose `ρ′`; by `P ⊨ Q` at `ρ′`, `Q(ρ′)`.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_mono`, aliases `TR.lemma_6_120`, `TR.«↺-mono»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_mono`, aliases `TR.lemma_6_120`, `TR.«↺-mono»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.120). `Fig16.BoLo.reborrow_mono`, on the printed carrier — hypothesis `P ⊨ Q`, conclusion `↺αP ⊨ ↺αQ`, no side condition.
+**Note.** `Fig16.BoLo.reborrow_mono`, on the printed carrier — hypothesis `P ⊨ Q`, conclusion `↺αP ⊨ ↺αQ`, no side condition.
 -/
 /-- **`[TR]` Lemma 6.120** (`↻-mono`, p. 32): from `P ⊨ Q`, `↻_α P ⊨ ↻_α Q`,
 with no side condition.  `[as printed]` -/
@@ -84,15 +84,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.121 (↺↦) · `[TR]` p. 32 · inventory `proved`
+## Lemma 6.121 (↺↦) · `[TR]` p. 32 · `proved`
 
 > ℓ ↦ v ⋆ [α]P̂(v) ⊨ ↺_α ℓ ↦I_α P̂
 
 **Printed proof, transcribed.** Let `ρ = ρ₁ ● ρ₂` with `ρ₁ = ℓ ↦ own(v)`, `P̂(v)(ρ₂)` and `@ρ₂ ⊐ α`.  Choose `ρ′ ∈ reb_α(ρ)` to be `ℓ ↦ imm({α}, v, ρ₂)`, and `β̃, v, ρ′` to be `{α}, v, ρ₂`.  What remains is `ℓ ↦ imm({α}, v, ρ₂) ∈ reb_α(ρ)`; choose `π` to be `ℓ ↦ ρ`.  It suffices that: `@ρ ⊐ α` — since `ρ = ℓ ↦ own(v) ● ρ₂`, it suffices that `@(ℓ ↦ own(v)) ⊐ α`, which holds by definition, and `@ρ₂ ⊐ α`, which is given; `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)` — since `dom(π) = {ℓ}` and `π(ℓ) = ρ`, this is `ρ ≥ ρ`; and the clause for each `ℓ ∈ dom(π)` — since `ρ(ℓ) = own(v)`, it is `(ℓ ↦ imm({α}, v, ρ₂))(ℓ) = imm({α}, v, π(ℓ) ∖ ℓ)`, by inspection.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_ptoOwn`, aliases `TR.lemma_6_121`, `TR.«↺↦»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_ptoOwn`, aliases `TR.lemma_6_121`, `TR.«↺↦»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.121). `Fig16.BoLo.reborrow_ptoOwn` — `ℓ ↦ v ⋆ [α]P̂(v) ⊨ ↺_α ℓ ↦I_α P̂`, at an arbitrary `P̂` and with the printed antecedent whole. The partition is `π ≜ [(ℓ, ρ)]`, so `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)` holds at `ρ ≥ ρ`, and the owned clause's `π(ℓ)/ℓ` is the frame the `⋆` supplies.
+**Note.** `Fig16.BoLo.reborrow_ptoOwn` — `ℓ ↦ v ⋆ [α]P̂(v) ⊨ ↺_α ℓ ↦I_α P̂`, at an arbitrary `P̂` and with the printed antecedent whole. The partition is `π ≜ [(ℓ, ρ)]`, so `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)` holds at `ρ ≥ ρ`, and the owned clause's `π(ℓ)/ℓ` is the frame the `⋆` supplies.
 -/
 /-- **`[TR]` Lemma 6.121** (`↻↦`, p. 32): `ℓ ↦ v ⋆ [α]P̂(v) ⊨ ↻_α ℓ ↦I_α P̂`.
 The reborrow's partition is `π ≜ [(ℓ, ρ)]`, so `⨀_{ℓ∈dom(π)} π(ℓ) = ρ` and the
@@ -150,15 +150,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.122 (↺m) · `[TR]` p. 32 · inventory `proved`
+## Lemma 6.122 (↺m) · `[TR]` p. 32 · `proved`
 
 > [α](ℓ ↦M_β P̂) ⊨ ↺_α(ℓ ↦I_α P̂)
 
 **Printed proof, transcribed.** Let `ρ = ℓ ↦ mut(β, v, ρ′, P̂)` (which implies `P̂(v)`) with `@ρ ⊐ α`, for some `β ⊒ α`, `v`, `ρ′`.  Choose `ℓ ↦ imm({α}, v, ρ′)` for the reborrow and `{α}, v, ρ′` for `β̃, v, ρ′`; it remains that `ℓ ↦ imm({α}, v, ρ′) ∈ reb_α(ρ)`.  Choose `π` to be `ℓ ↦ ρ`: `@ρ ⊐ α` is given; `ρ ≥ ⨀ π(ℓ)` is `ρ ≥ ρ`; and since `ρ(ℓ) = mut(β, v, ρ′, P̂)` the clause is `(ℓ ↦ imm({α}, v, ρ′))(ℓ) = imm({α}, v, ρ′) ∧ dom(π(ℓ)) = {ℓ}`, by inspection.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_ptoMut`, aliases `TR.lemma_6_122`, `TR.«↺m»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_ptoMut`, aliases `TR.lemma_6_122`, `TR.«↺m»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.122). `Fig16.BoLo.reborrow_ptoMut` — the borrow's own witness carried across at `{α}`, with `dom(π(ℓ)) = {ℓ}`
+**Note.** `Fig16.BoLo.reborrow_ptoMut` — the borrow's own witness carried across at `{α}`, with `dom(π(ℓ)) = {ℓ}`
 -/
 /-- **`[TR]` Lemma 6.122** (`↻m`, p. 32): `[α](ℓ ↦M_β P̂) ⊨ ↻_α(ℓ ↦I_α P̂)`.
 The mutable borrow's own witness is carried across unchanged and its piece is
@@ -207,15 +207,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.123 (↺i) · `[TR]` p. 32 · inventory `proved`
+## Lemma 6.123 (↺i) · `[TR]` p. 32 · `proved`
 
 > [α](ℓ ↦I_β P̂) ⊨ ↺_α(ℓ ↦I_β P̂)
 
 **Printed proof, transcribed.** Let `ρ = ℓ ↦ imm(β̃, v, ρ′)` with `P̂(v)(ρ′)`, `β ⊑ ⊔β̃` and `@ρ ⊐ α`.  Choose `ℓ ↦ imm(β̃, v, ρ′)` for the reborrow and `β̃, v, ρ′` for the cell; it remains that `ℓ ↦ imm(β̃, v, ρ′) ∈ reb_α(ρ)`.  Choose `π` to be `ℓ ↦ ρ`: `@ρ ⊐ α` is given; `ρ ≥ ⨀ π(ℓ)` is `ρ ≥ ρ`; and since `ρ(ℓ) = imm(β̃, v, ρ′)` the clause is `(ℓ ↦ imm(β̃, v, ρ′))(ℓ) = ρ(ℓ) ∧ dom(π(ℓ)) = {ℓ}`, by inspection.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_ptoImm`, aliases `TR.lemma_6_123`, `TR.«↺i»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_ptoImm`, aliases `TR.lemma_6_123`, `TR.«↺i»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.123). `Fig16.BoLo.reborrow_ptoImm` — the immutable cell passes through at its original lifetimes, with `dom(π(ℓ)) = {ℓ}`
+**Note.** `Fig16.BoLo.reborrow_ptoImm` — the immutable cell passes through at its original lifetimes, with `dom(π(ℓ)) = {ℓ}`
 -/
 /-- **`[TR]` Lemma 6.123** (`↻i`, p. 32): `[α](ℓ ↦I_β P̂) ⊨ ↻_α(ℓ ↦I_β P̂)`.
 The immutable cell passes through at its original lifetimes, and its piece is
@@ -250,15 +250,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.124 (↺⌜⌝) · `[TR]` p. 33 · inventory `proved`
+## Lemma 6.124 (↺⌜⌝) · `[TR]` p. 33 · `proved`
 
 > ⌜P⌝ ⊨ ↺_α ⌜P⌝
 
 **Printed proof, transcribed.** Let `ρ = ∅` and `P`.  Choose `ρ′ ∈ reb_α(ρ)` to be `∅`; it remains that `∅ ∈ reb_α(ρ)`.  Choose `π` to be `∅`; since `dom(∅) = ∅` this is `@∅ ⊐ α` and `∅ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)`, which hold by definition.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_pure`, aliases `TR.lemma_6_124`, `TR.«↺⌜⌝»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_pure`, aliases `TR.lemma_6_124`, `TR.«↺⌜⌝»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.124). `Fig16.BoLo.reborrow_pure`, `[as printed]` — no side condition on `α`. `⌜P⌝` holds of `∅` alone, and [TR]'s proof (p. 33) closes the leading conjunct with "`@∅ ⊐ α` … hold by definition". `Fig16.BoLo.reb_empty` is the resource half, now equally unrestricted. Same correction as 6.107; `docs/boca-rules.md` §C.25
+**Note.** `Fig16.BoLo.reborrow_pure`, `[as printed]` — no side condition on `α`. `⌜P⌝` holds of `∅` alone, and [TR]'s proof (p. 33) closes the leading conjunct with "`@∅ ⊐ α` … hold by definition". `Fig16.BoLo.reb_empty` is the resource half, now equally unrestricted. Same correction as 6.107; `docs/adjudications.md` §C.25
 -/
 /-- **`[TR]` Lemma 6.124** (`↻⌜⌝`, p. 33): `⌜P⌝ ⊨ ↻_α ⌜P⌝`.  `⌜P⌝` holds of `∅`
 alone, and `[TR]`'s proof closes the leading conjunct with "`@∅ ⊐ α` … hold by
@@ -279,15 +279,15 @@ variable {Loc Val : Type}
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.125 (↺⋆) · `[TR]` p. 33 · inventory `proved`
+## Lemma 6.125 (↺⋆) · `[TR]` p. 33 · `proved`
 
 > ↺_α P ⋆ ↺_α Q ⊨ ↺_α(P ⋆ Q)
 
 **Printed proof, transcribed.** Let `ρ = ρ₁ ● ρ₂` with `P(ρ′₁)` and `Q(ρ′₂)` for `ρ′₁ ∈ reb_α(ρ₁)` and `ρ′₂ ∈ reb_α(ρ₂)`.  By Lemma 6.61, `ρ′₁ ● ρ′₂ ∈ reb_α(ρ₁ ● ρ₂)`; choose it.  The remaining obligations are immediate.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_star`, aliases `TR.lemma_6_125`, `TR.«↺⋆»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_star`, aliases `TR.lemma_6_125`, `TR.«↺⋆»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.125). `Fig16.BoLo.reborrow_star` (`BoCa/Reborrow.lean` §27), on the printed carrier, `[as printed]`. The printed proof is one citation, *"By theorem 6.61"*, and `Fig16.ResU.six61` produces `ρ′₁ ● ρ′₂` **and** its membership in `reb_α(ρ₁ ● ρ₂)`, which is why the print calls the remaining obligations immediate. At the literal `imm` clause of `reb_α` the row carried `RebSurv`, 6.61's `ImmSurvives` at its sources; at the subset clause (definition row 5.28, `docs/boca-rules.md` §12.67(b)) it carries nothing
+**Note.** `Fig16.BoLo.reborrow_star`, on the printed carrier, `[as printed]`. The printed proof is one citation, *"By theorem 6.61"*, and `Fig16.ResU.six61` produces `ρ′₁ ● ρ′₂` **and** its membership in `reb_α(ρ₁ ● ρ₂)`, which is why the print calls the remaining obligations immediate. At the literal `imm` clause of `reb_α` the row carried `RebSurv`, 6.61's `ImmSurvives` at its sources; at the subset clause (definition row 5.28, `docs/adjudications.md` §12.67(b)) it carries nothing
 -/
 /-- **`[TR]` Lemma 6.125** (`↺⋆`, p. 33): `↺_α P ⋆ ↺_α Q ⊨ ↺_α (P ⋆ Q)`, along
 the printed proof's one citation.  `ResU.six61` delivers both `ρ′₁ ● ρ′₂` and
@@ -309,15 +309,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.126 (↺∨) · `[TR]` p. 33 · inventory `proved`
+## Lemma 6.126 (↺∨) · `[TR]` p. 33 · `proved`
 
 > ↺_α P ∨ ↺_α Q ⫤⊨ ↺_α(P ∨ Q)
 
 **Printed proof, transcribed.** Case `⊨`: let `(∃ρ′ ∈ reb_α(ρ). P(ρ′)) ∨ (∃ρ′ ∈ reb_α(ρ). Q(ρ′))`; in either case choose that `ρ′` and discharge the disjunction on the same side.  Case `⫤`: let `P(ρ′) ∨ Q(ρ′)` for some `ρ′ ∈ reb_α(ρ)`; in either case take the matching side of the disjunction and choose `ρ′`.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_or`, aliases `TR.lemma_6_126`, `TR.«↺∨»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_or`, aliases `TR.lemma_6_126`, `TR.«↺∨»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.126). `Fig16.BoLo.reborrow_or` — a genuine `⫤⊨`, both directions in one declaration
+**Note.** `Fig16.BoLo.reborrow_or` — a genuine `⫤⊨`, both directions in one declaration
 -/
 /-- **`[TR]` Lemma 6.126** (`↻∨`, p. 33): `↻_α P ∨ ↻_α Q ⫤⊨ ↻_α (P ∨ Q)`.
 `[as printed]` -/
@@ -340,15 +340,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.127 (↺-weak) · `[TR]` p. 33 · inventory `proved`
+## Lemma 6.127 (↺-weak) · `[TR]` p. 33 · `proved`
 
 > ↺_α(P ⋆ Q) ⊨ ↺_α P
 
 **Printed proof, transcribed.** Let `ρ′ = ρ′₁ ● ρ′₂` with `P(ρ′₁)` and `Q(ρ′₂)`, for some `ρ′ ∈ reb_α(ρ)`.  Choose `ρ′₁`; `P(ρ′₁)` is immediate and it remains that `ρ′₁ ∈ reb_α(ρ)`.  Unfolding `ρ′ ∈ reb_α(ρ)`: `@ρ ⊐ α` (H1), `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)` (H2), and `∀ℓ ∈ dom(π), v, ρ″. F(ℓ, v, ρ, ρ′, ρ″, π)` (H3) for some `π : dom(ρ′) → Res`, where `F(ℓ, v, ρ, ρ′, ρ″, π) = ℓ ∈ dom(π(ℓ)) ∧ (ρ(ℓ) = own(v) ⇒ ρ′(ℓ) = imm({α}, v, π(ℓ) ∖ ℓ)) ∧ (ρ(ℓ) = mut(−, v, ρ″, −) ⇒ ρ′(ℓ) = imm({α}, v, ρ″) ∧ dom(π(ℓ)) = {ℓ}) ∧ (ρ(ℓ) = imm(−, −, −) ⇒ ρ′(ℓ) = ρ(ℓ) ∧ dom(π(ℓ)) = {ℓ})`.  Let `π′` be `π` restricted to `dom(ρ′₁)`, and choose it.  `@ρ ⊐ α` is H1.  `ρ ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`: since `π′ ⊆ π`, `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`.  For `ℓ ∈ dom(π′)`, `v`, `ρ″`: `ℓ ∈ dom(π)`, so H3 gives `F(ℓ, v, ρ, ρ′, ρ″, π)`; *"by inspection of `F`, we observe that all usages of `π` are of the form `π(ℓ)`.  Since `π(ℓ) = π′(ℓ)`, we obtain `F(ℓ, v, ρ, ρ′₁, ρ″, π′)`."*
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_weak`, aliases `TR.lemma_6_127`, `TR.«↺-weak»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_weak`, aliases `TR.lemma_6_127`, `TR.«↺-weak»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.127). `Fig16.BoLo.reborrow_weak`, on the printed carrier, `[as printed]`. **The printed proof, step for step.**  `π′` is `π` with its domain restricted to `dom(ρ′₁)`; `π′ ⊆ π` is `List.filter_sublist`; the second bullet is `Fig16.BigComp.leS_of_sublist` chained onto H2 by `Fig16.ResU.Le.trans`; the first bullet is H1 unchanged. **The closing sentence** — *"By inspection of `F`, we observe that all usages of `π` are of the form `π(ℓ)`. Since `π(ℓ) = π′(ℓ)`, we obtain `F(ℓ,v,ρ,ρ′₁,ρ″,π′)`"* — has a `π → π′` half, which is `rfl`, and a `ρ′ → ρ′₁` half: `F` reads its image only at `ℓ`, where `ρ′₁(ℓ)` is a `●`-factor of `ρ′(ℓ)`, and a factor of `imm(s̄, v, χ)` is `imm` over a subset (`Fig16.ResU.factor_imm_sub`), which the clauses admit (`Fig16.ResU.RebAt.factor`, with `Fig16.immOf_sub_singleton` at the `own` and `mut` clauses). At the literal `imm` clause the row carried `SplitAgree`; at the subset clause (definition row 5.28, `docs/boca-rules.md` §12.67(b)) it carries nothing
+**Note.** `Fig16.BoLo.reborrow_weak`, on the printed carrier, `[as printed]`. **The printed proof, step for step.**  `π′` is `π` with its domain restricted to `dom(ρ′₁)`; `π′ ⊆ π` is `List.filter_sublist`; the second bullet is `Fig16.BigComp.leS_of_sublist` chained onto H2 by `Fig16.ResU.Le.trans`; the first bullet is H1 unchanged. **The closing sentence** — *"By inspection of `F`, we observe that all usages of `π` are of the form `π(ℓ)`. Since `π(ℓ) = π′(ℓ)`, we obtain `F(ℓ,v,ρ,ρ′₁,ρ″,π′)`"* — has a `π → π′` half, which is `rfl`, and a `ρ′ → ρ′₁` half: `F` reads its image only at `ℓ`, where `ρ′₁(ℓ)` is a `●`-factor of `ρ′(ℓ)`, and a factor of `imm(s̄, v, χ)` is `imm` over a subset (`Fig16.ResU.factor_imm_sub`), which the clauses admit (`Fig16.ResU.RebAt.factor`, with `Fig16.immOf_sub_singleton` at the `own` and `mut` clauses). At the literal `imm` clause the row carried `SplitAgree`; at the subset clause (definition row 5.28, `docs/adjudications.md` §12.67(b)) it carries nothing
 -/
 /-- **`[TR]` Lemma 6.127** (`↻-weak`, p. 33): `↻_α (P ⋆ Q) ⊨ ↻_α P`.
 
@@ -397,15 +397,15 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.128 (↺∃) · `[TR]` p. 34 · inventory `proved`
+## Lemma 6.128 (↺∃) · `[TR]` p. 34 · `proved`
 
 > ∃x. ↺_α P(x) ⫤⊨ ↺_α ∃x. P(x)
 
 **Printed proof, transcribed.** Case `⊨`: let `P̂(x)(ρ′)` for some `x` and `ρ′ ∈ reb_α(ρ)`; choose `x` and `ρ′`.  Case `⫤`: let `P̂(x)(ρ′)` for some `ρ′ ∈ reb_α(ρ)` and `x`; choose `ρ′` and `x`.  In both, `P̂(x)(ρ′)` is immediate.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_ex`, aliases `TR.lemma_6_128`, `TR.«↺∃»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_ex`, aliases `TR.lemma_6_128`, `TR.«↺∃»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.128). `Fig16.BoLo.reborrow_ex` — a genuine `⫤⊨`, both directions in one declaration
+**Note.** `Fig16.BoLo.reborrow_ex` — a genuine `⫤⊨`, both directions in one declaration
 -/
 /-- **`[TR]` Lemma 6.128** (`↻∃`, p. 34): `∃x. ↻_α P̂(x) ⫤⊨ ↻_α ∃x. P̂(x)`.
 `[as printed]` -/
@@ -426,16 +426,16 @@ namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.129 (↺∀) · `[TR]` p. 34 · inventory `variant`
+## Lemma 6.129 (↺∀) · `[TR]` p. 34 · `variant`
 
 > ∀x. ↺_α P(x) ⫤⊨ ↺_α ∀x. P(x)
 
 **Printed proof, transcribed.** Let `∀x. P̂(x)(ρ′)` for some `ρ′ ∈ reb_α(ρ)`.  Let `x` be arbitrary and choose `ρ′`.  Instantiate `∀x. P̂(x)(ρ′)` at `x` to obtain `P̂(x)(ρ′)`.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_all`, aliases `TR.lemma_6_129`, `TR.«↺∀»`, source tag `[variant: one direction of a printed `⫤⊨` — the direction the printed
+**Lean.** `BoCa.Fig16.BoLo.reborrow_all`, aliases `TR.lemma_6_129`, `TR.«↺∀»`, tag `[variant: one direction of a printed `⫤⊨` — the direction the printed
 paragraph runs]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.129). `Fig16.BoLo.reborrow_all`, `[variant: one direction of a printed `⫤⊨` — the direction the printed paragraph runs]`. The print (p. 34) fuses `∀x. ↺_α P̂(x) ⫤⊨ ↺_α ∀x. P̂(x)`, and its proof is one paragraph with no case split, unlike 6.126's and 6.128's, which do split. The paragraph opens on `∀x. P̂(x)(ρ′)` *"for some `ρ′ ∈ reb_α(ρ)`"* — the right-hand proposition — and closes by choosing that same `ρ′` at an arbitrary `x`, so it runs `⫤`, and that is transcribed here verbatim. The `⊨` half is not on the page: it would have to produce one `ρ′ ∈ reb_α(ρ)` serving every `x` out of a family that chooses one per `x`. `Wp.lean`'s note listing 6.126–6.129 among "genuine bi-entailments" is corrected to match
+**Note.** `Fig16.BoLo.reborrow_all`, `[variant: one direction of a printed `⫤⊨` — the direction the printed paragraph runs]`. The print (p. 34) fuses `∀x. ↺_α P̂(x) ⫤⊨ ↺_α ∀x. P̂(x)`, and its proof is one paragraph with no case split, unlike 6.126's and 6.128's, which do split. The paragraph opens on `∀x. P̂(x)(ρ′)` *"for some `ρ′ ∈ reb_α(ρ)`"* — the right-hand proposition — and closes by choosing that same `ρ′` at an arbitrary `x`, so it runs `⫤`, and that is transcribed here verbatim. The `⊨` half is not on the page: it would have to produce one `ρ′ ∈ reb_α(ρ)` serving every `x` out of a family that chooses one per `x`. `Wp.lean`'s note listing 6.126–6.129 among "genuine bi-entailments" is corrected to match
 -/
 /-- **`[TR]` Lemma 6.129** (`↻∀`, p. 34), printed `∀x. ↻_α P̂(x) ⫤⊨ ↻_α ∀x. P̂(x)`
 and proved in one paragraph:
@@ -495,19 +495,19 @@ theorem reborrow_emp_iff (α : Life) (ρ : ResU Loc Val) :
   · exact fun h => ⟨PMap.empty, (reb_emp_iff α ρ).mpr h, emp_empty⟩
 
 /-!
-## Lemma 6.130 · `[TR]` p. 34 · inventory `proved*`
+## Lemma 6.130 · `[TR]` p. 34 · `proved*`
 
 > P ⊨ ↺_α emp
 
 **Printed proof, transcribed.** Suppose `ρ ∈ P`.  Then `∅` vacuously satisfies the conditions needed to be a reborrowed version of `ρ`, so `ρ ∈ ↺_α emp`.
 
-**Lean.** `BoCa.Fig16.BoLo.reborrow_emp`, alias `TR.lemma_6_130`, source tag `[restricted: to `∀ρ. P(ρ) ⇒ ρ ∈ Res_α` — that `P` is one of `[TR]`.
+**Lean.** `BoCa.Fig16.BoLo.reborrow_emp`, alias `TR.lemma_6_130`, tag `[restricted: to `∀ρ. P(ρ) ⇒ ρ ∈ Res_α` — that `P` is one of `[TR]`.
 
 **Also here.** `BoCa.Fig16.BoLo.reb_emp_iff`; `BoCa.Fig16.BoLo.reborrow_emp_iff`; `BoCa.Fig16.BoLo.reborrow_emp_box`; `BoCa.Fig16.BoLo.reborrow_emp_ptoOwn`.
 
 **Literal reading.** `BoCa.Fig16.BoLo.reborrow_emp_outside_stratum`, in `Paper/LiteralReadings/S6_6_ReborrowingEntailments.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.130). `Fig16.BoLo.reborrow_emp`, on the printed carrier, conclusion exactly as printed, `[restricted: to `∀ρ. P(ρ) ⇒ ρ ∈ Res_α`]`. The printed proof (p. 34) supplies `∅` for `ρ′` and calls the conditions on it vacuous; `Fig16.BoLo.reb_emp_iff` is that, checked clause by clause — `dom(∅) = ∅` is the empty family's own domain, the empty fold is `∅ ≤ ρ`, and the body's `∀ℓ ∈ dom(π)` has nothing to range over. What the three leave is `reb_α`'s **leading** conjunct `@ρ ⊐ α`, which [TR] p. 5 writes of `ρ` and not of the `∅` supplied for `ρ′`, so `↻_α emp` is `Res_α` on the nose (`Fig16.BoLo.reborrow_emp_iff`) and the lemma is `P ⊆ Res_α` — that `P` is one of [TR] p. 4's printed `SProp_α ≜ Res_α → P`, which `Fig16.SPropS.toU_range` states inside `SProp` as exactly this inclusion. The hypothesis is not free (`Fig16.BoLo.reborrow_emp_outside_stratum`, off `Fig16.RebExample.not_reb_of_at`) and both of [TR]'s own uses of 6.130 — p. 34, inside 6.131, at `T₁ ⊸ T₂` and at `Ref T′` — supply it: `Fig16.BoLo.reborrow_emp_box` and `Fig16.BoLo.reborrow_emp_ptoOwn`. `reb_α` is untouched; `docs/boca-rules.md` §12.62
+**Note.** `Fig16.BoLo.reborrow_emp`, on the printed carrier, conclusion exactly as printed, `[restricted: to `∀ρ. P(ρ) ⇒ ρ ∈ Res_α`]`. The printed proof (p. 34) supplies `∅` for `ρ′` and calls the conditions on it vacuous; `Fig16.BoLo.reb_emp_iff` is that, checked clause by clause — `dom(∅) = ∅` is the empty family's own domain, the empty fold is `∅ ≤ ρ`, and the body's `∀ℓ ∈ dom(π)` has nothing to range over. What the three leave is `reb_α`'s **leading** conjunct `@ρ ⊐ α`, which [TR] p. 5 writes of `ρ` and not of the `∅` supplied for `ρ′`, so `↻_α emp` is `Res_α` on the nose (`Fig16.BoLo.reborrow_emp_iff`) and the lemma is `P ⊆ Res_α` — that `P` is one of [TR] p. 4's printed `SProp_α ≜ Res_α → P`, which `Fig16.SPropS.toU_range` states inside `SProp` as exactly this inclusion. The hypothesis is not free (`Fig16.BoLo.reborrow_emp_outside_stratum`, off `Fig16.RebExample.not_reb_of_at`) and both of [TR]'s own uses of 6.130 — p. 34, inside 6.131, at `T₁ ⊸ T₂` and at `Ref T′` — supply it: `Fig16.BoLo.reborrow_emp_box` and `Fig16.BoLo.reborrow_emp_ptoOwn`. `reb_α` is untouched; `docs/adjudications.md` §12.62
 -/
 /-- **`[TR]` Lemma 6.130** (p. 34): `P ⊨ ↻_α emp`.  The printed proof supplies
 `∅` for `ρ′` and calls the conditions on it vacuous; `reb_emp_iff` is that,
@@ -697,13 +697,13 @@ theorem reborrow_vDen {α : Life} {x : LifeVar} {δ : LSub}
       exact reborrow_emp_box α _
 
 /-!
-## Lemma 6.131 (↺V₁) · `[TR]` p. 34 · inventory `proved`
+## Lemma 6.131 (↺V₁) · `[TR]` p. 34 · `proved`
 
 > [δ('a)] 𝒱⟦T⟧δ(v) ⊨ ↺_δ('a) 𝒱⟦Imm̲ 'a T⟧δ(v) for all T ≠ Unk.
 
 **Printed proof, transcribed.** By induction on `T`, with `δ('a) = α`.  `T = 1`: unfold to `[α]⌜v = ()⌝ ⊨ ↺_α ⌜v = ()⌝`; apply `[]L` and `↺⌜⌝`.  `T = T₁ ⊗ T₂`: unfold; apply `[]∃`, `∃L`, `[]⋆`, `[]L` to reach `⌜v = (v₁, v₂)⌝ ⋆ [α]𝒱⟦T₁⟧δ(v₁) ⋆ [α]𝒱⟦T₂⟧δ(v₂)` on the left; apply `↺∃`, `∃R`, `↺⋆`, `↺⌜⌝` to reach `⌜v = (v₁, v₂)⌝ ⋆ ↺_α 𝒱⟦Imm̲ 'a T₁⟧δ(v₁) ⋆ ↺_α 𝒱⟦Imm̲ 'a T₂⟧δ(v₂)` on the right; apply IH.  `T = T₁ ⊕ T₂`: analogous, with `↺∨` for `↺⋆`.  `T = T₁ ⊸ T₂`: the goal unfolds to `[α]𝒱⟦T₁ ⊸ T₂⟧δ(v) ⊨ ↺_α emp`; apply Lemma 6.130.  `T = ∀'a ⊏ @b. T′`: analogous to `⊸`.  `T = [@a]T′`: unfold to `[α][@aδ]𝒱⟦T′⟧δ(v)`; apply `[]L`; apply IH.  `T = Ref T′`: unfold to `[α]∃ℓ, v′. ⌜v = ℓ⌝ ⋆ ℓ ↦ v′ ⋆ 𝒱⟦T′⟧δ(v′)`; apply `[]∃`, `∃L`, `[]⋆`, `[]L`; apply IH, giving `⌜v = ℓ⌝ ⋆ ℓ ↦ v′ ⋆ ↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′)`; apply Lemma 6.130, giving `↺_α emp ⋆ ↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′)`; apply `↺⋆`; done because `emp` is a unit for `⋆`.  `T = Imm @b T′`: unfold to `[α]∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦I_{@bδ} 𝒱⟦T′⟧δ`; apply `[]∃`, `[]⋆`, `[]L`; apply `↺i`; apply `↺⌜⌝`, `↺⋆`, `↺∃`; fold `𝒱⟦Imm @b T′⟧`.  `T = Mut @b T′`: the goal's right side is `↺_α 𝒱⟦Imm α T′⟧δ(v)`; unfold, apply `[]∃`, `[]⋆`, `[]L`; apply `↺m`, giving `↺_α(ℓ ↦I_α 𝒱⟦T′⟧δ)`; apply `↺⌜⌝`, `↺⋆`, `↺∃`; fold `𝒱⟦Imm α T′⟧`.  `T = Unk`: impossible.
 
-**Lean.** `BoCa.Fig16.LogRel.reborrow_vDen_ne_unk`, aliases `TR.lemma_6_131`, `TR.«↺V₁»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.reborrow_vDen_ne_unk`, aliases `TR.lemma_6_131`, `TR.«↺V₁»`, tag `[as printed]`.
 
 **Also here.** `BoCa.Fig16.LogRel.reborrow_vDen`; `BoCa.Fig16.BoLo.reborrow_star_pure`.
 
@@ -711,7 +711,7 @@ theorem reborrow_vDen {α : Life} {x : LifeVar} {δ : LSub}
 
 **Literal reading.** `BoCa.Fig16.LogRel.RefPrintedChainResidual`, in `Paper/LiteralReadings/S6_6_ReborrowingEntailments.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.131). `Fig16.LogRel.reborrow_vDen_ne_unk`, on the printed carrier, `[as printed]`. `Imm` in `𝒱⟦Imm 'a T⟧` is **underlined** at 400 dpi, i.e. the metafunction `Ty.immReborrow`; `Fig16LogRel` §2b is the missing bridge from it to `𝒱⟦−⟧`, one equation per clause of the metafunction plus the three `_at` forms that eliminate §1's `atLife` — which is what the `Imm` and `Mut` bullets' closing *"Fold the definition of `𝒱⟦Imm @b T′⟧`"* comes to. The induction is the printed ten bullets, each spending the rules its bullet names: `1` is `Fig16.BoLo.box_L` then `Fig16.BoLo.reborrow_pure`; `⊗` is `box_ex`, `box_sep`, `box_L`, IH, `↺⋆`, `↺⌜⌝`, `reborrow_ex`; `⊕` the same with `Fig16.BoLo.box_or` and `Fig16.BoLo.reborrow_or`; `T₁ ⊸ T₂` and `∀'a ⊏ @b.T′` are 6.130 at `Fig16.BoLo.reborrow_emp_box`, which is the hypothesis 6.130 inherits, supplied; `[@a]T` is `box_L` under `Fig16.BoLo.box_mono` then IH; `Imm @b T′` is `Fig16.BoLo.reborrow_ptoImm` (`↺i`) and `Mut @b T′` is `Fig16.BoLo.reborrow_ptoMut` (`↺m`), each folded through §2b's clause (6) and clause (9). **Two things the run found.**  (i) The `⊗` bullet is the one place where `↺⋆` joins two factors that both carry resource — the other four applications have the clause's own `⌜v = …⌝` on the left, which holds of `∅` alone and pins the `●`-decomposition, and `Fig16.BoLo.reborrow_star_pure` is the printed `↺⌜⌝`/`↺⋆` pair at that shape. At the `⊗` bullet `↺⋆` is `Fig16.BoLo.reborrow_star` (6.125, `proved`). (ii) The `Ref` bullet's printed chain (*"Apply IH … Apply theorem 6.130 … Apply `↺⋆` … Done because `emp` is a unit for `⋆`"*) **cannot be reconciled with our objects at the "Apply theorem 6.130" step**: clause (5) sends `Ref T′` to the *constructor* `Imm 'a T′` (1200 dpi, `BoCa/Ty.lean`), so the goal names the location `v` and the cell `ℓ ↦ v′` that 6.130 hands to `↺_α emp`, while the IH speaks of the contents `v′`; `Fig16.LogRel.RefPrintedChainResidual` is what the chain leaves, not derived and no obstruction to it verified. The block takes `[TR]` 6.121 (`↺↦`, `Fig16.BoLo.reborrow_ptoOwn`) there instead — its antecedent is this bullet's own `ℓ ↦ v′ ⋆ [α]P̂(v′)` and its conclusion this bullet's own `↺_α(ℓ ↦I_α P̂)`, and [TR] cites it nowhere — so the printed chain's technique, discarding the cell into `↺_α emp` and re-merging by `↺⋆`, is **not built here**; 6.130's other use, at `⊸` and `∀`, is. The `Unk` bullet is printed "impossible"; §12.11's clause `Imm̲ 'b Unk ≜ Unk` makes it the `⊸` bullet's step, so `Fig16.LogRel.reborrow_vDen` runs on every `T` — which the `⊗`, `⊕`, `[@a]` and `Ref` bullets need, a subterm being `Unk` where the whole type is not — and `T ≠ Unk` is carried, unspent, by `reborrow_vDen_ne_unk`  **At the repaired relation.**  `Fig16.LogRel.Typed.reborrow_vShape` is this induction bullet for bullet at the wp-free shape `Fig16.LogRel.Typed.vShape`, the `Ref` bullet taken as here; `Fig16.LogRel.Typed.image_vX_of_shape` makes a shaped image `𝒱X⟦Imm̲ 'x T⟧`-typed from the escrow's observable validity and coherence at the roots and `Mut` positions — the `⊸`/`∀` bullets discard their payload, which is what §12.69 reads the `Imm` clause through
+**Note.** `Fig16.LogRel.reborrow_vDen_ne_unk`, on the printed carrier, `[as printed]`. `Imm` in `𝒱⟦Imm 'a T⟧` is **underlined** at 400 dpi, i.e. the metafunction `Ty.immReborrow`; the bridge from it to `𝒱⟦−⟧` is one equation per clause of the metafunction plus the three `_at` forms that eliminate `atLife` — which is what the `Imm` and `Mut` bullets' closing *"Fold the definition of `𝒱⟦Imm @b T′⟧`"* comes to. The induction is the printed ten bullets, each spending the rules its bullet names: `1` is `Fig16.BoLo.box_L` then `Fig16.BoLo.reborrow_pure`; `⊗` is `box_ex`, `box_sep`, `box_L`, IH, `↺⋆`, `↺⌜⌝`, `reborrow_ex`; `⊕` the same with `Fig16.BoLo.box_or` and `Fig16.BoLo.reborrow_or`; `T₁ ⊸ T₂` and `∀'a ⊏ @b.T′` are 6.130 at `Fig16.BoLo.reborrow_emp_box`, which is the hypothesis 6.130 inherits, supplied; `[@a]T` is `box_L` under `Fig16.BoLo.box_mono` then IH; `Imm @b T′` is `Fig16.BoLo.reborrow_ptoImm` (`↺i`) and `Mut @b T′` is `Fig16.BoLo.reborrow_ptoMut` (`↺m`), each folded through the clause (6) and clause (9). **Two things the run found.**  (i) The `⊗` bullet is the one place where `↺⋆` joins two factors that both carry resource — the other four applications have the clause's own `⌜v = …⌝` on the left, which holds of `∅` alone and pins the `●`-decomposition, and `Fig16.BoLo.reborrow_star_pure` is the printed `↺⌜⌝`/`↺⋆` pair at that shape. At the `⊗` bullet `↺⋆` is `Fig16.BoLo.reborrow_star` (6.125, `proved`). (ii) The `Ref` bullet's printed chain (*"Apply IH … Apply theorem 6.130 … Apply `↺⋆` … Done because `emp` is a unit for `⋆`"*) **cannot be reconciled with our objects at the "Apply theorem 6.130" step**: clause (5) sends `Ref T′` to the *constructor* `Imm 'a T′` (`BoCa.Ty.immReborrow`), so the goal names the location `v` and the cell `ℓ ↦ v′` that 6.130 hands to `↺_α emp`, while the IH speaks of the contents `v′`; `Fig16.LogRel.RefPrintedChainResidual` is what the chain leaves, not derived and no obstruction to it verified. The block takes `[TR]` 6.121 (`↺↦`, `Fig16.BoLo.reborrow_ptoOwn`) there instead — its antecedent is this bullet's own `ℓ ↦ v′ ⋆ [α]P̂(v′)` and its conclusion this bullet's own `↺_α(ℓ ↦I_α P̂)`, and [TR] cites it nowhere — so the printed chain's technique, discarding the cell into `↺_α emp` and re-merging by `↺⋆`, is **not built here**; 6.130's other use, at `⊸` and `∀`, is. The `Unk` bullet is printed "impossible"; §12.11's clause `Imm̲ 'b Unk ≜ Unk` makes it the `⊸` bullet's step, so `Fig16.LogRel.reborrow_vDen` runs on every `T` — which the `⊗`, `⊕`, `[@a]` and `Ref` bullets need, a subterm being `Unk` where the whole type is not — and `T ≠ Unk` is carried, unspent, by `reborrow_vDen_ne_unk`  **At the repaired relation.**  `Fig16.LogRel.Typed.reborrow_vShape` is this induction bullet for bullet at the wp-free shape `Fig16.LogRel.Typed.vShape`, the `Ref` bullet taken as here; `Fig16.LogRel.Typed.image_vX_of_shape` makes a shaped image `𝒱X⟦Imm̲ 'x T⟧`-typed from the escrow's observable validity and coherence at the roots and `Mut` positions — the `⊸`/`∀` bullets discard their payload, which is what §12.69 reads the `Imm` clause through
 -/
 /-- **`[TR]` Lemma 6.131** with its printed side condition.  `_hT` is carried
 and not spent: the `Unk` bullet's own goal is `[α] emp ⊨ ↺_α emp` once §12.11's
@@ -734,17 +734,17 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.132 (↺V₂) · `[TR]` p. 35 · inventory `proved`
+## Lemma 6.132 (↺V₂) · `[TR]` p. 35 · `proved`
 
 > If 'a not free in T then 𝒱⟦T⟧δ(v) ⊨ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)
 
 **Printed proof, transcribed.** A table of steps.  Apply `ИR`, `Иmono` and fix `α ⊏ ⨅δ` arbitrary: `[α]𝒱⟦T⟧δ(v) ⊨ [α]↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.  Apply `[]R`: `[α]𝒱⟦T⟧δ(v) ⊨ ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.  Have `𝒱⟦T⟧δ = 𝒱⟦T⟧δ['a↦α]` because `'a` is not free in `T`: `[α]𝒱⟦T⟧δ['a↦α](v) ⊨ ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.  Apply `↺V₁`.
 
-**Lean.** `BoCa.Fig16.LogRel.reborrow_vDen_fresh`, aliases `TR.lemma_6_132`, `TR.«↺V₂»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.reborrow_vDen_fresh`, aliases `TR.lemma_6_132`, `TR.«↺V₂»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.six132_shape`, in `Support/TypedWorld/ReborrowShapes.lean`; `BoCa.Fig16.LogRel.Typed.six132_shape_fresh`, in `Support/TypedWorld/ReborrowShapes.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.132). `Fig16.LogRel.reborrow_vDen_fresh`, on the printed carrier, `[as printed]`. The printed proof is a four-row table and each row spends the rule it names: `ИR` is `Fig16.BoLo.fresh_R` (6.110), `Иmono` is `Fig16.BoLo.fresh_mono` (6.108), `[]R` is `Fig16.BoLo.box_R` (6.98), and `↺V₁` is `Fig16.LogRel.reborrow_vDen` (6.131). `Imm` is underlined at 400 dpi in the statement, so it is `Ty.immReborrow` and not the constructor, as in 6.131. **The bound `⨅δ` is supplied and goes unspent.**  `Иmono`'s bound is a parameter of the rule, so *"fix `α ⊏ ⨅δ` arbitrary"* is an instantiation of it; `Fig16.LogRel.meetOfCod` is that lifetime, a fold of `Fig16.Life.meet` over `cod(δ)` with `⨅∅ = ⊤`, and unlike `⊓Δ` (`docs/boca-rules.md` §12.15) nothing about its range is open, a substitution's values already being lifetimes. None of the three remaining rows reads the hypothesis `α ⊏ ⨅δ`, and the choice does not reach the statement: `⋔`'s bound is existential, so a different `β′` changes only the witness `Fig16.BoLo.fresh_mono` computes. [α]P̂(α)` is followed over [CONF] Fig. 19's modality-free row, on [CONF] §4.4's own prose (*"P will **outlive** any shorter lifetime `α`"*), and the printed carrier's `Fig16.BoLo.fresh` carries the `[α]` and is tagged `[as printed]`. That modality is what makes `[]R` the second row's rule at all; under [CONF] Fig. 19's reading there would be no `[α]` for it to act on  **At the repaired relation.**  `Fig16.LogRel.Typed.six132_shape` and `Fig16.LogRel.Typed.six132_shape_fresh` are this table's rows at `Fig16.LogRel.Typed.vShape`; `Fig16.LogRel.Typed.withload_compatX` spends the second
+**Note.** `Fig16.LogRel.reborrow_vDen_fresh`, on the printed carrier, `[as printed]`. The printed proof is a four-row table and each row spends the rule it names: `ИR` is `Fig16.BoLo.fresh_R` (6.110), `Иmono` is `Fig16.BoLo.fresh_mono` (6.108), `[]R` is `Fig16.BoLo.box_R` (6.98), and `↺V₁` is `Fig16.LogRel.reborrow_vDen` (6.131). `Imm` is underlined at 400 dpi in the statement, so it is `Ty.immReborrow` and not the constructor, as in 6.131. **The bound `⨅δ` is supplied and goes unspent.**  `Иmono`'s bound is a parameter of the rule, so *"fix `α ⊏ ⨅δ` arbitrary"* is an instantiation of it; `Fig16.LogRel.meetOfCod` is that lifetime, a fold of `Fig16.Life.meet` over `cod(δ)` with `⨅∅ = ⊤`, and unlike `⊓Δ` (`docs/adjudications.md` §12.15) nothing about its range is open, a substitution's values already being lifetimes. None of the three remaining rows reads the hypothesis `α ⊏ ⨅δ`, and the choice does not reach the statement: `⋔`'s bound is existential, so a different `β′` changes only the witness `Fig16.BoLo.fresh_mono` computes. [α]P̂(α)` is followed over [CONF] Fig. 19's modality-free row, on [CONF] §4.4's own prose (*"P will **outlive** any shorter lifetime `α`"*), and the printed carrier's `Fig16.BoLo.fresh` carries the `[α]` and is tagged `[as printed]`. That modality is what makes `[]R` the second row's rule at all; under [CONF] Fig. 19's reading there would be no `[α]` for it to act on  **At the repaired relation.**  `Fig16.LogRel.Typed.six132_shape` and `Fig16.LogRel.Typed.six132_shape_fresh` are this table's rows at `Fig16.LogRel.Typed.vShape`; `Fig16.LogRel.Typed.withload_compatX` spends the second
 -/
 /-- **`[TR]` Lemma 6.132** (`↺V₂`, p. 35): if `'a` is not free in `T` then
 `𝒱⟦T⟧δ(v) ⊨ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.
@@ -776,15 +776,15 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.133 (↺V₃) · `[TR]` p. 35 · inventory `proved`
+## Lemma 6.133 (↺V₃) · `[TR]` p. 35 · `proved`
 
 > If 'b not free in T then ℓ ↦I_α 𝒱⟦T⟧δ ⊨ ℓ ↦I_α Иβ. ↺_β 𝒱⟦Imm̲ 'b T⟧δ['b↦β]
 
 **Printed proof, transcribed.** Apply `↺V₂` and `I-mono`.
 
-**Lean.** `BoCa.Fig16.LogRel.ptoImm_reborrow_vDen_fresh`, aliases `TR.lemma_6_133`, `TR.«↺V₃»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.ptoImm_reborrow_vDen_fresh`, aliases `TR.lemma_6_133`, `TR.«↺V₃»`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.133). `Fig16.LogRel.ptoImm_reborrow_vDen_fresh`, on the printed carrier, `[as printed]`. The printed proof is one sentence — *"Apply `↺V₂` and `I-mono`"* — and both halves are spent: `I-mono` is `Fig16.BoLo.ptoImm_mono` (6.113), whose printed premise `∀v. P̂(v) ⊨ Q̂(v)` is 6.132 taken at each value. `Imm` is underlined here too. The row adds no hypothesis  **At the repaired relation.**  Its `I-mono` at the stratified cell is `Fig16.LogRel.Typed.ptoImmS_mono`, which 6.172 at `SemX` spends to weaken the framed payload to the observable view (§12.69); 6.133 itself is not restated at the shape relation
+**Note.** `Fig16.LogRel.ptoImm_reborrow_vDen_fresh`, on the printed carrier, `[as printed]`. The printed proof is one sentence — *"Apply `↺V₂` and `I-mono`"* — and both halves are spent: `I-mono` is `Fig16.BoLo.ptoImm_mono` (6.113), whose printed premise `∀v. P̂(v) ⊨ Q̂(v)` is 6.132 taken at each value. `Imm` is underlined here too. The row adds no hypothesis  **At the repaired relation.**  Its `I-mono` at the stratified cell is `Fig16.LogRel.Typed.ptoImmS_mono`, which 6.172 at `SemX` spends to weaken the framed payload to the observable view (§12.69); 6.133 itself is not restated at the shape relation
 -/
 /-- **`[TR]` Lemma 6.133** (`↺V₃`, p. 35): if `'b` is not free in `T` then
 `ℓ ↦I_α 𝒱⟦T⟧δ ⊨ ℓ ↦I_α Иβ. ↺_β 𝒱⟦Imm̲ 'b T⟧δ['b↦β]`.
@@ -811,15 +811,15 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.134 · `[TR]` p. 35 · inventory `proved`
+## Lemma 6.134 · `[TR]` p. 35 · `proved`
 
 > ⌜x = y⌝ ⋆ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α] ⊨ Иα. ↺_α(⌜x = y⌝ ⋆ 𝒱⟦Imm̲ 'a T⟧δ['a↦α])
 
 **Printed proof, transcribed.** By unfolding and substituting for `x = y`.
 
-**Lean.** `BoCa.Fig16.LogRel.pure_sep_reborrow_vDen_fresh`, alias `TR.lemma_6_134`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.pure_sep_reborrow_vDen_fresh`, alias `TR.lemma_6_134`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.134). `Fig16.LogRel.pure_sep_reborrow_vDen_fresh`, on the printed carrier, `[as printed]`. Unnamed in the print (p. 35): `⌜x = y⌝ ⋆ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α] ⊨ Иα. ↺_α (⌜x = y⌝ ⋆ 𝒱⟦Imm̲ 'a T⟧δ['a↦α])`, with the whole proof *"By unfolding and substituting for `x = y`"* — `Fig16.LogRel.pure_sep_iff` is the unfolding ([TR] p. 6's `⌜−⌝` holds of `∅` alone) and the equality is then re-formed over `∅` at the reborrowed resource the left-hand side already produced, so no bound and no reborrow changes. The printed row leaves the value argument of `𝒱⟦Imm̲ 'a T⟧δ['a↦α]` off both sides, `↺_α` taking a proposition; it is supplied, the same on both sides, and [TR] 6.175 applies the row at it (p. 48). The row is cited once, by 6.175. **"Inherits BoLo (d7)" is withdrawn** for the reason 6.132's row gives: (d7) is an adjudicated reading of `⋔`, not an open divergence
+**Note.** `Fig16.LogRel.pure_sep_reborrow_vDen_fresh`, on the printed carrier, `[as printed]`. Unnamed in the print (p. 35): `⌜x = y⌝ ⋆ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α] ⊨ Иα. ↺_α (⌜x = y⌝ ⋆ 𝒱⟦Imm̲ 'a T⟧δ['a↦α])`, with the whole proof *"By unfolding and substituting for `x = y`"* — `Fig16.LogRel.pure_sep_iff` is the unfolding ([TR] p. 6's `⌜−⌝` holds of `∅` alone) and the equality is then re-formed over `∅` at the reborrowed resource the left-hand side already produced, so no bound and no reborrow changes. The printed row leaves the value argument of `𝒱⟦Imm̲ 'a T⟧δ['a↦α]` off both sides, `↺_α` taking a proposition; it is supplied, the same on both sides, and [TR] 6.175 applies the row at it (p. 48). The row is cited once, by 6.175. **"Inherits BoLo (d7)" is withdrawn** for the reason 6.132's row gives: (d7) is an adjudicated reading of `⋔`, not an open divergence
 -/
 /-- **`[TR]` Lemma 6.134** (p. 35, unnamed in the print):
 

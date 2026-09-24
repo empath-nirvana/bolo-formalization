@@ -3,8 +3,7 @@
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-typing contexts as lists of slots with a liveness bit, and their splitting.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+typing contexts as lists of slots with a liveness bit, and their splitting.
 -/
 
 noncomputable section

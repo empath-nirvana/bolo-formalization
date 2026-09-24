@@ -34,7 +34,7 @@ import Support.TypedWorld.World
 declaration is in `Paper/S6_8_FundamentalProperty/Lemmas.lean` and its record here
 aliases it (`CONF.lemma_3_1`).  **Theorem 3.2** (adequacy: termination and memory
 reclamation) and **Corollary 3.3** (adequacy at `1`) are stated in `[CONF]` and
-proved in neither document; the proofs here are the source's.  Each is stated once
+proved in neither document; the proofs here are ours (`docs/adjudications.md` §A.1).  Each is stated once
 per machine — the library's (`BoLo.Steps`, `[TR]` §3 with rows 3.30 and 3.31's two
 frames) and `[TR]` §3's as printed (`TR3.Steps`) — and once more at the repaired
 judgment (`Fig16.LogRel.Typed.theorem32`, `Fig16.LogRel.Typed.corollary33`).
@@ -47,22 +47,22 @@ hypothesis.
 **How this file reads.**  The numbered results of the subsection, in printed order as
 far as Lean's definition-before-use allows.  Each opens with a record:
 
-* the result's number, page and the source inventory's status (`proved`, `proved*`,
-  `variant`; source `docs/paper-inventory.md`);
+* the result's number, page and status (`proved`, `proved*`, `variant`; the
+  legend is in `Paper/INDEX.md`);
 * the printed statement, quoted, with the extraction's garbled symbols restored;
 * the printed proof, transcribed compactly and in its own order, citing the lemmas it
   cites;
-* the Lean declaration, moved from the source with its name, statement and proof
-  unchanged (its docstring carries the source's tag and its account of the proof),
+* the Lean declaration (its docstring carries the tag and its account of the
+  proof),
   and the numbered alias `TR.lemma_6_N` declared after it;
-* the inventory row's note.
+* a note on how the declaration reads the printed statement.
 
 A result whose declaration an earlier subsection's printed proof needs is declared
 in that subsection's file, under a heading saying so; its record and alias stay
 here.  A run of declarations the paper does not print, placed in this file only
 because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
-are to the source repository (`borrow_lang` at `970a9d0`).
+`[about ours]` and names the result it serves.  `§N` citations are to
+`docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -78,7 +78,7 @@ open BoCa.Lifetime (LifeCtx LSub)
 *"If `⊨ wp(e){⌜P̂⌝}` then `(∅, e) →* (∅, v)` and `P̂(v)` for some `v`."*
 
 `→*` is `BoLo.Steps`, which is the `↦*` of the `wp` in the same row, so the two
-occurrences are one relation.  `docs/boca-rules.md` §12.42 is why that machine
+occurrences are one relation.  `docs/adjudications.md` §12.42 is why that machine
 is `[TR]` §3's rather than one of ours: §3's `Kont` is elided, and the completion
 is two frames and nothing else.
 `[as printed]` (`[CONF]` Theorem 3.2, p. 415:18; the `→*` is `[TR]` §3 completed
@@ -97,7 +97,7 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 
 /-! A declaration the record of Theorem 3.2 (Adequacy) cites. -/
 /-- **This `wp` is the stronger proposition.**  The two definitions differ in
-one conjunct, and §4's containment turns that conjunct one way.
+one conjunct, and the containment `TR3.Steps.toWp` turns that conjunct one way.
 `wp_lt_fig16` at the end of the file is the other half — a term at which
 `Fig16Wp`'s row holds and this one's is false — so the entailment is strict.
 
@@ -131,10 +131,10 @@ the antecedent and `TR3.Steps` in the conclusion, so again one relation
 throughout.
 
 `TR3.wp` is the stronger antecedent and `TR3.Steps` the stronger conclusion, so
-this row and `Theorem32` are not comparable — the pattern ledger D6 records for
+this row and `Theorem32` are not comparable — the pattern `docs/adjudications.md` D6 records for
 every §6.7 rule with a `wp` on the left.
 `[as printed]` (`[CONF]` Theorem 3.2, p. 415:18, over `[TR]` §3's machine as
-`BoCa/TR3.lean` transcribes it) -/
+`TR3.Steps` transcribes it) -/
 def Theorem32Printed : Prop :=
   ∀ (e : Expr) (P : Val → Prop),
     BoCa.TR3.wp e (fun v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes) →
@@ -190,7 +190,7 @@ theorem reclaim : Adequacy.Reclaim := by
 end BoCa.Adequacy
 
 /-!
-## Lemma 3.1 (Fundamental Property) · `[CONF]` p. 415:17 · inventory `proved*`
+## Lemma 3.1 (Fundamental Property) · `[CONF]` p. 415:17 · `proved*`
 
 > If Δ; Γ ⊢ e : T then Δ; Γ ⊨ e : T.
 
@@ -200,7 +200,7 @@ end BoCa.Adequacy
 
 **Lean.** `BoCa.Fig16.LogRel.Typed.fundamentalProperty`, alias `CONF.lemma_3_1` — the declaration of Lemma 6.151 (Fundamental Property), in `Paper/S6_8_FundamentalProperty/Lemmas.lean`: the same statement, printed twice.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 3.1). This row **is** [TR] 6.151 — [CONF] p. 415:17 prints the same statement, *"If Δ; Γ ⊢ e : T then Δ; Γ ⊨ e : T"*, and the proof it describes is [TR] §6.8's. `Fig16.LogRel.Typed.fundamentalProperty`, at row 6.151's restrictions — `⊧ Δ` carried as `Δ.Ok`, at the definition repairs of `docs/boca-rules.md` §12.69–§12.72 — and no other hypothesis. `Fig16.LogRel.FundamentalProperty`, the literal reading's statement, is refused (`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`, §12.68). Scored here only so that the [CONF] block does not read as unattempted; do not track it twice
+**Note.** This row **is** [TR] 6.151 — [CONF] p. 415:17 prints the same statement, *"If Δ; Γ ⊢ e : T then Δ; Γ ⊨ e : T"*, and the proof it describes is [TR] §6.8's. `Fig16.LogRel.Typed.fundamentalProperty`, at row 6.151's restrictions — `⊧ Δ` carried as `Δ.Ok`, at the definition repairs of `docs/adjudications.md` §12.69–§12.72 — and no other hypothesis. `Fig16.LogRel.FundamentalProperty`, the literal reading's statement, is refused (`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`, §12.68). Scored here only so that the [CONF] block does not read as unattempted; do not track it twice
 -/
 alias CONF.lemma_3_1 := BoCa.Fig16.LogRel.Typed.fundamentalProperty
 
@@ -211,17 +211,17 @@ open BoCa.BoLo (Heap)
 open BoCa.Lifetime (LifeCtx LSub)
 
 /-!
-## Theorem 3.2 (Adequacy) · `[CONF]` p. 415:18 · inventory `proved`
+## Theorem 3.2 (Adequacy) · `[CONF]` p. 415:18 · `proved`
 
 > If ⊨ wp(e){⌜P̂⌝} then (∅, e) →* (∅, v) and P̂(v) for some v.
 
-**Printed proof, transcribed.** Neither document prints one.  *"The next section develops proofs for these properties"* (`[CONF]` p. 415:18), and `[CONF]` §4 states no numbered result; `[TR]` §6 ends at 6.176.  The argument here is the source's: `⊨ H` is `H ∅`, so `wp` is read at `ρ = ∅` with its own `∀ρ_f` at `ρ_f = ∅`, and `⌜−⌝` pins `ρ′ = ∅`; the run is then the conclusion's, and what remains is `Adequacy.reclaim` — `∅ ↭ ρ⁺` and `ρ⁺|own = ∅` force `ρ⁺ = ∅`, *"essential for the memory reclamation component of adequacy (Theorem 3.2), which insists that owned cells are freed rather than forgotten"* (`[CONF]` p. 415:23).
+**Printed proof, transcribed.** Neither document prints one.  *"The next section develops proofs for these properties"* (`[CONF]` p. 415:18), and `[CONF]` §4 states no numbered result; `[TR]` §6 ends at 6.176.  The argument here is ours: `⊨ H` is `H ∅`, so `wp` is read at `ρ = ∅` with its own `∀ρ_f` at `ρ_f = ∅`, and `⌜−⌝` pins `ρ′ = ∅`; the run is then the conclusion's, and what remains is `Adequacy.reclaim` — `∅ ↭ ρ⁺` and `ρ⁺|own = ∅` force `ρ⁺ = ∅`, *"essential for the memory reclamation component of adequacy (Theorem 3.2), which insists that owned cells are freed rather than forgotten"* (`[CONF]` p. 415:23).
 
 **Lean.** `BoCa.Adequacy.theorem32`, alias `CONF.theorem_3_2`.
 
 **Also here.** `BoCa.Adequacy.Theorem32`; `BoCa.Adequacy.Reclaim`; `BoCa.Adequacy.reclaim`; `BoCa.Adequacy.Theorem32Printed`; `BoCa.Adequacy.theorem32Printed`; `BoCa.Fig16.LogRel.Typed.theorem32`; `BoCa.TR3.wp_le_fig16`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 3.2). `Adequacy.theorem32` proving `Adequacy.Theorem32`, and `Adequacy.theorem32Printed` proving `Adequacy.Theorem32Printed` — the row over each of the two machines. **The statement is `[CONF]`'s and the proof is not**: neither document prints an argument for this row (`docs/adequacy-plan.md` §1), so the status scores the statement alone and the argument below is ours. `⊨ H` is `H ∅`, so `wp` is read at `ρ = ∅` and its own `∀ρ_f` instantiated at `ρ_f = ∅`, and `⌜−⌝` pins `ρ′ = ∅`; the four composites collapse and **every occurrence of `→*` in the unfolding disappears**, which is why one argument serves over both machines and why no termination measure appears — `[TR]` p. 6's `wp` is a total-correctness row that asserts the run. What is left is `Adequacy.reclaim`, `[CONF]` p. 415:23's *"essential for the memory reclamation component"* conjunct: `Fig16.BoLo.flat_empty` gives `⦇∅⦈ = ∅`, `ResU.Flat.get` carries a cell of `ρ⁺` into `⦇ρ⁺⦈` ([TR] 6.16's own step), `NoOwn` refuses the `own` case and `↭`'s two clauses refuse `imm` and `mut` against `⦇∅⦈`. `Adequacy.Theorem32`, the row at 600 dpi — *"If ⊨ wp(e){⌜P̂⌝} then (∅, e) →* (∅, v) and P̂(v) for some v"* — with `⊨ H` read as `H ∅` (`docs/adequacy-plan.md` §2a fixes that reading from three printed things, and `Fig16.LogRel.Sem` already reads it so), `⌜P̂⌝` as the pointwise lift of a meta `P̂ : Val → ℙ`, and `∅` on the memory side as `Adequacy.emptyMem`. Neither implies the other: `wp` sits in the antecedent and `TR3.wp_le_fig16` turns that conjunct one way only, the pattern ledger D6 records for 6.135, 6.146, 6.147, 6.148 and 6.149. **Neither document prints a proof** — [TR] §6 runs 6.1-6.8 and ends at the Fundamental Property (last result 6.176, physical p. 49), and [CONF] §4 develops the model and states no numbered result — so `docs/adequacy-plan.md` §1 records the evidence and lays out the options rather than picking one. What is established about the shape: unfolding `wp(e){⌜P̂⌝}(∅)` at `ρ_f ≔ ∅` pins `ρ′ = ∅` through `⌜−⌝`, collapses the row's four composites, and **leaves no occurrence of `→*` at all**, so the residue is machine-free and is `Adequacy.Reclaim`: `∅ ↭ ρ⁺` and `ρ⁺
+**Note.** `Adequacy.theorem32` proving `Adequacy.Theorem32`, and `Adequacy.theorem32Printed` proving `Adequacy.Theorem32Printed` — the row over each of the two machines. **The statement is `[CONF]`'s and the proof is not**: neither document prints an argument for this row (`docs/adjudications.md` §A.1), so the status scores the statement alone and the argument below is ours. `⊨ H` is `H ∅`, so `wp` is read at `ρ = ∅` and its own `∀ρ_f` instantiated at `ρ_f = ∅`, and `⌜−⌝` pins `ρ′ = ∅`; the four composites collapse and **every occurrence of `→*` in the unfolding disappears**, which is why one argument serves over both machines and why no termination measure appears — `[TR]` p. 6's `wp` is a total-correctness row that asserts the run. What is left is `Adequacy.reclaim`, `[CONF]` p. 415:23's *"essential for the memory reclamation component"* conjunct: `Fig16.BoLo.flat_empty` gives `⦇∅⦈ = ∅`, `ResU.Flat.get` carries a cell of `ρ⁺` into `⦇ρ⁺⦈` ([TR] 6.16's own step), `NoOwn` refuses the `own` case and `↭`'s two clauses refuse `imm` and `mut` against `⦇∅⦈`. `Adequacy.Theorem32`, the row at 600 dpi — *"If ⊨ wp(e){⌜P̂⌝} then (∅, e) →* (∅, v) and P̂(v) for some v"* — with `⊨ H` read as `H ∅` (`docs/adjudications.md` §A.2a fixes that reading from three printed things, and `Fig16.LogRel.Sem` already reads it so), `⌜P̂⌝` as the pointwise lift of a meta `P̂ : Val → ℙ`, and `∅` on the memory side as `Adequacy.emptyMem`. Neither implies the other: `wp` sits in the antecedent and `TR3.wp_le_fig16` turns that conjunct one way only, the pattern `docs/adjudications.md` D6 records for 6.135, 6.146, 6.147, 6.148 and 6.149. **Neither document prints a proof** — [TR] §6 runs 6.1-6.8 and ends at the Fundamental Property (last result 6.176, physical p. 49), and [CONF] §4 develops the model and states no numbered result — so `docs/adjudications.md` §A.1 records the evidence and lays out the options rather than picking one. What is established about the shape: unfolding `wp(e){⌜P̂⌝}(∅)` at `ρ_f ≔ ∅` pins `ρ′ = ∅` through `⌜−⌝`, collapses the row's four composites, and **leaves no occurrence of `→*` at all**, so the residue is machine-free and is `Adequacy.Reclaim`: `∅ ↭ ρ⁺` and `ρ⁺
 -/
 /-- **`[CONF]` Theorem 3.2**, over the completed machine.  Neither document
 prints an argument, so this one is ours.
@@ -336,7 +336,7 @@ def Corollary33 : Prop :=
     BoCa.BoLo.Steps emptyMem e emptyMem (.val .unit)
 
 /-!
-## Corollary 3.3 (Adequacy at 1) · `[CONF]` p. 415:18 · inventory `proved`
+## Corollary 3.3 (Adequacy at 1) · `[CONF]` p. 415:18 · `proved`
 
 > If ⊨ e : 1 then (∅, e) →* (∅, ()).
 
@@ -348,7 +348,7 @@ def Corollary33 : Prop :=
 
 **Literal reading.** `BoCa.TR3.corThree_unreachable`, in `Paper/LiteralReadings/CONF.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 3.3). `Adequacy.corollary33` proving `Adequacy.Corollary33`, and `Adequacy.corollary33Printed` proving `Adequacy.Corollary33Printed`. **Statement printed, proof ours**, as at 3.2. It is 3.2 instantiated: `Fig16.LogRel.vDen_unit` makes `𝒱⟦1⟧δ` the pure `⌜v = ()⌝`, which is the row's own `⌜P̂⌝`, and `Fig16.LogRel.sem_iff` at `δ = ∅`, `γ = []`, `ρ = ∅` supplies the antecedent — `Adequacy.models_empty`, `Adequacy.gDen_empty` and `Adequacy.psub_nil` are those three. Appeals to [TR] 6.151 nowhere: the hypothesis is the semantic judgment. `Adequacy.Corollary33`, the row at 600 dpi — *"If ⊨ e : 1 then (∅, e) →* (∅, ())"* — with `⊨ e : 1` as `Fig16.LogRel.Sem LifeCtx.empty [] e Ty.unit`, [TR] p. 4's `Δ; Γ ⊨ e : T` at `Δ = Γ = ∅` and at `∅` by 3.2's reading of the bare turnstile. It is **3.2 instantiated** at `P̂ ≜ (· = ())`, because `Fig16.LogRel.vDen_unit` makes `𝒱⟦1⟧δ(v)` the pure `⌜v = ()⌝` and that is `⌜P̂⌝`'s own shape; the rest is `Fig16.LogRel.sem_iff`, `Fig16.LogRel.gDen_mk` and `Expr.psub k [] e = e`, which is the one piece of plumbing that does not exist. **Its printed hypothesis is the SEMANTIC judgment, so it appeals to 3.1 nowhere** — not merely until a final composition. `Adequacy.Corollary33Printed` is the row over [TR] §3's machine as printed, and it is stateable without rebuilding a logical relation: `wp` occurs in `𝒱⟦T⟧δ` only at `⊸` and `∀`, so at `T = 1` the interpretation names no machine (`Fig16LogRel` §11) and `Adequacy.SemUnitPrinted` is `ℰ⟦1⟧δ(e)` there. **`TR3.corThree_unreachable` is not about this row**: it exhibits `TR3.wSeq`, closed and typed at `1` by [TR] p. 2 (`TR3.derives_wSeq`), with no run to `()` on the printed machine — but `TR3.wp_seq_false` refuses the semantic hypothesis at that same term, so what it measures is the composite with 3.1, which over the printed machine also loses 6.154, 6.157 and 6.169.
+**Note.** `Adequacy.corollary33` proving `Adequacy.Corollary33`, and `Adequacy.corollary33Printed` proving `Adequacy.Corollary33Printed`. **Statement printed, proof ours**, as at 3.2. It is 3.2 instantiated: `Fig16.LogRel.vDen_unit` makes `𝒱⟦1⟧δ` the pure `⌜v = ()⌝`, which is the row's own `⌜P̂⌝`, and `Fig16.LogRel.sem_iff` at `δ = ∅`, `γ = []`, `ρ = ∅` supplies the antecedent — `Adequacy.models_empty`, `Adequacy.gDen_empty` and `Adequacy.psub_nil` are those three. Appeals to [TR] 6.151 nowhere: the hypothesis is the semantic judgment. `Adequacy.Corollary33`, the row at 600 dpi — *"If ⊨ e : 1 then (∅, e) →* (∅, ())"* — with `⊨ e : 1` as `Fig16.LogRel.Sem LifeCtx.empty [] e Ty.unit`, [TR] p. 4's `Δ; Γ ⊨ e : T` at `Δ = Γ = ∅` and at `∅` by 3.2's reading of the bare turnstile. It is **3.2 instantiated** at `P̂ ≜ (· = ())`, because `Fig16.LogRel.vDen_unit` makes `𝒱⟦1⟧δ(v)` the pure `⌜v = ()⌝` and that is `⌜P̂⌝`'s own shape; the rest is `Fig16.LogRel.sem_iff`, `Fig16.LogRel.gDen_mk` and `Expr.psub k [] e = e`, which is the one piece of plumbing that does not exist. **Its printed hypothesis is the SEMANTIC judgment, so it appeals to 3.1 nowhere** — not merely until a final composition. `Adequacy.Corollary33Printed` is the row over [TR] §3's machine as printed, and it is stateable without rebuilding a logical relation: `wp` occurs in `𝒱⟦T⟧δ` only at `⊸` and `∀`, so at `T = 1` the interpretation names no machine  and `Adequacy.SemUnitPrinted` is `ℰ⟦1⟧δ(e)` there. **`TR3.corThree_unreachable` is not about this row**: it exhibits `TR3.wSeq`, closed and typed at `1` by [TR] p. 2 (`TR3.derives_wSeq`), with no run to `()` on the printed machine — but `TR3.wp_seq_false` refuses the semantic hypothesis at that same term, so what it measures is the composite with 3.1, which over the printed machine also loses 6.154, 6.157 and 6.169.
 -/
 /-- **`[CONF]` Corollary 3.3**.  3.2 instantiated: `Fig16.LogRel.vDen_unit`
 makes `𝒱⟦1⟧δ` the pure `⌜v = ()⌝`, which is 3.2's own `⌜P̂⌝`.
@@ -380,11 +380,11 @@ open BoCa.Lifetime (LifeCtx LSub)
 /-- `⊨ e : 1` over `[TR]` §3's machine as printed.  `wp` occurs in `𝒱⟦T⟧δ` only
 at `⊸` and `∀`, so at `T = 1` the interpretation names no machine
 (`Fig16.LogRel.vDen_unit`) and `TR3.wp e (𝒱⟦1⟧δ)` **is** `ℰ⟦1⟧δ(e)` over the
-printed machine — `BoCa/Fig16LogRel.lean` §11's own observation.  `𝒟⟦∅⟧` and
+printed machine.  `𝒟⟦∅⟧` and
 `𝒢⟦∅⟧δ([])` name no machine either, so `[TR]` p. 4's `Δ; Γ ⊨ e : T` at
 `Δ = Γ = ∅` is this row and no logical relation has to be rebuilt.
 `[about ours: `[TR]` p. 4's `Δ; Γ ⊨ e : T` at `Δ = Γ = ∅`, `T = 1`, over
-`BoCa/TR3.lean`'s machine]` -/
+`TR3.Steps`]` -/
 def SemUnitPrinted (e : Expr) : Prop :=
   ∀ δ : LSub, LifeCtx.Models LifeCtx.empty δ →
     BoCa.TR3.wp e (Fig16.LogRel.vDen .unit δ) (PMap.empty : WRes)
@@ -396,10 +396,10 @@ def SemUnitPrinted (e : Expr) : Prop :=
 term `[TR]` p. 2 types at `1` whose run to `()` the printed machine has not, and
 what that measures is the composite with `[CONF]` Lemma 3.1 — the printed
 hypothesis here is the semantic judgment, which `BoCa.TR3.wp_seq_false` refuses
-at that same term.  `docs/boca-rules.md` §12.42's reading of §3 as elided is
+at that same term.  `docs/adjudications.md` §12.42's reading of §3 as elided is
 what the pair argues for.
 `[as printed]` (`[CONF]` Corollary 3.3, p. 415:18, over `[TR]` §3's machine as
-`BoCa/TR3.lean` transcribes it) -/
+`TR3.Steps` transcribes it) -/
 def Corollary33Printed : Prop :=
   ∀ e : Expr, SemUnitPrinted e → BoCa.TR3.Steps emptyMem e emptyMem (.val .unit)
 

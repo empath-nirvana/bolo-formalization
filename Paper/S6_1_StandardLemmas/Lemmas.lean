@@ -28,22 +28,22 @@ two of row 5.67's, which the same proofs use.
 **How this file reads.**  The numbered results of the subsection, in printed order as
 far as Lean's definition-before-use allows.  Each opens with a record:
 
-* the result's number, page and the source inventory's status (`proved`, `proved*`,
-  `variant`; source `docs/paper-inventory.md`);
+* the result's number, page and status (`proved`, `proved*`, `variant`; the
+  legend is in `Paper/INDEX.md`);
 * the printed statement, quoted, with the extraction's garbled symbols restored;
 * the printed proof, transcribed compactly and in its own order, citing the lemmas it
   cites;
-* the Lean declaration, moved from the source with its name, statement and proof
-  unchanged (its docstring carries the source's tag and its account of the proof),
+* the Lean declaration (its docstring carries the tag and its account of the
+  proof),
   and the numbered alias `TR.lemma_6_N` declared after it;
-* the inventory row's note.
+* a note on how the declaration reads the printed statement.
 
 A result whose declaration an earlier subsection's printed proof needs is declared
 in that subsection's file, under a heading saying so; its record and alias stay
 here.  A run of declarations the paper does not print, placed in this file only
 because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
-are to the source repository (`borrow_lang` at `970a9d0`).
+`[about ours]` and names the result it serves.  `§N` citations are to
+`docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -52,15 +52,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.1 · `[TR]` p. 6 · inventory `proved`
+## Lemma 6.1 · `[TR]` p. 6 · `proved`
 
 > ρ₁ ▸◁ ρ₂ = ρ₂ ▸◁ ρ₁
 
 **Printed proof, transcribed.** By definition, and the fact that `▸◁` is commutative on cells: at `▸◂` commutativity is immediate; at `▷◁` the first case is the previous one, and the second is immediate since sets are unordered.
 
-**Lean.** `BoCa.Fig16.ResU.compat_comm_iff`, alias `TR.lemma_6_1`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.compat_comm_iff`, alias `TR.lemma_6_1`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.1). `Fig16.ResU.compat_comm_iff`, on the printed carrier — one theorem in the schema, as the print states it, with the print's own "`▸◁` is commutative on cells" as a hypothesis discharged at **both** values the metavariable takes: `Fig16.ResU.compatS_comm_iff` at `▶◀` and `Fig16.ResU.compatR_comm_iff` at `⋈` (settled, `docs/boca-rules.md` §12.35). Definitions have no row in this file by design — they are `docs/definition-inventory.md`'s, at row 5.61
+**Note.** `Fig16.ResU.compat_comm_iff`, on the printed carrier — one theorem in the schema, as the print states it, with the print's own "`▸◁` is commutative on cells" as a hypothesis discharged at **both** values the metavariable takes: `Fig16.ResU.compatS_comm_iff` at `▶◀` and `Fig16.ResU.compatR_comm_iff` at `⋈` (settled, `docs/adjudications.md` §12.35). Definitions have no row in this file by design — they are definition rows of `Paper/INDEX.md`, at row 5.61
 -/
 /-- **`[TR]` Lemma 6.1** (p. 6): `ρ₁ ▶◁ ρ₂ = ρ₂ ▶◁ ρ₁`.  Stated once in the
 schema, as the print states it; `hC` is the print's own "`▶◁` is commutative on
@@ -79,15 +79,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.2 · `[TR]` p. 6 · inventory `proved`
+## Lemma 6.2 · `[TR]` p. 6 · `proved`
 
 > ρ₁ ◐ ρ₂ = ρ₂ ◐ ρ₁
 
 **Printed proof, transcribed.** Composability follows from Lemma 6.1.  The rest follows from commutativity of composition on cells: at `●` it is immediate because `∪` is commutative; at `○` the first two cases are immediate, and the other two follow from noting that `ψᵢ` is invariant under changing the order of the cells.
 
-**Lean.** `BoCa.Fig16.ResU.Comp.comm`, alias `TR.lemma_6_2`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.Comp.comm`, alias `TR.lemma_6_2`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.2). `Fig16.ResU.Comp.comm`, on the printed carrier — one theorem in the schema, discharged at both `●` (`Fig16.ResU.CompS.comm`) and `○` (`Fig16.ResU.CompR.comm`), which is how the print proves it. As a graph it is definedness and value together, i.e. the print's Kleene equality. Definitions have no row in this file by design — they are `docs/definition-inventory.md`'s, at row 5.65
+**Note.** `Fig16.ResU.Comp.comm`, on the printed carrier — one theorem in the schema, discharged at both `●` (`Fig16.ResU.CompS.comm`) and `○` (`Fig16.ResU.CompR.comm`), which is how the print proves it. As a graph it is definedness and value together, i.e. the print's Kleene equality. Definitions have no row in this file by design — they are definition rows of `Paper/INDEX.md`, at row 5.65
 -/
 /-- **`[TR]` Lemma 6.2** (p. 6): `ρ₁ ◐ ρ₂ = ρ₂ ◐ ρ₁`.  As a graph this is
 definedness and value together, which is the print's equation between partial
@@ -115,15 +115,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.3 · `[TR]` p. 6 · inventory `proved`
+## Lemma 6.3 · `[TR]` p. 6 · `proved`
 
 > ρ₁ ◐ (ρ₂ ◐ ρ₃) = ρ₁ ◐ ρ₂ ◐ ρ₃
 
 **Printed proof, transcribed.** Unfolding `◐`, the only interesting case is `ℓ ∈ dom(ρ₁) ∩ dom(ρ₂) ∩ dom(ρ₃)`.  At `●`, associativity of `∪`.  At `○`, split on `ρ₂ ○ ρ₃`: the first case is immediate; the second follows from `imm` always being preserved by `○`; in the third, if `ρ₁(ℓ)` is owned the `mut` is the result, if it is `mut` use associativity of `⊓` and `∧`, and if it is `imm` the result is `imm` either way; in the fourth, owned gives the `mut`, `mut` is immediate, `imm` gives `imm` either way; in the fifth, owned gives the `imm`, `mut` gives the `imm`, and `imm` combines the `imm`s.
 
-**Lean.** `BoCa.Fig16.ResU.Comp.assoc`, alias `TR.lemma_6_3`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.Comp.assoc`, alias `TR.lemma_6_3`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.3). `Fig16.ResU.Comp.assoc`, on the printed carrier — the Kleene equality of the two partial expressions, at every result `w`, stated once in the schema and discharged at both `●` (`Fig16.ResU.CompS.assoc`) and `○` (`Fig16.ResU.CompR.assoc`), which is how the print states and proves it. `hR` and `hC` constrain only the schema parameters. The cell level is `Fig16.CellU.compS_assoc` (associativity of `∪`, the print's `●` case) and `Fig16.CellU.compR_assoc` (the five-clause split, its `○` case). Definitions have no row in this file by design — they are `docs/definition-inventory.md`'s, at row 5.66
+**Note.** `Fig16.ResU.Comp.assoc`, on the printed carrier — the Kleene equality of the two partial expressions, at every result `w`, stated once in the schema and discharged at both `●` (`Fig16.ResU.CompS.assoc`) and `○` (`Fig16.ResU.CompR.assoc`), which is how the print states and proves it. `hR` and `hC` constrain only the schema parameters. The cell level is `Fig16.CellU.compS_assoc` (associativity of `∪`, the print's `●` case) and `Fig16.CellU.compR_assoc` (the five-clause split, its `○` case). Definitions have no row in this file by design — they are definition rows of `Paper/INDEX.md`, at row 5.66
 -/
 /-- **`[TR]` Lemma 6.3** (p. 6, its `○` case on p. 7):
 `ρ₁ ◐ (ρ₂ ◐ ρ₃) = ρ₁ ◐ ρ₂ ◐ ρ₃`.  Both sides are partial, so the printed
@@ -158,15 +158,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.4 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.4 · `[TR]` p. 7 · `proved`
 
 > ρ ◐ ∅ = ρ
 
 **Printed proof, transcribed.** By definition `dom(ρ) ∩ ∅ = ∅`, so `▸◁` holds immediately, and the result is trivially `ρ`.
 
-**Lean.** `BoCa.Fig16.ResU.comp_empty_right`, alias `TR.lemma_6_4`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.comp_empty_right`, alias `TR.lemma_6_4`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.4). `Fig16.ResU.comp_empty_right`, on the printed carrier — in the schema, so both `●` and `○`, definedness and value together. `PCM.op_emp` is its value half alone
+**Note.** `Fig16.ResU.comp_empty_right`, on the printed carrier — in the schema, so both `●` and `○`, definedness and value together. `PCM.op_emp` is its value half alone
 -/
 /-- **`[TR]` Lemma 6.4** (p. 7): `ρ ◐ ∅ = ρ`.  Definedness and value together,
 in the schema, hence at both `●` and `○`.  `[as printed]` -/
@@ -187,15 +187,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.5 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.5 · `[TR]` p. 7 · `proved`
 
 > If ✓ρ then ρ # ∅
 
 **Printed proof, transcribed.** Immediate by definition.
 
-**Lean.** `BoCa.Fig16.ResU.hash_empty_right`, alias `TR.lemma_6_5`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.hash_empty_right`, alias `TR.lemma_6_5`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.5). `Fig16.ResU.hash_empty_right`, on the printed carrier, at `Fig16.ResU.Hash` — which is the print's `ρ₁ ▶◀ ρ₂ ∧ ✓(ρ₁ ● ρ₂)` with `✓` the printed `⦇−⦈ defined`.
+**Note.** `Fig16.ResU.hash_empty_right`, on the printed carrier, at `Fig16.ResU.Hash` — which is the print's `ρ₁ ▶◀ ρ₂ ∧ ✓(ρ₁ ● ρ₂)` with `✓` the printed `⦇−⦈ defined`.
 -/
 /-- **`[TR]` Lemma 6.5** (p. 7): if `✓ρ` then `ρ # ∅`.  `[as printed]` -/
 theorem ResU.hash_empty_right {ρ : ResU Loc Val} (h : ResU.Valid ρ) :
@@ -223,15 +223,15 @@ theorem ResU.hash_symm {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.Hash ρ₁ ρ₂) 
   exact ⟨hc.symm, ρ, hcomp.comm, hv⟩
 
 /-!
-## Lemma 6.6 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.6 · `[TR]` p. 7 · `proved`
 
 > ρ₁ # ρ₂ if and only if ρ₂ # ρ₁
 
 **Printed proof, transcribed.** From Lemma 6.2, and unfolding `⦇−⦈` with Lemmas 6.20 and 6.18.
 
-**Lean.** `BoCa.Fig16.ResU.hash_symm_iff`, alias `TR.lemma_6_6`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.hash_symm_iff`, alias `TR.lemma_6_6`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.6). `Fig16.ResU.hash_symm_iff`, on the printed carrier — the printed "if and only if", from `Fig16.ResU.hash_symm` applied twice, which is 6.1 and 6.2 at `●`.
+**Note.** `Fig16.ResU.hash_symm_iff`, on the printed carrier — the printed "if and only if", from `Fig16.ResU.hash_symm` applied twice, which is 6.1 and 6.2 at `●`.
 -/
 /-- `[TR]` Lemma 6.6 (p. 7), the printed "if and only if".  `[as printed]` -/
 theorem ResU.hash_symm_iff (ρ₁ ρ₂ : ResU Loc Val) :
@@ -245,15 +245,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.9 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.9 · `[TR]` p. 7 · `proved`
 
 > ρ₁ ▸◂ ρ₂ iff ρ₁ ● ρ₂ is defined.
 
 **Printed proof, transcribed.** By definition.
 
-**Lean.** `BoCa.Fig16.ResU.compS_defined_iff`, alias `TR.lemma_6_9`, source tag `[as printed]` `[variant: …]`.
+**Lean.** `BoCa.Fig16.ResU.compS_defined_iff`, alias `TR.lemma_6_9`, tag `[as printed]` `[variant: …]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.9). `Fig16.ResU.compS_defined_iff`, on the printed carrier. Which half is definitional should be said plainly: `ResU.Comp` carries the printed guard as its first conjunct, so the forward direction is that conjunct and nothing more; the content is the converse, which builds the composite from `▶◀` alone through `Fig16.CellU.compS_defined_iff` at every overlapping location. `Fig16.ResU.compR_defined_iff` is the `○` twin, which the paper does not state
+**Note.** `Fig16.ResU.compS_defined_iff`, on the printed carrier. Which half is definitional should be said plainly: `ResU.Comp` carries the printed guard as its first conjunct, so the forward direction is that conjunct and nothing more; the content is the converse, which builds the composite from `▶◀` alone through `Fig16.CellU.compS_defined_iff` at every overlapping location. `Fig16.ResU.compR_defined_iff` is the `○` twin, which the paper does not state
 -/
 /-- `ρ₁ ▶◀ ρ₂` iff `ρ₁ ● ρ₂` is defined — `[TR]` Lemma 6.9 (p. 7, 600 dpi),
 whose own proof is "By definition".  `ResU.Comp` carries the printed guard as
@@ -261,7 +261,7 @@ its first conjunct, so the forward direction is that conjunct and nothing more.
 The content is the converse — building the composite from `▶◀` alone, which
 goes through `CellU.compS_defined_iff` at every overlapping location.
 Stated on this file's carrier, which is Fig. 16 on the settled reading of the
-`fin` mark (§3, and the `[variant: …]` at `Res`).  `[as printed]` -/
+`fin` mark (§12.33, and the `[variant: …]` at `Res`).  `[as printed]` -/
 theorem ResU.compS_defined_iff (ρ₁ ρ₂ : ResU Loc Val) :
     (∃ ρ, ResU.CompS ρ₁ ρ₂ ρ) ↔ ResU.CompatS ρ₁ ρ₂ :=
   ⟨fun ⟨_, h⟩ => h.1, fun h => ⟨_, ResU.compS_spec ρ₁ ρ₂ h⟩⟩
@@ -360,7 +360,7 @@ reassociates to `(σ₁ ◐ σ₂) ◐ τ = b`, Lemma 6.2 turns the head pair ro
 6.3 again puts `σ₂` outside, which is the transposed fold.  `swap` is the only
 `List.Perm` constructor that is not structural, so this is the whole content of
 `BigComp.of_perm`.
-`[about ours: `[TR]` Lemmas 6.2 and 6.3 read at one step of §16's fold]` -/
+`[about ours: `[TR]` Lemmas 6.2 and 6.3 read at one step of the fold]` -/
 theorem BigComp.swap (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {σ₁ σ₂ : ResU Loc Val} {l : List (ResU Loc Val)} {b : ResU Loc Val}
     (h : BigComp R C (σ₁ :: σ₂ :: l) b) : BigComp R C (σ₂ :: σ₁ :: l) b := by
@@ -376,9 +376,9 @@ theorem BigComp.swap (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ�
           exact BigComp.cons (BigComp.cons h₂ hx) hb
 
 /-- Reordering the folded list carries the graph across unchanged — definedness
-travels with the value, which is what settles §16's worry that the existential
+travels with the value, which is what settles the worry that the existential
 over orderings could make `⨀` newly defined.
-`[about ours: the order-independence of §16's fold, in transport form]` -/
+`[about ours: the order-independence of the fold, in transport form]` -/
 theorem BigComp.of_perm (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {l l' : List (ResU Loc Val)} (hp : l.Perm l') :
     ∀ {b : ResU Loc Val}, BigComp R C l b → BigComp R C l' b := by
@@ -396,11 +396,11 @@ theorem BigComp.of_perm (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ �
 
 A remark on a printed definition of `[TR]` §5; its proof uses results of §6, and the Lean of Lemmas 6.7, 6.8, 6.10, 6.11 and 6.15 in this file needs it, so it is declared here.  The row is recorded in `Paper/S5_Model/Remarks.lean`.
 -/
-/-- **The fold list may be reordered.**  This is what §16 owes: "`⨀` folds a
+/-- **The fold list may be reordered.**  This is what `BigComp` owes: "`⨀` folds a
 list, and that the value does not depend on the fold needs `[TR]` Lemmas 6.1,
 6.2 and 6.3".  6.1 enters through `ResU.Comp.comm_of_laws`, 6.2 and 6.3 through
 `BigComp.swap`.
-`[about ours: `BigComp` is §16's fold shape; the printed `⨀` is the order-free
+`[about ours: `BigComp` is the fold shape; the printed `⨀` is the order-free
 operator this makes it]` -/
 theorem BigComp.perm (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {l l' : List (ResU Loc Val)} (hp : l.Perm l') {b b' : ResU Loc Val}
@@ -430,7 +430,7 @@ paired value is the only walk of that cell's witness.  Spending it at every
 shared location makes the two lists permutations (`BigComp.sites`), `⨀` then
 has one value, and `ResU.Comp.functional` closes the two outer `◐`s.
 `[about ours: the print's `ex(ρ)_◐` is a term and `ExW` is its graph (G4); this
-is the proof that the graph is a function — the debt §16 and §22 record]` -/
+is the proof that the graph is a function — the obligation convention G4 incurs]` -/
 theorem ExW.functional (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {ρ σ σ' : ResU Loc Val} (h : ExW R C ρ σ) (h' : ExW R C ρ σ') : σ = σ' := by
   refine ExW.rec (motive_1 := fun ρ σ _ => ∀ τ, ExW R C ρ τ → σ = τ)
@@ -486,7 +486,7 @@ over `ResU.Sites` lists, so both are pinned up to order and `BigComp.permR`
 closes each `◯`; the two outer `○`s are `ResU.CompR.functional`.  `ag` is
 always at `○`, so the schema hypotheses are discharged here rather than taken.
 `[about ours: the print's `ag(ρ)` is a term and `AgW` is its graph (G4); this is
-the proof that the graph is a function — the debt §16 and §22 record]` -/
+the proof that the graph is a function — the obligation convention G4 incurs]` -/
 theorem AgW.functional {ρ σ σ' : ResU Loc Val} (h : AgW ρ σ) (h' : AgW ρ σ') :
     σ = σ' := by
   refine AgW.rec (motive_1 := fun ρ σ _ => ∀ τ, AgW ρ τ → σ = τ)
@@ -598,7 +598,7 @@ variable {R : CellU Loc Val → CellU Loc Val → Prop}
 variable {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
 
 /-- `⨀[σ] = σ`, by [TR] Lemma 6.4 — and nothing else folds to anything else.
-`[about ours: `BigComp` is §16's fold shape for the printed `⨀`]` -/
+`[about ours: `BigComp` is the fold shape for the printed `⨀`]` -/
 theorem BigComp.singleton_iff (hC : ResU.CompLaws C) {σ τ : ResU Loc Val} :
     BigComp R C [σ] τ ↔ τ = σ := by
   constructor
@@ -611,7 +611,7 @@ theorem BigComp.singleton_iff (hC : ResU.CompLaws C) {σ τ : ResU Loc Val} :
     exact BigComp.cons BigComp.nil (ResU.comp_empty_right _)
 
 /-- `⨀[σ₁, σ₂] = σ₁ ◐ σ₂` — the two-element fold is the binary composition.
-`[about ours: `BigComp` is §16's fold shape for the printed `⨀`]` -/
+`[about ours: `BigComp` is the fold shape for the printed `⨀`]` -/
 theorem BigComp.pair (hC : ResU.CompLaws C) {σ₁ σ₂ τ : ResU Loc Val} :
     BigComp R C [σ₁, σ₂] τ ↔ ResU.Comp R C σ₁ σ₂ τ := by
   constructor
@@ -626,7 +626,7 @@ theorem BigComp.pair (hC : ResU.CompLaws C) {σ₁ σ₂ τ : ResU Loc Val} :
 /-- **`⨀(l₁ ++ l₂) = ⨀l₁ ◐ ⨀l₂`**, as a Kleene equality: the concatenation
 folds exactly when both halves fold to composable values, and then to their
 composite.  This is where [TR] 6.3 and 6.4 are spent.
-`[about ours: `BigComp` is §16's fold shape; the rebracketing is the printed
+`[about ours: `BigComp` is the fold shape; the rebracketing is the printed
 6.3 and the base case the printed 6.4]` -/
 theorem BigComp.append (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {l₁ l₂ : List (ResU Loc Val)} {b : ResU Loc Val} :
@@ -732,7 +732,7 @@ theorem ResU.Sites.append_of_compS {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.Com
 /-- **A key-indexed family over the `own` or `mut` sites of `ρ₁ ● ρ₂` cuts into
 a family over `ρ₁`'s sites and one over `ρ₂`'s**, up to order and with no entry
 invented or lost.
-`[about ours: `ResU.Sites` is convention G6's index set (§16), and this is how
+`[about ours: `ResU.Sites` is convention G6's index set, and this is how
 two of them sit inside a third]` -/
 theorem ResU.Sites.split_pairs {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {k : Kind} (hk : k ≠ Kind.imm) {A : Type} {w : List (Loc × A)}
@@ -897,9 +897,9 @@ theorem AgWitsI.to_compS_right {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS �
 /-- **The value the `imm` half pairs with a location depends only on the cell's
 witness.**  This is what makes [TR] 6.20's `ρ₁ ∩ ρ₂` term *one* term rather than
 two: the entry `ex(ρ′)_○ ○ ag(ρ′)` is the same on either side of the overlap, so
-Lemma 6.19 can duplicate it.  `ExR.functional` and `AgW.functional` (§20a) fix
+Lemma 6.19 can duplicate it.  `ExR.functional` and `AgW.functional` fix
 the two halves, and `ResU.CompR.functional` their composite.
-`[about ours: `AgWitsI` is §18's family relation; the printed 6.19 is
+`[about ours: `AgWitsI` is the family relation; the printed 6.19 is
 `ResU.flatR_idem`]` -/
 theorem AgWitsI.value_functional {ρ ρ' : ResU Loc Val}
     {w w' : List (Loc × ResU Loc Val)} (h : AgWitsI ρ w) (h' : AgWitsI ρ' w')
@@ -944,7 +944,7 @@ theorem ResU.CompS.imm_site_iff {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS 
 `ρ₁` alone, over `ρ₂` alone, and over both — with `ρ₁`'s own index set the first
 block together with the third, and `ρ₂`'s the second with the third.  This is
 [TR] 6.20's inclusion-exclusion, at the index sets.
-`[about ours: `ResU.Sites` is convention G6's index set (§16); this is 6.20's
+`[about ours: `ResU.Sites` is convention G6's index set; this is 6.20's
 inclusion-exclusion read at the index sets]` -/
 theorem ResU.Sites.split_pairs_imm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {A : Type} {w : List (Loc × A)} (hs : ρ.Sites Kind.imm (w.map Prod.fst)) :
@@ -1016,7 +1016,7 @@ theorem ResU.Sites.split_pairs_imm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.Com
 one copy folds to.  At `○` this needs no hypothesis: `ResU.compR_self` says
 `ρ ○ ρ = ρ` for every `ρ`, which is clause (1) of `○` read pointwise, and [TR]
 Lemma 6.19 is its instance at `⦇ρ⦈_○`.
-`[about ours: `BigComp` is §16's fold shape; the printed 6.19 is
+`[about ours: `BigComp` is the fold shape; the printed 6.19 is
 `ResU.flatR_idem`, and this is the fold-level fact 6.20 spends it on]` -/
 theorem BigComp.dupR {l m : List (ResU Loc Val)} {x : ResU Loc Val} :
     BigComp CellU.CompatR CellU.CompR (l ++ (m ++ m)) x ↔
@@ -1037,7 +1037,7 @@ order, one of the blocks of `l`, then `⨀(l ++ d) = ⨀l`.  This is
 `BigComp.dupR` with the repetition located inside a larger fold, which is the
 shape [TR] 6.20's converse takes — only the `ρ₁ ∩ ρ₂` block is doubled, not the
 whole composite.
-`[about ours: `BigComp` is §16's fold shape; the printed 6.19 is
+`[about ours: `BigComp` is the fold shape; the printed 6.19 is
 `ResU.flatR_idem`]` -/
 theorem BigComp.dup_of_perm {l m d : List (ResU Loc Val)} (hp : l.Perm (m ++ d))
     {x : ResU Loc Val} :
@@ -1069,8 +1069,8 @@ is the part of `ρ₂`'s family at locations `ρ₁` does not carry, `w₂c` the
 does, and `w₁c` the block of `ρ₁`'s family sitting over the same locations —
 which `w₂c` permutes, so `⨀` cannot tell them apart.  `w₁ ++ w₂a` is then a
 family for `ρ₁₂` over its whole `imm` index set.
-`[about ours: `ResU.Sites` is convention G6's index set (§16) and `AgWitsI`
-§18's family; this is 6.20's inclusion-exclusion read in the assembling
+`[about ours: `ResU.Sites` is convention G6's index set and `AgWitsI`
+the family; this is 6.20's inclusion-exclusion read in the assembling
 direction]` -/
 theorem AgWitsI.assemble {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w₁ w₂ : List (Loc × ResU Loc Val)}
@@ -1350,8 +1350,8 @@ theorem ResU.CompatS.disjoint_of_immFree {ρ ρ' : ResU Loc Val}
 `ρ ▸◂ ρ₁` and `ρ ▸◂ ρ₂`.  The proof is the print's: `ρ|imm = ∅` turns the
 hypothesis into disjointness from the composite, the composite's domain is the
 union of the operands' domains, so `ρ` is disjoint from each operand, and
-disjoint resources are compatible.  `ρ|imm = ∅` is carried literally, as §12's
-`ResU.restrict` against `PMap.empty`; `ResU.restrict_imm_empty_iff` (§17) turns
+disjoint resources are compatible.  `ρ|imm = ∅` is carried literally, as
+`ResU.restrict` against `PMap.empty`; `ResU.restrict_imm_empty_iff` turns
 it into the pointwise `ResU.ImmFree` inside the proof.
 `[as printed]` (the printed `ρ₁ ○ ρ₂` appears as its graph — G4) -/
 theorem ResU.CompatS.of_compR_left {ρ ρ₁ ρ₂ r : ResU Loc Val}
@@ -1388,7 +1388,7 @@ theorem ResU.CompatS.of_compS_left_immFree {ρ₁ ρ₂ ρ σ : ResU Loc Val}
 /-- **The display and the composability constraints of `[TR]` Lemma 6.35's
 proof** (p. 12).  From `⦇ρ₁ ● ρ₂⦈ = σ` it returns the printed factorisation
 `ex(ρ₁)_● ● ex(ρ₂)_● ● (ag(ρ₁) ○ ag(ρ₂))` — 6.18 and 6.20 through
-`ResU.Flat.split` (§20b) — together with the two composites
+`ResU.Flat.split` — together with the two composites
 `ex(ρᵢ)_● ● ag(ρᵢ)` that 6.30 and 6.36 show are defined.  Those two are `⦇ρ₁⦈`
 and `⦇ρ₂⦈`, so this is 6.35 with its intermediate values still in hand, which
 is what 6.7 needs of it.
@@ -1461,18 +1461,18 @@ theorem ResU.Lower.split_left {ρ₁ ρ₂ ρ₁₂ : ResU Loc Val} {m : Loc →
     exact (CellU.CompS.erase hs).1.symm.trans (CellU.CompS.erase hs).2
 
 /-!
-## Lemma 6.7 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.7 · `[TR]` p. 7 · `proved`
 
 > If ρ₁ # ρ₂ then ⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁⟧ ∪ ⟦ρ₂⟧.
 
 **Printed proof, transcribed.** By Lemmas 6.20 and 6.18 with Lemma 6.36, every `ℓ ∈ dom(⟦ρ₁ ● ρ₂⟧)` is in `dom(ex(ρ₁)_●)`, in `dom(ex(ρ₂)_●)`, or in `dom(ag(ρ₁) ○ ag(ρ₂))`.  In the first two cases we are done; in the third we are done unless `ℓ ∈ dom(ag(ρ₁)) ∩ dom(ag(ρ₂))`, and then the definition of `○` gives `⟦ag(ρ₁)(ℓ)⟧ = ⟦ag(ρ₂)(ℓ)⟧`.
 
-**Lean.** `BoCa.Fig16.ResU.Lower.split`, alias `TR.lemma_6_7`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.Lower.split`, alias `TR.lemma_6_7`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.7). `Fig16.ResU.Lower.split` (§20c), on the printed carrier, as one Kleene equality: both sides are partial terms, so the printed `=` is the `↔` between the two graphs at an arbitrary common result `m`, the shape §20b already uses for 6.18 and 6.20. `∪` is `Fig16.MemUnion`, the union of two partial maps written in `OptComp`'s shape, whose overlap clause `v₁ = v₂ ∧ o = some v₁` **asserts** the agreement the printed proof's last sentence establishes — a reading that left the overlap open would be weaker than the print; `Fig16.MemUnion.iff_ext` is the four-conjunct extensional form of the same relation, one rewrite away. The hypotheses are the print's: `Fig16.ResU.Hash ρ₁ ρ₂` verbatim, and `Fig16.ResU.CompS ρ₁ ρ₂ ρ₁₂` naming `ρ₁ ● ρ₂` (G4), whose first conjunct is `#`'s own `▸◂`. The forward half needs no `#` and is carved out as `Fig16.ResU.Lower.split_left`, tagged `[restricted: …]`. `Fig16.LowerExample.split_overlap` runs the lemma on a `#`-pair that genuinely shares a location, so the row is not vacuous at the case the printed proof spends its last sentence on.
+**Note.** `Fig16.ResU.Lower.split`, on the printed carrier, as one Kleene equality: both sides are partial terms, so the printed `=` is the `↔` between the two graphs at an arbitrary common result `m`, the shape of 6.18 and 6.20. `∪` is `Fig16.MemUnion`, the union of two partial maps written in `OptComp`'s shape, whose overlap clause `v₁ = v₂ ∧ o = some v₁` **asserts** the agreement the printed proof's last sentence establishes — a reading that left the overlap open would be weaker than the print; `Fig16.MemUnion.iff_ext` is the four-conjunct extensional form of the same relation, one rewrite away. The hypotheses are the print's: `Fig16.ResU.Hash ρ₁ ρ₂` verbatim, and `Fig16.ResU.CompS ρ₁ ρ₂ ρ₁₂` naming `ρ₁ ● ρ₂` (G4), whose first conjunct is `#`'s own `▸◂`. The forward half needs no `#` and is carved out as `Fig16.ResU.Lower.split_left`, tagged `[restricted: …]`. `Fig16.LowerExample.split_overlap` runs the lemma on a `#`-pair that genuinely shares a location, so the row is not vacuous at the case the printed proof spends its last sentence on.
 -/
 /-- **`[TR]` Lemma 6.7** (p. 7): if `ρ₁ # ρ₂` then `⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁⟧ ∪ ⟦ρ₂⟧`.
-Both sides are partial terms, so — as with 6.18 and 6.20 in §20b — the printed
+Both sides are partial terms, so — as with 6.18 and 6.20 — the printed
 `=` is the Kleene equality of the two, which is this `↔` at an arbitrary common
 result `m`: the left-hand side is defined with value `m` exactly when the right
 is.  `MemUnion` is the union of partial maps on the right, and its overlap
@@ -1507,15 +1507,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.8 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.8 · `[TR]` p. 7 · `proved`
 
 > If ⟦ρ₂⟧ = ⟦ρ₃⟧ and ρ₁ # ρ₂ and ρ₁ # ρ₃ then ⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁ ● ρ₃⟧
 
 **Printed proof, transcribed.** Immediate by Lemma 6.7, rewriting with `⟦ρ₂⟧ = ⟦ρ₃⟧`.
 
-**Lean.** `BoCa.Fig16.ResU.Lower.congr`, alias `TR.lemma_6_8`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.Lower.congr`, alias `TR.lemma_6_8`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.8). `Fig16.ResU.Lower.congr` (§20c), on the printed carrier, off 6.7 exactly as the print takes it — "immediate by lemma 6.7, and rewriting with `⟦ρ₂⟧ = ⟦ρ₃⟧`", the rewriting being `Fig16.ResU.Lower.functional`. The printed hypothesis `⟦ρ₂⟧ = ⟦ρ₃⟧` is an equation between partial terms and is carried as one: both lowerings are related to the same memory, which says they are defined and equal, and under the printed `#`s they are defined anyway (`Fig16.ResU.Valid.split`), so no case of it is lost. The conclusion is likewise the Kleene equality of its two sides. Nothing constrains `ρ₁`, `ρ₂`, `ρ₃` beyond the print.
+**Note.** `Fig16.ResU.Lower.congr`, on the printed carrier, off 6.7 exactly as the print takes it — "immediate by lemma 6.7, and rewriting with `⟦ρ₂⟧ = ⟦ρ₃⟧`", the rewriting being `Fig16.ResU.Lower.functional`. The printed hypothesis `⟦ρ₂⟧ = ⟦ρ₃⟧` is an equation between partial terms and is carried as one: both lowerings are related to the same memory, which says they are defined and equal, and under the printed `#`s they are defined anyway (`Fig16.ResU.Valid.split`), so no case of it is lost. The conclusion is likewise the Kleene equality of its two sides. Nothing constrains `ρ₁`, `ρ₂`, `ρ₃` beyond the print.
 -/
 /-- **`[TR]` Lemma 6.8** (p. 7): if `⟦ρ₂⟧ = ⟦ρ₃⟧` and `ρ₁ # ρ₂` and `ρ₁ # ρ₃`
 then `⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁ ● ρ₃⟧`.  The printed hypothesis `⟦ρ₂⟧ = ⟦ρ₃⟧` is an
@@ -1524,7 +1524,7 @@ related to the **same** memory `m`, which says they are defined and equal, and
 under the printed `#`s they are defined anyway (`ResU.Valid.split`), so no case
 of the printed equation is lost.  The conclusion is likewise the Kleene equality
 of its two sides.  The proof is the print's — "immediate by lemma 6.7, and
-rewriting with `⟦ρ₂⟧ = ⟦ρ₃⟧`" — with `ResU.Lower.functional` (§20a) as the
+rewriting with `⟦ρ₂⟧ = ⟦ρ₃⟧`" — with `ResU.Lower.functional` as the
 rewriting step.
 `[as printed]` (as Kleene equalities between graphs — G4) -/
 theorem ResU.Lower.congr {ρ₁ ρ₂ ρ₃ ρ₁₂ ρ₁₃ : ResU Loc Val} {m w : Loc → Option Val}
@@ -1550,15 +1550,15 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.10 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.10 · `[TR]` p. 7 · `proved`
 
 > If ✓(ρ₁ ● ρ₂) then ✓ρ₁ and ✓ρ₂
 
 **Printed proof, transcribed.** By unfolding and applying Lemmas 6.18 and 6.20.
 
-**Lean.** `BoCa.Fig16.ResU.Valid.split`, alias `TR.lemma_6_10`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.Valid.split`, alias `TR.lemma_6_10`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.10). `Fig16.ResU.Valid.split` (§20c), on the printed carrier, `[as printed]` — the **same declaration as 6.35**, because p. 5's own table has the row `✓ρ ≜ ⦇ρ⦈ defined` and `Fig16.ResU.Valid ρ` *is* `∃ σ, Fig16.ResU.Flat ρ σ`. Two hypotheses, both printed: `Fig16.ResU.CompS ρ₁ ρ₂ ρ` names `ρ₁ ● ρ₂` (G4) and its first conjunct is the print's `▸◂` presupposition; `ρ.Valid` is the printed `✓(ρ₁ ● ρ₂)`. The proof written is 6.35's, the longer of the two printed ones, through `Fig16.ResU.Flat.split_factors`.
+**Note.** `Fig16.ResU.Valid.split`, on the printed carrier, `[as printed]` — the **same declaration as 6.35**, because p. 5's own table has the row `✓ρ ≜ ⦇ρ⦈ defined` and `Fig16.ResU.Valid ρ` *is* `∃ σ, Fig16.ResU.Flat ρ σ`. Two hypotheses, both printed: `Fig16.ResU.CompS ρ₁ ρ₂ ρ` names `ρ₁ ● ρ₂` (G4) and its first conjunct is the print's `▸◂` presupposition; `ρ.Valid` is the printed `✓(ρ₁ ● ρ₂)`. The proof written is 6.35's, the longer of the two printed ones, through `Fig16.ResU.Flat.split_factors`.
 -/
 /-- **`[TR]` Lemma 6.10** (p. 7) — equivalently **`[TR]` Lemma 6.35** (p. 12).
 6.10 reads *if `✓(ρ₁ ● ρ₂)` then `✓ρ₁` and `✓ρ₂`*; 6.35 reads *if `⦇ρ ● ρ′⦈` is
@@ -1590,20 +1590,20 @@ theorem ResU.CompS.assoc (ρ₁ ρ₂ ρ₃ w : ResU Loc Val) :
     (fun ψ₁ ψ₂ ψ₃ ω => CellU.compS_assoc ψ₁ ψ₂ ψ₃ ω) ρ₁ ρ₂ ρ₃ w
 
 /-!
-## Lemma 6.11 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.11 · `[TR]` p. 7 · `proved`
 
 > If ρ₁ ● ρ₂ # ρ₃ then ρ₁ # ρ₃ and ρ₂ # ρ₃
 
 **Printed proof, transcribed.** Definedness of `ρ₁ ● ρ₃` and `ρ₂ ● ρ₃` follows from unfolding definitions; `✓(ρ₁ ● ρ₃)` and `✓(ρ₂ ● ρ₃)` follow from Lemma 6.10 applied to `✓(ρ₁ ● ρ₂ ● ρ₃)`.
 
-**Lean.** `BoCa.Fig16.ResU.Hash.split`, alias `TR.lemma_6_11`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.Hash.split`, alias `TR.lemma_6_11`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.11). `Fig16.ResU.Hash.split` (§20c), on the printed carrier, at the print's own operand order — `(ρ₁ ● ρ₂) # ρ₃` in the hypothesis, both conclusions in one statement, no mirroring. The printed proof is carried step for step: 6.3 (`Fig16.ResU.CompS.assoc`) and 6.2 regroup the one composite `(ρ₁ ● ρ₂) ● ρ₃` as `ρ₁ ● (ρ₂ ● ρ₃)` and as `ρ₂ ● (ρ₁ ● ρ₃)`, which is "definedness … from unfolding definitions", and 6.10 (`Fig16.ResU.Valid.split`) at each regrouping is "✓(ρ₁ ● ρ₃) and ✓(ρ₂ ● ρ₃) follow from theorem 6.10".
+**Note.** `Fig16.ResU.Hash.split`, on the printed carrier, at the print's own operand order — `(ρ₁ ● ρ₂) # ρ₃` in the hypothesis, both conclusions in one statement, no mirroring. The printed proof is carried step for step: 6.3 (`Fig16.ResU.CompS.assoc`) and 6.2 regroup the one composite `(ρ₁ ● ρ₂) ● ρ₃` as `ρ₁ ● (ρ₂ ● ρ₃)` and as `ρ₂ ● (ρ₁ ● ρ₃)`, which is "definedness … from unfolding definitions", and 6.10 (`Fig16.ResU.Valid.split`) at each regrouping is "✓(ρ₁ ● ρ₃) and ✓(ρ₂ ● ρ₃) follow from theorem 6.10".
 -/
 /-- **`[TR]` Lemma 6.11** (p. 7): if `ρ₁ ● ρ₂ # ρ₃` then `ρ₁ # ρ₃` and
 `ρ₂ # ρ₃`.  The print's two halves are the two conjuncts of `#`.  "Definedness
 of `ρ₁ ● ρ₃` and `ρ₂ ● ρ₃` follow from unfolding definitions" is 6.3
-(`ResU.CompS.assoc`, §20) regrouping `(ρ₁ ● ρ₂) ● ρ₃` as `ρ₁ ● (ρ₂ ● ρ₃)` and —
+(`ResU.CompS.assoc`) regrouping `(ρ₁ ● ρ₂) ● ρ₃` as `ρ₁ ● (ρ₂ ● ρ₃)` and —
 after 6.2 — as `ρ₂ ● (ρ₁ ● ρ₃)`, each regrouping carrying the inner composite's
 own `▸◂` as its first conjunct.  "`✓(ρ₁ ● ρ₃)` and `✓(ρ₂ ● ρ₃)` follow from
 theorem 6.10 applied to `✓(ρ₁ ● ρ₂ ● ρ₃)`" is `ResU.Valid.split` at each
@@ -1625,20 +1625,19 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.12 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.12 · `[TR]` p. 7 · `proved`
 
 > If ρ₁ ● ρ₂ and ρ₁ ● ρ₃ and ρ₂ ○ ρ₃ are all defined, then so is ρ₁ ● (ρ₂ ○ ρ₃).
 
 **Printed proof, transcribed.** The own-or-mut cells of `ρ₁` are disjoint from those of `ρ₂` and `ρ₃`, hence from those of `ρ₂ ○ ρ₃`, because `○` introduces no new own-or-mut cells.  At a location where `(ρ₂ ○ ρ₃)(ℓ)` is an `imm` cell, either (1) both operands are `imm` cells over one value and one witness, `imm(α₁, v, ρ)` and `imm(α₂, v, ρ)`, so the composite is `imm(α₁ ∪ α₂, v, ρ)` and is composable with `ρ₁(ℓ)` by `ρ₁ ▸◂ ρ₂`; or (2) one operand is `imm` and the other own-or-mut (without loss of generality `ρ₂`'s), so `ℓ ∉ dom(ρ₁)` and `ℓ` is not in the overlap.  So the `imm` cells of `ρ₁` agree on overlap with those of `ρ₂ ○ ρ₃` up to lifetimes.
 
-**Lean.** `BoCa.Fig16.ResU.compatS_of_compR`, alias `TR.lemma_6_12`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.compatS_of_compR`, alias `TR.lemma_6_12`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.12). `Fig16.ResU.compatS_of_compR` (§20d), on the printed carrier.  "`ρ₁ ● ρ₂` is defined" is `▶◀` by Lemma 6.9 and "`ρ₂ ○ ρ₃` is defined" is `⋈` by its `○` twin, so the hypotheses are the print's. The imm case turns on `Fig16.CellU.compatS_iff`, which reads `▶◀` off a cell's tag, value and witness
+**Note.** `Fig16.ResU.compatS_of_compR`, on the printed carrier.  "`ρ₁ ● ρ₂` is defined" is `▶◀` by Lemma 6.9 and "`ρ₂ ○ ρ₃` is defined" is `⋈` by its `○` twin, so the hypotheses are the print's. The imm case turns on `Fig16.CellU.compatS_iff`, which reads `▶◀` off a cell's tag, value and witness
 -/
 /-- **`[TR]` Lemma 6.12** (p. 7): if `ρ₁ ● ρ₂` and `ρ₁ ● ρ₃` and `ρ₂ ○ ρ₃` are
 all defined then so is `ρ₁ ● (ρ₂ ○ ρ₃)`.  Stated, as 6.13 is, as "`ρ₁` is
-compatible with the composite", which by Lemma 6.9 (`ResU.compS_defined_iff`,
-§12) is definedness of `ρ₁ ● (ρ₂ ○ ρ₃)`.
+compatible with the composite", which by Lemma 6.9 (`ResU.compS_defined_iff`) is definedness of `ρ₁ ● (ρ₂ ○ ρ₃)`.
 
 The proof is the print's, at one location of the overlap.  Where only one of
 `ρ₂`, `ρ₃` is defined, `◐`'s outer pieces make the composite that operand and
@@ -1670,19 +1669,19 @@ namespace BoCa.Fig16
 variable {Loc Val : Type}
 
 /-!
-## Lemma 6.13 · `[TR]` p. 7 · inventory `proved`
+## Lemma 6.13 · `[TR]` p. 7 · `proved`
 
 > If ρ₁ ● ρ₂ and ρ₁ ● ρ₃ and ρ₂ ● ρ₃ are all defined, then so is ρ₁ ● ρ₂ ● ρ₃.
 
 **Printed proof, transcribed.** The own-or-mut cells of `ρ₁, ρ₂, ρ₃` are pairwise disjoint, hence mutually disjoint, and the `imm` cells pairwise agree up to lifetimes, hence mutually agree up to lifetimes.
 
-**Lean.** `BoCa.Fig16.ResU.compatS_of_pairwise`, alias `TR.lemma_6_13`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.compatS_of_pairwise`, alias `TR.lemma_6_13`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.13). `Fig16.ResU.compatS_of_pairwise`, on the printed carrier: from `ρ₁ ● ρ₂` and pairwise `▶◀` it produces `(ρ₁ ● ρ₂) ▶◀ ρ₃`, which by 6.9 is definedness of the triple composite.
+**Note.** `Fig16.ResU.compatS_of_pairwise`, on the printed carrier: from `ρ₁ ● ρ₂` and pairwise `▶◀` it produces `(ρ₁ ● ρ₂) ▶◀ ρ₃`, which by 6.9 is definedness of the triple composite.
 -/
 /-- **`[TR]` Lemma 6.13** (p. 7): if `ρ₁ ● ρ₂`, `ρ₁ ● ρ₃` and `ρ₂ ● ρ₃` are all
 defined then so is `ρ₁ ● ρ₂ ● ρ₃`.  Stated as "the composite is compatible with
-the third", which by Lemma 6.9 (`ResU.compS_defined_iff`, §12) is definedness of
+the third", which by Lemma 6.9 (`ResU.compS_defined_iff`) is definedness of
 the triple composite.  `[as printed]` -/
 theorem ResU.compatS_of_pairwise {ρ₁ ρ₂ ρ₃ σ : ResU Loc Val}
     (h₁₂ : ResU.CompS ρ₁ ρ₂ σ) (h₁₃ : ResU.CompatS ρ₁ ρ₃)
@@ -1714,7 +1713,7 @@ variable {Loc Val : Type}
 A remark on a printed definition of `[TR]` §5; its proof uses results of §6, and the Lean of Lemmas 6.14 and 6.15 in this file needs it, so it is declared here.  The row is recorded in `Paper/S5_Model/Remarks.lean`.
 -/
 /-- **`⋈` is exactly "a common value, and a common witness wherever there is one
-to share".**  Left to right is `CellU.CompR.erase` and `CellU.CompR.wit` (§13);
+to share".**  Left to right is `CellU.CompR.erase` and `CellU.CompR.wit`;
 right to left is the case analysis over the two tags that p. 5's five clauses
 decide, one clause per pair of tags — `own` against anything is (1), (4) or (5),
 two `imm` cells over one witness are (2), two `mut` cells over one witness are
@@ -1725,8 +1724,8 @@ right-to-left direction is what that proof spends: `○` merges an `imm` cell wi
 an own-or-mut cell "only when the given own-or-mut cell has the same value and
 subresource inside of it", and here that condition is not merely necessary but
 sufficient, so a composite that inherits it is `⋈` whatever the operand was.
-`[about ours: §15's `⋈`, which is `[TR]` p. 5's printed second disjunct on the
-reading argued there, in the projections of §7 and §13]` -/
+`[about ours: the `⋈`, which is `[TR]` p. 5's printed second disjunct on the
+reading argued there, in the projections `CellU.rep` and `CellU.erase`]` -/
 theorem CellU.compatR_iff {ψ₁ ψ₂ : CellU Loc Val} :
     CellU.CompatR ψ₁ ψ₂ ↔
       (ψ₁.erase = ψ₂.erase ∧
@@ -1792,20 +1791,20 @@ theorem CellU.CompatR.of_compR {ψ₁ ψ₂ ψ ψ₃ : CellU Loc Val}
   · exact he.trans (k₂.2 hn h₃)
 
 /-!
-## Lemma 6.14 · `[TR]` p. 8 · inventory `proved`
+## Lemma 6.14 · `[TR]` p. 8 · `proved`
 
 > If ρ₁ ○ ρ₂ and ρ₁ ○ ρ₃ and ρ₂ ○ ρ₃ are all defined, then so is ρ₁ ○ ρ₂ ○ ρ₃.
 
 **Printed proof, transcribed.** Analogous to Lemma 6.13.  The only wrinkle is that `○`, unlike `●`, merges `imm` cells with `own` and `mut` cells; but it does so only when the own-or-mut cell has the same value and subresource inside it, so the composites still agree on overlapping `imm` cells up to lifetimes.
 
-**Lean.** `BoCa.Fig16.ResU.compatR_of_pairwise`, alias `TR.lemma_6_14`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.compatR_of_pairwise`, alias `TR.lemma_6_14`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.14). `Fig16.ResU.compatR_of_pairwise` (§20d), on the printed carrier — 6.13's `○` analogue, which needs its own proof since 6.13 is stated at `●`. The print's wrinkle (`○` merges an `imm` cell with an own-or-mut one *only when the value and subresource agree*, the subresource conjunct having its referent at the `mut` member of p. 5's clause (5) — the member that has one, `[CONF]` p. 415:24's "already has a witness resource" — since `own(Val)` carries no `ρ` field and clause (5) shares `ρ` between the `imm` and `mut` members only) is `Fig16.CellU.compatR_iff`, proved in **both** directions; the right-to-left half is what produces the conclusion, so the wrinkle is spent, not assumed
+**Note.** `Fig16.ResU.compatR_of_pairwise`, on the printed carrier — 6.13's `○` analogue, which needs its own proof since 6.13 is stated at `●`. The print's wrinkle (`○` merges an `imm` cell with an own-or-mut one *only when the value and subresource agree*, the subresource conjunct having its referent at the `mut` member of p. 5's clause (5) — the member that has one, `[CONF]` p. 415:24's "already has a witness resource" — since `own(Val)` carries no `ρ` field and clause (5) shares `ρ` between the `imm` and `mut` members only) is `Fig16.CellU.compatR_iff`, proved in **both** directions; the right-to-left half is what produces the conclusion, so the wrinkle is spent, not assumed
 -/
 /-- **`[TR]` Lemma 6.14** (p. 8): if `ρ₁ ○ ρ₂` and `ρ₁ ○ ρ₃` and `ρ₂ ○ ρ₃` are
 all defined then so is `ρ₁ ○ ρ₂ ○ ρ₃`.  As with 6.13, "so is the triple
 composite" is stated as `⋈` between the first composite and the third operand,
-which by `ResU.compR_defined_iff` (§15, the `○` twin of Lemma 6.9) is that
+which by `ResU.compR_defined_iff` (the `○` twin of Lemma 6.9) is that
 definedness.
 
 The proof is the print's "analogous to theorem 6.13", run at one location: the
@@ -1837,11 +1836,11 @@ variable {Loc Val : Type}
 /-! `[about ours]` — what the Lean of Lemma 6.15 needs; the paper prints nothing here. -/
 /-- **The composability constraints one `#` puts on its operands' walks.**
 `[TR]` Lemma 6.15's proof reads them off the display
-`⦇ρ₁ ● ρ₂⦈ = ex(ρ₁)_● ● ex(ρ₂)_● ● (ag(ρ₁) ○ ag(ρ₂))` — `ResU.Flat.split` (§20b),
+`⦇ρ₁ ● ρ₂⦈ = ex(ρ₁)_● ● ex(ρ₂)_● ● (ag(ρ₁) ○ ag(ρ₂))` — `ResU.Flat.split`,
 which is Lemmas 6.18 and 6.20 — as "`ex(ρ₁)_●`, `ex(ρ₂)_●` are
 pairwise-composable with respect to `●`" and "`ag(ρ₁)`, `ag(ρ₂)` are
 pairwise-composable with respect to `○`".  The four mixed constraints are
-Lemma 6.30 (`ResU.CompatS.of_compR_left`, §20c) applied to `ag(ρ₁) ○ ag(ρ₂)` and
+Lemma 6.30 (`ResU.CompatS.of_compR_left`) applied to `ag(ρ₁) ○ ag(ρ₂)` and
 then `ResU.CompatS.of_compS_left_immFree` down each exclusive factor — the same
 two steps `ResU.Flat.split_factors` takes, kept at all four pairs rather than at
 the diagonal.
@@ -1868,27 +1867,27 @@ theorem ResU.Hash.walks {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.Hash ρ₁ ρ₂)
   exact ⟨hec.1, hac.1, d₁₁, d₁₂, d₂₁, d₂₂⟩
 
 /-!
-## Lemma 6.15 · `[TR]` p. 8 · inventory `proved`
+## Lemma 6.15 · `[TR]` p. 8 · `proved`
 
 > If ρ₁ # ρ₂ and ρ₂ # ρ₃ and ρ₁ # ρ₃ then ρ₁ # ρ₂ ● ρ₃.
 
 **Printed proof, transcribed.** The composite `ρ₁ ● ρ₂ ● ρ₃` is defined by Lemma 6.13, so it remains to show `✓(ρ₁ ● ρ₂ ● ρ₃)`, which by Lemmas 6.18 and 6.20 is definedness of `ex(ρ₁)_● ● ex(ρ₂)_● ● ex(ρ₃)_● ● (ag(ρ₁) ○ ag(ρ₂) ○ ag(ρ₃))`.  By assumption the three flattenings `⦇ρᵢ ● ρⱼ⦈ = ex(ρᵢ)_● ● ex(ρⱼ)_● ● (ag(ρᵢ) ○ ag(ρⱼ))` are defined, so the `ex(ρᵢ)_●` are pairwise `●`-composable and the `ag(ρᵢ)` pairwise `○`-composable, and Lemmas 6.13 and 6.14 give the two triple composites.  By two applications of Lemma 6.12 it remains that `ex(ρ₁)_● ● ex(ρ₂)_● ● ex(ρ₃)_● ● ag(ρᵢ)` is defined for each `i`; for `i = 1`, `ex(ρ₁)_●`, `ex(ρ₂)_● ● ex(ρ₃)_●` and `ag(ρ₁)` are pairwise composable by assumption, so Lemma 6.13 applies, and the other two are analogous.
 
-**Lean.** `BoCa.Fig16.ResU.hash_of_pairwise`, alias `TR.lemma_6_15`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.ResU.hash_of_pairwise`, alias `TR.lemma_6_15`, tag `[as printed]`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.15). `Fig16.ResU.hash_of_pairwise` (§20d), on the printed carrier. The print's proof opens by unfolding `✓(ρ₁ ● ρ₂ ● ρ₃)` through 6.18 and 6.20; `Fig16.ResU.Flat.split` (§20b) is that equation.
+**Note.** `Fig16.ResU.hash_of_pairwise`, on the printed carrier. The print's proof opens by unfolding `✓(ρ₁ ● ρ₂ ● ρ₃)` through 6.18 and 6.20; `Fig16.ResU.Flat.split` is that equation.
 -/
 /-- **`[TR]` Lemma 6.15** (p. 8): if `ρ₁ # ρ₂` and `ρ₂ # ρ₃` and `ρ₁ # ρ₃` then
 `ρ₁ # ρ₂ ● ρ₃`.  Both conjuncts of `#` are produced, in the print's order:
 `ρ₁ ▸◂ ρ₂ ● ρ₃` by 6.13, and `✓(ρ₁ ● (ρ₂ ● ρ₃))` by the walk bookkeeping the
 print sets out, with the walks grouped as `ex(ρ₁)_● ● (ex(ρ₂)_● ● ex(ρ₃)_●)` so
-that `ResU.Flat.split` (§20b) applies at `ρ₁` against `ρ₂ ● ρ₃`.
+that `ResU.Flat.split` applies at `ρ₁` against `ρ₂ ● ρ₃`.
 
 The composite `ρ₂ ● ρ₃` is named by its graph, which carries the `▸◂` the
 printed expression presupposes; naming it adds nothing, `●` being single-valued.
 The six walks exist because each operand is valid — `[TR]` Lemma 6.10
-(`ResU.Valid.split`, §20c) applied to the hypotheses — and they are the same six
-in all three displays because `ex` and `ag` are functions (§20a).
+(`ResU.Valid.split`) applied to the hypotheses — and they are the same six
+in all three displays because `ex` and `ag` are functions.
 `[as printed]` (the printed `ρ₂ ● ρ₃` appears as its graph — G4) -/
 theorem ResU.hash_of_pairwise {ρ₁ ρ₂ ρ₃ ρ₂₃ : ResU Loc Val}
     (h₁₂ : ResU.Hash ρ₁ ρ₂) (h₂₃ : ResU.Hash ρ₂ ρ₃) (h₁₃ : ResU.Hash ρ₁ ρ₃)

@@ -43,22 +43,22 @@ under — is measured in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.le
 **How this file reads.**  The numbered results of the subsection, in printed order as
 far as Lean's definition-before-use allows.  Each opens with a record:
 
-* the result's number, page and the source inventory's status (`proved`, `proved*`,
-  `variant`; source `docs/paper-inventory.md`);
+* the result's number, page and status (`proved`, `proved*`, `variant`; the
+  legend is in `Paper/INDEX.md`);
 * the printed statement, quoted, with the extraction's garbled symbols restored;
 * the printed proof, transcribed compactly and in its own order, citing the lemmas it
   cites;
-* the Lean declaration, moved from the source with its name, statement and proof
-  unchanged (its docstring carries the source's tag and its account of the proof),
+* the Lean declaration (its docstring carries the tag and its account of the
+  proof),
   and the numbered alias `TR.lemma_6_N` declared after it;
-* the inventory row's note.
+* a note on how the declaration reads the printed statement.
 
 A result whose declaration an earlier subsection's printed proof needs is declared
 in that subsection's file, under a heading saying so; its record and alias stay
 here.  A run of declarations the paper does not print, placed in this file only
 because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
-are to the source repository (`borrow_lang` at `970a9d0`).
+`[about ours]` and names the result it serves.  `§N` citations are to
+`docs/adjudications.md`.
 
 **The typed world.**  A result whose statement the source also proves at the typed
 world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
@@ -73,13 +73,13 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.135 (wp-bind) · `[TR]` p. 35 · inventory `proved`
+## Lemma 6.135 (wp-bind) · `[TR]` p. 35 · `proved`
 
 > wp(e){v. wp(K[v]){Q̂}} ⊨ wp(K[e]){Q̂}
 
 **Printed proof, transcribed.** Let `wp(e){v. wp(K[v]){Q̂}}(ρ)` (H1); the goal is `wp(K[e]){Q̂}(ρ)` (G1).  Unfold `wp` in G1 and let `ρ_f # ρ`.  H1 at `ρ_f` gives `(⟦ρ_f ● ρ⟧, e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧, v)` (H2), `ρ ↭ ρ′ ● ρ⁺` (H3), `ρ⁺|own = ∅` (H4) and `wp(K[v]){Q̂}(ρ′)` (H5), for some `ρ′ # ρ_f` (H6), `ρ⁺ # ρ_f ● ρ′` (H7), `v`.  Instantiate H5 at `ρ_f ● ρ⁺`, which is `# ρ′` by H7 and Lemma 6.46: `(⟦ρ_f ● ρ⁺ ● ρ′⟧, K[v]) →* (⟦ρ_f ● ρ⁺ ● ρ⁺⁺ ● ρ″⟧, v′)` (H8), `ρ′ ↭ ρ″ ● ρ⁺⁺` (H9), `ρ⁺⁺|own = ∅` (H10), `Q̂(v′)(ρ″)` (H11), for some `ρ″ # ρ_f ● ρ⁺` (H12), `ρ⁺⁺ # ρ_f ● ρ⁺ ● ρ″` (H13), `v′`.  In G1 choose `ρ″, ρ⁺ ● ρ⁺⁺, v′`.  `ρ″ # ρ_f` by H12 and Lemma 6.11; `ρ⁺ ● ρ⁺⁺ # ρ_f ● ρ″` by H13 and Lemma 6.46; the run by transitivity with H2 and H8; `ρ ↭ ρ″ ● ρ⁺ ● ρ⁺⁺` by H3, H9, H13 and Lemmas 6.48 and 6.49; `(ρ⁺ ● ρ⁺⁺)|own = ∅` by H4 and H10; `Q̂(v′)(ρ″)` by H11.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_bind`, aliases `TR.lemma_6_135`, `TR.«wp-bind»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_bind`, aliases `TR.lemma_6_135`, `TR.«wp-bind»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_bind`.
 
@@ -87,7 +87,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 **Literal reading.** `BoCa.TR3.stuck_wInj`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`; `BoCa.TR3.stuck_wSeq`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`; `BoCa.TR3.wp_inj₁_false`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`; `BoCa.TR3.wp_seq_false`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`; `BoCa.TR3.wp_stuck_false_nonvacuous`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`; `BoCa.TR3.wp_lt_fig16`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.135). `Fig16.BoLo.wp_bind`, on the printed carrier, `[as printed]`. The two runs are chained and the discarded fragments accumulate to `ρ⁺ ● ρ⁺⁺`, which is why `Fig16.BoLo.NoOwn` is closed under `●` and why the two `↭`s are composed with 6.48 before 6.49. `TR3.wp_bind` is the same rule over [TR] §3's own machine, at its seven printed frames (ledger D6)
+**Note.** `Fig16.BoLo.wp_bind`, on the printed carrier, `[as printed]`. The two runs are chained and the discarded fragments accumulate to `ρ⁺ ● ρ⁺⁺`, which is why `Fig16.BoLo.NoOwn` is closed under `●` and why the two `↭`s are composed with 6.48 before 6.49. `TR3.wp_bind` is the same rule over [TR] §3's own machine, at its seven printed frames (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.135** (`wp-bind`, p. 35):
 `wp(e){v. wp(K[v]){Q̂}} ⊨ wp(K[e]){Q̂}`.  The two runs are chained and the
@@ -192,7 +192,7 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.136 (wp-val) · `[TR]` p. 36 · inventory `proved`
+## Lemma 6.136 (wp-val) · `[TR]` p. 36 · `proved`
 
 > Q̂(v) ⫤⊨ wp(v){Q̂}
 
@@ -200,13 +200,13 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 The printed proof runs the `⊨` direction only; the Lean states that direction, and the inventory note gives the reading.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_val`, aliases `TR.lemma_6_136`, `TR.«wp-val»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_val`, aliases `TR.lemma_6_136`, `TR.«wp-val»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_val`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_val`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.136). `Fig16.BoLo.wp_val`, on the printed carrier, `[as printed]`. **The printed `⫤⊨` is a typesetting error for `⊨`** — settled, and the evidence is internal: every citation of `wp-val` across [TR]'s compatibility proofs is goal-directed, i.e. forward, and no proof turns a hypothesis `wp(v){Q̂}` into `Q̂(v)`; separately the converse composed with 6.148/6.149 (p. 38) would give free weakening on `⋆` in a linear logic. So the `⊨` direction is the lemma, not one half of a bi-entailment, and rule 6 does not apply — adjudicated by the project owner. `TR3.wp_val` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_val`, on the printed carrier, `[as printed]`. **The printed `⫤⊨` is a typesetting error for `⊨`** — settled, and the evidence is internal: every citation of `wp-val` across [TR]'s compatibility proofs is goal-directed, i.e. forward, and no proof turns a hypothesis `wp(v){Q̂}` into `Q̂(v)`; separately the converse composed with 6.148/6.149 (p. 38) would give free weakening on `⋆` in a linear logic. So the `⊨` direction is the lemma, not one half of a bi-entailment, and rule 6 does not apply — adjudicated by the project owner. `TR3.wp_val` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.136** (`wp-val`, p. 36): `Q̂(v) ⊨ wp(v){Q̂}`.  The run is
 empty, `ρ′` is `ρ`, `ρ⁺` is `∅`, and `ρ ↭ ρ ● ∅` is `ρ ↭ ρ`, which at `[TR]`
@@ -239,8 +239,8 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 /-! A declaration the record of Lemma 6.136 (wp-val) cites. -/
 /-- **`[TR]` Lemma 6.136** (`wp-val`, p. 36): `Q̂(v) ⊨ wp(v){Q̂}`.  The run is
 empty, so nothing about the machine is used and the proof is `Fig16Wp`'s.  The
-print's `⫤⊨` is a typesetting slip for `⊨`; `BoCa/Fig16Wp.lean`'s `wp_val`
-gives the evidence.  `[as printed]` (`[TR]` p. 36, reading the `⫤⊨` as the `⊨`
+print's `⫤⊨` is read as `⊨` (`Fig16.BoLo.wp_val`'s record gives the reason).
+`[as printed]` (`[TR]` p. 36, reading the `⫤⊨` as the `⊨`
 it was meant to be) -/
 theorem wp_val (v : Val) (Q : Val → WProp) : Entails (Q v) (wp (.val v) Q) := by
   intro ρ hQ ρf hf
@@ -272,19 +272,19 @@ theorem wp_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (Q : Val → 
     .more (Step1.head (h μ)) h₈, h₉, hA, hB, hC⟩
 
 /-!
-## Lemma 6.137 (wp1) · `[TR]` p. 36 · inventory `proved`
+## Lemma 6.137 (wp1) · `[TR]` p. 36 · `proved`
 
 > wp(e){Q̂} ⊨ wp((); e){Q̂}
 
 **Printed proof, transcribed.** Let `wp(e){Q̂}(ρ)` (H1) and `ρ_f # ρ` (H2).  H1 at `ρ_f` gives the run (H3), `ρ ↭ ρ′ ● ρ⁺` (H4), `ρ⁺|own = ∅` (H5), `Q̂(v)(ρ′)` (H6), `ρ′ # ρ_f` (H7), `ρ⁺ # ρ_f ● ρ′` (H8).  Choose `ρ′, ρ⁺, v`.  Most obligations are immediate; the run is `(⟦ρ_f ● ρ⟧, (); e) → (⟦ρ_f ● ρ⟧, e)` by the operational semantics, then H3.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_1`, aliases `TR.lemma_6_137`, `TR.wp1`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_1`, aliases `TR.lemma_6_137`, `TR.wp1`, tag `[as printed]`.
 
 **Also here.** `BoCa.Fig16.BoLo.wp_head`; `BoCa.TR3.wp_head`; `BoCa.TR3.wp_1`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_head`, in `Support/TypedWorld/Wp.lean`; `BoCa.Fig16.LogRel.Typed.wpTS_1`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.137). `Fig16.BoLo.wp_1`, on the printed carrier, `[as printed]` — one instance of `Fig16.BoLo.wp_head`, the head step 6.137–6.140 share. `TR3.wp_1` is the same rule over [TR] §3's own machine, whose `1↦` fires at `()` alone (ledger D6)
+**Note.** `Fig16.BoLo.wp_1`, on the printed carrier, `[as printed]` — one instance of `Fig16.BoLo.wp_head`, the head step 6.137–6.140 share. `TR3.wp_1` is the same rule over [TR] §3's own machine, whose `1↦` fires at `()` alone (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.137** (`wp1`, p. 36): `wp(e){Q̂} ⊨ wp((); e){Q̂}`.
 `[as printed]` -/
@@ -318,7 +318,7 @@ theorem wp_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (Q : Val → 
 /-! A declaration the record of Lemma 6.137 (wp1) cites. -/
 /-- **`[TR]` Lemma 6.137** (`wp1`, p. 36): `wp(e){Q̂} ⊨ wp((); e){Q̂}`.  The
 printed `1↦` fires at `()` and at nothing else, so this rule is available at
-`(); e` and — unlike `BoCa/Wp.lean`'s — at no other sequence; `wp_seq_false`
+`(); e` and — unlike `BoLo.Steps`'s — at no other sequence; `wp_seq_false`
 below is the difference.  `[as printed]` -/
 theorem wp_1 (e : Expr) (Q : Val → WProp) :
     Entails (wp e Q) (wp (.seq (.val .unit) e) Q) :=
@@ -331,19 +331,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.138 (wp⊗) · `[TR]` p. 36 · inventory `proved`
+## Lemma 6.138 (wp⊗) · `[TR]` p. 36 · `proved`
 
 > wp(e[v₁/x₁, v₂/x₂]){Q̂} ⊨ wp(let (x₁, x₂) = (v₁, v₂); e){Q̂}
 
 **Printed proof, transcribed.** As for Lemma 6.137: H1 at `ρ_f` gives H3–H8; choose `ρ′, ρ⁺, v`; the run is `(⟦ρ_f ● ρ⟧, let (x₁, x₂) = (v₁, v₂); e) → (⟦ρ_f ● ρ⟧, e[v₁/x₁, v₂/x₂])` by the operational semantics, then H3.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_tensor`, aliases `TR.lemma_6_138`, `TR.«wp⊗»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_tensor`, aliases `TR.lemma_6_138`, `TR.«wp⊗»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_tensor`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_tensor`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.138). `Fig16.BoLo.wp_tensor`, on the printed carrier, `[as printed]`; the printed substitution is de Bruijn here, `Expr.subst`. `TR3.wp_tensor` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_tensor`, on the printed carrier, `[as printed]`; the printed substitution is de Bruijn here, `Expr.subst`. `TR3.wp_tensor` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.138** (`wp⊗`, p. 36):
 `wp(e[v₁/x₁, v₂/x₂]){Q̂} ⊨ wp(let (x₁,x₂) = (v₁,v₂); e){Q̂}`.  The printed
@@ -379,7 +379,7 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.139 (wp⊕) · `[TR]` p. 36 · inventory `proved`
+## Lemma 6.139 (wp⊕) · `[TR]` p. 36 · `proved`
 
 > wp(eᵢ[v/xᵢ]){Q̂} ⊨ wp(match i v {1 x₁ ⇒ e₁ ∣ 2 x₂ ⇒ e₂}){Q̂}
 
@@ -387,13 +387,13 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 Schematic in `i`, as Lemma 6.72: one declaration per `i`.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_sum₁`, aliases `TR.lemma_6_139_1`, `TR.«wp⊕₁»`, source tag `[as printed]`; `BoCa.Fig16.BoLo.wp_sum₂`, aliases `TR.lemma_6_139_2`, `TR.«wp⊕₂»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_sum₁`, aliases `TR.lemma_6_139_1`, `TR.«wp⊕₁»`, tag `[as printed]`; `BoCa.Fig16.BoLo.wp_sum₂`, aliases `TR.lemma_6_139_2`, `TR.«wp⊕₂»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_sum₁`; `BoCa.TR3.wp_sum₂`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_sum₁`, in `Support/TypedWorld/Wp.lean`; `BoCa.Fig16.LogRel.Typed.wpTS_sum₂`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.139). `Fig16.BoLo.wp_sum₁` and `wp_sum₂`, on the printed carrier — [TR] prints one rule schematic in `i` and these are its two instances, the precedent 6.157 sets (rule 6). `TR3.wp_sum₁` and `TR3.wp_sum₂` are the same two instances over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_sum₁` and `wp_sum₂`, on the printed carrier — [TR] prints one rule schematic in `i` and these are its two instances, the precedent 6.157 sets (rule 6). `TR3.wp_sum₁` and `TR3.wp_sum₂` are the same two instances over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.139** (`wp⊕`, p. 36), first summand:
 `wp(eᵢ[v/xᵢ]){Q̂} ⊨ wp(match i v {…}){Q̂}`.  `[TR]` prints one rule schematic in
@@ -449,19 +449,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.140 (wp⊸) · `[TR]` p. 36 · inventory `proved`
+## Lemma 6.140 (wp⊸) · `[TR]` p. 36 · `proved`
 
 > wp(e[v/x]){Q̂} ⊨ wp((λx.e) v){Q̂}
 
 **Printed proof, transcribed.** As for Lemma 6.137: H1 at `ρ_f` gives H3–H8; choose `ρ′, ρ⁺, v`; the run is `(⟦ρ_f ● ρ⟧, (λx.e) v) → (⟦ρ_f ● ρ⟧, e[v/x])` by the operational semantics, then H3.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_lolli`, aliases `TR.lemma_6_140`, `TR.«wp⊸»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_lolli`, aliases `TR.lemma_6_140`, `TR.«wp⊸»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_lolli`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_lolli`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.140). `Fig16.BoLo.wp_lolli`, on the printed carrier, `[as printed]`. `TR3.wp_lolli` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_lolli`, on the printed carrier, `[as printed]`. `TR3.wp_lolli` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.140** (`wp⊸`, p. 36): `wp(e[v/x]){Q̂} ⊨ wp((λx.e) v){Q̂}`,
 i.e. `β`-reduction.  `[as printed]` -/
@@ -493,26 +493,24 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.141 (wp-alloc) · `[TR]` p. 37 · inventory `proved`
+## Lemma 6.141 (wp-alloc) · `[TR]` p. 37 · `proved`
 
 > (∀ℓ. ℓ ↦ v –⋆ Q̂(ℓ)) ⊨ wp(alloc v){Q̂}
 
 **Printed proof, transcribed.** Let `(∀ℓ. ℓ ↦ v –⋆ Q̂(ℓ))(ρ)` (H1) and `ρ_f # ρ` (H2).  Choose `ℓ ∉ ρ_f ● ρ` (H3).  H1 at `ℓ`, `ℓ ↦ own(v)`, `ρ ● ℓ ↦ own(v)` gives `Q̂(ℓ)(ρ ● ℓ ↦ own(v))` (H4).  Choose `ρ′, ρ⁺, v` to be `ρ ● ℓ ↦ own(v), ∅, ℓ`.  `ρ ● ℓ ↦ own(v) # ρ_f` by H2 and H3; `∅ # ρ_f ● ρ′` by definition; the run is `(⟦ρ_f ● ρ⟧, alloc v) → (⟦ρ_f ● ρ⟧ ⊎ ℓ ↦ v, ℓ)`, and `⟦ρ_f ● ρ⟧ ⊎ ℓ ↦ v = ⟦ρ_f ● ρ⟧ ⊎ ⟦ℓ ↦ own(v)⟧ = ⟦ρ_f ● ρ ● ℓ ↦ own(v)⟧`; `ρ ↭ ρ ● ℓ ↦ own(v)` by definition, since `↭` ignores `own` cells; `∅|own = ∅`; `Q̂(ℓ)(ρ ● ℓ ↦ own(v))` by H4.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_alloc`, aliases `TR.lemma_6_141`, `TR.«wp-alloc»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_alloc`, aliases `TR.lemma_6_141`, `TR.«wp-alloc»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_alloc`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_alloc`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.141). `Fig16.BoLo.wp_alloc`, on the printed carrier, `[as printed]` — **no added hypothesis**. `Fig16.ResU` is [TR] p. 4 row 7's `Loc ⇀ᶠⁱⁿ Cell`, so `Fig16.PMap.exists_fresh` is the one step 6.141's proof takes without justification, and `Fig16.BoLo.loc_infinite` discharges its `Loc` hypothesis at [TR] §3's `Loc ≜ ℕ`. A finding recorded at the site: the print chooses `ℓ ∉ ρ_f ● ρ` where the printed `alloc` reduction needs `ℓ ∉ ⟦ρ_f ● ρ⟧`, which is strictly stronger; `ℓ` is chosen fresh for the flattening and `Fig16.BoLo.get_eq_none_of_flat` recovers the print's own choice. `TR3.wp_alloc` is the same rule over [TR] §3's own machine, at the printed term `alloc v` and the printed `alloc↦` (ledger D6)
+**Note.** `Fig16.BoLo.wp_alloc`, on the printed carrier, `[as printed]` — **no added hypothesis**. `Fig16.ResU` is [TR] p. 4 row 7's `Loc ⇀ᶠⁱⁿ Cell`, so `Fig16.PMap.exists_fresh` is the one step 6.141's proof takes without justification, and `Fig16.BoLo.loc_infinite` discharges its `Loc` hypothesis at [TR] §3's `Loc ≜ ℕ`. A finding recorded at the site: the print chooses `ℓ ∉ ρ_f ● ρ` where the printed `alloc` reduction needs `ℓ ∉ ⟦ρ_f ● ρ⟧`, which is strictly stronger; `ℓ` is chosen fresh for the flattening and `Fig16.BoLo.get_eq_none_of_flat` recovers the print's own choice. `TR3.wp_alloc` is the same rule over [TR] §3's own machine, at the printed term `alloc v` and the printed `alloc↦` (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.141** (`wp-alloc`, p. 37):
 `(∀ℓ. ℓ ↦ v ─⋆ Q̂(ℓ)) ⊨ wp(alloc v){Q̂}`.
 
-**No hypothesis is added.**  `BoCa/Wp.lean`'s `BoLo.wp_alloc` had to carry a
-`HasFresh d n ρ` that 6.141 does not print, and that its own carrier does not
-inhabit; `Fig16.ResU` is `[TR]` p. 4's finite map, so `PMap.exists_fresh` is the
+**No hypothesis is added.**  `Fig16.ResU` is `[TR]` p. 4's finite map, so `PMap.exists_fresh` is the
 one step 6.141's proof takes without justification and the rule is the printed
 one.  `[as printed]` -/
 theorem wp_alloc (v : Val) (Q : Val → WProp) :
@@ -580,19 +578,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.142 (wp-free) · `[TR]` p. 37 · inventory `proved`
+## Lemma 6.142 (wp-free) · `[TR]` p. 37 · `proved`
 
 > ℓ ↦ v ⋆ Q̂(v) ⊨ wp(free ℓ){Q̂}
 
 **Printed proof, transcribed.** Let `ρ = ρ₁ ● ρ₂` with `ρ₁ = ℓ ↦ own(v)` and `Q̂(v)(ρ₂)` (H1), and `ρ_f # ρ` (H2).  Choose `ρ′, ρ⁺, v` to be `ρ₂, ∅, v`.  What is not immediate is the run: by definition `⟦ρ_f ● ℓ ↦ own(v) ● ρ₂⟧ = ⟦ρ_f ● ρ₂⟧ ⊎ ℓ ↦ v`, and by the operational semantics `(⟦ρ_f ● ρ₂⟧ ⊎ ℓ ↦ v, free ℓ) → (⟦ρ_f ● ρ₂⟧, v)`.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_free`, aliases `TR.lemma_6_142`, `TR.«wp-free»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_free`, aliases `TR.lemma_6_142`, `TR.«wp-free»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_free`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_free`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.142). `Fig16.BoLo.wp_free`, on the printed carrier, `[as printed]`; the printed `⟦ρ_f ● ℓ↦own(v) ● ρ₂⟧ = ⟦ρ_f ● ρ₂⟧ ⊎ ℓ↦v` is `Fig16.BoLo.lower_compS_own_inv`. `TR3.wp_free` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_free`, on the printed carrier, `[as printed]`; the printed `⟦ρ_f ● ℓ↦own(v) ● ρ₂⟧ = ⟦ρ_f ● ρ₂⟧ ⊎ ℓ↦v` is `Fig16.BoLo.lower_compS_own_inv`. `TR3.wp_free` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.142** (`wp-free`, p. 37): `ℓ ↦ v ⋆ Q̂(v) ⊨ wp(free ℓ){Q̂}`.
 The run frees the cell, so `ρ′` is the frame `ρ₂` and `ρ⁺` is `∅`; the printed
@@ -669,19 +667,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.143 (wp-load) · `[TR]` p. 37 · inventory `proved`
+## Lemma 6.143 (wp-load) · `[TR]` p. 37 · `proved`
 
 > ℓ ↦ v ⋆ (ℓ ↦ v –⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}
 
 **Printed proof, transcribed.** Let `ρ = ρ₁ ● ρ₂` with `ρ₁ = ℓ ↦ own(v)` and `(ℓ ↦ v –⋆ Q̂(v))(ρ₂)` (H1).  H1 at `ρ₁, ρ` gives `Q̂(v)(ρ)` (H2).  Let `ρ_f # ρ` and choose `ρ′, ρ⁺, v` to be `ρ, ∅, v`.  What is not immediate is the run: `⟦ρ_f ● ρ⟧ = ⟦ρ_f ● ρ₁ ● ℓ ↦ own(v)⟧ = ⟦ρ_f ● ρ₁⟧ ⊎ ℓ ↦ v`, and `(⟦ρ_f ● ρ₁⟧ ⊎ ℓ ↦ v, load ℓ) → (⟦ρ_f ● ρ₁⟧ ⊎ ℓ ↦ v, v)`.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_load`, aliases `TR.lemma_6_143`, `TR.«wp-load»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_load`, aliases `TR.lemma_6_143`, `TR.«wp-load»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_load`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_load`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.143). `Fig16.BoLo.wp_load`, on the printed carrier, `[as printed]` — the wand instantiated with the cell and with `ρ` itself, as the print does. `TR3.wp_load` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_load`, on the printed carrier, `[as printed]` — the wand instantiated with the cell and with `ρ` itself, as the print does. `TR3.wp_load` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.143** (`wp-load`, p. 37):
 `ℓ ↦ v ⋆ (ℓ ↦ v ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`.  The wand is instantiated with the
@@ -749,7 +747,7 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.144 (wp-load-I) · `[TR]` p. 37 · inventory `proved`
+## Lemma 6.144 (wp-load-I) · `[TR]` p. 37 · `proved`
 
 > ℓ ↦I_α P̂ ⋆ (∀v. ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v)) –⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}
 
@@ -761,7 +759,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_load_I`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.144). `Fig16.BoLo.wp_load_I`, on the printed carrier, `[as printed]` — `ℓ ↦I_α P̂ ⋆ (∀v. ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v)) ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`, read at 900 dpi, with no added hypothesis and no restriction. **The proof is the print's, sentence by sentence.**  `ρ = ℓ↦imm(β̄,v,ρ_v) ● ρ_R`; *"since `⌜v = v′⌝ ⋆ P̂(v)` is equivalent to `P̂(v)`"* is `Fig16.BoLo.pure_sep_biEntails`, which with the printed `α ⊑ ⊔β̄` puts the cell in `ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v))`; `R` is instantiated at the cell's own value and its wand applied to the cell and to `ρ`, giving `ρ ∈ Q̂(v)`; and the closing run takes `ρ′ := ρ`, `ρ⁺ := ∅` and one `load↦` that leaves the memory alone. **Two steps the page elides, both about the cell and neither about `↭`:** the wand is fed the cell itself, so the family has to hold at the cell's *own* value; and the run reads `v` out of `⟦ρ_f ● ρ⟧` where the cell is only a `⋆`-factor of `ρ` — an `imm` cell does not exclude other cells at its location the way 6.143's `own` cell does, so `Fig16.BoLo.compS_get_erase` carries the value through the two `●`s (`●` merges two `imm` cells over one value) and `Fig16.BoLo.lower_get` through the walk. `Fig16.BoLo.lower_get` is `lower_get_own` with the tag dropped, which is all 6.143 was using. **[CONF] prints a rule of the same name and it is a different proposition** — Fig. 13b (p. 415:15) `wp Load I` is `ℓ ↦ I_α P̂ ⋆ (∀v. ℓ ↦ I_α (_. P̂(v)) ─⋆ wp(v){Q̂}) ⊨ wp(load ℓ){Q̂}`, at the *constant* family and at `wp(v){Q̂}` where [TR] has `Q̂(v)`; the two differences push opposite ways, so neither row is the other's special case. Both are proved: `Fig16.BoLo.wp_load_I_conf` is [CONF]'s, tagged `[variant: …]`, and it is the shape [CONF] Fig. 14 feeds to 6.150. `docs/boca-rules.md` §12.65 is the reconciliation. `Fig16.BoLo.wp_load_I_nonvacuous` inhabits the printed premise with the `─⋆` reached. `TR3.wp_load_I` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_load_I`, on the printed carrier, `[as printed]` — `ℓ ↦I_α P̂ ⋆ (∀v. ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v)) ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`, read at 900 dpi, with no added hypothesis and no restriction. **The proof is the print's, sentence by sentence.**  `ρ = ℓ↦imm(β̄,v,ρ_v) ● ρ_R`; *"since `⌜v = v′⌝ ⋆ P̂(v)` is equivalent to `P̂(v)`"* is `Fig16.BoLo.pure_sep_biEntails`, which with the printed `α ⊑ ⊔β̄` puts the cell in `ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v))`; `R` is instantiated at the cell's own value and its wand applied to the cell and to `ρ`, giving `ρ ∈ Q̂(v)`; and the closing run takes `ρ′ := ρ`, `ρ⁺ := ∅` and one `load↦` that leaves the memory alone. **Two steps the page elides, both about the cell and neither about `↭`:** the wand is fed the cell itself, so the family has to hold at the cell's *own* value; and the run reads `v` out of `⟦ρ_f ● ρ⟧` where the cell is only a `⋆`-factor of `ρ` — an `imm` cell does not exclude other cells at its location the way 6.143's `own` cell does, so `Fig16.BoLo.compS_get_erase` carries the value through the two `●`s (`●` merges two `imm` cells over one value) and `Fig16.BoLo.lower_get` through the walk. `Fig16.BoLo.lower_get` is `lower_get_own` with the tag dropped, which is all 6.143 was using. **[CONF] prints a rule of the same name and it is a different proposition** — Fig. 13b (p. 415:15) `wp Load I` is `ℓ ↦ I_α P̂ ⋆ (∀v. ℓ ↦ I_α (_. P̂(v)) ─⋆ wp(v){Q̂}) ⊨ wp(load ℓ){Q̂}`, at the *constant* family and at `wp(v){Q̂}` where [TR] has `Q̂(v)`; the two differences push opposite ways, so neither row is the other's special case. Both are proved: `Fig16.BoLo.wp_load_I_conf` is [CONF]'s, tagged `[variant: …]`, and it is the shape [CONF] Fig. 14 feeds to 6.150. `docs/adjudications.md` §12.65 is the reconciliation. `Fig16.BoLo.wp_load_I_nonvacuous` inhabits the printed premise with the `─⋆` reached. `TR3.wp_load_I` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.144** (`wp-load-I`, p. 37):
 `ℓ ↦I_α P̂ ⋆ (∀v. ℓ ↦I_α (v′. ⌜v = v′⌝ ⋆ P̂(v)) ─⋆ Q̂(v)) ⊨ wp(load ℓ){Q̂}`.
@@ -858,7 +856,7 @@ turning it into a constant function"* (p. 415:16).  The borrowed family is
 literally constant where `[TR]` 6.144's is `(v′. ⌜v = v′⌝ ⋆ P̂(v))`, and the
 wand lands in `wp(v){Q̂}` where 6.144's lands in `Q̂(v)`; neither difference is
 a weakening of the other, so the two rows are proved separately
-(`docs/boca-rules.md` §12.65).  The proof is 6.144's with the pure conjunct
+(`docs/adjudications.md` §12.65).  The proof is 6.144's with the pure conjunct
 dropped and the load step prepended to the run `wp(v){Q̂}` already carries.
 `[variant: `[CONF]` Fig. 13b's printing of `[TR]` 6.144, at the constant family
 and at `wp(v){Q̂}` in place of `Q̂(v)`]` -/
@@ -903,7 +901,7 @@ theorem wp_load_I_nonvacuous (b : Life) (w : Val) :
   exact ⟨_, eq_of_compS_empty_left hc⟩
 
 /-!
-## Lemma 6.145 (wp-store) · `[TR]` p. 37 · inventory `proved`
+## Lemma 6.145 (wp-store) · `[TR]` p. 37 · `proved`
 
 > ℓ ↦ v₁ ⋆ (ℓ ↦ v₂ –⋆ Q̂(())) ⊨ wp(store ℓ v₂){Q̂}
 
@@ -911,13 +909,13 @@ theorem wp_load_I_nonvacuous (b : Life) (w : Val) :
 
 The printed proof cites Lemma 6.40 for `ρ₂ ● ℓ ↦ own(v) # ρ_f`.  6.40 has no declaration here (its record, in `Paper/S6_2_NonStandardLemmas/Lemmas.lean`, says why); the Lean obtains that `#` from `Fig16.BoLo.hash_compS_own`.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_store`, aliases `TR.lemma_6_145`, `TR.«wp-store»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_store`, aliases `TR.lemma_6_145`, `TR.«wp-store»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_store`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_store`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.145). `Fig16.BoLo.wp_store`, on the printed carrier, `[as printed]`; the printed `ℓ↦own(−) ● ρ₂ ↭ ρ₂ ● ℓ↦own(v)` is `Fig16.BoLo.updV_compS_own` at each side of the store, composed by 6.49.
+**Note.** `Fig16.BoLo.wp_store`, on the printed carrier, `[as printed]`; the printed `ℓ↦own(−) ● ρ₂ ↭ ρ₂ ● ℓ↦own(v)` is `Fig16.BoLo.updV_compS_own` at each side of the store, composed by 6.49.
 -/
 /-- **`[TR]` Lemma 6.145** (`wp-store`, p. 37):
 `ℓ ↦ v₁ ⋆ (ℓ ↦ v₂ ─⋆ Q̂(())) ⊨ wp(store ℓ v₂){Q̂}`.  The printed step
@@ -967,10 +965,10 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 /-! A declaration the record of Lemma 6.145 (wp-store) cites. -/
 /-- **`[TR]` Lemma 6.145** (`wp-store`, p. 37):
 `ℓ ↦ v₁ ⋆ (ℓ ↦ v₂ ─⋆ Q̂(())) ⊨ wp(store ℓ v₂){Q̂}`, at `store ℓ v₂` spelled
-`(store ℓ) v₂`, an application of an application.  `BoCa/Fig16Wp.lean` states
+`(store ℓ) v₂`, an application of an application.  `Fig16.BoLo.wp_store` states
 the same rule at `.app (.val (.storeV (.loc ℓ))) (.val v₂)`, which is the same
 term: `[TR]` p. 1 prints both `store v` and `e₂ e₁` and identifies them, and so
-does `BoCa/Syntax.lean`.  `[as printed]` -/
+does `Expr`.  `[as printed]` -/
 theorem wp_store (l : BoCa.Loc) (v₁ v₂ : Val) (Q : Val → WProp) :
     Entails (sep (ptoOwn l v₁) (wand (ptoOwn l v₂) (Q .unit)))
       (wp (.app (.app (.val (.prim .store)) (.val (.loc l))) (.val v₂)) Q) := by
@@ -1011,19 +1009,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.146 (wp-ramify) · `[TR]` p. 38 · inventory `proved`
+## Lemma 6.146 (wp-ramify) · `[TR]` p. 38 · `proved`
 
 > wp(e){P̂} ⋆ (P̂ –⋆ Q̂) ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** Let `ρ = ρ₁ ● ρ₂` with `wp(e){P̂}(ρ₁)` (H1) and `(∀(P̂ –⋆ Q̂))(ρ₂)` (H2), and `ρ_f # ρ` (H3).  Instantiate H1 at `ρ_f ● ρ₂`, which is `# ρ₁` by H3 and Lemma 6.46: `(⟦ρ_f ● ρ₂ ● ρ₁⟧, e) →* (⟦ρ_f ● ρ₂ ● ρ′ ● ρ⁺⟧, v)` (H4), `ρ₁ ↭ ρ′ ● ρ⁺` (H5), `ρ⁺|own = ∅` (H6), `P̂(v)(ρ′)` (H7), for `ρ′ # ρ_f ● ρ₂` (H8), `ρ⁺ # ρ_f ● ρ₂ ● ρ′` (H9), `v`.  H2 at `v, ρ′, ρ₂ ● ρ′` gives `Q̂(v)(ρ₂ ● ρ′)` (H10).  Choose `ρ₂ ● ρ′, ρ⁺, v`; most obligations are immediate and the others follow from Lemma 6.46 or Lemma 6.48.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_ramify`, aliases `TR.lemma_6_146`, `TR.«wp-ramify»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_ramify`, aliases `TR.lemma_6_146`, `TR.«wp-ramify»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_ramify`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_ramify`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.146). `Fig16.BoLo.wp_ramify`, on the printed carrier, `[as printed]`. `Fig16.BoLo.wandAll = ∀v. P̂(v) ─⋆ Q̂(v)`; that `∀` is [TR]'s own — H2 of its proof reads `(∀ (P̂ –⋆ Q̂))(ρ₂)` at 500 dpi — and is the only well-typed reading of the printed `(P̂ –⋆ Q̂)` at `P̂, Q̂ : Val → SProp`. `TR3.wp_ramify` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_ramify`, on the printed carrier, `[as printed]`. `Fig16.BoLo.wandAll = ∀v. P̂(v) ─⋆ Q̂(v)`; that `∀` is [TR]'s own — H2 of its proof reads `(∀ (P̂ –⋆ Q̂))(ρ₂)` at 500 dpi — and is the only well-typed reading of the printed `(P̂ –⋆ Q̂)` at `P̂, Q̂ : Val → SProp`. `TR3.wp_ramify` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.146** (`wp-ramify`, p. 38):
 `wp(e){P̂} ⋆ (P̂ ─⋆ Q̂) ⊨ wp(e){Q̂}`.  The frame is threaded *through* the run —
@@ -1109,27 +1107,25 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.147 (wp[]) · `[TR]` p. 38 · inventory `proved`
+## Lemma 6.147 (wp[]) · `[TR]` p. 38 · `proved`
 
 > [α]wp(e){Q̂} ⊨ wp(e){[α]Q̂}
 
 **Printed proof, transcribed.** Let `wp(e){Q̂}(ρ)` (H1), `@ρ ⊐ α` (H2) and `ρ_f # ρ` (H3).  H1 at `ρ_f` gives the run (H4), `ρ ↭ ρ′ ● ρ⁺` (H5), `ρ⁺|own = ∅` (H6), `Q̂(v)(ρ′)` (H7), `ρ′ # ρ_f` (H8), `ρ⁺ # ρ_f ● ρ′` (H9).  Choose `ρ′, ρ⁺, v`; all obligations are immediate except `@ρ′ ⊐ α`.  Lemma 6.50 with H2 and H5 gives `@(ρ′ ● ρ⁺) ⊐ α`, and Lemma 6.45 gives `@ρ′ ⊐ α`.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_box`, aliases `TR.lemma_6_147`, `TR.«wp[]»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_box`, aliases `TR.lemma_6_147`, `TR.«wp[]»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_box`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_box`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.147). The proof is [TR]'s: 6.50 carries `@ρ ⊐ α` along `↭` and 6.45 takes the left factor. `TR3.wp_box` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** The proof is [TR]'s: 6.50 carries `@ρ ⊐ α` along `↭` and 6.45 takes the left factor. `TR3.wp_box` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.147** (`wp[]`, p. 38): `[α]wp(e){Q̂} ⊨ wp(e){[α]Q̂}`.
 
-**No well-formedness hypothesis.**  `BoCa/Wp.lean`'s `BoLo.wp_box` had to
-restrict to resources satisfying `Model.HwfRes`, because 6.147's `⊨` quantifies
-over the printed `SProp ≜ Res → ℙ` and that carrier is wider; `Fig16.SPropU`
-*is* the printed `SProp`, so the restriction dissolves and the entailment is the
-printed one.  The proof is `[TR]`'s: 6.50 carries `@ρ ⊐ α` along `↭` to
+**No well-formedness hypothesis.**  6.147's `⊨` quantifies over the printed
+`SProp ≜ Res → ℙ`, and `Fig16.SPropU` *is* the printed `SProp`, so the
+entailment is the printed one.  The proof is `[TR]`'s: 6.50 carries `@ρ ⊐ α` along `↭` to
 `@(ρ′ ● ρ⁺) ⊐ α`, and 6.45 takes the left factor.  `[as printed]` -/
 theorem wp_box (α : Life) (e : Expr) (Q : Val → WProp) :
     Entails (box α (wp e Q)) (wp e fun v => box α (Q v)) := by
@@ -1208,19 +1204,19 @@ theorem wp_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ) (e : Expr)
   exact updV_frame hcρ hπn ⟨hcρ.1, ρ, hcρ, (hash_valid hf).2⟩ h₁π gA
 
 /-!
-## Lemma 6.148 (wp-M-forget) · `[TR]` p. 38 · inventory `proved`
+## Lemma 6.148 (wp-M-forget) · `[TR]` p. 38 · `proved`
 
 > ℓ ↦M_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** Let `ρ = ρ₁ ● ρ₂` with `ρ₁ = ℓ ↦ mut(β, v, ρ′, P̂)` and `wp(e){Q̂}(ρ₂)` (H1), and `ρ_f # ρ` (H2).  Instantiate H1 at `ρ_f ● ρ₁`, which is `# ρ₂` by H2 and Lemma 6.46: the run (H3), `ρ₂ ↭ ρ′ ● ρ⁺` (H4), `ρ⁺|own = ∅` (H5), `Q̂(v)(ρ′)` (H6), `ρ′ # ρ_f ● ρ₁` (H7), `ρ⁺ # ρ_f ● ρ₁ ● ρ′` (H8).  Choose `ρ′, ρ⁺ ● ρ₁, v`.  `ρ′ # ρ_f` by H7 and Lemma 6.11; `ρ⁺ ● ρ₁ # ρ_f ● ρ′` (H9) by H8 and Lemma 6.46; `(ρ⁺ ● ρ₁)|own = ∅` by H5 and since `ρ₁` contains only a borrow; `ρ₁ ● ρ₂ ↭ ρ′ ● ρ⁺ ● ρ₁` by H4, H9 and Lemma 6.48.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_M_forget`, aliases `TR.lemma_6_148`, `TR.«wp-M-forget»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_M_forget`, aliases `TR.lemma_6_148`, `TR.«wp-M-forget»`, tag `[as printed]`.
 
 **Also here.** `BoCa.Fig16.BoLo.wp_frame_noOwn`; `BoCa.TR3.wp_frame_noOwn`; `BoCa.TR3.wp_M_forget`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_frame_noOwn`, in `Support/TypedWorld/Wp.lean`; `BoCa.Fig16.LogRel.Typed.wpTS_M_forget`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.148). `Fig16.BoLo.wp_M_forget`, on the printed carrier, `[as printed]` — one instance of `Fig16.BoLo.wp_frame_noOwn`, whose hypothesis is the one property of the frame both this and 6.149 use. `TR3.wp_M_forget` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_M_forget`, on the printed carrier, `[as printed]` — one instance of `Fig16.BoLo.wp_frame_noOwn`, whose hypothesis is the one property of the frame both this and 6.149 use. `TR3.wp_M_forget` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.148** (`wp-M-forget`, p. 38):
 `ℓ ↦M_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}`.  The frame is one `mut` cell, so
@@ -1291,19 +1287,19 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-!
-## Lemma 6.149 (wp-I-forget) · `[TR]` p. 38 · inventory `proved`
+## Lemma 6.149 (wp-I-forget) · `[TR]` p. 38 · `proved`
 
 > ℓ ↦I_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** Proceeds almost identically to the proof of Lemma 6.148.  The reasoning depends only on the resource being a borrow, not on it being a mutable borrow.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_I_forget`, aliases `TR.lemma_6_149`, `TR.«wp-I-forget»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_I_forget`, aliases `TR.lemma_6_149`, `TR.«wp-I-forget»`, tag `[as printed]`.
 
 **Also here.** `BoCa.TR3.wp_I_forget`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_I_forget`, in `Support/TypedWorld/Wp.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.149). `Fig16.BoLo.wp_I_forget`, on the printed carrier, `[as printed]` — the other instance of `Fig16.BoLo.wp_frame_noOwn`, which is exactly what 6.149's own proof says ("the reasoning depends only on the resource being a borrow"). `Fig16.BoLo.ptoImm`'s nonemptiness is [TR] p. 4's own `℘⁺(Life)`, in `Fig16.LSet`. `TR3.wp_I_forget` is the same rule over [TR] §3's own machine (ledger D6)
+**Note.** `Fig16.BoLo.wp_I_forget`, on the printed carrier, `[as printed]` — the other instance of `Fig16.BoLo.wp_frame_noOwn`, which is exactly what 6.149's own proof says ("the reasoning depends only on the resource being a borrow"). `Fig16.BoLo.ptoImm`'s nonemptiness is [TR] p. 4's own `℘⁺(Life)`, in `Fig16.LSet`. `TR3.wp_I_forget` is the same rule over [TR] §3's own machine (`docs/adjudications.md` D6)
 -/
 /-- **`[TR]` Lemma 6.149** (`wp-I-forget`, p. 38):
 `ℓ ↦I_α P̂ ⋆ wp(e){Q̂} ⊨ wp(e){Q̂}`.  `[as printed]` -/
@@ -1339,13 +1335,13 @@ open BoCa.Fig16
 open BoCa.BoLo (Heap Steps)
 
 /-!
-## Theorem 6.150 (↺ rule) · `[TR]` p. 39 · inventory `proved*`
+## Theorem 6.150 (↺ rule) · `[TR]` p. 39 · `proved*`
 
 > ℓ ↦ Imm α (Иβ. ↺_β P̂) ⋆ (Иβ. ∀v. P̂(v) –⋆ wp(e){[β]Q̂}) ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** Let `ρ` satisfy the left side (H1); unfold `wp` at `ρ_f # ρ` (H2); the goals are `ρ′ # ρ_f` (G2), `ρ⁺ # ρ′ ● ρ_f` (G3), the run (G4), `ρ ↭ ρ′ ● ρ⁺` (G5), `ρ⁺|own = ∅` (G6), `ρ′ ∈ Q̂(v)` (G7).  Unfolding `⋆`, `ρ = ρᵢ ● ρ_b` (H3) with `ρᵢ ∈ ℓ ↦ Imm α (Иβ. ↺_β P̂)` (H4) and `ρ_b ∈ Иβ. ∀v. P̂(v) –⋆ wp(e){[β]Q̂}` (H5).  Unfolding `Imm`, `ρᵢ = ℓ ↦ imm(ᾱ, v′, ρ′)` (H6), `ρ′ ∈ (Иβ. ↺_β P̂)(v′)` (H7), `α ⊑ ᾱ` (H8).  Unfolding `И` in H7 gives `γᵢ` with `ρ′ ∈ ∀β ⊏ γᵢ. [β](↺_β P̂)(v′)` (H9); in H5, `γ_b` with `ρ_b ∈ ∀β ⊏ γ_b. [β](∀v. …)` (H10).  Let `β ⊏ γᵢ ⊓ γ_b` (H11) — *"such a `β` always exists"*.  Specialising and unfolding `[β]`: `ρ′ ∈ ↺_β P̂(v′)` (H12), `@ρ′ ⊐ β` (H13), `ρ_b ∈ P̂(v′) –⋆ wp(e){[β]Q̂}` (H14), `@ρ_b ⊐ β` (H15).  Unfolding `↺_β` in H12, `ρ_P̂(v′) ∈ reb_β(ρ′)` (H16) and `ρ_P̂(v′) ∈ P̂(v′)` (H17).  By Lemma 6.10 with H2, `✓ρ`, so `ρᵢ # ρ_b` (H18); by Lemma 6.55 with H16, `ρ_P̂(v′) # ρ_b` (H19), and similarly `ρ_P̂(v′) # ρ_b ● ρ_f`; by 6.55, `ρᵢ # ρ_P̂(v′)`; by Lemma 6.15 with H2, `ρ_P̂(v′) # ρᵢ ● ρ_b ● ρ_f` (H20).  By `–⋆`, `ρ_P̂(v′) ● ρ_b ∈ wp(e){[β]Q̂}` (H21); unfolding at the frame `ρᵢ ● ρ_f` with H20 gives `ρ_Q # ρᵢ ● ρ_f` (H22), `ρ⁺ # ρ_Q ● ρᵢ ● ρ_f` (H23), `v`, the run from `⟦ρᵢ ● ρ_f ● ρ_P̂(v′) ● ρ_b⟧` to `⟦ρᵢ ● ρ_f ● ρ_Q ● ρ⁺⟧` (H24), `ρ_P̂(v′) ● ρ_b ↭ ρ_Q ● ρ⁺` (H25), `ρ⁺|own = ∅` (H26), `ρ_Q ∈ [β]Q̂(v)` (H27), i.e. `ρ_Q ∈ Q̂(v)` (H28) and `@ρ_Q ⊐ β` (H29).  Let `ρ⁺′ = ρ⁺ ⊟ ρ_P̂(v′)|dom(ρ′|mut,own)`.  Rewriting H24 with Lemma 6.58 applied to H16, H25, H15, H29, H18 and H23 with Lemma 6.11 gives `(⟦ρ_f ● ρᵢ ● ρ_b⟧, e) ⇓ (⟦ρ_f ● ρ_Q ● ρᵢ ● ρ⁺′⟧, v)` (H30).  By Lemma 6.11 with H23, `ρ_Q # ρ_f` (H31) and `ρᵢ ● ρ⁺′ # ρ_Q ● ρ_f` (H32).  By Lemma 6.59 applied to H16, H25, H15, H29, H18 and H23, `ρᵢ ● ρ_b ↭ ρ_Q ● ρᵢ ● ρ⁺′` (H33).  At `ρ′ ≔ ρ_Q`, `ρ⁺ ≔ ρᵢ ● ρ⁺′`: G2 by H31, G3 by H32, G4 by H30, G5 by H33, G6 by H26, G7 by H28.
 
-**Lean.** `BoCa.Fig16.BoLo.wp_reborrow`, aliases `TR.lemma_6_150`, `TR.«↺ rule»`, source tag `[restricted: to `RebEscrow P̂` — the two inputs `[TR]`.
+**Lean.** `BoCa.Fig16.BoLo.wp_reborrow`, aliases `TR.lemma_6_150`, `TR.«↺ rule»`, tag `[restricted: to `RebEscrow P̂` — the two inputs `[TR]`.
 
 **Also here.** `BoCa.Fig16.BoLo.rebEscrow_emp`; `BoCa.Fig16.BoLo.wp_reborrow_nonvacuous`; `BoCa.Fig16.BoLo.wp_reborrow_emp_applies`; `BoCa.Fig16.BoLo.rebEscrow_of_no_own`.
 
@@ -1353,7 +1349,7 @@ open BoCa.BoLo (Heap Steps)
 
 **Literal reading.** `BoCa.DefectB.wp_reborrow_unreconciled_at_split_view`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`; `BoCa.Fig16.BoLo.defectB_not_rebEscrow`, in `Paper/LiteralReadings/S6_7_WeakestPreconditionRules.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.150). `Fig16.BoLo.wp_reborrow` (`BoCa/RebWp.lean` §3), on the printed carrier, the printed entailment exactly as printed. **[CONF] prints the same rule** — Fig. 13b (p. 415:15) under the name `I Reborrow`, glyph for glyph at 900 dpi, so this is not a documents-differ row (`docs/boca-rules.md` §12.61) — `ℓ ↦ Imm α` is `Fig16.BoLo.ptoImm`, `И` is `Fig16.BoLo.fresh`, `↺_β` is `Fig16.BoLo.reborrow`, `[β]` is `Fig16.BoLo.box`, `─⋆` is `Fig16.BoLo.wand`, `wp` is `Fig16.BoLo.wp`, and `P̂ : Val → SProp` does not depend on `β`, as the print writes it. `[restricted: to `Fig16.BoLo.RebEscrow P̂` — the two inputs 6.55 adds (`Fig16.EscrowAgree ρ′ ρ (ag ρ_f)` and `ag(ρ)` defined), at the reborrows `↺_β P̂` names]`. **The printed proof, H-number for H-number.**  H18 is 6.10 (`Fig16.BoLo.hash_valid`) at the printed `ρ_f # ρ`; H19 and the two sentences after it are 6.55 (`Fig16.ResU.six55`) at `ρ_b`, at `ρ_b ● ρ_f` — reached by 6.46 (`Fig16.BoLo.hash_shift`) — and at `ρᵢ` through the corollary p. 18 draws (`Fig16.ResU.six55_self`); H20 is 6.15 (`Fig16.ResU.hash_of_pairwise`); H11's *"such a `β` always exists"* is `Fig16.BoLo.exists_shorter` at `↓(γᵢ ⊓ γ_b)`; `ρ⁺′ = ρ⁺ ⊟ ρ_P̂(v′)
+**Note.** `Fig16.BoLo.wp_reborrow`, on the printed carrier, the printed entailment exactly as printed. **[CONF] prints the same rule** — Fig. 13b (p. 415:15) under the name `I Reborrow`, glyph for glyph at 900 dpi, so this is not a documents-differ row (`docs/adjudications.md` §12.61) — `ℓ ↦ Imm α` is `Fig16.BoLo.ptoImm`, `И` is `Fig16.BoLo.fresh`, `↺_β` is `Fig16.BoLo.reborrow`, `[β]` is `Fig16.BoLo.box`, `─⋆` is `Fig16.BoLo.wand`, `wp` is `Fig16.BoLo.wp`, and `P̂ : Val → SProp` does not depend on `β`, as the print writes it. `[restricted: to `Fig16.BoLo.RebEscrow P̂` — the two inputs 6.55 adds (`Fig16.EscrowAgree ρ′ ρ (ag ρ_f)` and `ag(ρ)` defined), at the reborrows `↺_β P̂` names]`. **The printed proof, H-number for H-number.**  H18 is 6.10 (`Fig16.BoLo.hash_valid`) at the printed `ρ_f # ρ`; H19 and the two sentences after it are 6.55 (`Fig16.ResU.six55`) at `ρ_b`, at `ρ_b ● ρ_f` — reached by 6.46 (`Fig16.BoLo.hash_shift`) — and at `ρᵢ` through the corollary p. 18 draws (`Fig16.ResU.six55_self`); H20 is 6.15 (`Fig16.ResU.hash_of_pairwise`); H11's *"such a `β` always exists"* is `Fig16.BoLo.exists_shorter` at `↓(γᵢ ⊓ γ_b)`; `ρ⁺′ = ρ⁺ ⊟ ρ_P̂(v′)
 -/
 /-- **`[TR]` Theorem 6.150** (`↺` rule, p. 39):
 `ℓ ↦ Imm α (Иβ. ↺_β P̂) ⋆ (Иβ. ∀v. P̂(v) ─⋆ wp(e){[β]Q̂}) ⊧ wp(e){Q̂}`.
@@ -1409,15 +1405,15 @@ Two printed hypotheses go unspent, as they do on the page: **H8** (`α ⊑ ᾱ`)
 **H13** (`@ρ′ ⊐ β`); so does 6.52's second conclusion `@(ρ⁺ ⊟ ρ_reb) ⊐ β`, which
 6.59 spends inside its own proof.
 
-`Steps` is `BoCa/Wp.lean`'s machine, larger than `[TR]` §3's (convention W2,
-ledger D6), exactly as for every other rule in `BoCa/Fig16Wp.lean`.
+`Steps` is `BoLo.Steps`, larger than `[TR]` §3's (convention W2,
+`docs/adjudications.md` D6), exactly as for every other rule of `Fig16.BoLo.wp`.
 
 `[restricted: to `RebEscrow P̂` — the two inputs `[TR]` 6.55 adds
 (`Fig16.EscrowAgree ρ′ ρ (ag ρ_f)`, the sentence `[TR]` p. 18 asserts inside
 6.55's own proof, and `ag(ρ)` defined), at the reborrows `↺_β P̂` names.  The
 conclusion is the printed entailment and no printed definition is touched.  The
 route additionally spends 6.59 at `Fig16.ResU.SubKeep` — Definition 6.3's third
-bullet read through the paragraph printed below it, `docs/boca-rules.md` §12.58
+bullet read through the paragraph printed below it, `docs/adjudications.md` §12.58
 — but that is 6.59's hypothesis and `Fig16.ResU.six52_keep` discharges it, so it
 is not an assumption of this statement]` -/
 theorem wp_reborrow (l : BoCa.Loc) (α : Life) (P : Life → BoCa.Val → WProp)

@@ -37,8 +37,7 @@ import Support.TypedWorld.World
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the family `TW` and its invariant (source `BoCa/TypedWorld.lean`): `mut` cells at any depth, `Mut` positions, coherence, sub-records and lineages, and preservation of the invariant by every step.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the family `TW` and its invariant: `mut` cells at any depth, `Mut` positions, coherence, sub-records and lineages, and preservation of the invariant by every step.
 -/
 
 noncomputable section

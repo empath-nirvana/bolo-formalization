@@ -11,8 +11,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the records the typed world keeps: frame records and their lineages, root, chain and `Mut` positions, coherence of a record with the world, tags, and the Kripke order `Ext`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the records the typed world keeps: frame records and their lineages, root, chain and `Mut` positions, coherence of a record with the world, tags, and the Kripke order `Ext`.
 -/
 
 noncomputable section
@@ -144,7 +143,7 @@ def CellIn (ρ : WRes) (b : Life) : Prop :=
 
 /-- **`ls′` extends `ls` at `ρ`**: the records relevant to `ρ` are kept (`Keeps`), and
 the records strictly longer-lived than any borrow cell of `ρ` — `mut` or `imm` — are exactly
-the same.  `[about ours: our stratified Kripke order; docs/boca-rules.md §12.72]` -/
+the same.  `[about ours: our stratified Kripke order; docs/adjudications.md §12.72]` -/
 def Ext (ls ls' : List SRec) (ρ : WRes) : Prop :=
   Keeps (rsOf ls) (rsOf ls') ρ ∧
     ∀ b, CellIn ρ b → ∀ x : SRec, x.2 ⊐ b → (x ∈ ls ↔ x ∈ ls')

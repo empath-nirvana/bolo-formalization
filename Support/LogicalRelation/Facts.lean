@@ -16,8 +16,7 @@ import Support.Statics.Presupposed
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`⌜p⌝ ⋆ P` and the context relation read pointwise.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`⌜p⌝ ⋆ P` and the context relation read pointwise.
 -/
 
 noncomputable section
@@ -550,7 +549,7 @@ theorem vDen_extend_of_not_free {x : LifeVar} {T : Ty} (h : ¬ LFree x T)
 /-- `⨅δ` — the meet of the lifetimes `δ` assigns, as a right fold of
 `Fig16.Life.meet` with `⨅∅ = ⊤`.  `[TR]` p. 35 writes it in the first row of
 the `↺V₂` table, "fix `α ⊏ ⨅δ` arbitrary", and defines it nowhere.  Unlike
-`⊓Δ` (`docs/boca-rules.md` §12.15) there is nothing to decide about its range:
+`⊓Δ` (`docs/adjudications.md` §12.15) there is nothing to decide about its range:
 a substitution's values already *are* lifetimes, so the fold is over `cod(δ)`
 and lands in the carrier rather than in `Lifetime.Life`'s grammar, whose meets
 are binary.

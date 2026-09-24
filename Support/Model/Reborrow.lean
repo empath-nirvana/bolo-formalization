@@ -15,8 +15,7 @@ import Support.Model.WalkSplitting
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`reb_α` at one location, the frame read from `✓` alone, and the cells of a reborrow.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`reb_α` at one location, the frame read from `✓` alone, and the cells of a reborrow.
 -/
 
 noncomputable section
@@ -145,7 +144,7 @@ theorem ResU.reb_dom_subset {α : Life} {ρ ρ' : ResU Loc Val}
 /-- **The `imm` clause of `reb_α`**: over an `imm` source cell the image cell is
 `imm` over a nonempty subset of its lifetime set, at the same value and witness.
 `[TR]` p. 5's third implication, at one location, read as `Fig16.ResU.RebAt`
-reads it (`docs/boca-rules.md` §12.67).
+reads it (`docs/adjudications.md` §12.67).
 `[about ours: the `imm` clause of our `Fig16.ResU.RebAt`, at one location]` -/
 theorem ResU.reb_imm_cell_sub {α : Life} {ρ ρ' : ResU Loc Val} (h : ResU.Reb α ρ ρ')
     {l : Loc} {ψ : CellU Loc Val} (hg : ρ'.get l = some ψ)

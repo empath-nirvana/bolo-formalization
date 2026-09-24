@@ -12,8 +12,7 @@ import Support.Model.Surgery
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the swaps §6.3's frame rules spend at both ends of the run: `ℓ ↦ own(v) ● ρ_P̂(v)` against the `mut` or `imm` cell that borrows it, under a frame, lowered and validated.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the swaps §6.3's frame rules spend at both ends of the run: `ℓ ↦ own(v) ● ρ_P̂(v)` against the `mut` or `imm` cell that borrows it, under a frame, lowered and validated.
 -/
 
 noncomputable section

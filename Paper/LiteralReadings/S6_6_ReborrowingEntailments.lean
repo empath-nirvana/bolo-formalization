@@ -17,7 +17,7 @@ import Support.Model.Singletons
   obstruction to it is verified.
 
 **How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  The declarations are the source's, with their tags; a
+that result's record is.  Each declaration carries its tag; an
 `[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
 this file.
 -/

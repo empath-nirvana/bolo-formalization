@@ -30,22 +30,22 @@ its subsection.
 **How this file reads.**  The numbered results of the subsection, in printed order as
 far as Lean's definition-before-use allows.  Each opens with a record:
 
-* the result's number, page and the source inventory's status (`proved`, `proved*`,
-  `variant`; source `docs/paper-inventory.md`);
+* the result's number, page and status (`proved`, `proved*`, `variant`; the
+  legend is in `Paper/INDEX.md`);
 * the printed statement, quoted, with the extraction's garbled symbols restored;
 * the printed proof, transcribed compactly and in its own order, citing the lemmas it
   cites;
-* the Lean declaration, moved from the source with its name, statement and proof
-  unchanged (its docstring carries the source's tag and its account of the proof),
+* the Lean declaration (its docstring carries the tag and its account of the
+  proof),
   and the numbered alias `TR.lemma_6_N` declared after it;
-* the inventory row's note.
+* a note on how the declaration reads the printed statement.
 
 A result whose declaration an earlier subsection's printed proof needs is declared
 in that subsection's file, under a heading saying so; its record and alias stay
 here.  A run of declarations the paper does not print, placed in this file only
 because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
-are to the source repository (`borrow_lang` at `970a9d0`).
+`[about ours]` and names the result it serves.  `§N` citations are to
+`docs/adjudications.md`.
 
 **The typed world.**  A result whose statement the source also proves at the typed
 world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
@@ -85,17 +85,17 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Theorem 6.64 (Imm Frame) · `[TR]` p. 22 · inventory `proved`
+## Theorem 6.64 (Imm Frame) · `[TR]` p. 22 · `proved`
 
 > ℓ ↦ v ⋆ P̂(v) ⋆ (Иα. Imm α P̂ –⋆ wp(e){[α](ℓ ↦ v –⋆ P̂(v) –⋆ Q̂)}) ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** Let `ρ` satisfy the left side (H1).  By Lemma 6.112, `Иα. ρ ∈ ℓ ↦ v ⋆ P̂(v) ⋆ (Imm α P̂ –⋆ wp(e){[α](ℓ ↦ v –⋆ P̂(v) –⋆ Q̂)})` (H2).  Unfolding `wp` in the goal (G1), let `ρ_f # ρ` (H3); the goals are `ρ′ # ρ_f` (G2), `ρ⁺ # ρ′ ● ρ_f` (G3), `(⟦ρ_f ● ρ⟧, e) ⇓ (⟦ρ_f ● ρ′ ● ρ⁺⟧, v)` (G4), `ρ ↭ ρ′ ● ρ⁺` (G5), `ρ⁺|own = ∅` (G6), `ρ′ ∈ Q̂(v)` (G7).  Unfolding `И` in H2 gives `β` with `∀α ⊏ β. ρ ∈ [α](…)`; take `α ⊏ β` (H4) — *"such an `α` always exists because for any lifetime, the set of lifetimes shorter than it is infinite"* — and specialise (H5).  Lemma 6.104 splits the box (H6), and unfolding `⋆` and `[α]` gives `ρ = ρ_ℓ ● ρ_P̂(v) ● ρ_b` with `ρ_ℓ ∈ ℓ ↦ v` (H7), `ρ_P̂(v) ∈ P̂(v)` (H8), `ρ_b ∈ Imm α P̂ –⋆ wp(e){…}` (H9), `@ρ_P̂(v) ⊐ α` (H10), `@ρ_b ⊐ α` (H11).  Let the *"fictional"* `ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))`, well formed by H10.  Compatibilities: `ρ_b # ρ_ℓ ● ρ_P̂(v)` (H12: `▸◂` from `ρ`'s decomposition, `✓ρ` by Lemma 6.10 with H3); `ρ_b # ρᵢ` (H13) and `ρ_f # ρᵢ` (H15) by Lemma 6.34; `ρ_f # ρ_ℓ ● ρ_P̂(v)` (H14) and `ρ_f # ρ_b` (H16) by Lemma 6.11; `ρ_f # ρ_b ● ρᵢ` (H17) by Lemma 6.15.  By `–⋆` with H9 and H13, `ρ_b ● ρᵢ ∈ wp(e){[α](…)}`; unfolding `wp` at `ρ_f` gives `ρ′ # ρ_f` (H18), `ρ⁺ # ρ′ ● ρ_f` (H19), the run from `⟦ρ_f ● ρ_b ● ρᵢ⟧` (H20), `ρ_b ● ρᵢ ↭ ρ′ ● ρ⁺` (H21), `ρ⁺|own = ∅` (H22) and `ρ′ ∈ [α](ℓ ↦ v –⋆ P̂(v) –⋆ Q̂)(v′)` (H23), i.e. `@ρ′ ⊐ α` (H24) and `ρ′ ∈ ℓ ↦ v –⋆ P̂(v) –⋆ Q̂(v′)` (H25).  By Lemma 6.29 with H11, H12 and H21, `ρ′ ● ρ⁺ = (ρ′ ● ρ⁺)/ℓ ● ρᵢ`; by H24 `ℓ ∉ dom(ρ′)`, so `ρ′ ● ρ⁺ = ρ′ ● ρ⁺/ℓ ● ρᵢ` (H26).  Then `ρ′ # ρ⁺` (H27, Lemma 6.11); `ρ′ ● ρ⁺/ℓ # ρ_ℓ ● ρ_P̂(v)` (H28, **Lemma 6.38** with H12, H27, H11, H24, H22 and H21); `ρ′ ● ρ⁺/ℓ # ρ_f` (H29, 6.11); `ρ′ ● ρ⁺/ℓ ● ρ_ℓ ● ρ_P̂(v) # ρ_f` (H30, 6.15 with H28, H29, H14); `ρ′ ● ρ_ℓ ● ρ_P̂(v) # ρ_f` (H31, 6.11); `ρ⁺/ℓ # ρ′ ● ρ_ℓ ● ρ_P̂(v) ● ρ_f` (H32, by H30); `ρ′ # ρ_ℓ ● ρ_P̂(v)` (H33, 6.11).  Lemmas 6.26 and 6.8 with H12, H28 and H20 give `(⟦ρ_f ● ρ⟧, e) ⇓ (⟦ρ_f ● ρ′ ● ρ⁺/ℓ ● ρ_ℓ ● ρ_P̂(v)⟧, v′)` (H34); Lemma 6.39 with H12, H28 and H21 gives `ρ ↭ ρ′ ● ρ⁺/ℓ ● ρ_ℓ ● ρ_P̂(v)` (H35); `–⋆` gives `ρ′ ● ρ_ℓ ● ρ_P̂(v) ∈ Q̂(v′)` (H36).  Setting `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)` and `ρ⁺ ≔ ρ⁺/ℓ`: G2 by H31, G3 by H32, G4 by H34, G5 by H35, G6 by H22, G7 by H36.
 
-**Lean.** `BoCa.Fig16.LogRel.wp_I_frame`, aliases `TR.lemma_6_64`, `TR.«Imm Frame»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.wp_I_frame`, aliases `TR.lemma_6_64`, `TR.«Imm Frame»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_I_frameX`, in `Support/TypedWorld/FrameRules.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.64). `Fig16.LogRel.wp_I_frame` (`BoCa/Fig16LogRel.lean`), on the printed carrier, `[as printed]` — [TR] p. 22's display at this file's `wp`, no premise added: the borrow is immutable, so the lender gets the **same** `v` back and there is no `∀v′` and no `P̂ ⊨ [β]P̂`. The printed proof step for step: 6.112 (`Fig16.BoLo.fresh_frame`) pulls `ℓ ↦ v ⋆ P̂(v)` inside the `N`, *"such an `α` always exists"* is `↓β`, and 6.104 splits the box over the `⋆`, its two conjuncts giving H10 and H11 (`Fig16.ResU.CompS.inStratum_right`). The *"fictional"* `ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))` is `Fig16.CellU.immOf` at `Fig16.LSet.singleton`, *"well formed by H10"* being that constructor's own typing argument. H12 is `▸◂` off `ρ`'s decomposition with `✓ρ` by 6.10; H13 and H15 are **6.34** (`Fig16.ResU.six34`); H14 and H16 are 6.11 (`Fig16.ResU.Hash.split`); H17 is 6.15 (`Fig16.ResU.hash_of_pairwise`). H26 is **6.29** with H11, H12 and H21 followed by *"by H24, `ℓ ∉ dom(ρ′)`"* — together `Fig16.ResU.six38_steps_one_two`; **H28 is 6.38** itself (`Fig16.ResU.six38`) with H12, H27, H11, H24, H22 and H21, and it is the step this row waited on. H29–H33 are 6.11 and 6.15 again; H34 is **6.26** under a frame by 6.8 (`Fig16.ResU.lower_swap_imm_own`), spent at both ends of the run; H35 is **6.39** (`Fig16.ResU.six39`), which returns `↭` with both validity conjuncts, so no separate 6.28-style step is needed; H36 applies the returned `─⋆` to the cell and the payload. The seven printed goals are then discharged at `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)` and `ρ⁺ ≔ ρ⁺/ℓ`, in the print's own order. Was the cited `axiom` `wp_I_frame` until 6.38 closed. `immFrame_is_stated` there is an `rfl` unfolding, not a proof  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_I_frameX` is this proof at `Fig16.LogRel.Typed.wpTS` with the record list carried: entry by `Fig16.LogRel.Typed.TW.immFrame` at the record and its lineage (`Fig16.LogRel.Typed.lineage_list`), tagged at the frame's `α`, exit by `Fig16.LogRel.Typed.TW.immEnd`; `[variant: …]` names `P̂ ≔ 𝒱X⟦T⟧δ`, `TW.immFrame`'s `AdmWf` premise, and `Q̂` stable along `Fig16.LogRel.Typed.Ext` (§12.70, §12.72)
+**Note.** `Fig16.LogRel.wp_I_frame`, on the printed carrier, `[as printed]` — [TR] p. 22's display at this file's `wp`, no premise added: the borrow is immutable, so the lender gets the **same** `v` back and there is no `∀v′` and no `P̂ ⊨ [β]P̂`. The printed proof step for step: 6.112 (`Fig16.BoLo.fresh_frame`) pulls `ℓ ↦ v ⋆ P̂(v)` inside the `N`, *"such an `α` always exists"* is `↓β`, and 6.104 splits the box over the `⋆`, its two conjuncts giving H10 and H11 (`Fig16.ResU.CompS.inStratum_right`). The *"fictional"* `ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))` is `Fig16.CellU.immOf` at `Fig16.LSet.singleton`, *"well formed by H10"* being that constructor's own typing argument. H12 is `▸◂` off `ρ`'s decomposition with `✓ρ` by 6.10; H13 and H15 are **6.34** (`Fig16.ResU.six34`); H14 and H16 are 6.11 (`Fig16.ResU.Hash.split`); H17 is 6.15 (`Fig16.ResU.hash_of_pairwise`). H26 is **6.29** with H11, H12 and H21 followed by *"by H24, `ℓ ∉ dom(ρ′)`"* — together `Fig16.ResU.six38_steps_one_two`; **H28 is 6.38** itself (`Fig16.ResU.six38`) with H12, H27, H11, H24, H22 and H21, and it is the step this row waited on. H29–H33 are 6.11 and 6.15 again; H34 is **6.26** under a frame by 6.8 (`Fig16.ResU.lower_swap_imm_own`), spent at both ends of the run; H35 is **6.39** (`Fig16.ResU.six39`), which returns `↭` with both validity conjuncts, so no separate 6.28-style step is needed; H36 applies the returned `─⋆` to the cell and the payload. The seven printed goals are then discharged at `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)` and `ρ⁺ ≔ ρ⁺/ℓ`, in the print's own order. Was the cited `axiom` `wp_I_frame` until 6.38 closed. `immFrame_is_stated` there is an `rfl` unfolding, not a proof  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_I_frameX` is this proof at `Fig16.LogRel.Typed.wpTS` with the record list carried: entry by `Fig16.LogRel.Typed.TW.immFrame` at the record and its lineage (`Fig16.LogRel.Typed.lineage_list`), tagged at the frame's `α`, exit by `Fig16.LogRel.Typed.TW.immEnd`; `[variant: …]` names `P̂ ≔ 𝒱X⟦T⟧δ`, `TW.immFrame`'s `AdmWf` premise, and `Q̂` stable along `Fig16.LogRel.Typed.Ext` (§12.70, §12.72)
 -/
 /-- **`[TR]` Theorem 6.64** (`Imm Frame`, physical p. 22):
 
@@ -128,7 +128,7 @@ spent at both ends of the run, and H35 is 6.39 (`ResU.six39`).  H36 applies the
 returned `─⋆` to the cell and the payload, and the seven goals are then the
 print's, at `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)` and `ρ⁺ ≔ ρ⁺/ℓ`.
 `[as printed]` (`[TR]` p. 22's display, at this file's `wp` — `Fig16Wp`'s row
-over `BoCa/Wp.lean`'s machine, as every §6.7 rule there) -/
+over `BoLo.Steps`, as every §6.7 rule there) -/
 theorem wp_I_frame (l : BoCa.Loc) (P : Val → WProp) (v : Val) (e : Expr)
     (Q : Val → WProp) :
     Entails
@@ -290,17 +290,17 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Theorem 6.65 (Mut Frame) · `[TR]` p. 24 · inventory `proved`
+## Theorem 6.65 (Mut Frame) · `[TR]` p. 24 · `proved`
 
 > If P̂ ⊨ [β]P̂, then ℓ ↦ v ⋆ P̂(v) ⋆ (Иα. Mut α P̂ –⋆ wp(e){[α] ∀v′. ℓ ↦ v′ –⋆ P̂(v′) –⋆ Q̂}) ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** The shape of Theorem 6.64's, with `Mut` for `Imm`.  By Lemma 6.112 (H2); unfold `wp` at `ρ_f # ρ` (H3; goals G1–G7 as there).  Unfolding `И` gives `γ`; take `α ⊏ γ ⊓ β` (H4), which always exists, and specialise (H5); Lemma 6.104 splits the box (H6), giving `ρ = ρ_ℓ ● ρ_P̂(v) ● ρ_b` with H7–H11 as in 6.64.  Let `ρ_m = ℓ ↦ mut(α, v, ρ_P̂(v), P̂)`, well formed by H4.  `ρ_b # ρ_ℓ ● ρ_P̂(v)` (H12, Lemma 6.10 with H3); `ρ_b # ρ_m` (H13) and `ρ_f # ρ_m` (H15) by **Lemma 6.24**; `ρ_f # ρ_ℓ ● ρ_P̂(v)` (H14) and `ρ_f # ρ_b` (H16) by 6.11; `ρ_f # ρ_b ● ρ_m` (H17) by 6.15.  By `–⋆` with H9 and H13, `ρ_b ● ρ_m ∈ wp(e){…}`; unfolding at `ρ_f` gives H18–H25 as in 6.64.  By **Lemma 6.27** with H11 and H21, `ρ′ ● ρ⁺ = (ρ′ ● ρ⁺)/ℓ ● ρ_m`, and by H24 `ρ′ ● ρ⁺ = ρ′ ● ρ⁺/ℓ ● ρ_m` (H26).  `ρ′ ● ρ⁺/ℓ # ρ_ℓ ● ρ_P̂(v)` (H27, Lemma 6.24 with `✓(ρ′ ● ρ⁺)` from H19 and H26); H28–H32 by 6.11 and 6.15 as there; Lemmas 6.25 and 6.8 with H12, H27 and H20 give the run (H33); **Lemma 6.28** with H12, H27 and H21 gives `ρ ↭ ρ′ ● ρ⁺/ℓ ● ρ_ℓ ● ρ_P̂(v)` (H34); `–⋆` gives `ρ′ ● ρ_ℓ ● ρ_P̂(v) ∈ Q̂(v′)` (H35).  At `ρ′ ≔ ρ′ ● ρ_ℓ ● ρ_P̂(v)`, `ρ⁺ ≔ ρ⁺/ℓ`: G2 by H30, G3 by H31, G4 by H33, G5 by H34, G6 by H22, G7 by H35.
 
-**Lean.** `BoCa.Fig16.LogRel.wp_M_frame`, aliases `TR.lemma_6_65`, `TR.«Mut Frame»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.wp_M_frame`, aliases `TR.lemma_6_65`, `TR.«Mut Frame»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_M_frameX`, in `Support/TypedWorld/FrameRules.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.65). `Fig16.LogRel.wp_M_frame` (`BoCa/Fig16LogRel.lean`), on the printed carrier, `[as printed]` — `[TR]` p. 24's display at this file's `wp`, premise `P̂ ⊨ [β]P̂` included. The printed proof step for step: 6.112 (`Fig16.BoLo.fresh_frame`) pulls `ℓ ↦ v ⋆ P̂(v)` inside the `N`, *"let `α` be some lifetime where `α ⊏ γ ⊓ β`"* is `↓(γ ⊓ β)`, and 6.104 (`Fig16.BoLo.box_sep`) splits the box. `P̂ ⊨ [β]P̂` is what puts `P̂`'s resources in `Res_α`, which is what lets the *"fictional"* `ρ_m` be built at all.  6.24 is spent at H13 and H15, 6.15 (`Fig16.ResU.hash_of_pairwise`) at H17, **6.27 (`Fig16.ResU.six27`) at H26**, 6.25 with 6.8 (`Fig16.ResU.lower_swap_mut_own`) at H33 and 6.28 at H34. Was the cited `axiom` `wp_M_frame` until §31 and §32 carried 6.21–6.28 to the printed carrier. `mutFrame`'s body is 6.65 as printed, premise `P̂ ⊨ [β]P̂` included. The restriction is inhabited exactly once (`SurgeryTests.lean:227`, at `d=[ℓ]`, `P̂ ≜ ✓`, `mut` cells only), so the rule is non-vacuous and holds at no `𝒱⟦T⟧` — ledger D9  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_M_frameX`, this proof at `Fig16.LogRel.Typed.wpTS`, entry by `Fig16.LogRel.Typed.TW.mutFold` (`Fig16.LogRel.Typed.ptoMutX_create`) and exit by `Fig16.LogRel.Typed.TW.mutUnfold`; the premise `P̂ ⊨ [β]P̂` is taken at every list, the stratified family's reading (§12.70)
+**Note.** `Fig16.LogRel.wp_M_frame`, on the printed carrier, `[as printed]` — `[TR]` p. 24's display at this file's `wp`, premise `P̂ ⊨ [β]P̂` included. The printed proof step for step: 6.112 (`Fig16.BoLo.fresh_frame`) pulls `ℓ ↦ v ⋆ P̂(v)` inside the `N`, *"let `α` be some lifetime where `α ⊏ γ ⊓ β`"* is `↓(γ ⊓ β)`, and 6.104 (`Fig16.BoLo.box_sep`) splits the box. `P̂ ⊨ [β]P̂` is what puts `P̂`'s resources in `Res_α`, which is what lets the *"fictional"* `ρ_m` be built at all.  6.24 is spent at H13 and H15, 6.15 (`Fig16.ResU.hash_of_pairwise`) at H17, **6.27 (`Fig16.ResU.six27`) at H26**, 6.25 with 6.8 (`Fig16.ResU.lower_swap_mut_own`) at H33 and 6.28 at H34. `mutFrame`'s body is 6.65 as printed, premise `P̂ ⊨ [β]P̂` included. The restriction is inhabited exactly once (`SurgeryTests.lean:227`, at `d=[ℓ]`, `P̂ ≜ ✓`, `mut` cells only), so the rule is non-vacuous and holds at no `𝒱⟦T⟧` — `docs/adjudications.md` D9  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_M_frameX`, this proof at `Fig16.LogRel.Typed.wpTS`, entry by `Fig16.LogRel.Typed.TW.mutFold` (`Fig16.LogRel.Typed.ptoMutX_create`) and exit by `Fig16.LogRel.Typed.TW.mutUnfold`; the premise `P̂ ⊨ [β]P̂` is taken at every list, the stratified family's reading (§12.70)
 -/
 /-- **`[TR]` Theorem 6.65** (`Mut Frame`, p. 24): if `P̂ ⊨ [β] P̂`, then
 
@@ -322,9 +322,9 @@ borrower left in the cell together with the promise that it satisfies `P̂` —
 
 The premise `P̂ ⊨ [β] P̂` is at each value, as `[CONF]` Fig. 13a prints it
 (`∀v_p. P̂(v_p) ⊨ [β]P̂(v_p)`); it is what lets the proof's `ρ_m` be a
-well-formed `mut` cell at the `α ⊏ β` it picks (§3).
+well-formed `mut` cell at the `α ⊏ β` it picks.
 `[as printed]` (`[TR]` p. 24's display, at this file's `wp` — `Fig16Wp`'s row
-over `BoCa/Wp.lean`'s machine, as every §6.7 rule there) -/
+over `BoLo.Steps`, as every §6.7 rule there) -/
 theorem wp_M_frame (l : BoCa.Loc) (β : Life) (P : Val → WProp)
     (hP : ∀ v, Entails (P v) (box β (P v))) (v : Val) (e : Expr) (Q : Val → WProp) :
     Entails
@@ -524,17 +524,17 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Theorem 6.66 (Anti Frame) · `[TR]` p. 25 · inventory `proved`
+## Theorem 6.66 (Anti Frame) · `[TR]` p. 25 · `proved`
 
 > ℓ ↦ Mut α P̂ ⋆ (∀v. ℓ ↦ v –⋆ P̂(v) –⋆ wp(e){∃v. ℓ ↦ v ⋆ P̂(v) ⋆ (ℓ ↦ Mut α P̂ –⋆ Q̂)}) ⊨ wp(e){Q̂}
 
 **Printed proof, transcribed.** Let `ρ` satisfy the left side (H1); unfold `wp` at `ρ_f # ρ` (H2; goals G1–G7 as in 6.64).  Unfolding `⋆`, `ρ = ρ_m ● ρ_a` with `ρ_m ∈ ℓ ↦ Mut α P̂` (H3) and `ρ_a` in the wand (H4); unfolding `ℓ ↦ Mut`, `ρ_m = ℓ ↦ mut(β, v, ρ_P̂(v), P̂)` for some `β ⊒ α`, `v` and `ρ_P̂(v) ∈ P̂(v)` (H5).  Specialise H4 to `v` (H6).  By 6.11 with H2, `ρ_m # ρ_a`; with `ρ_ℓ = ℓ ↦ own(v)`, Lemma 6.24 gives `ρ_a # ρ_ℓ ● ρ_P̂(v)` (H7); likewise `ρ_m # ρ_f`, so `ρ_f # ρ_ℓ ● ρ_P̂(v)` (H8).  By `–⋆` with H6, `ρ_a ● ρ_ℓ ● ρ_P̂(v) ∈ wp(e){…}` (H9); unfolding at `ρ_f` with H8 gives `ρ′ # ρ_f` (H10), `ρ⁺ # ρ′ ● ρ_f` (H11), the run (H12), `ρ_a ● ρ_ℓ ● ρ_P̂(v) ↭ ρ′ ● ρ⁺` (H13), `ρ⁺|own = ∅` (H14), and `ρ′ ∈ ∃v. ℓ ↦ v ⋆ P̂(v) ⋆ (ℓ ↦ Mut α P̂ –⋆ Q̂(v′))` (H15).  Unfolding, `ρ′ = ρ″_ℓ ● ρ_P̂(v″) ● ρ_b` (H16) with `ρ″_ℓ ∈ ℓ ↦ v″` (H17), `ρ_P̂(v″) ∈ P̂(v″)` (H18), `ρ_b ∈ ℓ ↦ Mut α P̂ –⋆ Q̂(v′)` (H19).  Let `ρ″_m = ℓ ↦ mut(β, v″, ρ_P̂(v″), P̂)`, well formed since `ρ_m` is.  `ρ_b ● ρ⁺ # ρ″_m` (H20, 6.11 with H11, then 6.24); `ρ_f # ρ_b ● ρ⁺ ● ρ″_m` (H21, H11 and 6.24); `ρ_b # ρ″_m` (H22) and `ρ_b ● ρ″_m # ρ_f` (H23) by 6.11 with H21.  Lemmas 6.25 and 6.8 with H21 and H12 give the run to `⟦ρ_f ● ρ_b ● ρ⁺ ● ρ″_m⟧` (H24); Lemma 6.28 with H20 and H13 gives `ρ ↭ ρ_b ● ρ⁺ ● ρ″_m` (H25); `–⋆` with H22 gives `ρ_b ● ρ″_m ∈ Q̂(v′)` (H26).  At `ρ′ ≔ ρ_b ● ρ″_m`, `ρ⁺ ≔ ρ⁺`: G2 by H23, G3 by H21, G4 by H24, G5 by H25, G6 by H14, G7 by H26.
 
-**Lean.** `BoCa.Fig16.LogRel.wp_M_antiFrame`, aliases `TR.lemma_6_66`, `TR.«Anti Frame»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.wp_M_antiFrame`, aliases `TR.lemma_6_66`, `TR.«Anti Frame»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.wpTS_M_antiFrameX`, in `Support/TypedWorld/FrameRules.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.66). `Fig16.LogRel.wp_M_antiFrame` (`BoCa/Fig16LogRel.lean`), on the printed carrier, `[as printed]` — `[TR]` p. 25's display at this file's `wp`. The printed proof step for step: `ρ_ℓ ● ρ_P̂(v)`, which the print writes without comment, is `Fig16.ResU.compS_own_of_valid_mut` off `✓ρ_m`; 6.24 (`Fig16.ResU.six24`) is spent four times, at H8, H9 and again at H20–H23, with 6.11 (`Fig16.ResU.Hash.split`) and `Fig16.ResU.hash_of_pairwise` for the compatibility list the print gives there; *"note since `ρ_m` is well formed, `ρ''_m` is as well"* is `Fig16.ResU.valid_single_mut_of_wit` by 6.23; H24 is `Fig16.ResU.lower_swap_mut_own`, 6.25 under a frame by 6.8, at both ends of the run; H25 is 6.28 (`Fig16.ResU.six28`). Was the cited `axiom` of this name until §31 carried 6.21–6.28 to the printed carrier. `ptoBor` occurs once positively and once negatively, so those two propositions are incomparable — ledger D4  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_M_antiFrameX`, this proof at `Fig16.LogRel.Typed.wpTS`, entry by `Fig16.LogRel.Typed.TW.mutUnfold` and exit by `Fig16.LogRel.Typed.TW.mutFold`; the write is `Fig16.LogRel.Typed.ptoMutX_write` with `Fig16.LogRel.Typed.lifeBound_of_tagged` (§12.70)
+**Note.** `Fig16.LogRel.wp_M_antiFrame`, on the printed carrier, `[as printed]` — `[TR]` p. 25's display at this file's `wp`. The printed proof step for step: `ρ_ℓ ● ρ_P̂(v)`, which the print writes without comment, is `Fig16.ResU.compS_own_of_valid_mut` off `✓ρ_m`; 6.24 (`Fig16.ResU.six24`) is spent four times, at H8, H9 and again at H20–H23, with 6.11 (`Fig16.ResU.Hash.split`) and `Fig16.ResU.hash_of_pairwise` for the compatibility list the print gives there; *"note since `ρ_m` is well formed, `ρ''_m` is as well"* is `Fig16.ResU.valid_single_mut_of_wit` by 6.23; H24 is `Fig16.ResU.lower_swap_mut_own`, 6.25 under a frame by 6.8, at both ends of the run; H25 is 6.28 (`Fig16.ResU.six28`). `ptoBor` occurs once positively and once negatively, so those two propositions are incomparable — `docs/adjudications.md` D4  **At the repaired `wp`.**  `Fig16.LogRel.Typed.wpTS_M_antiFrameX`, this proof at `Fig16.LogRel.Typed.wpTS`, entry by `Fig16.LogRel.Typed.TW.mutUnfold` and exit by `Fig16.LogRel.Typed.TW.mutFold`; the write is `Fig16.LogRel.Typed.ptoMutX_write` with `Fig16.LogRel.Typed.lifeBound_of_tagged` (§12.70)
 -/
 /-- **`[TR]` Theorem 6.66** (`Anti Frame`, p. 25):
 
@@ -563,7 +563,7 @@ of the run, and H25 is 6.28 (`Fig16.ResU.six28`).  H26 is the inner wand, and
 the six goals are then the print's own list.
 
 `[as printed]` (`[TR]` p. 25's display, at this file's `wp` — `Fig16Wp`'s row
-over `BoCa/Wp.lean`'s machine, as every §6.7 rule there) -/
+over `BoLo.Steps`, as every §6.7 rule there) -/
 theorem wp_M_antiFrame (l : BoCa.Loc) (α : Life) (P : Val → WProp) (e : Expr)
     (Q : Val → WProp) :
     Entails

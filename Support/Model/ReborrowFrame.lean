@@ -19,8 +19,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the steps of Lemmas 6.53–6.55 and 6.61 that the printed proofs name.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the steps of Lemmas 6.53–6.55 and 6.61 that the printed proofs name.
 -/
 
 noncomputable section
@@ -65,7 +64,7 @@ def EscrowAgree (χ ρ σ : ResU Loc Val) : Prop :=
 conjunct is quantified over the `own` cells of the source alone, so at a source
 with none — where `reb_α` reads every witness off the cell it reborrows — it
 holds of any image and any frame whatever.  That is exactly the scope
-`docs/boca-rules.md` §12.41 gives it.
+`docs/adjudications.md` §12.41 gives it.
 `[about ours: the added hypothesis is empty off the `own` clause]` -/
 theorem escrowAgree_of_no_own {χ : ResU Loc Val}
     (h : ∀ l ψ, χ.get l = some ψ → ψ.kind ≠ Kind.own) (ρ σ : ResU Loc Val) :
@@ -139,7 +138,7 @@ carries one over the same value, and over the same witness wherever `ρ`'s cell
 is not `own`.  `own` is excluded on the `ρ` side exactly where `▷◁` excludes it
 (`CellU.compatR_iff`), an `own` cell having no witness to compare.
 `[about ours: `[TR]` 6.54's closing line (p. 18) at one resource; it is the
-conclusion shape of `ResU.witFlat_cell`, named so that §6's closure lemmas can
+conclusion shape of `ResU.witFlat_cell`, named so that the closure lemmas can
 be stated]` -/
 def ResU.Under (f ρ : ResU Loc Val) : Prop :=
   ∀ l ζ, ρ.get l = some ζ → ∃ φ, f.get l = some φ ∧ ζ.erase = φ.erase ∧
@@ -422,7 +421,7 @@ theorem ResU.flatR_of_valid_single_imm {l : Loc} {s : LSet} {v : Val}
 /-- **`ex(ρ)_◐ = ∅` when `ρ` carries `imm` cells only** — the printed
 *"noting `dom(ρ|own,mut) = ∅`"* of 6.55's second display, which is what
 collapses `ex(ρ_f)● ● ex(ρ)●` to `ex(ρ_f)●`.  The image of `reb_α` is such a
-`ρ` (`ResU.reb_imm_image`, §6).
+`ρ` (`ResU.reb_imm_image`).
 `[about ours: the walk at an argument with no own or mut cell]` -/
 theorem ExW.empty_of_all_imm {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} {ρ : ResU Loc Val}
@@ -451,7 +450,7 @@ theorem ExW.empty_of_all_imm {R : CellU Loc Val → CellU Loc Val → Prop}
 being the printed first bullet's *"We have `ag(ρ_f) ▷◁ ⦇ρ′⦈_○`"*.
 
 Step for step: 6.18 and 6.20 (`ExS.split`, `AgW.split`) cut the display at
-`ρ_f ● ρ_i`; `AgW.single_imm_inv` (§3) is *"unfolding the definitions of `ex`
+`ρ_f ● ρ_i`; `AgW.single_imm_inv` is *"unfolding the definitions of `ex`
 and `ag`"* at `ρ_i`, which is where `⦇ρ′⦈_○` appears; 6.10 (`ResU.Valid.split`)
 gives `✓ρ_f` and with it `ex(ρ_f)● ▸◂ ag(ρ_f)`; 6.36 (`ExS.immFree`) and 6.30
 (`ResU.CompatS.of_compR_left`), applied twice, peel `ρ_i` and then `⦇ρ′⦈_○` off
@@ -493,7 +492,7 @@ theorem ResU.frame_flat_facts {ρf ρ' ρc : ResU Loc Val} {l₀ : Loc} {s : LSe
 suffices to show `dom(ex(ρ_f)●) ∩ dom(ag(ρ)) = ∅`, which is implied by
 `dom(ag(ρ)) ⊆ dom(⦇ρ′⦈_○)`."*  The first sentence is 6.36 (`ExS.immFree`) with
 `ResU.CompatS.disjoint_of_immFree`; the last is 6.54
-(`ResU.ag_dom_of_reb`, §6); `ResU.Compat.of_disjoint` is *"unfolding the
+(`ResU.ag_dom_of_reb`); `ResU.Compat.of_disjoint` is *"unfolding the
 definition of `▸◂`"*.
 `[about ours: `[TR]` 6.55's second bullet (p. 18), with `dom` written
 pointwise]` -/
@@ -593,9 +592,9 @@ theorem ResU.CompS.inStratum {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ�
     exact (CellU.CompS.inStratum hC α).mpr ⟨h₁ l _ f₁, h₂ l _ f₂⟩
 
 /-- **A sub-list of a `⨀` folds, and to a factor of it.**  `[TR]` Lemmas 6.2
-and 6.3 carried along §16's fold, as `BigComp.mem_factor` carries them for a
+and 6.3 carried along the fold, as `BigComp.mem_factor` carries them for a
 single member.
-`[about ours: `[TR]` 6.2 and 6.3 along §16's fold, at a sub-list]` -/
+`[about ours: `[TR]` 6.2 and 6.3 along the fold, at a sub-list]` -/
 theorem BigComp.sublist_factor {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
     (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C) :

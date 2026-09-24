@@ -17,8 +17,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the immutable ancestor of a cell of the aliasable walk: every cell of `ag(ρ)` sits beneath an `imm` cell, carried across `↭` — the step of Lemma 6.48's printed proof that 6.59 reaches for.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the immutable ancestor of a cell of the aliasable walk: every cell of `ag(ρ)` sits beneath an `imm` cell, carried across `↭` — the step of Lemma 6.48's printed proof that 6.59 reaches for.
 -/
 
 noncomputable section
@@ -413,7 +412,7 @@ theorem OptComp.functional {C : CellU Loc Val → CellU Loc Val → CellU Loc Va
       obtain ⟨ψ', e', hc'⟩ := h'
       rw [e, e', hC ψ₁ ψ₂ ψ ψ' hc hc']
 
-/-- `S ○ own(v) = S` read off the tag.  `CellU.compR_own_right` (Fig16 §14) is
+/-- `S ○ own(v) = S` read off the tag.  `CellU.compR_own_right`  is
 the same at an explicit `own(v)`; this is it at `S.kind = own`, which is the form
 `[TR]` 6.48's `own` bullet has.
 `[about ours: `CellU.compR_own_right` at a tag rather than a cell]` -/

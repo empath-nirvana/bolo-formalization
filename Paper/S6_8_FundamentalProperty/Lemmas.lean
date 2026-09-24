@@ -55,22 +55,22 @@ inhabited.
 **How this file reads.**  The numbered results of the subsection, in printed order as
 far as Lean's definition-before-use allows.  Each opens with a record:
 
-* the result's number, page and the source inventory's status (`proved`, `proved*`,
-  `variant`; source `docs/paper-inventory.md`);
+* the result's number, page and status (`proved`, `proved*`, `variant`; the
+  legend is in `Paper/INDEX.md`);
 * the printed statement, quoted, with the extraction's garbled symbols restored;
 * the printed proof, transcribed compactly and in its own order, citing the lemmas it
   cites;
-* the Lean declaration, moved from the source with its name, statement and proof
-  unchanged (its docstring carries the source's tag and its account of the proof),
+* the Lean declaration (its docstring carries the tag and its account of the
+  proof),
   and the numbered alias `TR.lemma_6_N` declared after it;
-* the inventory row's note.
+* a note on how the declaration reads the printed statement.
 
 A result whose declaration an earlier subsection's printed proof needs is declared
 in that subsection's file, under a heading saying so; its record and alias stay
 here.  A run of declarations the paper does not print, placed in this file only
 because a result below needs it and it needs a result above, is marked
-`[about ours]` and names the result it serves.  Citations of `docs/…` and `BoCa/…`
-are to the source repository (`borrow_lang` at `970a9d0`).
+`[about ours]` and names the result it serves.  `§N` citations are to
+`docs/adjudications.md`.
 
 **The typed world.**  A result whose statement the source also proves at the typed
 world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
@@ -90,7 +90,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 /-! A declaration the record of Lemma 6.151 (Fundamental Property) cites. -/
 /-- **`[TR]` Lemma 6.151** at `SemX`, by its printed proof, over the judgment read under
 `[TR]` p. 2's presuppositions.  `[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs
-of docs/boca-rules.md §12.69–§12.72]` -/
+of docs/adjudications.md §12.69–§12.72]` -/
 theorem fundamental :
     ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty),
       DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemX Δ Γ e T := by
@@ -166,20 +166,20 @@ theorem fundamental :
 
 /-! A declaration the record of Lemma 6.151 (Fundamental Property) cites. -/
 /-- **`[TR]` Lemma 6.151 (Fundamental Property, p. 40)** at the judgment p. 2 presupposes and the
-definitions `docs/boca-rules.md` §12.69–§12.72 repair: "If `Δ; Γ ⊢ e : T` then
+definitions `docs/adjudications.md` §12.69–§12.72 repair: "If `Δ; Γ ⊢ e : T` then
 `Δ; Γ ⊨ e : T`", over `DerivesWf`, under `⊧ Δ` (carried as `Δ.Ok`, as
 `Fig16.LogRel.FundamentalProperty` carries it) and `Δ ⊢ Γ` (`Ctx.ScopedB`).
 `Fig16.LogRel.FundamentalProperty` is the same statement at the literal reading, `Sem`; it is
 refused by `Fig16.LogRel.ViewWitness.fundamentalProperty_refused`, and the configuration that
 refuses it is excluded here by `Fig16.LogRel.ViewWitness.excluded`.
-`[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs of docs/boca-rules.md
+`[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs of docs/adjudications.md
 §12.69–§12.72]` -/
 def FundamentalProperty : Prop :=
   ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty),
     DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemX Δ Γ e T
 
 /-!
-## Lemma 6.151 (Fundamental Property) · `[TR]` p. 40 · inventory `proved*`
+## Lemma 6.151 (Fundamental Property) · `[TR]` p. 40 · `proved*`
 
 > If Δ; Γ ⊢ e : T then Δ; Γ ⊨ e : T.
 
@@ -195,7 +195,7 @@ def FundamentalProperty : Prop :=
 
 **Literal reading.** `BoCa.Fig16.LogRel.ViewWitness.fundamentalProperty_refused`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.ViewWitness.excluded`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.FundamentalPropertyOverRules`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.not_everyDerivationWf`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.fundamental_of_open`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.fundamental_in`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.fundamentalProperty_of`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.not_everyDerivationInRegime`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.SemArising`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.sem_of_semArising`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.Arises`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.Fig16.LogRel.lifeMembers_of_arises`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.151). `Fig16.LogRel.Typed.fundamentalProperty` proving `Fig16.LogRel.Typed.FundamentalProperty` (`BoCa/TypedFundamental.lean`), `[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs of docs/boca-rules.md §12.69–§12.72]`, and **no other hypothesis**; every declaration it rests on has `#print axioms` within `[propext, Classical.choice, Quot.sound]`. **The judgment.**  The antecedent is `Δ; Γ ⊢ e : T` **as p. 2 reads it** — `BoCa.DerivesWf`, under `⊧ Δ` (`Lifetime.LifeCtx.Ok`, sufficient and not necessary, `Lifetime.LifeCtx.sat_of_ok`) and `Δ ⊢ Γ` (`BoCa.Ctx.ScopedB`), the presuppositions p. 2 boxes. The conclusion is `Fig16.LogRel.Typed.SemX Δ Γ e T`, [TR] p. 4's judgment at the repaired definitions: the `Imm` payload read at its observable view (§12.69), the `Mut` and `Imm` payloads stratified by the record list (§12.70), the `Imm` clause's coherence conjunct `Fig16.LogRel.Typed.CohE` (§12.71), and `⊸`/`∀` Kripke over the record list with `wp` ranging over tagged typed worlds, `Fig16.LogRel.Typed.wpTS` over `Fig16.LogRel.Typed.TW` (§12.72). **The proof is p. 40's one line**, `Fig16.LogRel.Typed.fundamental`: the induction of `Fig16.LogRel.fundamental` with each compatibility lemma read at `SemX` (`Fig16.LogRel.Typed.id_compatX` … `Fig16.LogRel.Typed.withswap_compatX`), `⊧ Δ` and `Δ ⊢ Γ` threaded as there (`Lifetime.LifeCtx.Ok.extend`, `Ctx.ScopedB.allI`, `Ctx.ScopedB.split_left`/`.split_right`, `Ctx.ScopedB.cons`, `Ctx.ScopedB.of_dead`). The `withload` node spends 6.175 at `SemX` (`Fig16.LogRel.Typed.withload_compatX`), whose 6.150 step (`Fig16.LogRel.Typed.wpTS_reborrow`) chooses the reborrow at the tagged world, so `RebEscrow` is discharged at every use (`Fig16.LogRel.Typed.rebChooseTW_top`, `Fig16.LogRel.Typed.rebChooseTW_deep`); its two freshnesses come from p. 2's `Δ ⊢ T` (`BoCa.scopedB_axWithloadTy`). **The literal reading stays, as the measurement.**  `Fig16.LogRel.fundamentalProperty` proves `Fig16.LogRel.FundamentalProperty` — the same statement at `Fig16.LogRel.Sem`, the unrepaired `𝒱⟦−⟧` and `wp` — from `Fig16.LogRel.WithloadEscrow`, and `Fig16.LogRel.ViewWitness.fundamentalProperty_refused` refuses it at a `withloadAx` node of our carrier (`BoCa/ViewWitness.lean`, `docs/boca-rules.md` §12.68). That configuration is not a typed world with the argument in its type: `Fig16.LogRel.ViewWitness.excluded` (`BoCa/TypedViewWitness.lean`, §12.73). **The antecedent read as the rule figures alone** is `Fig16.LogRel.FundamentalPropertyOverRules`, over `BoCa.Derives`; `Fig16.LogRel.not_everyDerivationWf` is why the two readings differ (`witness`, `∅; • ⊢ λ().() : ∀('a ⊏ 'a). 1`, is a `Derives` node and no `DerivesWf` node). `Fig16.LogRel.fundamental_of_open` is the same induction over §12a's `Fig16.LogRel.DerivesIn`, whose five sides — `Fig16.LogRel.AllISide`, `Fig16.LogRel.Withbor1Side`, `Fig16.LogRel.Withbor2Side`, `Fig16.LogRel.Withbor3Side`, `Fig16.LogRel.WithloadSide` — are the binder's freshness and 6.150's escrow; `Fig16.LogRel.fundamental_in` discharges its nine slots, `Fig16.LogRel.fundamentalProperty_of` reaches `FundamentalPropertyOverRules` from `Fig16.LogRel.EveryDerivationInRegime`, which is refused (`Fig16.LogRel.not_everyDerivationInRegime`). `Fig16.LogRel.SemArising` is not a route to this row: `Fig16.LogRel.sem_of_semArising` concludes at `Fig16.LogRel.gDenB`, and nothing carries `SemArising` to `Sem`. `Fig16.LogRel.Arises` and `Fig16.LogRel.lifeMembers_of_arises` are the resource operations read as a family (§12.66).
+**Note.** `Fig16.LogRel.Typed.fundamentalProperty` proving `Fig16.LogRel.Typed.FundamentalProperty`, `[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs of docs/adjudications.md §12.69–§12.72]`, and **no other hypothesis**; every declaration it rests on has `#print axioms` within `[propext, Classical.choice, Quot.sound]`. **The judgment.**  The antecedent is `Δ; Γ ⊢ e : T` **as p. 2 reads it** — `BoCa.DerivesWf`, under `⊧ Δ` (`Lifetime.LifeCtx.Ok`, sufficient and not necessary, `Lifetime.LifeCtx.sat_of_ok`) and `Δ ⊢ Γ` (`BoCa.Ctx.ScopedB`), the presuppositions p. 2 boxes. The conclusion is `Fig16.LogRel.Typed.SemX Δ Γ e T`, [TR] p. 4's judgment at the repaired definitions: the `Imm` payload read at its observable view (§12.69), the `Mut` and `Imm` payloads stratified by the record list (§12.70), the `Imm` clause's coherence conjunct `Fig16.LogRel.Typed.CohE` (§12.71), and `⊸`/`∀` Kripke over the record list with `wp` ranging over tagged typed worlds, `Fig16.LogRel.Typed.wpTS` over `Fig16.LogRel.Typed.TW` (§12.72). **The proof is p. 40's one line**, `Fig16.LogRel.Typed.fundamental`: the induction of `Fig16.LogRel.fundamental` with each compatibility lemma read at `SemX` (`Fig16.LogRel.Typed.id_compatX` … `Fig16.LogRel.Typed.withswap_compatX`), `⊧ Δ` and `Δ ⊢ Γ` threaded as there (`Lifetime.LifeCtx.Ok.extend`, `Ctx.ScopedB.allI`, `Ctx.ScopedB.split_left`/`.split_right`, `Ctx.ScopedB.cons`, `Ctx.ScopedB.of_dead`). The `withload` node spends 6.175 at `SemX` (`Fig16.LogRel.Typed.withload_compatX`), whose 6.150 step (`Fig16.LogRel.Typed.wpTS_reborrow`) chooses the reborrow at the tagged world, so `RebEscrow` is discharged at every use (`Fig16.LogRel.Typed.rebChooseTW_top`, `Fig16.LogRel.Typed.rebChooseTW_deep`); its two freshnesses come from p. 2's `Δ ⊢ T` (`BoCa.scopedB_axWithloadTy`). **The literal reading stays, as the measurement.**  `Fig16.LogRel.fundamentalProperty` proves `Fig16.LogRel.FundamentalProperty` — the same statement at `Fig16.LogRel.Sem`, the unrepaired `𝒱⟦−⟧` and `wp` — from `Fig16.LogRel.WithloadEscrow`, and `Fig16.LogRel.ViewWitness.fundamentalProperty_refused` refuses it at a `withloadAx` node of our carrier (`Paper/LiteralReadings/S6_8_FundamentalProperty.lean`, `docs/adjudications.md` §12.68). That configuration is not a typed world with the argument in its type: `Fig16.LogRel.ViewWitness.excluded` (§12.73). **The antecedent read as the rule figures alone** is `Fig16.LogRel.FundamentalPropertyOverRules`, over `BoCa.Derives`; `Fig16.LogRel.not_everyDerivationWf` is why the two readings differ (`witness`, `∅; • ⊢ λ().() : ∀('a ⊏ 'a). 1`, is a `Derives` node and no `DerivesWf` node). `Fig16.LogRel.fundamental_of_open` is the same induction over the `Fig16.LogRel.DerivesIn`, whose five sides — `Fig16.LogRel.AllISide`, `Fig16.LogRel.Withbor1Side`, `Fig16.LogRel.Withbor2Side`, `Fig16.LogRel.Withbor3Side`, `Fig16.LogRel.WithloadSide` — are the binder's freshness and 6.150's escrow; `Fig16.LogRel.fundamental_in` discharges its nine slots, `Fig16.LogRel.fundamentalProperty_of` reaches `FundamentalPropertyOverRules` from `Fig16.LogRel.EveryDerivationInRegime`, which is refused (`Fig16.LogRel.not_everyDerivationInRegime`). `Fig16.LogRel.SemArising` is not a route to this row: `Fig16.LogRel.sem_of_semArising` concludes at `Fig16.LogRel.gDenB`, and nothing carries `SemArising` to `Sem`. `Fig16.LogRel.Arises` and `Fig16.LogRel.lifeMembers_of_arises` are the resource operations read as a family (§12.66).
 -/
 theorem fundamentalProperty : FundamentalProperty := fundamental
 
@@ -267,7 +267,7 @@ def FundamentalProperty : Prop :=
 
 /-! Lemma 6.151 (Fundamental Property), the literal reading, continued. -/
 /-- **`[TR]` Lemma 6.150's inherited escrow, at `withload`'s own reborrows.**
-`[TR]` 6.150 (p. 39) inherits `RebEscrow` from 6.55 (`BoCa/RebWp.lean` §1), and
+`[TR]` 6.150 (p. 39) inherits `RebEscrow` from 6.55, and
 `withload_compat` meets it at the `P̂` its own `↺_β P̂` names; this is that
 instance at every binder, payload type, substitution and loaded value.
 `withload_hesc_unit` inhabits it at `T₁ = 1`, and `ViewWitness` is a
@@ -278,18 +278,18 @@ def WithloadEscrow : Prop :=
     (fun β v' => ⌜vℓ = v'⌝ ⋆ vDen (T₁.immReborrow (.var x)) (δ.extend x β) vℓ)
 
 /-!
-## Lemma 6.152 (id-compat) · `[TR]` p. 40 · inventory `proved`
+## Lemma 6.152 (id-compat) · `[TR]` p. 40 · `proved`
 
 > ─────────────── id
 > Δ; x : T ⊨ x : T
 
 **Printed proof, transcribed.** By unfolding and `wp-val`.
 
-**Lean.** `BoCa.Fig16.LogRel.id_compat`, aliases `TR.lemma_6_152`, `TR.«id-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.id_compat`, aliases `TR.lemma_6_152`, `TR.«id-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.id_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.152). `Fig16.LogRel.id_compat`, on the printed carrier, `[as printed]`.
+**Note.** `Fig16.LogRel.id_compat`, on the printed carrier, `[as printed]`.
 -/
 /-- **`[TR]` Lemma 6.152** (`id-compat`, p. 40) `[as printed]`:
 `Δ; x : T ⊨ x : T`.  `x : T` is `Ctx.Solo Γ i T`.  "By unfolding and
@@ -317,18 +317,18 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.153 (1I-compat) · `[TR]` p. 40 · inventory `proved`
+## Lemma 6.153 (1I-compat) · `[TR]` p. 40 · `proved`
 
 > ─────────────── 1I
 > Δ; ∅ ⊨ () : 1
 
 **Printed proof, transcribed.** By unfolding and `wp-val`.
 
-**Lean.** `BoCa.Fig16.LogRel.unitI_compat`, aliases `TR.lemma_6_153`, `TR.«1I-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.unitI_compat`, aliases `TR.lemma_6_153`, `TR.«1I-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.unitI_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.153). `Fig16.LogRel.unitI_compat`, on the printed carrier, `[as printed]`.
+**Note.** `Fig16.LogRel.unitI_compat`, on the printed carrier, `[as printed]`.
 -/
 /-- **`[TR]` Lemma 6.153** (`1I-compat`, p. 40) `[as printed]`:
 `Δ; ∅ ⊨ () : 1`.  `∅` is `Ctx.Dead Γ`: positionally, every slot already
@@ -353,7 +353,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.154 (1E-compat) · `[TR]` p. 40 · inventory `proved`
+## Lemma 6.154 (1E-compat) · `[TR]` p. 40 · `proved`
 
 > Δ; Γ₁ ⊨ e₁ : 1    Δ; Γ₂ ⊨ e₂ : T
 > ───────────────────────────────── 1E
@@ -361,13 +361,13 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1 and H2 (the premises); let `δ ∈ ⟦Δ⟧` and `γ`, split into `γ₁, γ₂`.  Apply `wp-bind`; the goal is `𝒢⟦Γ₁⟧δ(γ₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(e₁γ₁){v₁. wp(v₁; e₂γ₂){𝒱⟦T⟧δ}}`.  Apply H1, `wp-frame` and `wp-mono` at an arbitrary `v₁`: `𝒱⟦1⟧δ(v₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(v₁; e₂γ₂){𝒱⟦T⟧δ}`.  Unfolding `𝒱⟦1⟧`, `v₁ = ()`; follows from `wp-1` and H2.
 
-**Lean.** `BoCa.Fig16.LogRel.unitE_compat`, aliases `TR.lemma_6_154`, `TR.«1E-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.unitE_compat`, aliases `TR.lemma_6_154`, `TR.«1E-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.unitE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
 **Literal reading.** `BoCa.Fig16.LogRel.unitE_refuted_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.TR3.derives_wSeq`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.154). `Fig16.LogRel.unitE_compat`, on the printed carrier, `[as printed]`. **False over [TR] §3's own machine**, and checked: it binds `e₁` under the frame `K; e`, which the printed `K` grammar does not have, and the printed `1↦` fires only at a literal `()`. `Fig16.LogRel.unitE_refuted_on_TR3` exhibits both premises and the negated conclusion at `e₁ = free (alloc ())`, `e₂ = ()`, `T = 1` — a closed instance [TR] p. 2's `1E` types (`TR3.derives_wSeq`).
+**Note.** `Fig16.LogRel.unitE_compat`, on the printed carrier, `[as printed]`. **False over [TR] §3's own machine**, and checked: it binds `e₁` under the frame `K; e`, which the printed `K` grammar does not have, and the printed `1↦` fires only at a literal `()`. `Fig16.LogRel.unitE_refuted_on_TR3` exhibits both premises and the negated conclusion at `e₁ = free (alloc ())`, `e₂ = ()`, `T = 1` — a closed instance [TR] p. 2's `1E` types (`TR3.derives_wSeq`).
 -/
 /-- **`[TR]` Lemma 6.154** (`1E-compat`, p. 40) `[as printed]`:
 
@@ -402,7 +402,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.155 (⊗I-compat) · `[TR]` p. 41 · inventory `proved`
+## Lemma 6.155 (⊗I-compat) · `[TR]` p. 41 · `proved`
 
 > Δ; Γ₁ ⊨ e₁ : T₁    Δ; Γ₂ ⊨ e₂ : T₂
 > ─────────────────────────────────── ⊗I
@@ -410,13 +410,13 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1, H2; let `δ ∈ ⟦Δ⟧`, `γ` split into `γ₁, γ₂`.  Apply `wp-bind`: `𝒢⟦Γ₁⟧δ(γ₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(e₁γ₁){v₁. wp((v₁, e₂γ₂)){𝒱⟦T₁ ⊗ T₂⟧}}`.  Apply H1, `wp-frame` and `wp-mono` at an arbitrary `v₁`; apply `wp-bind`; repeat with H2 at some `v₂`: `𝒱⟦T₁⟧δ(v₁) ⋆ 𝒱⟦T₂⟧δ(v₂) ⊨ wp((v₁, v₂)){𝒱⟦T₁ ⊗ T₂⟧}`.  Fold `𝒱⟦⊗⟧`; follows from `wp-val`.
 
-**Lean.** `BoCa.Fig16.LogRel.tensorI_compat`, aliases `TR.lemma_6_155`, `TR.«⊗I-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.tensorI_compat`, aliases `TR.lemma_6_155`, `TR.«⊗I-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.tensorI_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
 **Literal reading.** `BoCa.Fig16.LogRel.tensorI_step_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.155). `Fig16.LogRel.tensorI_compat`, on the printed carrier, `[as printed]`. The frames `(K,e)` and `(v,K)` it binds with are printed, and so is the last step: `wp-val` at the *expression* `(v₁,v₂)`, which [CONF] Fig. 1 takes silently because its grammar derives `(v₁,v₂)` twice and identifies the two — as `BoCa/Syntax.lean` now does (`docs/boca-rules.md` §12.43).
+**Note.** `Fig16.LogRel.tensorI_compat`, on the printed carrier, `[as printed]`. The frames `(K,e)` and `(v,K)` it binds with are printed, and so is the last step: `wp-val` at the *expression* `(v₁,v₂)`, which [CONF] Fig. 1 takes silently because its grammar derives `(v₁,v₂)` twice and identifies the two — as `Expr` does (`docs/adjudications.md` §12.43).
 -/
 /-- **`[TR]` Lemma 6.155** (`⊗I-compat`, p. 41) `[as printed]`:
 
@@ -425,7 +425,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
         Δ; Γ₁, Γ₂ ⊨ (e₁, e₂) : T₁ ⊗ T₂
 
 Two `wp-bind`s, left to right, then "Fold 𝒱⟦⊗⟧.  Follows from wp-val."  The
-step from `wp((v₁,v₂))` to `wp(v₁,v₂)` is `wp_pair`, which is §5a's
+step from `wp((v₁,v₂))` to `wp(v₁,v₂)` is `wp_pair`, which is
 reflexivity: the two are one term. -/
 theorem tensorI_compat {Δ : LifeCtx} {Γ Γ₁ Γ₂ : Ctx Ty} {e₁ e₂ : Expr} {T₁ T₂ : Ty}
     (hsp : Ctx.Split Γ Γ₁ Γ₂)
@@ -456,7 +456,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.156 (⊗E-compat) · `[TR]` p. 41 · inventory `proved`
+## Lemma 6.156 (⊗E-compat) · `[TR]` p. 41 · `proved`
 
 > Δ; Γ₁ ⊨ e₁ : T₁₁ ⊗ T₁₂    Δ; Γ₂, x₁ : T₁₁, x₂ : T₁₂ ⊨ e₂ : T₂
 > ──────────────────────────────────────────────────────────── ⊗E
@@ -464,11 +464,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1, H2; let `δ ∈ ⟦Δ⟧`, `γ` split into `γ₁, γ₂`.  Apply `wp-bind`: `𝒢⟦Γ₁⟧δ(γ₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(e₁γ₁){v₁. wp(let (x₁, x₂) = v₁; e₂γ₂){𝒱⟦T₂⟧δ}}`.  Apply H1, `wp-frame` and `wp-mono` at an arbitrary `v₁`.  Unfolding `𝒱⟦⊗⟧`, `v₁ = (v₁₁, v₁₂)`: `𝒱⟦T₁₁⟧δ(v₁₁) ⋆ 𝒱⟦T₁₂⟧(v₁₂) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(let (x₁, x₂) = (v₁₁, v₁₂); e₂γ₂){𝒱⟦T₂⟧δ}`.  Follows from `wp-⊗` and H2 with `γ₂[x₁ ↦ v₁₁, x₂ ↦ v₁₂]`.
 
-**Lean.** `BoCa.Fig16.LogRel.tensorE_compat`, aliases `TR.lemma_6_156`, `TR.«⊗E-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.tensorE_compat`, aliases `TR.lemma_6_156`, `TR.«⊗E-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.tensorE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.156). `Fig16.LogRel.tensorE_compat`, on the printed carrier, `[as printed]`; [TR]'s `γ₂[x₁↦v₁¹, x₂↦v₁²]` is the list `v₁² :: v₁¹ :: γ` and `Expr.psub_cons₂` crosses the two binders.
+**Note.** `Fig16.LogRel.tensorE_compat`, on the printed carrier, `[as printed]`; [TR]'s `γ₂[x₁↦v₁¹, x₂↦v₁²]` is the list `v₁² :: v₁¹ :: γ` and `Expr.psub_cons₂` crosses the two binders.
 -/
 /-- **`[TR]` Lemma 6.156** (`⊗E-compat`, p. 41) `[as printed]`:
 
@@ -518,7 +518,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.157 (⊕I-compat) · `[TR]` p. 41 · inventory `proved`
+## Lemma 6.157 (⊕I-compat) · `[TR]` p. 41 · `proved`
 
 > Δ; Γ ⊨ e : Tᵢ
 > ─────────────────────── ⊕I
@@ -528,13 +528,13 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 Schematic in `i`, as Lemma 6.72: one declaration per `i`.
 
-**Lean.** `BoCa.Fig16.LogRel.sumI₁_compat`, aliases `TR.lemma_6_157_1`, `TR.«⊕I-compat₁»`, source tag `[as printed]`; `BoCa.Fig16.LogRel.sumI₂_compat`, aliases `TR.lemma_6_157_2`, `TR.«⊕I-compat₂»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.sumI₁_compat`, aliases `TR.lemma_6_157_1`, `TR.«⊕I-compat₁»`, tag `[as printed]`; `BoCa.Fig16.LogRel.sumI₂_compat`, aliases `TR.lemma_6_157_2`, `TR.«⊕I-compat₂»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.sumI₁_compatX`, in `Support/TypedWorld/Compatibility.lean`; `BoCa.Fig16.LogRel.Typed.sumI₂_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
 **Literal reading.** `BoCa.Fig16.LogRel.sumI₁_refuted_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.TR3.derives_wInj`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.157). `Fig16.LogRel.sumI₁_compat`, `sumI₂_compat`, on the printed carrier, `[as printed]` — [TR] prints one rule schematic in `i` and these are its two instances (rule 6). **False over [TR] §3's own machine**, and checked: it binds `e` under the frame `injᵢ K`, which the printed `K` grammar does not have. `Fig16.LogRel.sumI₁_refuted_on_TR3` exhibits the premise and the negated conclusion at `e = free (alloc ())` — a closed instance [TR] p. 2's `⊕I` types (`TR3.derives_wInj`).
+**Note.** `Fig16.LogRel.sumI₁_compat`, `sumI₂_compat`, on the printed carrier, `[as printed]` — [TR] prints one rule schematic in `i` and these are its two instances (rule 6). **False over [TR] §3's own machine**, and checked: it binds `e` under the frame `injᵢ K`, which the printed `K` grammar does not have. `Fig16.LogRel.sumI₁_refuted_on_TR3` exhibits the premise and the negated conclusion at `e = free (alloc ())` — a closed instance [TR] p. 2's `⊕I` types (`TR3.derives_wInj`).
 -/
 /-- **`[TR]` Lemma 6.157** (`⊕I-compat`, p. 41) `[as printed]` at `i = 1`:
 
@@ -586,7 +586,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.158 (⊕E-compat) · `[TR]` p. 41 · inventory `proved`
+## Lemma 6.158 (⊕E-compat) · `[TR]` p. 41 · `proved`
 
 > Δ; Γ₁ ⊨ e₁ : T₁₁ ⊕ T₁₂    Δ; Γ₂, xᵢ : T₁ᵢ ⊨ eᵢ₂ : T₂    i ∈ {1, 2}
 > ─────────────────────────────────────────────────────────────── ⊕E
@@ -594,11 +594,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1 and, for each `i`, H2; let `δ ∈ ⟦Δ⟧`, `γ` split into `γ₁, γ₂`.  Apply `wp-bind`: `𝒢⟦Γ₁⟧δ(γ₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(e₁γ₁){v₁. wp(match v₁ {…}){𝒱⟦T₂⟧δ}}`.  Apply H1, `wp-frame` and `wp-mono` at an arbitrary `v₁`.  Unfolding `𝒱⟦⊕⟧` gives `i` and `v′₁`: `𝒱⟦T₁ᵢ⟧δ(v′₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(match i v′₁ {…}){𝒱⟦T₂⟧δ}`.  Follows from `wp-⊕` and H2 with `γ₂[xᵢ ↦ v′₁]`.
 
-**Lean.** `BoCa.Fig16.LogRel.sumE_compat`, aliases `TR.lemma_6_158`, `TR.«⊕E-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.sumE_compat`, aliases `TR.lemma_6_158`, `TR.«⊕E-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.sumE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.158). `Fig16.LogRel.sumE_compat`, on the printed carrier, `[as printed]`.
+**Note.** `Fig16.LogRel.sumE_compat`, on the printed carrier, `[as printed]`.
 -/
 /-- **`[TR]` Lemma 6.158** (`⊕E-compat`, p. 41) `[as printed]`:
 
@@ -650,7 +650,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.159 (⊸I-compat) · `[TR]` p. 41 · inventory `proved`
+## Lemma 6.159 (⊸I-compat) · `[TR]` p. 41 · `proved`
 
 > Δ; Γ, x : T₁ ⊨ e : T₂
 > ──────────────────────── ⊸I
@@ -658,11 +658,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1; let `δ ∈ ⟦Δ⟧`, `γ`.  Apply `wp-val`; unfold `𝒱⟦⊸⟧` and let `v′` be arbitrary: `𝒢⟦Γ⟧δ(γ) ⋆ 𝒱⟦T₁⟧δ(v′) ⊨ wp((λx.eγ) v′){𝒱⟦T₂⟧δ}`.  Follows from `wp-⊸` and H1.
 
-**Lean.** `BoCa.Fig16.LogRel.lolliI_compat`, aliases `TR.lemma_6_159`, `TR.«⊸I-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.lolliI_compat`, aliases `TR.lemma_6_159`, `TR.«⊸I-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.lolliI_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.159). `Fig16.LogRel.lolliI_compat`, on the printed carrier, `[as printed]`.
+**Note.** `Fig16.LogRel.lolliI_compat`, on the printed carrier, `[as printed]`.
 -/
 /-- **`[TR]` Lemma 6.159** (`⊸I-compat`, p. 41) `[as printed]`:
 
@@ -700,7 +700,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.160 (⊸E-compat) · `[TR]` p. 42 · inventory `proved`
+## Lemma 6.160 (⊸E-compat) · `[TR]` p. 42 · `proved`
 
 > Δ; Γ₁ ⊨ e₁ : T₁    Δ; Γ₂ ⊨ e₂ : T₁ ⊸ T₂
 > ──────────────────────────────────────── ⊸E
@@ -708,11 +708,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1, H2; let `δ ∈ ⟦Δ⟧`, `γ` split into `γ₁, γ₂`.  Apply `wp-bind`: `𝒢⟦Γ₁⟧δ(γ₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(e₁γ₁){v₁. wp(e₂γ₂ v₁){𝒱⟦T₂⟧δ}}`.  Apply H1, `wp-frame` and `wp-mono` at an arbitrary `v₁`; apply `wp-bind`: `𝒱⟦T₁⟧δ(v₁) ⋆ 𝒢⟦Γ₂⟧δ(γ₂) ⊨ wp(e₂γ₂){v₂. wp(v₂ v₁){𝒱⟦T₂⟧δ}}`.  Apply H2, `wp-frame` and `wp-mono` at an arbitrary `v₂`: `𝒱⟦T₁⟧δ(v₁) ⋆ 𝒱⟦T₁ ⊸ T₂⟧(v₂) ⊨ wp(v₂ v₁){𝒱⟦T₂⟧δ}`.  Follows from unfolding `𝒱⟦⊸⟧`.
 
-**Lean.** `BoCa.Fig16.LogRel.lolliE_compat`, aliases `TR.lemma_6_160`, `TR.«⊸E-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.lolliE_compat`, aliases `TR.lemma_6_160`, `TR.«⊸E-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.lolliE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.160). `Fig16.LogRel.lolliE_compat`, on the printed carrier, `[as printed]` — the argument's half of the context is framed off first, because `Kont`'s `e K` comes before `K v`.
+**Note.** `Fig16.LogRel.lolliE_compat`, on the printed carrier, `[as printed]` — the argument's half of the context is framed off first, because `Kont`'s `e K` comes before `K v`.
 -/
 /-- **`[TR]` Lemma 6.160** (`⊸E-compat`, p. 42) `[as printed]`:
 
@@ -751,7 +751,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.161 (∀I-compat) · `[TR]` p. 42 · inventory `variant`
+## Lemma 6.161 (∀I-compat) · `[TR]` p. 42 · `variant`
 
 > Δ, ('a ⊏ @b); Γ ⊨ e : T
 > ───────────────────────────── ∀I
@@ -759,15 +759,15 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1; let `δ ∈ ⟦Δ⟧`, `γ`.  Apply `wp-val`: `𝒢⟦Γ⟧δ(γ) ⊨ 𝒱⟦∀('a ⊏ @b). T⟧δ(λ_.eγ)`.  Unfold `𝒱⟦∀⟧` and let `α ⊏ @bδ` be arbitrary.  By `Δ-extend`, `δ['a ↦ α] ∈ ⟦Δ, ('a ⊏ @b)⟧`.  Extend `𝒢⟦Γ⟧δ` with `δ['a ↦ α]`: `𝒢⟦Γ⟧δ['a↦α](γ) ⊨ wp((λ_.eγ) ()){𝒱⟦T⟧δ['a↦α]}`.  Follows from `wp-⊸` and H1.
 
-The source inventory's row names the old carrier's `LogRel.allI_compat`.  On the printed carrier the statement is `Fig16.LogRel.allI_compat`, used here; it carries the same three added freshness hypotheses, tagged `[variant: …]`.
+On the printed carrier the statement is `Fig16.LogRel.allI_compat`, used here; it carries the same three added freshness hypotheses, tagged `[variant: …]`.
 
-**Lean.** `BoCa.Fig16.LogRel.allI_compat`, aliases `TR.lemma_6_161`, `TR.«∀I-compat»`, source tag `[variant: adds the freshness of `'a` for `@b`, for the bounds of `Δ` and for
+**Lean.** `BoCa.Fig16.LogRel.allI_compat`, aliases `TR.lemma_6_161`, `TR.«∀I-compat»`, tag `[variant: adds the freshness of `'a` for `@b`, for the bounds of `Δ` and for
 the live types of `Γ`, which the printed proof takes from its named binder and
 does not state]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.allI_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.161). `LogRel.allI_compat` adds the freshness of `'a` for `Δ`'s bounds, for `@b` and for `Γ`'s live types. `Derives.allI` supplies none of them: `LogRel.AllIGap` is a derivation where the `Γ` condition fails
+**Note.** `LogRel.allI_compat` adds the freshness of `'a` for `Δ`'s bounds, for `@b` and for `Γ`'s live types. `Derives.allI` supplies none of them: `LogRel.AllIGap` is a derivation where the `Γ` condition fails
 -/
 /-- **`[TR]` Lemma 6.161** (`∀I-compat`, p. 42)
 `[variant: adds the freshness of `'a` for `@b`, for the bounds of `Δ` and for
@@ -784,7 +784,7 @@ and H1."  `Λ.e ≜ λ_.e` (§12.14), so the premise's context gains a slot alre
 dead and the closing substitution gains a `()` at it; `Δ, ('a ⊏ @b)` is
 `Δ.extend x b` together with `hx`, which makes the extension a genuine one
 rather than a shadowing.  `Δ ⊨ @b` is not asked for: the `∀` clause's bound is
-a proposition about `@bδ` (§1), so the arbitrary `α ⊏ @bδ` already carries
+a proposition about `@bδ` (L3), so the arbitrary `α ⊏ @bδ` already carries
 `@bδ` defined, which is all `Δ-extend` needs of it at `'a` itself.  `hx` is
 `Derives.allI`'s own premise (§12.44) and the proof reads it nowhere:
 `Δ.extend x b` shadows whatever `Δ` had at `'a`, and `hΔx` speaks of `Δ`
@@ -860,7 +860,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.162 (∀E-compat) · `[TR]` p. 42 · inventory `proved`
+## Lemma 6.162 (∀E-compat) · `[TR]` p. 42 · `proved`
 
 > Δ; Γ ⊨ e : ∀('a ⊏ @b). T    Δ ⊨ @a ⊏ @b
 > ───────────────────────────────────────── ∀E
@@ -868,13 +868,13 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1 and `Δ ⊨ @a ⊏ @b` (H2); let `δ ∈ ⟦Δ⟧`, `γ`.  Apply `wp-bind`: `𝒢⟦Γ⟧δ(γ) ⊨ wp(eγ){v. wp(v ()){𝒱⟦T[@a/'a]⟧δ}}`.  Apply H1 and `wp-mono` at an arbitrary `v`: `𝒱⟦∀('a ⊏ @b). T⟧δ(v) ⊨ wp(v ()){𝒱⟦T[@a/'a]⟧δ}`.  Unfold `𝒱⟦∀⟧` and instantiate with `@aδ`, which is `⊏ @bδ` by H2.  Apply `wp-mono` at an arbitrary `v′`: `𝒱⟦T⟧δ['a↦@aδ](v′) ⊨ 𝒱⟦T[@a/'a]⟧δ(v′)`.  Follows from `Δ-subst`.
 
-**Lean.** `BoCa.Fig16.LogRel.allE_compat`, aliases `TR.lemma_6_162`, `TR.«∀E-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.allE_compat`, aliases `TR.lemma_6_162`, `TR.«∀E-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.allE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
 **Literal reading.** `BoCa.Fig16.LogRel.MutGapClosed.gap_closed`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.162). `Fig16.LogRel.allE_compat`, on the printed carrier, `[as printed]`: H1, the printed `Δ ⊨ @a ⊏ @b` as `LifeCtx.EntailsLt`, and the conclusion at `T[@a/'a]` (`Ty.instLife`); the proof's closing `Δ-subst` is `Fig16.LogRel.vDen_instLife`. Both have one cause, the code-valued `mut` invariant (§10 (n15)): `MutGap` (§9a) refutes the lemma without the second, `RenameGap` (§9b) refutes the α-invariance the first stands in for, and `vDen_mut_payload_det` mentions no binder, so no change to how `∀` binds retires `MutClosed`. A de Bruijn binder retires `NoCapture` alone.
+**Note.** `Fig16.LogRel.allE_compat`, on the printed carrier, `[as printed]`: H1, the printed `Δ ⊨ @a ⊏ @b` as `LifeCtx.EntailsLt`, and the conclusion at `T[@a/'a]` (`Ty.instLife`); the proof's closing `Δ-subst` is `Fig16.LogRel.vDen_instLife`. Both have one cause, the code-valued `mut` invariant: `MutGap` refutes the lemma without the second, `RenameGap` refutes the α-invariance the first stands in for, and `vDen_mut_payload_det` mentions no binder, so no change to how `∀` binds retires `MutClosed`. A de Bruijn binder retires `NoCapture` alone.
 -/
 /-- **`[TR]` Lemma 6.162** (`∀E-compat`, p. 42) `[as printed]`:
 
@@ -912,7 +912,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.163 ([]I-compat) · `[TR]` p. 42 · inventory `proved`
+## Lemma 6.163 ([]I-compat) · `[TR]` p. 42 · `proved`
 
 > Δ; Γ ⊨ e : T    Δ ⊨ Γ ⊐ @a
 > ──────────────────────────── []I
@@ -920,11 +920,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1 and `Δ ⊢ Γ ⊐ @a` (H2); let `δ ∈ ⟦Δ⟧`, `γ`.  The goal is `𝒢⟦Γ⟧δ(γ) ⊨ wp(e){𝒱⟦[@a] T⟧δ}`.  Apply Lemma 6.62 with H2; unfold `𝒱⟦[]⟧`: `[@aδ]𝒢⟦Γ⟧δ(γ) ⊨ wp(e){[@aδ]𝒱⟦T⟧δ}`.  Follows from `wp-[]`, `[]-mono` and H1.
 
-**Lean.** `BoCa.Fig16.LogRel.boxI_compat`, aliases `TR.lemma_6_163`, `TR.«[]I-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.boxI_compat`, aliases `TR.lemma_6_163`, `TR.«[]I-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.boxI_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.163). `Fig16.LogRel.boxI_compat`, `[as printed]` — [TR]'s proof is "Apply theorem 6.62 with H2. Unfold `𝒱⟦[]⟧`… Follows from wp-[], []-mono, and H1", with 6.62 `Fig16.LogRel.gDen_box` and `wp-[]` `Fig16.BoLo.wp_box`. **The index is unrestricted**: `@aδ` has only to be defined, which is `Ctx.Outlives`'s own presupposition ([TR] p. 2's `Δ ⊨ @a`). At the literal `⊔β̄` of definition row 5.30 the row carried a licence on the context resource's recorded borrows; at `⊓β̄` 6.60 needs none (`docs/boca-rules.md` §12.67(a))
+**Note.** `Fig16.LogRel.boxI_compat`, `[as printed]` — [TR]'s proof is "Apply theorem 6.62 with H2. Unfold `𝒱⟦[]⟧`… Follows from wp-[], []-mono, and H1", with 6.62 `Fig16.LogRel.gDen_box` and `wp-[]` `Fig16.BoLo.wp_box`. **The index is unrestricted**: `@aδ` has only to be defined, which is `Ctx.Outlives`'s own presupposition ([TR] p. 2's `Δ ⊨ @a`). At the literal `⊔β̄` of definition row 5.30 the row carried a licence on the context resource's recorded borrows; at `⊓β̄` 6.60 needs none (`docs/adjudications.md` §12.67(a))
 -/
 /-- **`[TR]` Lemma 6.163** (`[]I-compat`, p. 42):
 
@@ -964,7 +964,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.164 ([]E-compat) · `[TR]` p. 43 · inventory `proved`
+## Lemma 6.164 ([]E-compat) · `[TR]` p. 43 · `proved`
 
 > Δ; Γ ⊨ e : [@a] T
 > ─────────────────── []E
@@ -972,11 +972,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1; let `δ ∈ ⟦Δ⟧`, `γ`.  Follows from H1, `wp-mono`, unfolding `𝒱⟦[]⟧`, and `[]l`.
 
-**Lean.** `BoCa.Fig16.LogRel.boxE_compat`, aliases `TR.lemma_6_164`, `TR.«[]E-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.boxE_compat`, aliases `TR.lemma_6_164`, `TR.«[]E-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.boxE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.164). `Fig16.LogRel.boxE_compat`, on the printed carrier, `[as printed]` — `[]l` is `Fig16.BoLo.box_L`, the first conjunct of `[α]P`.
+**Note.** `Fig16.LogRel.boxE_compat`, on the printed carrier, `[as printed]` — `[]l` is `Fig16.BoLo.box_L`, the first conjunct of `[α]P`.
 -/
 /-- **`[TR]` Lemma 6.164** (`[]E-compat`, p. 43) `[as printed]`:
 
@@ -1006,18 +1006,18 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.165 (alloc-compat) · `[TR]` p. 43 · inventory `proved`
+## Lemma 6.165 (alloc-compat) · `[TR]` p. 43 · `proved`
 
 > ───────────────────────── alloc
 > Δ; ∅ ⊨ alloc : T ⊸ Ref T
 
 **Printed proof, transcribed.** Let `δ ∈ ⟦∅⟧`, `γ`.  Apply `wp-val` and unfold `𝒱⟦⊸⟧` at an arbitrary `v`: `𝒱⟦T⟧δ(v) ⊨ wp(alloc v){𝒱⟦Ref T⟧δ}`.  Follows from `wp-alloc` and unfolding `𝒱⟦Ref⟧`.
 
-**Lean.** `BoCa.Fig16.LogRel.alloc_compat`, aliases `TR.lemma_6_165`, `TR.«alloc-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.alloc_compat`, aliases `TR.lemma_6_165`, `TR.«alloc-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.alloc_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.165). `Fig16.LogRel.alloc_compat`, on the printed carrier, `[as printed]` — `Δ; ∅ ⊨ alloc : T ⊸ Ref T`, with `∅` as `Ctx.Dead Γ` (§12.19) and `Ref T` as `Ty.ref`, the precedent 6.166 sets. `#print axioms` is `[propext, Classical.choice, Quot.sound]`: no hypothesis beyond the printed context condition, and no cited `axiom`. **The proof is p. 43's, sentence for sentence.**  "Apply wp-val and unfold `𝒱⟦⊸⟧` for an arbitrary `v`" is `Fig16.BoLo.wp_val` and the `⊸` clause, whose wand composes `∅ ● ρ₁`, so what it hands back is the argument's own resource; "Follows from wp-alloc" is `Fig16.BoLo.wp_alloc` (6.141), its premise `∀ℓ. ℓ ↦ v ─⋆ Q̂(ℓ)` instantiated at the location that rule picks; "and unfolding `𝒱⟦∗⟧`" folds the `Ref` clause at `v′ = v` — the new cell is its `ℓ ↦ v′` and the argument's `𝒱⟦T⟧δ(v)`, untouched because `alloc` reads nothing, is its second conjunct. It inhabits `Fig16.LogRel.fundamental_of_open`'s `open_alloc` outright, and `Fig16.LogRel.DerivesIn` adds no side at `allocAx`.
+**Note.** `Fig16.LogRel.alloc_compat`, on the printed carrier, `[as printed]` — `Δ; ∅ ⊨ alloc : T ⊸ Ref T`, with `∅` as `Ctx.Dead Γ` (§12.19) and `Ref T` as `Ty.ref`, the precedent 6.166 sets. `#print axioms` is `[propext, Classical.choice, Quot.sound]`: no hypothesis beyond the printed context condition, and no cited `axiom`. **The proof is p. 43's, sentence for sentence.**  "Apply wp-val and unfold `𝒱⟦⊸⟧` for an arbitrary `v`" is `Fig16.BoLo.wp_val` and the `⊸` clause, whose wand composes `∅ ● ρ₁`, so what it hands back is the argument's own resource; "Follows from wp-alloc" is `Fig16.BoLo.wp_alloc` (6.141), its premise `∀ℓ. ℓ ↦ v ─⋆ Q̂(ℓ)` instantiated at the location that rule picks; "and unfolding `𝒱⟦∗⟧`" folds the `Ref` clause at `v′ = v` — the new cell is its `ℓ ↦ v′` and the argument's `𝒱⟦T⟧δ(v)`, untouched because `alloc` reads nothing, is its second conjunct. It inhabits `Fig16.LogRel.fundamental_of_open`'s `open_alloc` outright, and `Fig16.LogRel.DerivesIn` adds no side at `allocAx`.
 -/
 /-- **`[TR]` Lemma 6.165** (`alloc-compat`, p. 43) `[as printed]`:
 
@@ -1061,18 +1061,18 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.166 (free-compat) · `[TR]` p. 43 · inventory `proved`
+## Lemma 6.166 (free-compat) · `[TR]` p. 43 · `proved`
 
 > ───────────────────────── free
 > Δ; ∅ ⊨ free : Ref T ⊸ T
 
 **Printed proof, transcribed.** Let `δ ∈ ⟦∅⟧`, `γ`.  Apply `wp-val` and unfold `𝒱⟦⊸⟧` at an arbitrary `v`: `𝒱⟦Ref T⟧δ(v) ⊨ wp(free v){𝒱⟦T⟧δ}`.  Follows from unfolding `𝒱⟦Ref⟧` and `wp-free`.
 
-**Lean.** `BoCa.Fig16.LogRel.free_compat`, aliases `TR.lemma_6_166`, `TR.«free-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.free_compat`, aliases `TR.lemma_6_166`, `TR.«free-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.free_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.166). `Fig16.LogRel.free_compat`, on the printed carrier, `[as printed]`, at `Fig16.BoLo.wp_free`.
+**Note.** `Fig16.LogRel.free_compat`, on the printed carrier, `[as printed]`, at `Fig16.BoLo.wp_free`.
 -/
 /-- **`[TR]` Lemma 6.166** (`free-compat`, p. 43) `[as printed]`:
 `Δ; ∅ ⊨ free : Ref T ⊸ T`.  "Apply wp-val and unfold `𝒱⟦⊸⟧` … Follows from
@@ -1102,7 +1102,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.167 (⊑imm-compat) · `[TR]` p. 43 · inventory `proved`
+## Lemma 6.167 (⊑imm-compat) · `[TR]` p. 43 · `proved`
 
 > Δ; Γ ⊨ e : Imm @b T    Δ ⊨ @a ⊑ @b
 > ─────────────────────────────────── ⊑imm
@@ -1110,11 +1110,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** Suppose H1 and `Δ ⊨ @a ⊑ @b` (H2); let `δ ∈ ⟦Δ⟧`, `γ`.  Apply H1 to `𝒢⟦Γ⟧δ(γ)`, then `wp-mono` at an arbitrary `v`: `𝒱⟦Imm @b T⟧δ(v) ⊨ 𝒱⟦Imm @a T⟧δ(v)`.  Unfold `𝒱⟦Imm⟧δ`, with `v = ℓ`: `ℓ ↦I_{@bδ} 𝒱⟦T⟧δ ⊨ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦I_{@aδ} 𝒱⟦T⟧δ`.  Apply `I⊒` with H2; choose `ℓ`.
 
-**Lean.** `BoCa.Fig16.LogRel.immSub_compat`, aliases `TR.lemma_6_167`, `TR.«⊑imm-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.immSub_compat`, aliases `TR.lemma_6_167`, `TR.«⊑imm-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.immSub_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.167). `Fig16.LogRel.immSub_compat`, on the printed carrier, `[as printed]` — `I ⊒` is `Fig16.BoLo.ptoImm_antitone` (6.114).
+**Note.** `Fig16.LogRel.immSub_compat`, on the printed carrier, `[as printed]` — `I ⊒` is `Fig16.BoLo.ptoImm_antitone` (6.114).
 -/
 /-- **`[TR]` Lemma 6.167** (`⊑imm-compat`, p. 43) `[as printed]`:
 
@@ -1149,7 +1149,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.168 (⊑mut-compat) · `[TR]` p. 43 · inventory `proved`
+## Lemma 6.168 (⊑mut-compat) · `[TR]` p. 43 · `proved`
 
 > Δ; Γ ⊨ e : Mut @b T    Δ ⊨ @a ⊑ @b
 > ─────────────────────────────────── ⊑mut
@@ -1157,7 +1157,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Printed proof, transcribed.** As Lemma 6.167, at `Mut`: apply H1 and `wp-mono`; unfold `𝒱⟦Mut⟧δ` with `v = ℓ`: `ℓ ↦M_{@bδ} 𝒱⟦T⟧δ ⊨ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦M_{@aδ} 𝒱⟦T⟧δ`.  Apply `M⊒` with H2; choose `ℓ`.
 
-**Lean.** `BoCa.Fig16.LogRel.mutSub_compat`, aliases `TR.lemma_6_168`, `TR.«⊑mut-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.mutSub_compat`, aliases `TR.lemma_6_168`, `TR.«⊑mut-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.mutSub_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 -/
@@ -1168,8 +1168,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
               Δ; Γ ⊨ e : Mut @a T
 
 The same proof at `M ⊒` (`Fig16.BoLo.ptoMut_antitone`, `[TR]` 6.118).  The
-connective is applied to `𝒱⟦T⟧δ` itself, so unlike `BoCa/Compat.lean`'s
-`mutSub_compat` nothing has to be said about a stored code. -/
+connective is applied to `𝒱⟦T⟧δ` itself, so nothing has to be said about a
+stored code. -/
 theorem mutSub_compat {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr}
     {a b : Lifetime.Life} {T : Ty}
     (h : Sem Δ Γ e (.mut b T)) (hle : Δ.EntailsLe a b) :
@@ -1195,20 +1195,20 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.169 (swap-compat) · `[TR]` p. 44 · inventory `proved`
+## Lemma 6.169 (swap-compat) · `[TR]` p. 44 · `proved`
 
 > ────────────────────────────────────────── swap
 > Δ; ∅ ⊨ swap : Ref T₁ ⊸ T₂ ⊸ Ref T₂ ⊗ T₁
 
 **Printed proof, transcribed.** Let `δ ∈ ⟦∅⟧`, `γ`.  Apply `wp-val`; unfold `𝒱⟦⊸⟧` at `v₁` and apply `wp-⊸`; apply `wp-val`, unfold `𝒱⟦⊸⟧` at `v₂` and apply `wp-⊸`: `𝒱⟦Ref T₁⟧δ(v₁) ⋆ 𝒱⟦T₂⟧δ(v₂) ⊨ wp(let z = load v₁; store v₁ v₂; (v₁, z)){𝒱⟦Ref T₂ ⊗ T₁⟧δ}`.  Unfold `let` to `(λz. store v₁ v₂; (v₁, z)) (load v₁)` and apply `wp-bind`.  Unfold `𝒱⟦Ref⟧`: `v₁ = ℓ`, `ℓ ↦ v′₁ ⋆ 𝒱⟦T₁⟧δ(v′₁) ⋆ 𝒱⟦T₂⟧δ(v₂)`.  Apply `wp-load`, `wp-⊸` and `wp-bind`; then `wp-store` and `wp-val`: `ℓ ↦ v₂ ⋆ 𝒱⟦T₁⟧δ(v′₁) ⋆ 𝒱⟦T₂⟧δ(v₂) ⊨ 𝒱⟦Ref T₂ ⊗ T₁⟧δ((ℓ, v′₁))`, which follows by folding and unfolding the `𝒱` definitions.
 
-**Lean.** `BoCa.Fig16.LogRel.swap_compat`, aliases `TR.lemma_6_169`, `TR.«swap-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.swap_compat`, aliases `TR.lemma_6_169`, `TR.«swap-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.swap_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
 **Literal reading.** `BoCa.Fig16.LogRel.swap_step_blocked_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.169). `Fig16.LogRel.swap_compat`, on the printed carrier, `[as printed]`, at `Fig16.BoLo.wp_load` and `wp_store`; [TR]'s own proof runs [CONF] Fig. 3b's body (§12.20). **Blocked over [TR] §3's own machine**, and checked: that body reduces to `store ℓ v₂; (ℓ, w)`, whose left component is not `()`, and the printed `K` grammar has no `K; e` — `Fig16.LogRel.swap_step_blocked_on_TR3` refutes `wp` at exactly that term. The row itself is typed at a `⊸`, so it is the step and not the row that is stated there.
+**Note.** `Fig16.LogRel.swap_compat`, on the printed carrier, `[as printed]`, at `Fig16.BoLo.wp_load` and `wp_store`; [TR]'s own proof runs [CONF] Fig. 3b's body (§12.20). **Blocked over [TR] §3's own machine**, and checked: that body reduces to `store ℓ v₂; (ℓ, w)`, whose left component is not `()`, and the printed `K` grammar has no `K; e` — `Fig16.LogRel.swap_step_blocked_on_TR3` refutes `wp` at exactly that term. The row itself is typed at a `⊸`, so it is the step and not the row that is stated there.
 -/
 /-- **`[TR]` Lemma 6.169** (`swap-compat`, p. 44) `[as printed]`:
 
@@ -1302,19 +1302,19 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.170 (copy-compat) · `[TR]` p. 44 · inventory `proved`
+## Lemma 6.170 (copy-compat) · `[TR]` p. 44 · `proved`
 
 > Δ ⊨ copy : Imm @a T ⊸ (Imm @a T ⊗ Imm @a T)
 
 **Printed proof, transcribed.** A table of steps.  Let `δ ∈ ⟦Δ⟧`; apply `wp-val`; let `v` be arbitrary; apply `wp⊸`: `𝒱⟦Imm @a T⟧δ(v) ⊨ 𝒱⟦Imm @a T ⊗ Imm @a T⟧δ(v, v)`.  Unfold, and choose `v₁ = v₂ = v`: `𝒱⟦Imm @a T⟧δ(v) ⊨ 𝒱⟦Imm @a T⟧δ(v) ⋆ 𝒱⟦Imm @a T⟧δ(v)`.  Unfold, substitute `v = ℓ`, unfold and simplify: `ℓ ↦I_{@aδ} 𝒱⟦T⟧ ⊨ (ℓ ↦I_{@aδ} 𝒱⟦T⟧) ⋆ (ℓ ↦I_{@aδ} 𝒱⟦T⟧)`.  Apply `I-Dup`.
 
-**Lean.** `BoCa.Fig16.LogRel.copy_compat`, aliases `TR.lemma_6_170`, `TR.«copy-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.copy_compat`, aliases `TR.lemma_6_170`, `TR.«copy-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.copy_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
 **Literal reading.** `BoCa.Fig16.LogRel.copy_step_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.170). `Fig16.LogRel.copy_compat`, on the printed carrier, `[as printed]` — `I-Dup` is `Fig16.BoLo.ptoImm_dup` (6.116). The row is typed at a `⊸`, so it is the step and not the row that is stated there.
+**Note.** `Fig16.LogRel.copy_compat`, on the printed carrier, `[as printed]` — `I-Dup` is `Fig16.BoLo.ptoImm_dup` (6.116). The row is typed at a `⊸`, so it is the step and not the row that is stated there.
 -/
 /-- **`[TR]` Lemma 6.170** (`copy-compat`, p. 44) `[as printed]`:
 `Δ ⊨ copy : Imm @a T ⊸ (Imm @a T ⊗ Imm @a T)`.
@@ -1357,7 +1357,7 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.171 (forget-compat) · `[TR]` p. 44 · inventory `proved`
+## Lemma 6.171 (forget-compat) · `[TR]` p. 44 · `proved`
 
 > Δ ⊨ forget : B ⊸ 1 for all B ∈ {Imm @a T, Mut @a T, Unk}.
 
@@ -1365,11 +1365,11 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 One lemma with three cases; Lean states one declaration per case, aliased `TR.lemma_6_171_1` (`Imm`), `_2` (`Mut`), `_3` (`Unk`).
 
-**Lean.** `BoCa.Fig16.LogRel.forgetImm_compat`, aliases `TR.lemma_6_171_1`, `TR.«forget-compat₁»`, source tag `[as printed]`; `BoCa.Fig16.LogRel.forgetMut_compat`, aliases `TR.lemma_6_171_2`, `TR.«forget-compat₂»`, source tag `[as printed]`; `BoCa.Fig16.LogRel.forgetUnk_compat`, aliases `TR.lemma_6_171_3`, `TR.«forget-compat₃»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.forgetImm_compat`, aliases `TR.lemma_6_171_1`, `TR.«forget-compat₁»`, tag `[as printed]`; `BoCa.Fig16.LogRel.forgetMut_compat`, aliases `TR.lemma_6_171_2`, `TR.«forget-compat₂»`, tag `[as printed]`; `BoCa.Fig16.LogRel.forgetUnk_compat`, aliases `TR.lemma_6_171_3`, `TR.«forget-compat₃»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.forgetImm_compatX`, in `Support/TypedWorld/Compatibility.lean`; `BoCa.Fig16.LogRel.Typed.forgetMut_compatX`, in `Support/TypedWorld/Compatibility.lean`; `BoCa.Fig16.LogRel.Typed.forgetUnk_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.171). `Fig16.LogRel.forgetImm_compat`, `forgetMut_compat`, `forgetUnk_compat`, on the printed carrier, `[as printed]` — [TR] prints one lemma with three cases and `Derives` has one constructor per case (rule 6).
+**Note.** `Fig16.LogRel.forgetImm_compat`, `forgetMut_compat`, `forgetUnk_compat`, on the printed carrier, `[as printed]` — [TR] prints one lemma with three cases and `Derives` has one constructor per case (rule 6).
 -/
 /-- **`[TR]` Lemma 6.171** (`forget-compat`, pp. 44–45) `[as printed]` at
 `B = Imm @a T`: `Δ ⊨ forget : B ⊸ 1` for all `B ∈ {Imm @a T, Mut @a T, Unk}`.
@@ -1412,11 +1412,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-- **`[TR]` Lemma 6.171** (`forget-compat`, pp. 44–45) `[as printed]` at
 `B = Mut @a T`.  The same proof at `wp-M-forget` (`[TR]` 6.148).
 
-**No unfolding step is needed here and one was needed on `ResI`.**
-`BoCa/Compat.lean`'s `forgetMut_compat` has to route through
-`LogRel.vDen_mut_ptoMut`, because its clause stores a code and `wp-M-forget` is
-stated at a predicate; the clause below *is* `ℓ ↦ M @aδ 𝒱⟦T⟧δ`, so the rule
-applies to it directly. -/
+**No unfolding step is needed.**  `wp-M-forget` is stated at a predicate, and
+the clause below *is* `ℓ ↦ M @aδ 𝒱⟦T⟧δ`, so the rule applies to it directly. -/
 theorem forgetMut_compat {Δ : LifeCtx} {Γ : Ctx Ty} {a : Lifetime.Life} {T : Ty}
     (hΓ : Ctx.Dead Γ) : Sem Δ Γ forget (axForgetMutTy a T) := by
   refine sem_iff.mpr fun δ γ ρ _ hg => ?_
@@ -1478,13 +1475,13 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 /-!
-## Lemma 6.172 (withbor-compat1) · `[TR]` p. 45 · inventory `variant`
+## Lemma 6.172 (withbor-compat1) · `[TR]` p. 45 · `variant`
 
 > Δ ⊨ withbor : Ref T₁ ⊸ (∀'a ⊏ ⨅Δ. Imm 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂
 
 **Printed proof, transcribed.** Let `T_f ≔ ∀'a ⊏ ⨅Δ. Imm 'a T₁ ⊸ ['a]T₂` and fix `δ ∈ ⟦Δ⟧`.  Apply `wp-val`, `wp⊸` and fix `v, v_f`: `𝒱⟦Ref T₁⟧δ(v) ⋆ 𝒱⟦T_f⟧δ(v_f) ⊨ wp(v, v_f () v){𝒱⟦Ref T₁ ⊗ T₂⟧δ}`.  Unfold and substitute `v = ℓ`: `ℓ ↦ v_ℓ ⋆ 𝒱⟦T₁⟧δ(v_ℓ) ⋆ 𝒱⟦T_f⟧δ(v_f) ⊨ wp(ℓ, v_f () ℓ){…}`.  Apply ImmFrame (6.64): `𝒱⟦T_f⟧(v_f) ⊨ Иα. ℓ ↦I_α 𝒱⟦T₁⟧δ(v_ℓ) –⋆ wp(ℓ, v_f () ℓ){[α](ℓ ↦ v_ℓ –⋆ 𝒱⟦T₁⟧δ(v_ℓ) –⋆ 𝒱⟦Ref T₁ ⊗ T₂⟧δ)}`.  Unfold `𝒱⟦Ref T₁ ⊗ T₂⟧δ` to `P̂`; apply `wp-bind`; choose `v₁ ≔ ℓ`, `v₂ ≔ v₂`; unfold `𝒱⟦Ref T₁⟧δ`; choose `v_ℓ ≔ v_ℓ` and cancel `ℓ ↦ v_ℓ`, `𝒱⟦T₁⟧δ(v_ℓ)`; apply `wp-val`: `𝒱⟦T_f⟧δ(v_f) ⊨ Иα. ℓ ↦I_α 𝒱⟦T₁⟧δ(v_ℓ) –⋆ wp(v_f () ℓ){v₂. [α]𝒱⟦T₂⟧δ(v₂)}`.  Unfold `T_f`.  Apply `ИR` on the left; fix `α ⊏ ⨅δ` by `И-mono`; apply `–⋆R`.  Fold and simplify, using that `'b` does not occur free in `T₁` or `T₂`: `𝒱⟦T_f⟧δ(v_f) ⋆ 𝒱⟦Imm 'a T₁⟧δ['a↦α](ℓ) ⊨ wp(v_f () ℓ){v₂. 𝒱⟦['a]T₂⟧δ['a↦α](v₂)}`.  Follows from `∀E-compat` and `⊸E-compat`.
 
-**Lean.** `BoCa.Fig16.LogRel.withbor1_compat`, aliases `TR.lemma_6_172`, `TR.«withbor-compat1»`, source tag `[variant: the printed statement is kept and two hypotheses are added, each the
+**Lean.** `BoCa.Fig16.LogRel.withbor1_compat`, aliases `TR.lemma_6_172`, `TR.«withbor-compat1»`, tag `[variant: the printed statement is kept and two hypotheses are added, each the
 content of one sentence of the printed proof — `hfree₁`/`hfree₂`, the binder
 convention its last step folds by]`.
 
@@ -1492,7 +1489,7 @@ convention its last step folds by]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.withbor1_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.172). `Fig16.LogRel.withbor1_compat`, on the printed carrier, conclusion exactly as printed — `Δ ⊨ withbor : Ref T₁ ⊸ (∀'a ⊏ ⊓Δ. Imm 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂`, `⊓Δ` being `Lifetime.LifeCtx.meetOfDom` (§12.15) and the page's schematic binder a parameter `x` (§12.44). `[variant: `hfree₁ : ¬LFree x T₁` and `hfree₂ : ¬LFree x T₂` are added]` — p. 46's *"Fold and simplify, using that `'b` does not occur free in `T₁` or `T₂`"*, the convention a named binder has and a schematic `x` does not. They constrain the printed statement's own `T₁` and `T₂`, which is what rule 5 demotes on. `Fig16.LogRel.wp_I_frame` is [TR] 6.64 (`Imm Frame`, p. 22) at this file's `wp`, which is the proof's "Apply ImmFrame" step; it is **proved**, so `#print axioms` is the three and this row stands on no `axiom`. **The rest of the proof is p. 45's, step for step:** `wp-val`, `𝒱⟦⊸⟧` and `wp-⊸` twice, unfold `𝒱⟦Ref T₁⟧` to `ℓ ↦ vℓ ⋆ 𝒱⟦T₁⟧δ(vℓ)`, `ImmFrame`, `wp-bind` and `wp-ret` at `(ℓ, vf () ℓ)`, the `𝒱⟦Ref T₁ ⊗ T₂⟧δ` unfold at `v₁ ≔ ℓ`, `v₂ ≔ v″`, `vℓ ≔ vℓ` — the **same** `vℓ`, `ImmFrame` returning the value it lent — then "the remainder … from the step 'Unfold Tf' onwards": `⋔r` at `@ρ₂`, `⋔-mono` down to `⊓Δδ` (defined at every `δ ⊨ Δ` by `Lifetime.meetOfDomL_wf`), `─⋆R`, the fold, and the callback's own `𝒱⟦∀⟧` and `𝒱⟦⊸⟧`. **What a consumer carries:** `Ctx.Dead Γ`; `Δ.find? x = none`, which is printed and **spent nowhere** because `𝒱⟦∀⟧` is instantiated at `α` directly where [TR] closes through `∀E-compat` (§12.32); and the two freshnesses. `Fig16.LogRel.Withbor1Side` is exactly that pair, `Fig16.LogRel.DerivesIn` asks it of every `withbor1Ax` node, `Fig16.LogRel.withbor1Side_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withbor1_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withbor1`.
+**Note.** `Fig16.LogRel.withbor1_compat`, on the printed carrier, conclusion exactly as printed — `Δ ⊨ withbor : Ref T₁ ⊸ (∀'a ⊏ ⊓Δ. Imm 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂`, `⊓Δ` being `Lifetime.LifeCtx.meetOfDom` (§12.15) and the page's schematic binder a parameter `x` (§12.44). `[variant: `hfree₁ : ¬LFree x T₁` and `hfree₂ : ¬LFree x T₂` are added]` — p. 46's *"Fold and simplify, using that `'b` does not occur free in `T₁` or `T₂`"*, the convention a named binder has and a schematic `x` does not. They constrain the printed statement's own `T₁` and `T₂`, which is what rule 5 demotes on. `Fig16.LogRel.wp_I_frame` is [TR] 6.64 (`Imm Frame`, p. 22) at this file's `wp`, which is the proof's "Apply ImmFrame" step; it is **proved**, so `#print axioms` is the three and this row stands on no `axiom`. **The rest of the proof is p. 45's, step for step:** `wp-val`, `𝒱⟦⊸⟧` and `wp-⊸` twice, unfold `𝒱⟦Ref T₁⟧` to `ℓ ↦ vℓ ⋆ 𝒱⟦T₁⟧δ(vℓ)`, `ImmFrame`, `wp-bind` and `wp-ret` at `(ℓ, vf () ℓ)`, the `𝒱⟦Ref T₁ ⊗ T₂⟧δ` unfold at `v₁ ≔ ℓ`, `v₂ ≔ v″`, `vℓ ≔ vℓ` — the **same** `vℓ`, `ImmFrame` returning the value it lent — then "the remainder … from the step 'Unfold Tf' onwards": `⋔r` at `@ρ₂`, `⋔-mono` down to `⊓Δδ` (defined at every `δ ⊨ Δ` by `Lifetime.meetOfDomL_wf`), `─⋆R`, the fold, and the callback's own `𝒱⟦∀⟧` and `𝒱⟦⊸⟧`. **What a consumer carries:** `Ctx.Dead Γ`; `Δ.find? x = none`, which is printed and **spent nowhere** because `𝒱⟦∀⟧` is instantiated at `α` directly where [TR] closes through `∀E-compat` (§12.32); and the two freshnesses. `Fig16.LogRel.Withbor1Side` is exactly that pair, `Fig16.LogRel.DerivesIn` asks it of every `withbor1Ax` node, `Fig16.LogRel.withbor1Side_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withbor1_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withbor1`.
 -/
 /-- **`[TR]` Lemma 6.172** (`withbor-compat1`, p. 45):
 
@@ -1622,20 +1619,20 @@ theorem withbor1Side_unit (x : LifeVar) : Withbor1Side x .unit .unit :=
   ⟨fun h => h, fun h => h⟩
 
 /-!
-## Lemma 6.173 (withbor-compat2) · `[TR]` p. 46 · inventory `variant`
+## Lemma 6.173 (withbor-compat2) · `[TR]` p. 46 · `variant`
 
 > If Δ ⊢ T₁ ⊐ @b then Δ ⊨ withbor : Ref T₁ ⊸ (∀'a ⊏ ⨅Δ. Mut 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂
 
 **Printed proof, transcribed.** Let `T_f = ∀'a ⊏ ⨅Δ. Mut 'a T₁ ⊸ ['a]T₂`.  Follow the proof of Lemma 6.172 up to the point where ImmFrame is applied: `ℓ ↦ v_ℓ ⋆ 𝒱⟦T₁⟧δ(v_ℓ) ⋆ 𝒱⟦T_f⟧δ(v_f) ⊨ wp(ℓ, v_f () ℓ){𝒱⟦Ref T₁ ⊗ T₂⟧δ}`.  Since `Δ ⊢ T₁ ⊐ @b`, Lemma 6.60 gives `𝒱⟦T₁⟧δ ⊨ [@bδ]𝒱⟦T₁⟧δ`, so MutFrame (6.65) applies: `𝒱⟦T_f⟧δ(v_f) ⊨ Иα. ℓ ↦M_α 𝒱⟦T₁⟧δ –⋆ wp(ℓ, v_f () ℓ){[α] ∀v′. ℓ ↦ v′ –⋆ 𝒱⟦T₁⟧δ(v′) –⋆ 𝒱⟦Ref T₁ ⊗ T₂⟧δ}`.  Apply `wp-bind`, `wp-ret`; unfold `𝒱⟦Ref T₁ ⊗ T₂⟧δ` and simplify; choose `v₁ ≔ ℓ`, `v₂ ≔ v″`, `v_ℓ ≔ v′`; cancel `ℓ ↦ v′`, `𝒱⟦T₁⟧δ(v′)`: `𝒱⟦T_f⟧δ(v_f) ⊨ Иα. ℓ ↦M_α 𝒱⟦T₁⟧δ –⋆ wp(v_f () ℓ){v″. [α]𝒱⟦T₂⟧δ(v″)}`.  The remainder follows the proof of Lemma 6.172 from the step "Unfold `T_f`" onwards.
 
-**Lean.** `BoCa.Fig16.LogRel.withbor2_compat`, aliases `TR.lemma_6_173`, `TR.«withbor-compat2»`, source tag `[variant: the printed hypothesis is kept and two are added, `hfree₁`/`hfree₂`,
+**Lean.** `BoCa.Fig16.LogRel.withbor2_compat`, aliases `TR.lemma_6_173`, `TR.«withbor-compat2»`, tag `[variant: the printed hypothesis is kept and two are added, `hfree₁`/`hfree₂`,
 the binder convention its last step folds by]`.
 
 **Also here.** `BoCa.Fig16.LogRel.withbor2Side_unit`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.withbor2_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.173). `Fig16.LogRel.withbor2_compat`, on the printed carrier, conclusion exactly as printed — "If `Δ ⊢ T₁ ⊐ @b` then `Δ ⊨ withbor : Ref T₁ ⊸ (∀'a ⊏ ⊓Δ. Mut 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂`". The printed side condition is carried as `hside`, read existentially because `@b` is bound nowhere else in the rule (§12.9) and `Δ ⊢ T ⊐ @a` presupposes `Δ ⊨ @a` (§C.25), and it is **spent where p. 46 spends it**: *"Since `Δ ⊢ T₁ ⊐ @b`, theorem 6.60 gives `𝒱⟦T₁⟧δ ⊨ [@bδ] 𝒱⟦T₁⟧δ`, so MutFrame applies"* is `Fig16.LogRel.vDen_outlives` at `@bδ`. `[variant: `hfree₁`/`hfree₂` are added, as at 6.172]`. **It spends no `axiom`.**  The [TR] 6.65 (`Mut Frame`, p. 24) it stands on is `Fig16.LogRel.wp_M_frame`, proved, so `#print axioms` is `[propext, Classical.choice, Quot.sound]`. The row stays `variant` for its added hypotheses alone. **The rest of the proof is p. 46's:** follow 6.172 "up to the point where ImmFrame is applied", then `MutFrame`; `wp-bind` and `wp-ret` at `(ℓ, vf () ℓ)`; the `𝒱⟦Ref T₁ ⊗ T₂⟧δ` unfold at `v₁ ≔ ℓ`, `v₂ ≔ v″`, `vℓ ≔ v′`, which cancels `ℓ ↦ v′ ⋆ 𝒱⟦T₁⟧δ(v′)` against `MutFrame`'s `∀v′`; and "the remainder … from the step 'Unfold Tf' onwards" as at 6.172. **What a consumer carries:** `Ctx.Dead Γ`, the printed `Δ.find? x = none` (unspent, §12.32), `hside` and the two freshnesses. `Fig16.LogRel.Withbor2Side` is the last two, `Fig16.LogRel.DerivesIn` asks it of every `withbor2Ax` node, `Fig16.LogRel.withbor2Side_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withbor2_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withbor2`.
+**Note.** `Fig16.LogRel.withbor2_compat`, on the printed carrier, conclusion exactly as printed — "If `Δ ⊢ T₁ ⊐ @b` then `Δ ⊨ withbor : Ref T₁ ⊸ (∀'a ⊏ ⊓Δ. Mut 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂`". The printed side condition is carried as `hside`, read existentially because `@b` is bound nowhere else in the rule (§12.9) and `Δ ⊢ T ⊐ @a` presupposes `Δ ⊨ @a` (§C.25), and it is **spent where p. 46 spends it**: *"Since `Δ ⊢ T₁ ⊐ @b`, theorem 6.60 gives `𝒱⟦T₁⟧δ ⊨ [@bδ] 𝒱⟦T₁⟧δ`, so MutFrame applies"* is `Fig16.LogRel.vDen_outlives` at `@bδ`. `[variant: `hfree₁`/`hfree₂` are added, as at 6.172]`. **It spends no `axiom`.**  The [TR] 6.65 (`Mut Frame`, p. 24) it stands on is `Fig16.LogRel.wp_M_frame`, proved, so `#print axioms` is `[propext, Classical.choice, Quot.sound]`. The row stays `variant` for its added hypotheses alone. **The rest of the proof is p. 46's:** follow 6.172 "up to the point where ImmFrame is applied", then `MutFrame`; `wp-bind` and `wp-ret` at `(ℓ, vf () ℓ)`; the `𝒱⟦Ref T₁ ⊗ T₂⟧δ` unfold at `v₁ ≔ ℓ`, `v₂ ≔ v″`, `vℓ ≔ v′`, which cancels `ℓ ↦ v′ ⋆ 𝒱⟦T₁⟧δ(v′)` against `MutFrame`'s `∀v′`; and "the remainder … from the step 'Unfold Tf' onwards" as at 6.172. **What a consumer carries:** `Ctx.Dead Γ`, the printed `Δ.find? x = none` (unspent, §12.32), `hside` and the two freshnesses. `Fig16.LogRel.Withbor2Side` is the last two, `Fig16.LogRel.DerivesIn` asks it of every `withbor2Ax` node, `Fig16.LogRel.withbor2Side_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withbor2_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withbor2`.
 -/
 /-- **`[TR]` Lemma 6.173** (`withbor-compat2`, p. 46): if `Δ ⊢ T₁ ⊐ @b` then
 
@@ -1771,20 +1768,20 @@ theorem withbor2Side_unit (x : LifeVar) : Withbor2Side x .unit .unit :=
   ⟨fun h => h, fun h => h⟩
 
 /-!
-## Lemma 6.174 (withbor-compat3) · `[TR]` p. 47 · inventory `variant`
+## Lemma 6.174 (withbor-compat3) · `[TR]` p. 47 · `variant`
 
 > Δ ⊨ withbor : Mut @a T₁ ⊸ (∀'b ⊏ ⨅Δ. Mut 'b T₁ ⊸ ['b]T₂) ⊸ Mut @a T₁ ⊗ T₂
 
 **Printed proof, transcribed.** Let `T_f = ∀'b ⊏ ⨅Δ. Mut 'b T₁ ⊸ ['b]T₂` and fix `δ ∈ ⟦Δ⟧`.  Apply `wp-val`, `wp⊸` and fix `v, v_f`.  Unfold, let `α ≔ @aδ` and substitute `v = ℓ`: `ℓ ↦M_α 𝒱⟦T₁⟧δ ⋆ 𝒱⟦T_f⟧(v_f) ⊨ wp(ℓ, v_f () ℓ){𝒱⟦Mut @a T₁ ⊗ T₂⟧δ}`.  Apply AntiFrame (6.66); apply `∀R`, `–⋆R`: `𝒱⟦T_f⟧(v_f) ⋆ ℓ ↦ v ⋆ 𝒱⟦T₁⟧δ(v) ⊨ wp(ℓ, v_f () ℓ){v′. ∃v. ℓ ↦ v ⋆ 𝒱⟦T₁⟧δ(v) ⋆ (ℓ ↦M_α 𝒱⟦T₁⟧δ(v) –⋆ 𝒱⟦Mut @a T₁ ⊗ T₂⟧δ(v′))}`.  Apply `wp-bind`, `wp-val`; simplify `𝒱⟦Mut @a T₁ ⊗ T₂⟧δ(ℓ, v″)`; cancel `ℓ ↦M_α 𝒱⟦T₁⟧δ(v)`: `… ⊨ wp(v_f () ℓ){v″. ∃v. ℓ ↦ v ⋆ 𝒱⟦T₁⟧δ(v) ⋆ 𝒱⟦T₂⟧δ(v″)}`.  *"Have `Δ ⊢ T₁ ⊐ @a` by well-formedness of the type `Mut @a T₁`, hence `𝒱⟦T₁⟧δ ⊨ [α]𝒱⟦T₁⟧δ` by theorem 6.60, so MutFrame applies"*: `𝒱⟦T_f⟧(v_f) ⊨ Иα. ℓ ↦M_α 𝒱⟦T₁⟧δ –⋆ wp(v_f () ℓ){v″. [α] ∀v′. ℓ ↦ v′ –⋆ 𝒱⟦T₁⟧δ(v′) –⋆ ∃v. ℓ ↦ v ⋆ 𝒱⟦T₁⟧δ(v) ⋆ 𝒱⟦T₂⟧δ(v″)}`.  In the postcondition choose `v ≔ v′` and cancel.  The remainder follows the proof of Lemma 6.172 from the step "Unfold `T_f`" onwards.
 
-**Lean.** `BoCa.Fig16.LogRel.withbor3_compat`, aliases `TR.lemma_6_174`, `TR.«withbor-compat3»`, source tag `[variant: the printed statement carries no side condition; two hypotheses are
+**Lean.** `BoCa.Fig16.LogRel.withbor3_compat`, aliases `TR.lemma_6_174`, `TR.«withbor-compat3»`, tag `[variant: the printed statement carries no side condition; two hypotheses are
 added, `hfree₁`/`hfree₂`, 6.172's binder convention, which 6.174 inherits]`.
 
 **Also here.** `BoCa.Fig16.LogRel.withbor3Side_unit`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.withbor3_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.174). `Fig16.LogRel.withbor3_compat`, on the printed carrier, conclusion exactly as printed — `Δ ⊨ withbor : Mut @a T₁ ⊸ (∀'b ⊏ ⊓Δ. Mut 'b T₁ ⊸ ['b]T₂) ⊸ Mut @a T₁ ⊗ T₂`, and the printed statement carries **no** side condition. `[variant: `hfree₁`/`hfree₂` are added, 6.172's binder convention that 6.174 inherits]`. **`MutFrame`'s premise.**  p. 47 reads it as *"Have `Δ ⊢ T₁ ⊐ @a` by well-formedness of the type `Mut @a T₁`, hence `𝒱⟦T₁⟧δ ⊨ [α] 𝒱⟦T₁⟧δ` by theorem 6.60, so MutFrame applies"*; [TR] p. 2's `Δ ⊢ Mut @a T` has the premises `Δ ⊢ T` and `Δ ⊨ @a` and not `Δ ⊢ T ⊐ @a` (definition row 2.28, §12.32), so that antecedent is not a premise p. 2 supplies at the node. This route reads the entailment off the `Mut` connective instead: the borrow in hand is `ℓ ↦ mut(β, v, ρ′, P̂)` with `P̂ : Val → SProp_β` (`Fig16.BoLo.ptoMut`, the `Supported` content `Fig16.LogRel.vDen_mut_supported` reads), so `𝒱⟦T₁⟧δ ⊨ [β] 𝒱⟦T₁⟧δ` at the cell's own `β`. The row stays `variant` for its added hypotheses alone. **The rest of the proof is p. 47's:** `wp-val`, `𝒱⟦⊸⟧` and `wp-⊸` twice, unfold `𝒱⟦Mut @a T₁⟧` to `ℓ ↦ M α₀ 𝒱⟦T₁⟧δ` with `α₀ = @aδ`; `AntiFrame`, which trades that borrow for the owned cell and its payload for the length of one run; `∀R`, `─⋆R` — from here the resources in hand are 6.173's after its `𝒱⟦Ref T₁⟧` unfold, so the remainder is that proof, "from 'Unfold Tf' onwards". The one change is the last fold: `AntiFrame`'s wand hands the mutable borrow back, so `ℓ ↦ M α₀ 𝒱⟦T₁⟧δ ⋆ 𝒱⟦T₂⟧δ(v″)` folds to `𝒱⟦Mut @a T₁ ⊗ T₂⟧δ((ℓ, v″))`. The `mut` cell is therefore **received and returned, never built**, so this row does not pay for the `𝒱⟦Mut⟧` emptiness this section's preamble records. **What a consumer carries:** `Ctx.Dead Γ`, the printed `Δ.find? x = none` (unspent) and the two freshnesses. `Fig16.LogRel.Withbor3Side` is the last two — the same two `Fig16.LogRel.Withbor2Side` asks — `Fig16.LogRel.DerivesIn` asks it of every `withbor3Ax` node, `Fig16.LogRel.withbor3Side_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withbor3_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withbor3`.
+**Note.** `Fig16.LogRel.withbor3_compat`, on the printed carrier, conclusion exactly as printed — `Δ ⊨ withbor : Mut @a T₁ ⊸ (∀'b ⊏ ⊓Δ. Mut 'b T₁ ⊸ ['b]T₂) ⊸ Mut @a T₁ ⊗ T₂`, and the printed statement carries **no** side condition. `[variant: `hfree₁`/`hfree₂` are added, 6.172's binder convention that 6.174 inherits]`. **`MutFrame`'s premise.**  p. 47 reads it as *"Have `Δ ⊢ T₁ ⊐ @a` by well-formedness of the type `Mut @a T₁`, hence `𝒱⟦T₁⟧δ ⊨ [α] 𝒱⟦T₁⟧δ` by theorem 6.60, so MutFrame applies"*; [TR] p. 2's `Δ ⊢ Mut @a T` has the premises `Δ ⊢ T` and `Δ ⊨ @a` and not `Δ ⊢ T ⊐ @a` (definition row 2.28, §12.32), so that antecedent is not a premise p. 2 supplies at the node. This route reads the entailment off the `Mut` connective instead: the borrow in hand is `ℓ ↦ mut(β, v, ρ′, P̂)` with `P̂ : Val → SProp_β` (`Fig16.BoLo.ptoMut`, the `Supported` content `Fig16.LogRel.vDen_mut_supported` reads), so `𝒱⟦T₁⟧δ ⊨ [β] 𝒱⟦T₁⟧δ` at the cell's own `β`. The row stays `variant` for its added hypotheses alone. **The rest of the proof is p. 47's:** `wp-val`, `𝒱⟦⊸⟧` and `wp-⊸` twice, unfold `𝒱⟦Mut @a T₁⟧` to `ℓ ↦ M α₀ 𝒱⟦T₁⟧δ` with `α₀ = @aδ`; `AntiFrame`, which trades that borrow for the owned cell and its payload for the length of one run; `∀R`, `─⋆R` — from here the resources in hand are 6.173's after its `𝒱⟦Ref T₁⟧` unfold, so the remainder is that proof, "from 'Unfold Tf' onwards". The one change is the last fold: `AntiFrame`'s wand hands the mutable borrow back, so `ℓ ↦ M α₀ 𝒱⟦T₁⟧δ ⋆ 𝒱⟦T₂⟧δ(v″)` folds to `𝒱⟦Mut @a T₁ ⊗ T₂⟧δ((ℓ, v″))`. The `mut` cell is therefore **received and returned, never built**, so this row does not pay for the `𝒱⟦Mut⟧` emptiness this section's preamble records. **What a consumer carries:** `Ctx.Dead Γ`, the printed `Δ.find? x = none` (unspent) and the two freshnesses. `Fig16.LogRel.Withbor3Side` is the last two — the same two `Fig16.LogRel.Withbor2Side` asks — `Fig16.LogRel.DerivesIn` asks it of every `withbor3Ax` node, `Fig16.LogRel.withbor3Side_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withbor3_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withbor3`.
 -/
 /-- **`[TR]` Lemma 6.174** (`withbor-compat3`, p. 47):
 
@@ -1809,7 +1806,7 @@ hands the mutable borrow back, so `ℓ ↦ M α₀ 𝒱⟦T₁⟧δ ⋆ 𝒱⟦T
 **`MutFrame`'s premise.**  The print reads it as "Have `Δ ⊢ T₁ ⊐ @a` by
 well-formedness of the type `Mut @a T₁`, hence `𝒱⟦T₁⟧δ ⊨ [α] 𝒱⟦T₁⟧δ` by
 theorem 6.60".  `[TR]` p. 2's `Δ ⊢ Mut @a T` has the premises `Δ ⊢ T` and
-`Δ ⊨ @a` and not `Δ ⊢ T ⊐ @a` (`docs/definition-inventory.md` row 2.28), so
+`Δ ⊨ @a` and not `Δ ⊢ T ⊐ @a` (definition row 2.28), so
 that antecedent is not a premise p. 2 supplies at this node.  This route reads
 the entailment off the `Mut` connective instead: the borrow in hand is
 `ℓ ↦ mut(β, v, ρ′, P̂)` with `P̂ : Val → SProp_β` (`Fig16.BoLo.ptoMut`, the
@@ -1932,7 +1929,7 @@ theorem withbor3Side_unit (x : LifeVar) : Withbor3Side x .unit .unit :=
   ⟨fun h => h, fun h => h⟩
 
 /-!
-## Lemma 6.175 (withload-compat) · `[TR]` p. 47 · inventory `proved*`
+## Lemma 6.175 (withload-compat) · `[TR]` p. 47 · `proved*`
 
 > Δ ⊨ withload : Imm @a T₁ ⊸ (∀'b ⊏ ⨅Δ. Imm̲ 'b T₁ ⊸ ['b]T₂) ⊸ T₂
 
@@ -1944,7 +1941,7 @@ theorem withbor3Side_unit (x : LifeVar) : Withbor3Side x .unit .unit :=
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.withload_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.175). `Fig16.LogRel.withload_compat`, on the printed carrier, conclusion exactly as printed, `[restricted: to `hfree₁` (6.132's), `hesc` (6.150's) and `hfree₂`]`. The proof is p. 48's, step for step, and every step spends the rule it names: `wp⊸`/`wp-val` at the two `𝒱⟦⊸⟧` unfolds, `wp-bind` (6.135) at `load ℓ`, **`wp-load-I` (6.144, `Fig16.BoLo.wp_load_I`)**, **`↺V₂` (6.132, `Fig16.LogRel.reborrow_vDen_fresh`)** under `I-mono` (6.113) and `⋆mono` (6.92), **6.134 (`Fig16.LogRel.pure_sep_reborrow_vDen_fresh`)**, **theorem 6.150 (`Fig16.BoLo.wp_reborrow`)**, then `ИR` (6.110) and `И-mono` (6.108) on the callback, `─⋆R`, `Fig16.LogRel.vDen_extend_of_not_free` for *"`𝒱⟦T₂⟧δ = 𝒱⟦T₂⟧δ['b↦β]` because `'b` does not occur free in `T₂`"*, and the fold of `ℰ⟦−⟧` against the callback's own `𝒱⟦∀⟧` and `𝒱⟦⊸⟧`. **What it inherits and nothing more.**  `hfree₁` is 6.132's own *"if `'a` not free in `T`"*; `hesc` is `Fig16.BoLo.RebEscrow` — 6.150's own inheritance from 6.55 — at this proof's `P̂`, and `Fig16.LogRel.withload_hesc_unit` inhabits it at `T₁ = 1`; `hfree₂` is the closing sentence. `Δ.find? x = none` is carried as printed and spent nowhere (§12.32). **The shape of `P̂` at the 6.150 step.**  `wp-load-I` leaves `(v′. ⌜v_ℓ = v′⌝ ⋆ 𝒱⟦T₁⟧δ(v_ℓ))` — 6.144's own printing, where p. 48's display writes the second factor at `v′`; the pin makes the two one proposition. `↺V₂` and 6.134 put it in 6.150's `Иβ. ↺_β P̂` shape at `P̂ ≔ (β, v′). ⌜v_ℓ = v′⌝ ⋆ 𝒱⟦Imm̲ 'x T₁⟧δ['x↦β](v_ℓ)`, whose `β` is bound by that `Иβ` — which is why `Fig16.BoLo.wp_reborrow`'s `P̂` is `Life → Val → SProp` and not `Val → SProp` (`docs/boca-rules.md` §12.61)  **What a consumer carries.**  `Fig16.LogRel.WithloadSide` is the three hypotheses that name the node — `hesc`, `hfree₁` and `hfree₂` — `Fig16.LogRel.DerivesIn` asks it of every `withloadAx` node, `Fig16.LogRel.withloadSide_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withloadSide_of_wfB` derives its two freshnesses from [TR] p. 2's `Δ ⊢ T`. With those, `withload_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withload`, which it did not inhabit before. **At the repaired judgment.**  `Fig16.LogRel.Typed.withload_compatX` is this proof at `Fig16.LogRel.Typed.SemX`, step for step, with **no `hesc`**: "Apply theorem 6.150" is `Fig16.LogRel.Typed.wpTS_reborrow`, its chooser read off the `CohE` the argument's own `𝒱X⟦Imm @a T₁⟧` carries at the loaded cell (§12.71). `[restricted: to `hfree₁` and `hfree₂`]`, and `Fig16.LogRel.Typed.fundamental` derives both from p. 2's `Δ ⊢ T` at the node (`BoCa.scopedB_axWithloadTy`), as `Fig16.LogRel.withloadSide_of_wfB` does here
+**Note.** `Fig16.LogRel.withload_compat`, on the printed carrier, conclusion exactly as printed, `[restricted: to `hfree₁` (6.132's), `hesc` (6.150's) and `hfree₂`]`. The proof is p. 48's, step for step, and every step spends the rule it names: `wp⊸`/`wp-val` at the two `𝒱⟦⊸⟧` unfolds, `wp-bind` (6.135) at `load ℓ`, **`wp-load-I` (6.144, `Fig16.BoLo.wp_load_I`)**, **`↺V₂` (6.132, `Fig16.LogRel.reborrow_vDen_fresh`)** under `I-mono` (6.113) and `⋆mono` (6.92), **6.134 (`Fig16.LogRel.pure_sep_reborrow_vDen_fresh`)**, **theorem 6.150 (`Fig16.BoLo.wp_reborrow`)**, then `ИR` (6.110) and `И-mono` (6.108) on the callback, `─⋆R`, `Fig16.LogRel.vDen_extend_of_not_free` for *"`𝒱⟦T₂⟧δ = 𝒱⟦T₂⟧δ['b↦β]` because `'b` does not occur free in `T₂`"*, and the fold of `ℰ⟦−⟧` against the callback's own `𝒱⟦∀⟧` and `𝒱⟦⊸⟧`. **What it inherits and nothing more.**  `hfree₁` is 6.132's own *"if `'a` not free in `T`"*; `hesc` is `Fig16.BoLo.RebEscrow` — 6.150's own inheritance from 6.55 — at this proof's `P̂`, and `Fig16.LogRel.withload_hesc_unit` inhabits it at `T₁ = 1`; `hfree₂` is the closing sentence. `Δ.find? x = none` is carried as printed and spent nowhere (§12.32). **The shape of `P̂` at the 6.150 step.**  `wp-load-I` leaves `(v′. ⌜v_ℓ = v′⌝ ⋆ 𝒱⟦T₁⟧δ(v_ℓ))` — 6.144's own printing, where p. 48's display writes the second factor at `v′`; the pin makes the two one proposition. `↺V₂` and 6.134 put it in 6.150's `Иβ. ↺_β P̂` shape at `P̂ ≔ (β, v′). ⌜v_ℓ = v′⌝ ⋆ 𝒱⟦Imm̲ 'x T₁⟧δ['x↦β](v_ℓ)`, whose `β` is bound by that `Иβ` — which is why `Fig16.BoLo.wp_reborrow`'s `P̂` is `Life → Val → SProp` and not `Val → SProp` (`docs/adjudications.md` §12.61)  **What a consumer carries.**  `Fig16.LogRel.WithloadSide` is the three hypotheses that name the node — `hesc`, `hfree₁` and `hfree₂` — `Fig16.LogRel.DerivesIn` asks it of every `withloadAx` node, `Fig16.LogRel.withloadSide_unit` inhabits it at `T₁ = T₂ = 1`, and `Fig16.LogRel.withloadSide_of_wfB` derives its two freshnesses from [TR] p. 2's `Δ ⊢ T`. With those, `withload_compat` is the term for `Fig16.LogRel.fundamental_of_open`'s `open_withload`, which it did not inhabit before. **At the repaired judgment.**  `Fig16.LogRel.Typed.withload_compatX` is this proof at `Fig16.LogRel.Typed.SemX`, step for step, with **no `hesc`**: "Apply theorem 6.150" is `Fig16.LogRel.Typed.wpTS_reborrow`, its chooser read off the `CohE` the argument's own `𝒱X⟦Imm @a T₁⟧` carries at the loaded cell (§12.71). `[restricted: to `hfree₁` and `hfree₂`]`, and `Fig16.LogRel.Typed.fundamental` derives both from p. 2's `Δ ⊢ T` at the node (`BoCa.scopedB_axWithloadTy`), as `Fig16.LogRel.withloadSide_of_wfB` does here
 -/
 /-- **`[TR]` Lemma 6.175** (`withload-compat`, pp. 47–48):
 
@@ -1986,7 +1983,7 @@ moves the pin inside the `⋔β. ↺_β`, which is what puts the family in the s
 **The three added hypotheses.**  `hfree₁` is `↺V₂`'s own *"if `'a` not free
 in `T`"* (6.132).  `hesc` is `RebEscrow` at the `P̂`
 above, which is what `[TR]` 6.150 inherits from 6.55 — the sentence p. 18
-asserts inside 6.55's proof and `ag(ρ)` defined (`BoCa/RebWp.lean` §1) — read at
+asserts inside 6.55's proof and `ag(ρ)` defined — read at
 this proof's own reborrows; the `δ` and `v_ℓ` it quantifies over are the two
 this proof binds before 6.150 is reached.  `hfree₂` is the closing sentence
 *"because `'b` does not occur free in `T₂`"*.  `Δ.find? x = none` is carried as
@@ -2145,18 +2142,18 @@ theorem withloadSide_of_wfB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
   withloadSide_of_scopedB hesc hx (Ty.scopedB_of_wfB h₁) (Ty.scopedB_of_wfB h₂)
 
 /-!
-## Lemma 6.176 (withswap-compat) · `[TR]` p. 48 · inventory `proved`
+## Lemma 6.176 (withswap-compat) · `[TR]` p. 48 · `proved`
 
 > ─────────────────────────────────────────────────────────── withswap
 > Δ; ∅ ⊨ withswap : Mut @a T₁ ⊸ (T₁ ⊸ T₁ ⊗ T₂) ⊸ Mut @a T₁ ⊗ T₂
 
 **Printed proof, transcribed.** Let `δ ∈ ⟦Δ⟧`.  Unfold `𝒱⟦⊸⟧` at `v₁`; apply `wp-⊸` and `wp-val`; unfold `𝒱⟦⊸⟧` at `v_f`; apply `wp-⊸`: `𝒱⟦Mut @a T₁⟧δ(v₁) ⋆ 𝒱⟦T₁ ⊸ T₁ ⊗ T₂⟧δ(v_f) ⊨ wp(let (y, z) = v_f (load v₁); store v₁ y; (v₁, z)){𝒱⟦Mut @a T₁ ⊗ T₂⟧δ}`.  Unfold `𝒱⟦Mut⟧`, `v₁ = ℓ`.  Apply `wp-m-anti-frame` (6.66) at an arbitrary `v₂`: the antecedent becomes `ℓ ↦ v₂ ⋆ 𝒱⟦T₁⟧δ(v₂) ⋆ 𝒱⟦T₁ ⊸ T₁ ⊗ T₂⟧δ(v_f)` and the postcondition `∃v. ℓ ↦ v ⋆ 𝒱⟦T₁⟧δ(v) ⋆ (ℓ ↦M_{@aδ} 𝒱⟦T₁⟧δ –⋆ 𝒱⟦Mut @a T₁ ⊗ T₂⟧δ)`.  Apply `wp-bind` at `load ℓ` and `wp-load`; instantiate `𝒱⟦T₁ ⊸ T₁ ⊗ T₂⟧δ(v_f)` with `𝒱⟦T₁⟧δ(v₂)`; apply `wp-bind` at `f v₂` and `wp-mono`; unfold `𝒱⟦⊗⟧` at `v₃, v₄`; apply `wp-⊗`; apply `wp-bind` at `store ℓ v₃`, `wp-store`, `wp-1` and `wp-val`: `ℓ ↦ v₃ ⋆ 𝒱⟦T₁⟧δ(v₃) ⋆ 𝒱⟦T₂⟧δ(v₄) ⊨ ∃v. …`.  Choose `v ≔ v₃`: `𝒱⟦T₂⟧δ(v₄) ⋆ ℓ ↦M_{@aδ} 𝒱⟦T₁⟧δ ⊨ 𝒱⟦Mut @a T₁ ⊗ T₂⟧δ((ℓ, v₄))`, which follows from the `𝒱` definitions.
 
-**Lean.** `BoCa.Fig16.LogRel.withswap_compat`, aliases `TR.lemma_6_176`, `TR.«withswap-compat»`, source tag `[as printed]`.
+**Lean.** `BoCa.Fig16.LogRel.withswap_compat`, aliases `TR.lemma_6_176`, `TR.«withswap-compat»`, tag `[as printed]`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.withswap_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Inventory note** (source `docs/paper-inventory.md`, row 6.176). `Fig16.LogRel.withswap_compat`, on the printed carrier, the statement exactly as printed and the declaration tagged `[as printed]` — `Δ; ∅ ⊨ withswap : Mut @a T₁ ⊸ (T₁ ⊸ T₁ ⊗ T₂) ⊸ Mut @a T₁ ⊗ T₂`, with `∅` as `Ctx.Dead Γ` (§12.19).
+**Note.** `Fig16.LogRel.withswap_compat`, on the printed carrier, the statement exactly as printed and the declaration tagged `[as printed]` — `Δ; ∅ ⊨ withswap : Mut @a T₁ ⊸ (T₁ ⊸ T₁ ⊗ T₂) ⊸ Mut @a T₁ ⊗ T₂`, with `∅` as `Ctx.Dead Γ` (§12.19).
 -/
 /-- **`[TR]` Lemma 6.176** (`withswap-compat`, pp. 48–49) `[as printed]`:
 
@@ -2285,8 +2282,8 @@ and `.split_right` across every `Γ₁ , Γ₂`, `Ctx.ScopedB.cons` across the t
 rules whose premise binds a slot, and `Ctx.ScopedB.of_dead` is what the axiom
 table's `•` gives.
 
-Twenty-seven of the twenty-eight constructors close from §6–§8 with nothing
-threaded.  The twenty-eighth is `withload`, whose 6.175 spends 6.150, and
+Twenty-seven of the twenty-eight constructors close from their
+compatibility lemmas with nothing threaded.  The twenty-eighth is `withload`, whose 6.175 spends 6.150, and
 6.150 inherits `RebEscrow` from 6.55: that is `esc`.  Our carrier admits a
 configuration at which `esc` is refused (`ViewWitness.withloadEscrow_refused`),
 so the row is not closed by this theorem. -/

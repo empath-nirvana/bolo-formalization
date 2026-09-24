@@ -84,7 +84,7 @@ end BoCa
 
 namespace BoCa.Lifetime
 
-/-- Lifetime variables.  Nat-indexed rather than named: freshness (§7) is then
+/-- Lifetime variables.  Nat-indexed rather than named: freshness (`LifeCtx.freshVar`) is then
     "one more than the largest in scope", and the pretty-printer recovers
     `'a`, `'b`, … for the tests. -/
 abbrev LifeVar := Nat

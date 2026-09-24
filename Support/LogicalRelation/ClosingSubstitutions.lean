@@ -8,8 +8,7 @@ import Support.Syntax.Terms
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-closing substitutions `γ(e)`, free lifetime variables of a type, and the empty resource in every stratum.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+closing substitutions `γ(e)`, free lifetime variables of a type, and the empty resource in every stratum.
 -/
 
 noncomputable section
@@ -32,8 +31,8 @@ open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
-/-- `γ(e)` — `BoCa/Subst.lean`'s parallel substitution, for the reason
-`BoCa/LogRel.lean` convention L5 gives: a fold of `Expr.subst 0` is the closing
+/-- `γ(e)` — the parallel substitution `Expr.psub`, for the reason
+convention L5 (`docs/adjudications.md`) gives: a fold of `Expr.subst 0` is the closing
 substitution only for a closed `γ`. -/
 def substAll (γ : List Val) (e : Expr) : Expr := Expr.psub 0 γ e
 

@@ -28,11 +28,11 @@ import Support.Syntax.Terms
   `TR3.wp` is strictly below the library's `wp` (`wp_lt_fig16`);
 * 6.150 (`↺ rule`): `DefectB.wp_reborrow_unreconciled_at_split_view`, the
   entailment written without the hypothesis `RebEscrow`, measured at a configuration
-  built in `BoCa/DefectB.lean` (moved here with it), and `defectB_not_rebEscrow`,
+  built in this file (namespace `DefectB`), and `defectB_not_rebEscrow`,
   that configuration outside `RebEscrow` — the two stand together.
 
 **How this file reads.**  Each run opens with the result it measures and says where
-that result's record is.  The declarations are the source's, with their tags; a
+that result's record is.  Each declaration carries its tag; an
 `[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
 this file.
 -/
@@ -49,7 +49,7 @@ open BoCa.Fig16.BoLo (Entails sep wand all box top ptoOwn ptoMut ptoImm outlives
 
 The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Lemma 6.135 (wp-bind).
 -/
-/-- **§3a's gap at a closed, well typed term.**  `inj₁ (free (alloc ()))` takes
+/-- **The `injᵢ K` gap at a closed, well typed term.**  `inj₁ (free (alloc ()))` takes
 no step and never reaches a value, and `derives_wInj` types it at `1 ⊕ T`.
 `[about ours: the printed `Kont` of `[TR]` p. 3, at `[TR]` p. 1's `inj₁ e`]` -/
 theorem stuck_wInj (μ : Heap) :
@@ -59,7 +59,7 @@ theorem stuck_wInj (μ : Heap) :
     exact absurd (IsVal.inj₁_inv (he ▸ Val.isVal v)) (by simp [wFreeAlloc])⟩
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
-/-- **§3c's gap at a closed, well typed term.**  `(free (alloc ())); ()` takes
+/-- **The `K; e` gap at a closed, well typed term.**  `(free (alloc ())); ()` takes
 no step and never reaches a value, and `derives_wSeq` types it at `1`.
 `[about ours: the printed `Kont` of `[TR]` p. 3, at `[TR]` p. 1's `e₁;e₂`]` -/
 theorem stuck_wSeq (μ : Heap) :
@@ -70,7 +70,7 @@ theorem stuck_wSeq (μ : Heap) :
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
 /-- `wp(inj₁ e)` is false whenever `e` is not a value: `[TR]` p. 3 prints no
 `injᵢ K` frame, so the run cannot start, and `inj₁ e` is not itself a value for
-it to end at.  This is §3a's frame gap at the level of `wp`.
+it to end at.  This is the `injᵢ K` frame gap at the level of `wp`.
 `[about ours: `[TR]` p. 6's row over the printed machine, at p. 1's
 `inj₁ e`]` -/
 theorem wp_inj₁_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) (e : Expr)
@@ -82,7 +82,7 @@ theorem wp_inj₁_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) (e : Expr)
 
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
 /-- `wp(e₁; e₂)` is false whenever `e₁` is not literally `()` — including when
-`e₁` is a redex, which is the `K; e` gap of §3c and no reading repairs it.
+`e₁` is a redex, which is the `K; e` gap (§12.42) and no reading repairs it.
 `[about ours: `[TR]` p. 6's row over the printed machine, at p. 1's
 `e₁;e₂`]` -/
 theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂ : Expr)
@@ -94,7 +94,7 @@ theorem wp_seq_false {ρ ρf : WRes} (hf : ResU.Hash ρf ρ) {e₁ : Expr} (e₂
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
 /-- The refutations are not vacuous: an owned cell has `∅` as an admissible
 frame, so `wp` really is false at a resource `[TR]` p. 6's row reaches.
-Contrast `BoCa/Fig16Wp.lean`'s `wp_ptoOwn`, which inhabits the same row at a
+Contrast `Fig16.BoLo.wp_ptoOwn`, which inhabits the same row at a
 value.
 `[about ours: an inhabited instance of the refutations]` -/
 theorem wp_stuck_false_nonvacuous (l : BoCa.Loc) (w : Val) (Q : Val → WProp) :
@@ -106,7 +106,7 @@ theorem wp_stuck_false_nonvacuous (l : BoCa.Loc) (w : Val) (Q : Val → WProp) :
 /-! Lemma 6.135 (wp-bind), literal reading, continued. -/
 /-- **`wp_le_fig16` is strict, at a reading-independent witness.**
 `inj₁ (free ℓ)` is stuck on the printed machine because `[TR]` p. 3 prints no
-`injᵢ K` frame (§3a), and `BoCa/Wp.lean`'s machine adds one — so `Fig16Wp`'s row
+`injᵢ K` frame (`docs/adjudications.md` §12.42), and `BoLo.Steps` adds one — so `Fig16Wp`'s row
 holds of the owned cell and this file's does not.  The two `wp`s are therefore
 different propositions, not merely defined over different relations.
 `[about ours: the two `wp`s, over the two machines]` -/
@@ -476,15 +476,15 @@ open BoCa.BoLo (Heap Steps)
 
 The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Theorem 6.150 (↺ rule).
 -/
-/-- **`BoCa/DefectB.lean`'s configuration fails `RebEscrow`'s escrow half.**
+/-- **The `DefectB` configuration fails `RebEscrow`'s escrow half.**
 `ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)` reborrows at `β` to `rebA β = 0↦imm({β}, 𝓋, 1↦own(𝓋))`
 — the `own` clause of `reb_β`, whose witness `reb_β` fabricates — while
 `ag(comp)`, the aliasable walk of the very composite the refutation is taken at,
 carries `0↦imm({β}, 𝓋, ∅)` there.  `∅ ≠ 1↦own(𝓋)`, which is exactly what
 `Fig16.EscrowAgree` forbids.  The refutation is written at the same `β`-indexed
-`P̂` the rule above takes (§3), so the escrow conjunct is the whole of what
+`P̂` the rule above takes, so the escrow conjunct is the whole of what
 separates the two results.
-`[about ours: `BoCa/DefectB.lean`'s witness measured against this rule's added
+`[about ours: the `DefectB` witness measured against this rule's added
 hypothesis]` -/
 theorem defectB_not_rebEscrow (b : Life) :
     ResU.Reb b (BoCa.DefectB.rho2 BoCa.DefectB.𝓋 BoCa.DefectB.𝓋)

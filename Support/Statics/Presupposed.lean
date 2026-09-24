@@ -12,8 +12,7 @@ import Support.Statics.Contexts
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the judgments `[TR]` p. 2 presupposes: `⊨ Δ` carried as `Δ.Ok` (sufficient, `sat_of_ok`), `Δ ⊢ T` as `Ty.wfB`/`Ty.scopedB`, `Δ ⊢ Γ` as `Ctx.ScopedB`, and `Δ; Γ ⊢ e : T` under them (`DerivesWf`), with the facts about lifetime interpretation and fresh variables they need.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the judgments `[TR]` p. 2 presupposes: `⊨ Δ` carried as `Δ.Ok` (sufficient, `sat_of_ok`), `Δ ⊢ T` as `Ty.wfB`/`Ty.scopedB`, `Δ ⊢ Γ` as `Ctx.ScopedB`, and `Δ; Γ ⊢ e : T` under them (`DerivesWf`), with the facts about lifetime interpretation and fresh variables they need.
 -/
 
 noncomputable section
@@ -305,7 +304,7 @@ them; `Unk` has no rule there, so no type mentioning it passes.
 
 Two clauses say more than `BoCa.WfTy` records, and both say what the page
 writes.  The `∀` rule's premise is `Δ, ('a ⊏ @b) ⊢ T`, an extension and not a
-shadowing, so `'a ∉ dom(Δ)` is asked here; `docs/definition-inventory.md`
+shadowing, so `'a ∉ dom(Δ)` is asked here; definition
 row 2.25 records that `WfTy.all` carries no such premise.  And `Δ ⊨ @a` is
 asked as `Life.wf`, which is the sound half of it: the semantic relation is
 weaker only at an unsatisfiable `Δ`, which p. 2's judgment box excludes by

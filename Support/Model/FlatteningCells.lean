@@ -14,8 +14,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the cells of a flattening: a cell of `ρ` reappears in `⦇ρ⦈`, the walks' witnesses lie beneath their cells, and the order `≤` on resources.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the cells of a flattening: a cell of `ρ` reappears in `⦇ρ⦈`, the walks' witnesses lie beneath their cells, and the order `≤` on resources.
 -/
 
 noncomputable section
@@ -54,7 +53,7 @@ theorem ResU.CompR.get_imm_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR 
     exact ⟨χ, f, m₁, m₂, m₃⟩
 
 /-- The mirror of `ResU.CompR.get_imm_left`, through `[TR]` Lemma 6.2 at `○`
-(`ResU.CompR.comm`, §20).
+(`ResU.CompR.comm`).
 `[about ours: `ResU.CompR.get_imm_left` with the operands transposed]` -/
 theorem ResU.CompR.get_imm_right {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR ρ₁ ρ₂ ρ)
     {l : Loc} {ψ : CellU Loc Val} (e : ρ₂.get l = some ψ) (hk : ψ.kind = Kind.imm) :
@@ -122,7 +121,7 @@ variable {Loc Val : Type}
 variable {R : CellU Loc Val → CellU Loc Val → Prop}
 variable {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
 
-/-- A factor of a factor is a factor: `[TR]` Lemma 6.3 (`ResU.Comp.assoc`, §20)
+/-- A factor of a factor is a factor: `[TR]` Lemma 6.3 (`ResU.Comp.assoc`)
 with both intermediate values discarded.  This is how the printed proof drops
 `ex(ρ)_●` and `ag(ρ)` from its display and keeps `ρₘ ● ex(ρᵥ)_●`.
 `[about ours: `[TR]` Lemma 6.3 with both intermediate values existentially
@@ -163,7 +162,7 @@ variable {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
 /-- **Every member of an iterated composition is a factor of it.**  `⨀` is a
 right fold, so a member is reached by one `◐` and then `[TR]` Lemmas 6.2 and 6.3
 for the rest of the fold.
-`[about ours: `[TR]` Lemmas 6.2 and 6.3 carried along §16's fold]` -/
+`[about ours: `[TR]` Lemmas 6.2 and 6.3 carried along the fold]` -/
 theorem BigComp.mem_factor (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C) :
     ∀ {xs : List (ResU Loc Val)} {b : ResU Loc Val}, BigComp R C xs b →
       ∀ x ∈ xs, ∃ z, ResU.Comp R C x z b := by
@@ -185,7 +184,7 @@ whole of `[TR]` 6.127's second bullet (p. 33): *"Since `π′ ⊆ π`,
 `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`."*  Dropping an entry from a
 defined fold leaves a defined fold and moves the dropped entry into the frame,
 which is [TR] 6.2 and 6.3 at each step of the drop.
-`[about ours: `BigComp` is §16's fold shape; the step is `[TR]` 6.127's own]` -/
+`[about ours: `BigComp` is the fold shape; the step is `[TR]` 6.127's own]` -/
 theorem BigComp.sublist (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {l l' : List (ResU Loc Val)} (hs : List.Sublist l' l) :
     ∀ {b : ResU Loc Val}, BigComp R C l b →
@@ -240,7 +239,7 @@ one of its entries (convention G6), so the entry is a factor of `⨀` and `⨀` 
 factor of the walk.  This is the `ρₘ ● ex(ρᵥ)_●` of `[TR]` Lemma 6.17's display,
 stated for a `mut` cell anywhere rather than for a lone one.
 `[about ours: the factor of `[TR]` Lemma 6.17's display (p. 8) that its proof
-actually uses, at §17's walk schema]` -/
+actually uses, at the walk schema]` -/
 theorem ExW.wit_le (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
     {ρ σ : ResU Loc Val} (h : ExW R C ρ σ) {l : Loc} {ψ : CellU Loc Val}
     (e : ρ.get l = some ψ) (hk : ψ.kind = Kind.mut) :
@@ -296,7 +295,7 @@ resource reaches `ex(ρ)_●` or `ex(ρₘ)_●` unchanged (`ExS.get_of_ne_imm`,
 `ExW.wit_le` for the descent into `ρᵥ`), while an `imm` cell reaches `ag(ρ)` or
 `ag(ρₘ)` over the same value and witness (`AgW.get_imm`, `AgW.mut_wit_le`).  The
 final `●` of `⦇ρ ● ρₘ⦈` rules out the three mixed cases, since `ex` carries no
-`imm` cell (Lemma 6.36, `ExS.immFree`, §18); and in the remaining one `○` forces
+`imm` cell (Lemma 6.36, `ExS.immFree`); and in the remaining one `○` forces
 the two `imm` cells to share a value and a witness.
 `[about ours: `[TR]` Lemma 6.17's proof (p. 8) from its display onward, stated
 for a `mut` cell in any `ρₘ` rather than a lone one]` -/

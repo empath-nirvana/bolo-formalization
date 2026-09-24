@@ -7,8 +7,7 @@ import Support.Model.Update
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`↭` is symmetric, and `ρ ↭ ρ` read off validity.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`↭` is symmetric, and `ρ ↭ ρ` read off validity.
 -/
 
 noncomputable section

@@ -6,8 +6,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-facts about the cell constructors: injectivity and distinctness of `own`/`imm`/`mut`, the lifetime of a `mut` cell, and the stored predicate.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+facts about the cell constructors: injectivity and distinctness of `own`/`imm`/`mut`, the lifetime of a `mut` cell, and the stored predicate.
 -/
 
 noncomputable section
@@ -15,7 +14,7 @@ noncomputable section
 namespace BoCa.Fig16.PMap
 variable {Loc A B : Type}
 
-/-- `Loc` is infinite.  **Ours** — neither document states it (§3). -/
+/-- `Loc` is infinite.  **Ours** — neither document states it. -/
 def Infinite (Loc : Type) : Prop := ∀ d : List Loc, ∃ l : Loc, l ∉ d
 
 /-- The step `[TR]` Lemma 6.141 (`wp-alloc`, p. 37) takes without justification:

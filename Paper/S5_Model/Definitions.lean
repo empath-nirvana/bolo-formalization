@@ -39,7 +39,7 @@ relations `R a b c` read "`a ◐ b` is defined and equals `c`" — rather than t
 functions with a default.  `Res` is finite at every depth (`PMap`), and the
 stratification is recovered from the unstratified carrier as membership in a
 stratum (`InStratum`, row 5.48).  Two rows here are `[repair]`s adjudicated in
-source `docs/boca-rules.md` §12.67: `ℓ ↦ Imm α P̂` bounds `α` by `⊓β̄` (row 5.30)
+`docs/adjudications.md` §12.67: `ℓ ↦ Imm α P̂` bounds `α` by `⊓β̄` (row 5.30)
 and `reb_α`'s `imm` clause keeps a nonempty subset of the lifetimes (row 5.28).
 
 **How this file reads.**  Each printed item is a row of `[TR]`'s section, in the
@@ -56,10 +56,8 @@ printed form, the page, a tag, and the reason the Lean has the shape it has:
 * `[about ours]` — a declaration the paper does not print, placed here only
   because Lean needs it before the next printed row.
 
-Row numbers are those of the source repository's `docs/definition-inventory.md`;
-citations of `docs/…` and `BoCa/…` are to that repository (`borrow_lang` at
-`970a9d0`).  Declaration names are the source's, unchanged, so that
-`Bridge/Names.csv` can check each one against its original.
+Row numbers are those of `Paper/INDEX.md` (*Definitions*); `§N` citations are
+to `docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -69,7 +67,7 @@ namespace BoCa.Fig16
 /-!
 ### 5.2 · `Res_α ≜ Loc ⇀ Cell_α` · [TR] p. 4, strata row 2 · `[repair]`
 
-The harpoon is bare at this row in BOTH documents; `BoCa.Fig16.PMap` bundles a finite-domain field, so `Res_α` has strictly fewer inhabitants than printed and finiteness becomes hereditary. A declared variant (`docs/axiom-ledger.md` D10, `docs/boca-rules.md` §12.33) forced by row 5.7's `fin` plus flattening's nested witnesses — but row-2 heredity is a separate question from the settled row-7 one. Adjudicated at `docs/boca-rules.md` §12.33, `docs/axiom-ledger.md` D10 and `BoCa/Fig16.lean` §3 with convention G1: the unmarked reading is untenable rather than merely inconvenient, since `@ρ ≜ ⨅_{ψ∈cod(ρ)} @ψ` with ⊓ = max has no value on an unbounded codomain and [TR] 6.141's proof chooses `ℓ ∉ ρ_f ● ρ` in one step; heredity is then forced, because `Mut_α`'s witness is a `Res_β` that every operation consumes as a `Res`
+The harpoon is bare at this row in BOTH documents; `BoCa.Fig16.PMap` bundles a finite-domain field, so `Res_α` has strictly fewer inhabitants than printed and finiteness becomes hereditary. A declared variant (`docs/adjudications.md` D10, `docs/adjudications.md` §12.33) forced by row 5.7's `fin` plus flattening's nested witnesses — but row-2 heredity is a separate question from the settled row-7 one. Adjudicated at `docs/adjudications.md` §12.33 and D10, with convention G1: the unmarked reading is untenable rather than merely inconvenient, since `@ρ ≜ ⨅_{ψ∈cod(ρ)} @ψ` with ⊓ = max has no value on an unbounded codomain and [TR] 6.141's proof chooses `ℓ ∉ ρ_f ● ρ` in one step; heredity is then forced, because `Mut_α`'s witness is a `Res_β` that every operation consumes as a `Res`
 
 ### 5.7 · `ρ ∈ Res ≜ Loc ⇀ᶠⁱⁿ Cell` · [TR] p. 4, strata row 7 · `[as printed]`
 
@@ -126,7 +124,7 @@ namespace BoCa.Fig16
 /-!
 ### 5.9 · `α, β ∈ Life ≜ (ℕ, ⊑ ≜ >, ⊔ ≜ min, ⊓ ≜ max, ⊤ ≜ 0)` · [TR] p. 4, strata row 9 · `[repair]`
 
-The glyph the row assigns `>` is the UNDERBARRED ⊑. Lean gives the strict `>` to ⊏ (following [CONF] Fig. 11) and adds a reflexive ⊑ of its own (row 5.59). [TR]'s own key cannot be right as printed: p. 6 uses the underbarred ⊒ in `ℓ ↦ Mut` and the bare ⊐ in `[α]P` two lines apart, which the key would collapse into one relation. Adjudicated at `docs/boca-rules.md` §12.3 and `BoCa/Fig16.lean` §1 with convention G5: under the printed key the structure is not a lattice — `⊤ = 0` is not ⊑-greatest, since `0 > 0` is false, and ⊔ = min is not a join — while [CONF] p. 415:12's prose above Fig. 11 calls it "a semi-bounded lattice of natural numbers". §12.3 attributes that word to the tuple's own line, which is where the entry is wrong; the reading is not
+The glyph the row assigns `>` is the UNDERBARRED ⊑. Lean gives the strict `>` to ⊏ (following [CONF] Fig. 11) and adds a reflexive ⊑ of its own (row 5.59). [TR]'s own key cannot be right as printed: p. 6 uses the underbarred ⊒ in `ℓ ↦ Mut` and the bare ⊐ in `[α]P` two lines apart, which the key would collapse into one relation. Adjudicated at `docs/adjudications.md` §12.3 with convention G5: under the printed key the structure is not a lattice — `⊤ = 0` is not ⊑-greatest, since `0 > 0` is false, and ⊔ = min is not a join — while [CONF] p. 415:12's prose above Fig. 11 calls it "a semi-bounded lattice of natural numbers". §12.3 attributes that word to the tuple's own line, which is where the entry is wrong; the reading is not
 -/
 abbrev Life : Type := ℕᵒᵈ
 
@@ -175,7 +173,7 @@ greatest element has no `⊓ᾱ` and satisfies no condition of the form `⊓ᾱ 
 and `LSet.exists_of_bounded` is the converse — every `ᾱ` that does satisfy it
 is an `LSet` with the same members and the same meet — so the *set* `Imm_α` is
 the printed one, though the binder is not `℘⁺(Life)` glyph for glyph.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 structure ImmF (α : Life) (below : ∀ β, α < β → Type) : Type where
   /-- `ᾱ : ℘⁺(Life)`. -/
   ls : LSet
@@ -194,7 +192,7 @@ The invariant is a genuine predicate, not a type code; both printed conditions a
 /-- `Mut_α ≜ {(β ⊐ α, v : Val, ρ : Res_β, P̂ : Val → SProp_β) | P̂(v)(ρ)}`, one
 layer.  Both printed conditions are fields: `β ⊐ α` is the first tuple slot,
 and the refinement `| P̂(v)(ρ)` is `hw`.  `P̂` is a genuine predicate.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 structure MutF (α : Life) (below : ∀ β, α < β → Type) : Type where
   /-- The cell's own lifetime. -/
   β : Life
@@ -216,7 +214,7 @@ structure MutF (α : Life) (below : ∀ β, α < β → Type) : Type where
 Three-way disjoint sum, one layer; `BoCa.Fig16.Cell_eq` is the printed row as an equation. The well-founded construction behind it is ours (row 5.58)
 -/
 /-- `Cell_α ≜ own(Val) + imm(Imm_α) + mut(Mut_α)`, one layer.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 inductive CellF (α : Life) (below : ∀ β, α < β → Type) : Type where
   /-- `own(Val)`. -/
   | own (v : Val)
@@ -230,7 +228,7 @@ Row 5.3, continued.
 
 ### 5.58 · — neither document prints the recursion, only the measure — · [TR] p. 4, row 3 · `[repair]`
 
-The construction that makes the printed fixpoint equation well-founded; the equation is propositional here, not definitional, so every constructor goes through a cast. Adjudicated at `BoCa/Fig16.lean`'s header, "Why this is definable at all": every recursive occurrence is at a strictly smaller lifetime index, so ordinary well-founded recursion suffices with no step-indexing, fuel or defunctionalised invariant, and the printed row is recovered as `BoCa.Fig16.Cell_eq`. [CONF] p. 415:20 says the circularity is broken "using stratification, but using a very different measure"
+The construction that makes the printed fixpoint equation well-founded; the equation is propositional here, not definitional, so every constructor goes through a cast. Adjudicated here: every recursive occurrence is at a strictly smaller lifetime index, so ordinary well-founded recursion suffices with no step-indexing, fuel or defunctionalised invariant, and the printed row is recovered as `BoCa.Fig16.Cell_eq`. [CONF] p. 415:20 says the circularity is broken "using stratification, but using a very different measure"
 -/
 /-- `Cell_α` — well-founded recursion on the lifetime index; every recursive
 occurrence is at a strictly smaller natural.  `[TR]` §5 says nothing about the
@@ -259,7 +257,7 @@ abbrev Res (α : Life) : Type := PMap Loc (Cell Loc Val α)
 Total arrow into `Prop`; its domain is row 5.2, so it inherits row 5.2's variant
 -/
 /-- `SProp_α ≜ Res_α → ℙ`.  The arrow is total.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 abbrev SProp (α : Life) : Type := Res Loc Val α → Prop
 
 /-!
@@ -268,7 +266,7 @@ Rows 5.3, 5.58, continued.
 /-- The fixpoint equation — Fig. 16 row 3 as an equation, which is the form the
 row is printed in.  Propositional here, not definitional, so the constructors
 below go through `cast`.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 theorem Cell_eq (α : Life) :
     Cell Loc Val α = CellF Loc Val α (fun β _ => Cell Loc Val β) :=
   WellFounded.fix_eq (invImage OrderDual.ofDual Nat.lt_wfRel).wf (CellF Loc Val) α
@@ -277,14 +275,14 @@ theorem Cell_eq (α : Life) :
 Row 5.4, continued.
 -/
 /-- `Imm_α` — Fig. 16 row 4, at the strata it is a row of.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 abbrev Imm (α : Life) : Type := ImmF Loc Val α (fun β _ => Cell Loc Val β)
 
 /-!
 Row 5.5, continued.
 -/
 /-- `Mut_α` — Fig. 16 row 5, at the strata it is a row of.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 abbrev Mut (α : Life) : Type := MutF Loc Val α (fun β _ => Cell Loc Val β)
 
 /-!
@@ -335,10 +333,10 @@ structure MutU : Type where
 Row 5.8, continued.
 -/
 /-- `ψ ∈ Cell ≜ ⋃_α Cell_α`.  The union is realised directly, its payloads
-being the already-constructed strata; §6's `CellU.inStratum_iff` and
+being the already-constructed strata; the stratum equivalences and
 `CellU.exists_stratum` are the proof that this is `⋃_α Cell_α` and not
 something larger or smaller.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 inductive CellU : Type where
   /-- `own(Val)`. -/
   | own (v : Val)
@@ -373,10 +371,10 @@ Row 5.7, continued.
 -/
 /-- `ρ ∈ Res ≜ Loc ⇀ᶠⁱⁿ Cell`.  The `fin` mark is `[TR]` p. 4 row 7, read at
 1600 dpi; `[CONF]` Fig. 16 prints the harpoon bare and never mentions
-finiteness, and that omission is the typesetting error (§3).
+finiteness, and that omission is settled in `docs/adjudications.md` §12.33.
 The mark on *this* row is `[TR]`'s print; the variance is in `Cell`, whose
 payloads are finite at every depth.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 abbrev ResU : Type := PMap Loc (CellU Loc Val)
 
 /-!
@@ -385,7 +383,7 @@ abbrev ResU : Type := PMap Loc (CellU Loc Val)
 This, not row 5.1, is the carrier of the whole p. 6 proposition display
 -/
 /-- `P ∈ SProp ≜ Res → ℙ`.
-`[variant: `Res` is finite at every depth (G1, §3, ledger D10, `docs/boca-rules.md` §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
+`[variant: `Res` is finite at every depth (G1; `docs/adjudications.md` D10 and §12.33); of the two printed `Res` rows only row 7, and only in `[TR]`, carries the mark]` -/
 abbrev SPropU : Type := ResU Loc Val → Prop
 
 end BoCa.Fig16
@@ -418,7 +416,7 @@ abbrev meet (a b : Life) : Life := a ⊓ b
 Row 5.9, continued.
 -/
 /-- `α ⊏ β ≜ α > β` — "`α` is outlived by `β`", strict.  `[as printed]`
-(following `[CONF]` Fig. 11's labelling; see §1) -/
+(following `[CONF]` Fig. 11's labelling; `docs/adjudications.md` §12.3) -/
 abbrev Sqsubset (a b : Life) : Prop := a < b
 
 /-!
@@ -763,7 +761,7 @@ variable {Loc Val : Type}
 /-!
 ### 5.48 · — presupposed, never written — · [TR] pp. 4–5 · `[repair]`
 
-In the paper the strata are subsets of one set, so membership is free; here they are distinct types and the inclusion becomes an obligation. Every printed clause that shares ONE ρ across two strata — row 5.13, row 5.15, and clauses (2), (3), (5) of row 5.16 — is stated through it. Adjudicated at `BoCa/Fig16.lean` convention G3 with §6's preamble and §22: in the paper the strata are subsets of one set, so membership is free; here they are distinct types and the inclusion becomes an obligation, which is discharged rather than declared, and that is what lets §10 onward state the printed operations with one shared ρ and plain equality
+In the paper the strata are subsets of one set, so membership is free; here they are distinct types and the inclusion becomes an obligation. Every printed clause that shares ONE ρ across two strata — row 5.13, row 5.15, and clauses (2), (3), (5) of row 5.16 — is stated through it. Adjudicated at convention G3 (`docs/adjudications.md`): in the paper the strata are subsets of one set, so membership is free; here they are distinct types and the inclusion becomes an obligation, which is discharged rather than declared, and that is what lets the later definitions state the printed operations with one shared ρ and plain equality
 -/
 /-- `ψ ∈ Cell_α` — the `α`-th piece of `⋃_α Cell_α`.  An `own` cell carries no
 side condition and so lies in every stratum; an `imm` or `mut` cell lies in
@@ -931,7 +929,7 @@ variable {Loc Val : Type}
 /-!
 ### 5.51 · — `ρ∣own,mut` is used from [TR] Def. 6.3 on with no defining row — · [TR] p. 5 gives only single-tag `ρ∣ι` · `[repair]`
 
-Closes a printed coverage gap; [TR] Definition 6.3 and Lemma 6.52 are stated at it. Adjudicated at `BoCa/Fig16.lean` §16, which names the printed coverage gap precisely: [TR] p. 5's defining row gives only the single-tag `ρ∣ι`, while [TR] Definition 6.3 (p. 17) and Lemma 6.52 are stated at `ρ∣own,mut`, which no row defines. `restrict` is recovered as the one-tag instance, so nothing above it is restated
+Closes a printed coverage gap; [TR] Definition 6.3 and Lemma 6.52 are stated at it. Adjudicated here: [TR] p. 5's defining row gives only the single-tag `ρ∣ι`, while [TR] Definition 6.3 (p. 17) and Lemma 6.52 are stated at `ρ∣own,mut`, which no row defines. `restrict` is recovered as the one-tag instance, so nothing above it is restated
 -/
 /-- `ρ|ῑ` for a set of tags — `[TR]` §6's `ρ|own,mut`.  The p. 5 row defines
 only the single-tag `ρ|ι`, which is the instance `ResU.restrict`.
@@ -957,7 +955,7 @@ def ResU.exclPart (ρ : ResU Loc Val) : ResU Loc Val :=
 /-!
 ### 5.52 · `ℓ ↦ ψ` — used from [TR] Lemma 6.17 on, defined nowhere · [TR] pp. 5–6 · `[repair]`
 
-The evident notation, given no defining row by either document; deciding `ℓ′ = ℓ` on an abstract `Loc` is where classical choice enters, so rows 5.29–5.31 and [TR] Lemmas 6.41–6.44 all carry it. Adjudicated at `BoCa/Fig16.lean` §16 with convention G8: neither document gives `ℓ ↦ ψ` a defining row, though [TR] states Lemmas 6.17, 6.22–6.29 and 6.40–6.44 at it, and deciding `ℓ′ = ℓ` on an abstract `Loc` is where classical choice enters. The alternative is rejected with a reason — a `[DecidableEq Loc]` instance argument would put a hypothesis into the printed statements of 6.41–6.44 — and `docs/axiom-ledger.md` names the cluster rather than burying it
+The evident notation, given no defining row by either document; deciding `ℓ′ = ℓ` on an abstract `Loc` is where classical choice enters, so rows 5.29–5.31 and [TR] Lemmas 6.41–6.44 all carry it. Adjudicated at convention G8 (`docs/adjudications.md`): neither document gives `ℓ ↦ ψ` a defining row, though [TR] states Lemmas 6.17, 6.22–6.29 and 6.40–6.44 at it, and deciding `ℓ′ = ℓ` on an abstract `Loc` is where classical choice enters. The alternative is rejected with a reason — a `[DecidableEq Loc]` instance argument would put a hypothesis into the printed statements of 6.41–6.44
 -/
 open Classical in
 /-- `ℓ ↦ ψ` — the singleton resource.  Neither document gives it a defining
@@ -1002,7 +1000,7 @@ variable {Loc Val : Type}
 /-!
 ### 5.53 · `ρ/ℓ` — the `/` of `ρ₁/dom(ρ₂)` and of `π(ℓ)/ℓ` · [TR] p. 5, rows 9 and 19 · `[repair]`
 
-Domain subtraction is used twice on p. 5 and defined nowhere; [CONF] Fig. 19 writes the same operation with a set-minus. Adjudicated at `BoCa/Fig16.lean` §16 and §20e and at the declaration: both uses are on [TR] p. 5 and neither document defines the operation, [CONF] Fig. 19 writing it as a set-minus; the classical equality test is convention G8, already opened by `BoCa.Fig16.ResU.single`
+Domain subtraction is used twice on p. 5 and defined nowhere; [CONF] Fig. 19 writes the same operation with a set-minus. Adjudicated at the declaration: both uses are on [TR] p. 5 and neither document defines the operation, [CONF] Fig. 19 writing it as a set-minus; the classical equality test is convention G8, already opened by `BoCa.Fig16.ResU.single`
 -/
 open Classical in
 /-- `ρ/ℓ` — `ρ` with the cell at `ℓ` removed.  `[TR]` p. 5 writes `/` for domain
@@ -1029,7 +1027,7 @@ open Classical in
 /-!
 ### 5.55 · — the index set of the `ex`/`ag` comprehensions and of `dom(ρ′)` — · [TR] p. 5, rows 11, 12, 19 · `[repair]`
 
-The location index set the family reading of rows 5.20 and 5.21 needs; the `Nodup` field is what makes a list of pairs a function. Adjudicated at `BoCa/Fig16.lean` §16 and §20e and at each declaration: `Sites` is convention G6's index set, the thing `∃ℓ. ρ(ℓ) = mut(…)` ranges over and `cod(ρ∣mut)` does not, so it inherits `docs/boca-rules.md` §12.36's argument; `Dom` is `Sites` with the tag dropped, which is what `reb_α`'s `π : dom(ρ′) → Res` needs
+The location index set the family reading of rows 5.20 and 5.21 needs; the `Nodup` field is what makes a list of pairs a function. Adjudicated at each declaration: `Sites` is convention G6's index set, the thing `∃ℓ. ρ(ℓ) = mut(…)` ranges over and `cod(ρ∣mut)` does not, so it inherits `docs/adjudications.md` §12.36's argument; `Dom` is `Sites` with the tag dropped, which is what `reb_α`'s `π : dom(ρ′) → Res` needs
 -/
 /-- `d` lists the locations of `ρ` carrying a cell of tag `k`, each exactly
 once.  This is convention G6's index set: it is what `∃ ℓ. ρ(ℓ) = mut(…)`
@@ -1043,7 +1041,7 @@ def ResU.Sites (ρ : ResU Loc Val) (k : Kind) (d : List Loc) : Prop :=
 Row 5.55, continued.
 -/
 /-- `d` lists the locations of `ρ`, each exactly once — `dom(ρ)` as a list.  This
-is `ResU.Sites` (§16) with the tag restriction dropped: the walks' families are
+is `ResU.Sites` with the tag restriction dropped: the walks' families are
 indexed by the locations carrying one tag, where `reb_α`'s `π` is indexed by all
 of `dom(ρ′)`.  `dom(π(ℓ)) = {ℓ}` is this at the one-element list.  The `Nodup` is
 what makes a list of pairs a *function* on `dom(ρ′)`.
@@ -1055,12 +1053,12 @@ def ResU.Dom (ρ : ResU Loc Val) (d : List Loc) : Prop :=
 /-!
 ### 5.56 · `⨀` — the iterated composition, with no printed empty case · [TR] p. 5, rows 11, 12, 19 · `[repair]`
 
-The fold behind the printed large operator. The empty case is printed nowhere, and without it `ex(ρ)_◖` would have no value on any mut-free ρ — so `✓ρ` on the simplest resources depends on it; `BoCa.Fig16.BigComp.perm` makes the fold order irrelevant. Adjudicated at `BoCa/Fig16.lean` §16: the empty case is necessary and not convenient — neither document prints it, and without it `ex(ρ)_◖` has no value on any mut-free ρ — and `BoCa.Fig16.BigComp.perm` discharges the order-independence out of [TR] Lemmas 6.1–6.3 instead of assuming it
+The fold behind the printed large operator. The empty case is printed nowhere, and without it `ex(ρ)_◖` would have no value on any mut-free ρ — so `✓ρ` on the simplest resources depends on it; `BoCa.Fig16.BigComp.perm` makes the fold order irrelevant. Adjudicated here: the empty case is necessary and not convenient — neither document prints it, and without it `ex(ρ)_◖` has no value on any mut-free ρ — and `BoCa.Fig16.BigComp.perm` discharges the order-independence out of [TR] Lemmas 6.1–6.3 instead of assuming it
 -/
 /-- `⨀_◐` — the iterated composition, folded right with `∅` at the end.  By
-Lemma 6.4 (`ρ ◐ ∅ = ρ`, §20) that is the fold of the list.  Which fold is taken
-is irrelevant exactly when `[TR]` Lemmas 6.1–6.3 hold, and they are proved in
-§20; `BigComp.perm` (§20a) is that independence, so the graph may be stated at
+Lemma 6.4 (`ρ ◐ ∅ = ρ`) that is the fold of the list.  Which fold is taken
+is irrelevant exactly when `[TR]` Lemmas 6.1–6.3 hold, and they are proved
+(`Paper/S6_1_StandardLemmas/Lemmas.lean`); `BigComp.perm` is that independence, so the graph may be stated at
 one fold without loss.  `BigComp.nil : ⨀∅ = ∅` is ours: neither document prints
 the empty case, and without it `ex(ρ)_◐` would be undefined for every mut-free
 `ρ`.
@@ -1076,7 +1074,7 @@ inductive BigComp (R : CellU Loc Val → CellU Loc Val → Prop)
 /-!
 ### 5.57 · — the paper's `SProp_α ⊆ SProp_{α′} ⊆ SProp` is a set inclusion — · [TR] p. 4, rows 1 and 6 · `[repair]`
 
-Extension by falsity outside the smaller stratum, which is how the inclusion is encoded; clause (3) of row 5.16 and the invariant match of row 5.31 both go through it. `BoCa.Fig16.SPropS.toU_range` names the cost: `SProp_α` becomes the subset of `SProp` whose members hold only in `Res_α`. Adjudicated at `BoCa/Fig16.lean` §8 with §24: `P̂ : Val → SProp_α` is already a family of subsets of `Res_{α′}`, so writing the paper's inclusion out is extension by falsity and changes no statement; §24 names the price rather than hiding it, and `BoCa.Fig16.SPropS.toU_range` proves it
+Extension by falsity outside the smaller stratum, which is how the inclusion is encoded; clause (3) of row 5.16 and the invariant match of row 5.31 both go through it. `BoCa.Fig16.SPropS.toU_range` names the cost: `SProp_α` becomes the subset of `SProp` whose members hold only in `Res_α`. Adjudicated here: `P̂ : Val → SProp_α` is already a family of subsets of `Res_{α′}`, so writing the paper's inclusion out is extension by falsity and changes no statement; the price is named rather than hidden, and `BoCa.Fig16.SPropS.toU_range` proves it
 -/
 /-- `SProp_α ⊆ SProp_{α'}`, as the image of the inclusion of subsets. -/
 def SPropS.embed {a a' : Life} (P : Val → SPropS Loc Val a) : Val → SPropS Loc Val a' :=
@@ -1100,7 +1098,7 @@ theorem SPropS.conj_holds {a b : Life} {P : Val → SPropS Loc Val a}
 /-!
 Row 5.57, continued.
 -/
-/-- `SProp_α ⊆ SProp` — §8's inclusion, at the union.  `[about ours: the
+/-- `SProp_α ⊆ SProp` — the inclusion, at the union.  `[about ours: the
 encoding of a set-theoretic inclusion, not a change of statement]` -/
 def SPropS.toU {a : Life} (P : SPropS Loc Val a) : SPropU Loc Val :=
   fun ρ => ∃ h : ρ.InStratum a, P ⟨ρ, h⟩
@@ -1217,7 +1215,7 @@ def CellU.wit : CellU Loc Val → ResU Loc Val
 /-!
 ### 5.20 · `ex(ρ)_◖ ≜ ρ∣own ◖ ρ∣mut ◖ ⨀{ex(ρ′)_◖ ∣ ∃ℓ. ρ(ℓ) = mut(_,_,ρ′,_)}` · [TR] p. 5, operation row 11 · `[repair]`
 
-The printed comprehension is a SET and the Lean composes a FAMILY indexed by locations. On the set reading two `mut` cells with equal witnesses compose once, [TR] Lemma 6.18 is false, and a resource with two mutable borrows of one cell would be admitted (`BoCa.Fig16.WalkNeg.set_reading_would_admit`); declared at `docs/boca-rules.md` §12.36. Adjudicated at `docs/boca-rules.md` §12.36 and `BoCa/Fig16.lean` §17 with convention G6: one reading of the printed set-builder makes a printed lemma false, since on the set reading [TR] Lemma 6.18 fails at two `mut` cells with equal witnesses, and the crux is compiled rather than asserted. [CONF] Fig. 18a writes the same row as `cod(ρ∣mut)`
+The printed comprehension is a SET and the Lean composes a FAMILY indexed by locations. On the set reading two `mut` cells with equal witnesses compose once, [TR] Lemma 6.18 is false, and a resource with two mutable borrows of one cell would be admitted (`BoCa.Fig16.WalkNeg.set_reading_would_admit`); declared at `docs/adjudications.md` §12.36. Adjudicated at `docs/adjudications.md` §12.36 with convention G6: one reading of the printed set-builder makes a printed lemma false, since on the set reading [TR] Lemma 6.18 fails at two `mut` cells with equal witnesses, and the crux is compiled rather than asserted. [CONF] Fig. 18a writes the same row as `cod(ρ∣mut)`
 -/
 mutual
 
@@ -1227,7 +1225,7 @@ mutual
 `ρ|own ◐ ρ|mut`; `hσ` is the outer `◐`.  `w` is bound here and appears in no
 statement.
 `[variant: the printed comprehension is a set and this is the family it indexes
-(convention G6, §17); the recursive subscript is `[TR]`'s generic `◐`, not
+(convention G6); the recursive subscript is `[TR]`'s generic `◐`, not
 `[CONF]` Fig. 18a's `•`]` -/
 inductive ExW (R : CellU Loc Val → CellU Loc Val → Prop)
     (C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop) :
@@ -1391,7 +1389,7 @@ def CellU.immOf (s : LSet) (v : Val) (ρ : ResU Loc Val)
 
 /-- `mut(β, v, ρ, P̂)`, with `ρ : Res`, `h` the print's `ρ : Res_β`, `P̂` a
 predicate on `Res_β` — i.e. an element of `Val → SProp_β`, read on the union
-through §6's equivalence — and `hw` the printed refinement `P̂(v)(ρ)`.
+through `Cell.stratumEquiv` — and `hw` the printed refinement `P̂(v)(ρ)`.
 `mutOf` is injective in `P̂` (`CellU.mutOf_inj`), so the cell remembers exactly
 the subset of `Res_β` the paper's cell remembers, and no more.
 `[as printed]` -/
@@ -1455,7 +1453,7 @@ def CellU.CompatS (ψ₁ ψ₂ : CellU Loc Val) : Prop :=
 Given both ways, as a function of the ▸◂ proof and as a graph; `BoCa.Fig16.CellU.compS_defined_iff` says the domain is exactly ▸◂, and `BoCa.Fig16.LSet.union` is round set union with the bounds recomputed (`BoCa.Fig16.LSet.ext`: no extra data)
 -/
 /-- `ψ₁ ● ψ₂ = ψ` — the printed equation as a graph, so that the resource-level
-schema of §12 can be instantiated at it.  `[as printed]` (as a graph — G4) -/
+schema can be instantiated at it.  `[as printed]` (as a graph — G4) -/
 def CellU.CompS (ψ₁ ψ₂ ψ : CellU Loc Val) : Prop :=
   ∃ (s₁ s₂ : LSet) (v : Val) (ρ : ResU Loc Val)
     (h₁ : ρ.InStratum s₁.join) (h₂ : ρ.InStratum s₂.join)
@@ -1528,7 +1526,7 @@ abbrev ExS (ρ σ : ResU Loc Val) : Prop := ExW CellU.CompatS CellU.CompS ρ σ
 /-!
 ### 5.28 · `reb_α(ρ) ≜ {ρ′ ∣ @ρ ⊐ α ∧ ∃π : dom(ρ′) → Res. ρ ≥ ⨀_● π(ℓ) ∧ …}` · [TR] p. 5, operation row 19 · `[repair]`
 
-Membership in the printed set; `π` is an association list with `Nodup` keys pinned to `dom(ρ′)`, which IS the printed function, and `ρ ≥ x` is `BoCa.Fig16.ResU.Le` from [CONF] p. 415:24 fn. 1 since [TR] uses ≥ with no defining row (row 5.54). **The `imm` clause is read at a subset**: where the print has `ρ(ℓ) = imm(_,_,_) ⇒ ρ′(ℓ) = ρ(ℓ)`, `BoCa.Fig16.ResU.RebAt` has `ρ′(ℓ) = imm(t̄, v, χ)` for a nonempty `t̄ ⊆ s̄` at `ρ(ℓ) = imm(s̄, v, χ)`, same value and witness. Adjudicated at `docs/boca-rules.md` §12.67(b): [CONF] 415:24 — *"`ρ′` must be just like a subresource of the original resource `ρ` … its imm locations are preserved at their original lifetimes"* — and [TR] 6.57's proof, which prints `ρ∣dom(ρ′ᵢ∣imm) ≤ ρ′ᵢ∣imm` (`≤`, not `=`); at this reading [TR] 6.61's *"the only interesting cases are locations `ℓ` that are in both `ρ′₁` and `ρ′₂`"* holds (`BoCa.Fig16.ResU.six61_imm_at`). The literal `ρ′(ℓ) = ρ(ℓ)` is recorded there with its cost: 6.61, 6.125 and 6.127 needed the added hypotheses `ImmSurvives`, `RebSurv` and `SplitAgree`, since a `●`-factor of an `imm` cell is `imm` over a subset
+Membership in the printed set; `π` is an association list with `Nodup` keys pinned to `dom(ρ′)`, which IS the printed function, and `ρ ≥ x` is `BoCa.Fig16.ResU.Le` from [CONF] p. 415:24 fn. 1 since [TR] uses ≥ with no defining row (row 5.54). **The `imm` clause is read at a subset**: where the print has `ρ(ℓ) = imm(_,_,_) ⇒ ρ′(ℓ) = ρ(ℓ)`, `BoCa.Fig16.ResU.RebAt` has `ρ′(ℓ) = imm(t̄, v, χ)` for a nonempty `t̄ ⊆ s̄` at `ρ(ℓ) = imm(s̄, v, χ)`, same value and witness. Adjudicated at `docs/adjudications.md` §12.67(b): [CONF] 415:24 — *"`ρ′` must be just like a subresource of the original resource `ρ` … its imm locations are preserved at their original lifetimes"* — and [TR] 6.57's proof, which prints `ρ∣dom(ρ′ᵢ∣imm) ≤ ρ′ᵢ∣imm` (`≤`, not `=`); at this reading [TR] 6.61's *"the only interesting cases are locations `ℓ` that are in both `ρ′₁` and `ρ′₂`"* holds (`BoCa.Fig16.ResU.six61_imm_at`). The literal `ρ′(ℓ) = ρ(ℓ)` is recorded there with its cost: 6.61, 6.125 and 6.127 needed the added hypotheses `ImmSurvives`, `RebSurv` and `SplitAgree`, since a `●`-factor of an `imm` cell is `imm` over a subset
 -/
 /-- The body of `reb_α`'s `∀ ℓ ∈ dom(π), v, ρ″`, at one location `ℓ` and the
 piece `p = π(ℓ)` the family gives it.
@@ -1548,7 +1546,7 @@ imm locations are preserved at their original lifetimes".  A subresource of an
 `imm` cell is that cell over fewer outstanding borrows (`[TR]` Definition 6.3 and
 the sentence after it, p. 17), and `[TR]` 6.57's proof prints
 `ρ|dom(ρ′ᵢ|imm) ≤ ρ′ᵢ|imm` — `≤`, not `=`.  `t̄ ⊆ s̄` with `t̄` nonempty keeps
-every lifetime `t̄` records one `s̄` records.  `docs/boca-rules.md` §12.67.
+every lifetime `t̄` records one `s̄` records.  `docs/adjudications.md` §12.67.
 
 `imm({α}, v, −)` is `CellU.immOf` at `LSet.singleton α`, whose join is `α`, and
 the existential over the typing constraint is that constructor's `h` — the cell
@@ -1556,7 +1554,7 @@ does not depend on which proof of it is supplied.  The print binds `v` and `ρ�
 in the outer `∀`; `∀` distributes over the conjunction, so binding them at each
 clause's own pattern is the same proposition.
 `[variant: the `imm` clause at a nonempty subset of `ρ(ℓ)`'s lifetime set,
-`docs/boca-rules.md` §12.67]`
+`docs/adjudications.md` §12.67]`
 (`[TR]` p. 5's `reb_α`) -/
 def ResU.RebAt (α : Life) (ρ ρ' : ResU Loc Val) (l : Loc) (p : ResU Loc Val) : Prop :=
   (∃ ψ, p.get l = some ψ) ∧
@@ -1611,14 +1609,13 @@ variable {Loc Val : Type}
 /-!
 ### 5.54 · `ρ₁ ≤ ρ₃ ≜ ∃ρ₂ ▶◀ ρ₁. ρ₁ ● ρ₂ = ρ₃` — `≥` used in `reb_α`, `≤` in [TR] Def. 6.3 · [CONF] p. 415:24 fn. 1 (printed); [TR] p. 5, row 19 (used) · `[as printed]`
 
-A documents-differ row, scored against the document that prints a defining row: [TR] uses the order and defines it nowhere, and [CONF] p. 415:24's footnote 1 prints `ρ₁ ≤ ρ₃ ≜ ∃ρ₂ ▶◀ ρ₁. ρ₁ ● ρ₂ = ρ₃`, read at 1200 dpi. `BoCa.Fig16.ResU.Le` is that glyph for glyph, with the operands of ▶◀ transposed, which [TR] Lemma 6.1 licenses. The declaration and `BoCa/Fig16.lean` §16 both carry `[as printed]`, and `docs/boca-rules.md` §12.37 is the retraction of the earlier `ours` reading, of which this row was the last site
+A documents-differ row, scored against the document that prints a defining row: [TR] uses the order and defines it nowhere, and [CONF] p. 415:24's footnote 1 prints `ρ₁ ≤ ρ₃ ≜ ∃ρ₂ ▶◀ ρ₁. ρ₁ ● ρ₂ = ρ₃`, read at 1200 dpi. `BoCa.Fig16.ResU.Le` is that glyph for glyph, with the operands of ▶◀ transposed, which [TR] Lemma 6.1 licenses. The declaration carries `[as printed]`; `docs/adjudications.md` §12.37 records the printed definition
 -/
 /-- `ρ ≤ ρ′` — `[CONF]` p. 415:24 footnote 1 (1200 dpi):
 `ρ₁ ≤ ρ₃ ≜ ∃ρ₂ ▶◀ ρ₁. ρ₁ ● ρ₂ = ρ₃`.  This is that, glyph for glyph; the
 operands of `▶◀` are transposed, which `[TR]` Lemma 6.1 licenses.  `[TR]` uses
 `≤` in Definition 6.3 and `reb_α` and never defines it — documents-differ,
-resolved toward the document that prints a defining row (§16;
-`docs/boca-rules.md` §12.37).  `[as printed]` -/
+resolved toward the document that prints a defining row (`docs/adjudications.md` §12.37).  `[as printed]` -/
 def ResU.Le (ρ σ : ResU Loc Val) : Prop := ∃ τ, ResU.CompS ρ τ σ
 
 /-!
@@ -1629,7 +1626,7 @@ Row 5.28, continued.
 The four printed conjuncts, in order: `@ρ ⊐ α`, written at `ResU.AtLife`'s graph
 so that nothing is chosen (`ResU.reb_at_iff` is the same condition at `ResU.at`);
 `π : dom(ρ′) → Res` as a list of `(location, resource)` pairs whose first
-projection is `dom(ρ′)` without repetition, the idiom §17 and §18 use for the
+projection is `dom(ρ′)` without repetition, the idiom the walks use for the
 printed comprehensions; `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)`, the iterated **strict**
 composition — the operator is a filled disc at 900 dpi — with `ρ ≥ x` read as
 `ResU.Le x ρ` per `[CONF]` p. 415:24 footnote 1; and the body, `ResU.RebAt`, at
@@ -1667,11 +1664,11 @@ namespace BoCa.Fig16.Life
 /-!
 ### 5.59 · — ⊑ appears in [TR] p. 4 row 9 as the STRICT `>` — · [TR] p. 4, row 9 · `[repair]`
 
-The reflexive closure of ⊏, where the printed glyph carries the strict `>`. Adjudicated at `docs/boca-rules.md` §12.3 with convention G5, corroborated by [CONF] Fig. 19's dotted underbarred glyphs at the two rows that use it: Fig. 16's underbarred glyphs are the reflexive order. `BoCa/Fig16.lean` §1 now enumerates every printed definition stated with it — `BoCa.Fig16.ResU.AtLife`, `BoCa.Fig16.BoLo.ptoImm`, `BoCa.Fig16.BoLo.ptoMut` — and every `[as printed]` lemma — `BoCa.Fig16.BoLo.box_antitone`, `BoCa.Fig16.BoLo.ptoImm_antitone` ([TR] 6.114) and `BoCa.Fig16.BoLo.ptoMut_antitone` — and separates the statements that are our own facts about it
+The reflexive closure of ⊏, where the printed glyph carries the strict `>`. Adjudicated at `docs/adjudications.md` §12.3 with convention G5, corroborated by [CONF] Fig. 19's dotted underbarred glyphs at the two rows that use it: Fig. 16's underbarred glyphs are the reflexive order. The printed definitions stated with it are `BoCa.Fig16.ResU.AtLife`, `BoCa.Fig16.BoLo.ptoImm`, `BoCa.Fig16.BoLo.ptoMut` — and every `[as printed]` lemma — `BoCa.Fig16.BoLo.box_antitone`, `BoCa.Fig16.BoLo.ptoImm_antitone` ([TR] 6.114) and `BoCa.Fig16.BoLo.ptoMut_antitone` — and separates the statements that are our own facts about it
 -/
 /-- `α ⊑ β` — the reflexive closure of `⊏`.  **Ours** (G5): neither document
 defines a reflexive order — `[TR]` p. 4 assigns this glyph the strict `>`
-(§1). -/
+(§12.3). -/
 abbrev Sqsubseteq (a b : Life) : Prop := a ≤ b
 
 end BoCa.Fig16.Life
@@ -1731,7 +1728,7 @@ variable {Loc Val : Type}
 /-!
 ### 5.30 · `ℓ ↦ Imm α P̂  (ρ) ≜ ∃β̄,v,ρ′. ρ = ℓ ↦ imm(β̄,v,ρ′) ∧ P̂(v)(ρ′) ∧ α ⊑ ⊔β̄` · [TR] p. 6, proposition row 2 · `[repair]`
 
-**Two repairs.**  (i) The last conjunct is `α ⊑ ⊓β̄`, not the printed `α ⊑ ⊔β̄`. Adjudicated at `docs/boca-rules.md` §12.67(a): each lifetime in `β̄` is one outstanding borrow ([TR] Definition 6.3 and the sentence after it, p. 17: *"'without' means removing the lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`"*), and the index is a lower bound on each ([CONF] 415:8 *"forbids the context from holding borrows at lifetime `a` or shorter"*, 415:9 *"the lifetime `a` is really only a lower bound on the 'true' lifetime"*, 415:10 and 415:14 *"an unambiguous lifetime bound"*, 415:20 `Mut_α`'s predicate *"sits in the stratification at its lifetime `β`"*), which is what [TR] 6.60's `Imm` step (p. 21) spends to reach `@ρ = ⊓β̄`. The literal reading — [CONF] 415:19 *"the borrow connective will bound its lifetime index `α` by the longest among them"* and [TR] p. 6's `⊔` — is recorded there with its cost: 6.60's `Imm` step does not follow, and `𝒱⟦Mut @a T⟧` is empty whenever `T` has a top-level `Imm`. [TR] 6.115 is `variant` in consequence (`BoCa.Fig16.BoLo.not_iAgreeAtJoin`). (ii) `⊑` is implemented with `BoCa.Fig16.Life.Sqsubseteq`, the REFLEXIVE order the model file declares ours, where [TR] p. 4 row 9's key makes the printed ⊑ the strict `>`; load-bearing because `reb_α` produces `imm({α},v,−)`, whose `⊓β̄` is exactly `α`. Adjudicated at `docs/boca-rules.md` §12.3 with `BoCa/Fig16.lean` convention G5; [CONF] Fig. 19 (p. 415:23) prints this row's relation with the dotted UNDERBARRED ⊑
+**Two repairs.**  (i) The last conjunct is `α ⊑ ⊓β̄`, not the printed `α ⊑ ⊔β̄`. Adjudicated at `docs/adjudications.md` §12.67(a): each lifetime in `β̄` is one outstanding borrow ([TR] Definition 6.3 and the sentence after it, p. 17: *"'without' means removing the lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`"*), and the index is a lower bound on each ([CONF] 415:8 *"forbids the context from holding borrows at lifetime `a` or shorter"*, 415:9 *"the lifetime `a` is really only a lower bound on the 'true' lifetime"*, 415:10 and 415:14 *"an unambiguous lifetime bound"*, 415:20 `Mut_α`'s predicate *"sits in the stratification at its lifetime `β`"*), which is what [TR] 6.60's `Imm` step (p. 21) spends to reach `@ρ = ⊓β̄`. The literal reading — [CONF] 415:19 *"the borrow connective will bound its lifetime index `α` by the longest among them"* and [TR] p. 6's `⊔` — is recorded there with its cost: 6.60's `Imm` step does not follow, and `𝒱⟦Mut @a T⟧` is empty whenever `T` has a top-level `Imm`. [TR] 6.115 is `variant` in consequence (`BoCa.Fig16.BoLo.not_iAgreeAtJoin`). (ii) `⊑` is implemented with `BoCa.Fig16.Life.Sqsubseteq`, the REFLEXIVE order the model file declares ours, where [TR] p. 4 row 9's key makes the printed ⊑ the strict `>`; load-bearing because `reb_α` produces `imm({α},v,−)`, whose `⊓β̄` is exactly `α`. Adjudicated at `docs/adjudications.md` §12.3 with convention G5; [CONF] Fig. 19 (p. 415:23) prints this row's relation with the dotted UNDERBARRED ⊑
 -/
 /-- `ℓ ↦ I_α P̂ (ρ) ≜ ∃β̄,v,ρ′. ρ = ℓ ↦ imm(β̄,v,ρ′) ∧ P̂(v)(ρ′) ∧ α ⊑ ⊓β̄`.
 
@@ -1743,8 +1740,8 @@ borrow was originally assigned", 415:8 has `Δ ⊢ T ⊐ a` forbid "the context 
 holding borrows at lifetime `a` or shorter", and 415:14 asks the borrowed
 predicate for "an unambiguous lifetime bound".  At `⊔β̄`, `[TR]` 6.60's `Imm`
 step does not follow and `𝒱⟦Mut @a T⟧` is empty wherever `T` has a top-level
-`Imm`.  `docs/boca-rules.md` §12.67.
-`[variant: `⊓β̄` for the printed `⊔β̄`, `docs/boca-rules.md` §12.67]` -/
+`Imm`.  `docs/adjudications.md` §12.67.
+`[variant: `⊓β̄` for the printed `⊔β̄`, `docs/adjudications.md` §12.67]` -/
 noncomputable def ptoImm (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
     SPropU Loc Val :=
   fun ρ => ∃ (s : LSet) (v : Val) (σ : ResU Loc Val) (h : σ.InStratum s.join),
@@ -1753,7 +1750,7 @@ noncomputable def ptoImm (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
 /-!
 ### 5.31 · `ℓ ↦ Mut α P̂  (ρ) ≜ ∃β ⊒ α, v, ρ′. ρ = ℓ ↦ mut(β,v,ρ′,P̂)` · [TR] p. 6, proposition row 3 · `[repair]`
 
-The same undeclared reflexive-⊑ substitution as row 5.30, admitting `β = α` where [TR]'s key makes ⊒ strict. The other half — matching the stored invariant through `BoCa.Fig16.BoLo.ofS` — costs nothing, since a paper `P̂ : Val → SProp_β` is already false off `Res_β` (`BoCa.Fig16.SPropS.toU_range`). Adjudicated at `docs/boca-rules.md` §12.3 with convention G5 for the glyph — [CONF] Fig. 19 prints `∃β ⊒ α` with the dotted underbar — and at `BoCa/Fig16.lean` §24 for the invariant match, which names the cost outright rather than hiding it (`BoCa.Fig16.SPropS.toU_range`)
+The same undeclared reflexive-⊑ substitution as row 5.30, admitting `β = α` where [TR]'s key makes ⊒ strict. The other half — matching the stored invariant through `BoCa.Fig16.BoLo.ofS` — costs nothing, since a paper `P̂ : Val → SProp_β` is already false off `Res_β` (`BoCa.Fig16.SPropS.toU_range`). Adjudicated at `docs/adjudications.md` §12.3 with convention G5 for the glyph — [CONF] Fig. 19 prints `∃β ⊒ α` with the dotted underbar — and here for the invariant match, which names the cost outright rather than hiding it (`BoCa.Fig16.SPropS.toU_range`)
 -/
 /-- `ℓ ↦ M_α P̂ (ρ) ≜ ∃β ⊒ α,v,ρ′. ρ = ℓ ↦ mut(β,v,ρ′,P̂)`. -/
 noncomputable def ptoMut (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
@@ -1765,7 +1762,7 @@ noncomputable def ptoMut (l : Loc) (α : Life) (P : Val → SPropU Loc Val) :
 /-!
 ### 5.63 · `ρ⁺∣own = ∅` is named; `ℓ ↦ _` has no printed counterpart · [TR] p. 6, row 5 · `[repair]`
 
-`NoOwn` is the printed side condition given a name, and `noOwn_compS` is the closure under composition that `wp`-bind and `wp`-M-forget use in one step; `ptoAny` has no printed counterpart at all and is used only to state non-vacuity witnesses. Adjudicated at `BoCa/Fig16Wp.lean` §1: `NoOwn` is [TR] p. 6's own `ρ⁺∣own = ∅` given a name, and `noOwn_compS` the closure the printed proofs of 6.135 and 6.148 take in one step. `ptoAny` is justified at its consumers rather than at itself — `BoCa.Fig16.BoLo.ptoOwn_excl` and `BoCa.Fig16.BoLo.ptoMut_excl` each carry the tag saying [TR] Lemma 6.95's and 6.119's elided `_` is read as a cell of any kind, so both are strictly stronger than the printed instances. It is that widened wildcard, not only a non-vacuity witness
+`NoOwn` is the printed side condition given a name, and `noOwn_compS` is the closure under composition that `wp`-bind and `wp`-M-forget use in one step; `ptoAny` has no printed counterpart at all and is used only to state non-vacuity witnesses. Adjudicated here: `NoOwn` is [TR] p. 6's own `ρ⁺∣own = ∅` given a name, and `noOwn_compS` the closure the printed proofs of 6.135 and 6.148 take in one step. `ptoAny` is justified at its consumers rather than at itself — `BoCa.Fig16.BoLo.ptoOwn_excl` and `BoCa.Fig16.BoLo.ptoMut_excl` each carry the tag saying [TR] Lemma 6.95's and 6.119's elided `_` is read as a cell of any kind, so both are strictly stronger than the printed instances. It is that widened wildcard, not only a non-vacuity witness
 -/
 /-- `ℓ ↦ _` — a single cell at `ℓ`, of any kind. -/
 noncomputable def ptoAny (l : Loc) : SPropU Loc Val :=
@@ -1858,7 +1855,7 @@ variable {Loc Val : Type}
 /-!
 ### 5.64 · `ρ∣dom(ρ′)` — a domain restriction, used from [TR] Lemma 6.56 on with no defining row · [TR] p. 18, Lemmas 6.56 and 6.57 · `[repair]`
 
-The second half of the coverage gap row 5.19 records: [TR] p. 5's row gives only `ρ∣ι`, and [TR] Lemmas 6.56 and 6.57 are stated at `ρ∣dom(ρ′∣mut,own)` and `ρ∣dom(ρ′∣imm)`, which no row defines. `ρ/dom(ρ′)` comes with it — [TR] p. 5 writes it inside `◐`'s own defining row and row 5.53 covers only the one-location `ρ/ℓ` — and the two are what `BoCa.Fig16.ResU.restrictDom_compS` splits `ρ` by, which is how [TR] 6.56's appeal to 6.11 is discharged. Adjudicated at `BoCa/Fig16.lean` §12, which names the gap, and at `BoCa/Reborrow.lean` §9, where the definitions sit beside their first consumers; the membership test is on `dom(ρ′)` and needs no decidable equality on `Loc`
+The second half of the coverage gap row 5.19 records: [TR] p. 5's row gives only `ρ∣ι`, and [TR] Lemmas 6.56 and 6.57 are stated at `ρ∣dom(ρ′∣mut,own)` and `ρ∣dom(ρ′∣imm)`, which no row defines. `ρ/dom(ρ′)` comes with it — [TR] p. 5 writes it inside `◐`'s own defining row and row 5.53 covers only the one-location `ρ/ℓ` — and the two are what `BoCa.Fig16.ResU.restrictDom_compS` splits `ρ` by, which is how [TR] 6.56's appeal to 6.11 is discharged. Adjudicated here; the membership test is on `dom(ρ′)` and needs no decidable equality on `Loc`
 -/
 /-- `ρ|dom(σ)` — `ρ` at the locations `σ` is defined at.
 `[about ours: the notation `[TR]` §6 uses without a defining row]` -/
@@ -1887,7 +1884,7 @@ def ResU.delDom (ρ σ : ResU Loc Val) : ResU Loc Val where
 /-!
 ### 5.67 · — [CONF] §4.3's characterisation of `✓`: *"in a valid resource, every pair of aliases map to the same object and each has an immutable ancestor"*, and *"aliasing of exclusive locations … not guarded by immutable cells … violates the mutability-xor-aliasing restriction"* — · [CONF] p. 415:21, not in [TR] §5 · `[as printed]`
 
-Prose, not a defining row, and it characterises an object that already has one — `✓ρ ≜ ⦇ρ⦈ defined` (row 5.59). [CONF] p. 415:21 says the enforcement is composition itself and nothing more: *"the advantage of reusing composition is that it already rules out all of the inconsistent aliasing cases"*, and names the mechanism — *"the conflict at `ℓ₁` causes `•` and therefore `E•` to be undefined, while the conflict at `ℓ₂` causes `◦` and therefore `A` to be undefined"*. So there is nothing extra to transcribe, and the three clauses are already theorems: *same object* is `CellU.compatR_iff`, proved as an **iff** (`▷◁ ⟺ a common value, and a common witness wherever there is one to share`), with `CellU.CompatS.imm_imm` at `●`; *an immutable ancestor* is `AgW.nonimm_beneath_imm` with `ExW.immFree` (6.36); *no cell both exclusive and aliasable* is `ResU.CompatS.disjoint_of_immFree` and `ResU.flat_eq_ag_at`. The row exists because the prose was uncited for the whole of `[TR]` §6's development; `docs/boca-rules.md` §12.52 assembles it and records what it does **not** say
+Prose, not a defining row, and it characterises an object that already has one — `✓ρ ≜ ⦇ρ⦈ defined` (row 5.59). [CONF] p. 415:21 says the enforcement is composition itself and nothing more: *"the advantage of reusing composition is that it already rules out all of the inconsistent aliasing cases"*, and names the mechanism — *"the conflict at `ℓ₁` causes `•` and therefore `E•` to be undefined, while the conflict at `ℓ₂` causes `◦` and therefore `A` to be undefined"*. So there is nothing extra to transcribe, and the three clauses are already theorems: *same object* is `CellU.compatR_iff`, proved as an **iff** (`▷◁ ⟺ a common value, and a common witness wherever there is one to share`), with `CellU.CompatS.imm_imm` at `●`; *an immutable ancestor* is `AgW.nonimm_beneath_imm` with `ExW.immFree` (6.36); *no cell both exclusive and aliasable* is `ResU.CompatS.disjoint_of_immFree` and `ResU.flat_eq_ag_at`. The row exists because the prose was uncited for the whole of `[TR]` §6's development; `docs/adjudications.md` §12.52 assembles it and records what it does **not** say
 -/
 /-- Two compatible `imm` cells agree on the value and on the witness — with the
 witness compared by *plain equality* in `Res`, which is what the print's single
@@ -1999,21 +1996,21 @@ inductive CellU.CompR : CellU Loc Val → CellU Loc Val → CellU Loc Val → Pr
 /-!
 ### 5.14 · `ψ₁ ▷◁ ψ₂ ≜ ψ₁ ▸◂ ψ₂ ∨ ∃i,ᾱ,β,v,ρ,P̂. {ψ₁,ψ₂} ∈ {imm(ᾱ,v,ρ), own(v), mut(β,v,ρ,P̂)}` · [TR] p. 5, operation row 5 · `[repair]`
 
-The printed second disjunct does not type — a two-element SET asserted to be an ELEMENT of a three-element set of cells — and binds an unused `∃i`. Lean reads ⋈ as the domain of ○, settled against [TR]'s own Lemma 6.3 proof (`docs/boca-rules.md` §12.35). Adjudicated at `docs/boca-rules.md` §12.35 and `BoCa/Fig16.lean` §15: the printed disjunct cannot be taken as printed at all, a two-element SET asserted to be an ELEMENT of a three-element set of cells, with an `∃i` that is never used. Corroborated by [TR] p. 7's own proof of 6.3 and by Lemma 6.37's use of `ρ₁ ⋈ ρ₂` in the position "ρ₁ ○ ρ₂ is defined"
+The printed second disjunct does not type — a two-element SET asserted to be an ELEMENT of a three-element set of cells — and binds an unused `∃i`. Lean reads ⋈ as the domain of ○, settled against [TR]'s own Lemma 6.3 proof (`docs/adjudications.md` §12.35). Adjudicated at `docs/adjudications.md` §12.35: the printed disjunct cannot be taken as printed at all, a two-element SET asserted to be an ELEMENT of a three-element set of cells, with an `∃i` that is never used. Corroborated by [TR] p. 7's own proof of 6.3 and by Lemma 6.37's use of `ρ₁ ⋈ ρ₂` in the position "ρ₁ ○ ρ₂ is defined"
 -/
 /-- `ψ₁ ⋈ ψ₂` — relaxed cell compatibility, as the domain of `○`.
 `[variant: `[TR]` p. 5's printed second disjunct does not type (a two-element
 set asserted to be an element of a three-element set of cells, and an unused
 `∃ i`); this is the reading forced by `[TR]` Lemma 6.3's own `○`-case proof,
-with Lemma 6.9 as the precedent and 6.1 and 6.37 consistent with it — §15]` -/
+with Lemma 6.9 as the precedent and 6.1 and 6.37 consistent with it — `docs/adjudications.md` §12.35]` -/
 def CellU.CompatR (ψ₁ ψ₂ : CellU Loc Val) : Prop := ∃ ψ, CellU.CompR ψ₁ ψ₂ ψ
 
 /-!
 Row 5.17, continued.
 -/
-/-- `ρ₁ ⋈ ρ₂` — §12's `▶◁` schema at the relaxed mode.
+/-- `ρ₁ ⋈ ρ₂` — the `▶◁` schema at the relaxed mode.
 `[variant: obtained by instantiating the printed schema at `⋈`, whose cell-level
-reading is §15's]` -/
+reading is `CellU.CompatR`'s]` -/
 abbrev ResU.CompatR (ρ₁ ρ₂ : ResU Loc Val) : Prop := ResU.Compat CellU.CompatR ρ₁ ρ₂
 
 /-! `[about ours]` — what Lean needs before the next printed definition; the paper prints nothing here. -/
@@ -2051,15 +2048,15 @@ def ResU.compS (ρ₁ ρ₂ : ResU Loc Val) (h : ResU.CompatS ρ₁ ρ₂) : Res
 /-!
 Row 5.18, continued.
 -/
-/-- `ρ₁ ○ ρ₂ = ρ` — §12's `◐` schema at the relaxed mode.
+/-- `ρ₁ ○ ρ₂ = ρ` — the `◐` schema at the relaxed mode.
 `[variant: obtained by instantiating the printed schema at `⋈`/`○`; the guard
-and the `ρ₂(ℓ)` are `[TR]`'s, as in §12]` -/
+and the `ρ₂(ℓ)` are `[TR]`'s, as in `ResU.CompS`]` -/
 abbrev ResU.CompR (ρ₁ ρ₂ ρ : ResU Loc Val) : Prop :=
   ResU.Comp CellU.CompatR CellU.CompR ρ₁ ρ₂ ρ
 
 /-! `[about ours]` — what Lean needs before the next printed definition; the paper prints nothing here. -/
 /-- The cell-level `○` as a function of its guard.  `○` is single-valued
-(`CellU.CompR.functional`, §11), so the choice is of a representative of a
+(`CellU.CompR.functional`), so the choice is of a representative of a
 singleton; `Classical.choose` is what extracts it from the `∃` that `⋈` is.
 `[about ours: the function form of a graph the print gives by cases]` -/
 noncomputable def CellU.compR (ψ₁ ψ₂ : CellU Loc Val) (h : ψ₁.CompatR ψ₂) : CellU Loc Val :=
@@ -2081,7 +2078,7 @@ theorem optCompR_eq_none {o₁ o₂ : Option (CellU Loc Val)}
 Row 5.18, continued.
 -/
 /-- `ρ₁ ○ ρ₂`, as a function of the `⋈` guard — the relaxed twin of
-`ResU.compS` (§12).  Finite because both operands are.
+`ResU.compS`.  Finite because both operands are.
 `[about ours: the function form of a graph the print gives by cases]` -/
 noncomputable def ResU.compR (ρ₁ ρ₂ : ResU Loc Val) (h : ResU.CompatR ρ₁ ρ₂) : ResU Loc Val where
   get := fun l => optCompR (ρ₁.get l) (ρ₂.get l) (fun ψ₁ ψ₂ e₁ e₂ => h l ψ₁ ψ₂ e₁ e₂)
@@ -2106,13 +2103,13 @@ abbrev ExR (ρ σ : ResU Loc Val) : Prop := ExW CellU.CompatR CellU.CompR ρ σ
 /-!
 ### 5.21 · `ag(ρ)_◖ ≜ ρ∣imm ○ ◯{ag(ρ′) ∣ …mut…} ○ ◯{ex(ρ′)_○ ○ ag(ρ′) ∣ …imm…}` · [TR] p. 5, operation row 12 · `[repair]`
 
-The same set-versus-family reading as row 5.20; additionally the ◖ subscript printed on the LEFT-hand side occurs nowhere on the right (the body is at ○ throughout, with `ex(ρ′)_○` explicitly hollow) and is dropped as vestigial, following [CONF] Fig. 18a's unsubscripted flattening — so no `ag(ρ)_●` exists here. Adjudicated at `BoCa/Fig16.lean` §18, the family half by `docs/boca-rules.md` §12.36 and convention G6: the printed left-hand subscript parametrizes nothing, occurring nowhere on the right-hand side, whose body is at ○ throughout with `ex(ρ′)_○` explicitly hollow, and [CONF] p. 415:22 writes the same row unsubscripted
+The same set-versus-family reading as row 5.20; additionally the ◖ subscript printed on the LEFT-hand side occurs nowhere on the right (the body is at ○ throughout, with `ex(ρ′)_○` explicitly hollow) and is dropped as vestigial, following [CONF] Fig. 18a's unsubscripted flattening — so no `ag(ρ)_●` exists here. Adjudicated here, the family half by `docs/adjudications.md` §12.36 and convention G6: the printed left-hand subscript parametrizes nothing, occurring nowhere on the right-hand side, whose body is at ○ throughout with `ex(ρ′)_○` explicitly hollow, and [CONF] p. 415:22 writes the same row unsubscripted
 -/
 mutual
 
 /-- `ag(ρ) = σ` — the aliasable walk, as a graph, always at `○`.
 `[variant: the printed comprehensions are sets and these are the families they
-index (convention G6, §17); the vestigial `◐` on the printed left-hand side is
+index (convention G6); the vestigial `◐` on the printed left-hand side is
 dropped, following `[CONF]` Fig. 18a's unsubscripted `A⦇ρ⦈`]` -/
 inductive AgW : ResU Loc Val → ResU Loc Val → Prop where
   | mk {ρ σ a bm bi : ResU Loc Val} {wm wi : List (Loc × ResU Loc Val)}
@@ -2168,7 +2165,7 @@ def ResU.Valid (ρ : ResU Loc Val) : Prop := ∃ σ, ResU.Flat ρ σ
 
 [TR]'s row with the inner erasure and the `✓ρ` guard; [CONF] Fig. 18a prints neither and so equates a `Cell` with a `Val`
 -/
-/-- `⟦ρ⟧ = m` — `⟦ρ⟧ ≜ [ℓ ↦ v | ⟦⦇ρ⦈(ℓ)⟧ = v]` when `✓ρ`, with `⟦ψ⟧` §13's
+/-- `⟦ρ⟧ = m` — `⟦ρ⟧ ≜ [ℓ ↦ v | ⟦⦇ρ⦈(ℓ)⟧ = v]` when `✓ρ`, with `⟦ψ⟧` the
 `CellU.erase`.  The guard is carried by the existential: a lowering exists
 exactly when the flattening does.
 `[as printed]` (as a graph — G4; `[TR]`'s row, not `[CONF]` Fig. 18a's, which
@@ -2190,12 +2187,12 @@ def ResU.Hash (ρ₁ ρ₂ : ResU Loc Val) : Prop :=
 /-!
 ### 5.60 · `⦇ρ⦈(ℓ)` — an application of a partial term · [TR] p. 5, row 18 · `[repair]`
 
-"Some flattening of ρ carries ψ at ℓ" — false when `⦇ρ⦈` is undefined, single-valued by `BoCa.Fig16.ResU.Flat.functional`. This is exactly where [TR]'s guarded ↭ and [CONF]'s unguarded one come apart (`BoCa.Fig16.ResU.upd_of_not_valid`). Adjudicated at `BoCa/Fig16.lean` §20e with convention G4 and at the declaration: the print applies a partial term and says nothing about the undefined case, so a reading must be chosen; the one taken is stated, proved single-valued by `BoCa.Fig16.ResU.Flat.functional`, and identified as exactly where the two printed readings of ↭ part company
+"Some flattening of ρ carries ψ at ℓ" — false when `⦇ρ⦈` is undefined, single-valued by `BoCa.Fig16.ResU.Flat.functional`. This is exactly where [TR]'s guarded ↭ and [CONF]'s unguarded one come apart (`BoCa.Fig16.ResU.upd_of_not_valid`). Adjudicated at convention G4 and at the declaration: the print applies a partial term and says nothing about the undefined case, so a reading must be chosen; the one taken is stated, proved single-valued by `BoCa.Fig16.ResU.Flat.functional`, and identified as exactly where the two printed readings of ↭ part company
 -/
 /-- `⦇ρ⦈(ℓ) = ψ` — the printed partial-value equation, as `↭` uses it.  `⦇−⦈` is
 a graph here (G4), so this says some flattening of `ρ` carries `ψ` at `ℓ`; it is
 false when `⦇ρ⦈` is undefined, and single-valued in `ψ` by
-`ResU.Flat.functional` (§20a).
+`ResU.Flat.functional`.
 `[about ours: the application `⦇ρ⦈(ℓ)` of a printed term, at the graph]` -/
 def ResU.FlatAt (ρ : ResU Loc Val) (l : Loc) (ψ : CellU Loc Val) : Prop :=
   ∃ σ, ResU.Flat ρ σ ∧ σ.get l = some ψ
@@ -2203,13 +2200,13 @@ def ResU.FlatAt (ρ : ResU Loc Val) (l : Loc) (ψ : CellU Loc Val) : Prop :=
 /-!
 ### 5.27 · `ρ₁ ↭ ρ₂ ≜ {∀ℓ,… (⦇ρ₁⦈(ℓ)=mut(α,_,_,P̂) ⇔ ⦇ρ₂⦈(ℓ)=mut(α,_,_,P̂)) ∧ (⦇ρ₁⦈(ℓ)=imm(β̄,v,ρ) ⇔ ⦇ρ₂⦈(ℓ)=mut(β̄,v,ρ))}`, `✓ρ₁ ∧ ✓ρ₂` · [TR] p. 5, operation row 18 · `[repair]`
 
-The second clause's right-hand side prints a THREE-ary `mut` with a barred first argument; the Lean writes `imm`, following [CONF] Fig. 18b. The repair is forced — `mut` is 4-ary everywhere and its first slot is a single lifetime — but it changes a constructor, not a subscript. Adjudicated at `docs/boca-rules.md` §12.39, `BoCa/Fig16.lean` §20e and `docs/axiom-ledger.md` D3: the arity is the tell — `mut` is four-ary in Fig. 16 and in the clause two lines above, and its first argument here is printed overbarred, a lifetime SET in a single-lifetime slot — so the clause is well formed on no reading. [CONF] Fig. 18b prints `imm ⇔ imm` and `mut(β,−,−,P̂) ⇔ mut(β,−,−,P̂)`
+The second clause's right-hand side prints a THREE-ary `mut` with a barred first argument; the Lean writes `imm`, following [CONF] Fig. 18b. The repair is forced — `mut` is 4-ary everywhere and its first slot is a single lifetime — but it changes a constructor, not a subscript. Adjudicated at `docs/adjudications.md` §12.39 and D3: the arity is the tell — `mut` is four-ary in Fig. 16 and in the clause two lines above, and its first argument here is printed overbarred, a lifetime SET in a single-lifetime slot — so the clause is well formed on no reading. [CONF] Fig. 18b prints `imm ⇔ imm` and `mut(β,−,−,P̂) ⇔ mut(β,−,−,P̂)`
 -/
 /-- Clause (1) of `↭`: `⦇ρ₁⦈(ℓ) = imm(ᾱ, v, ρ) ⇔ ⦇ρ₂⦈(ℓ) = imm(ᾱ, v, ρ)`, with
 the lifetime set, the value and the witness all fixed across the `⇔` — nothing
 wildcarded.  `h` is the print's own typing constraint on `imm`'s third
 component.  This is `[CONF]` Fig. 18b's clause (1); `[TR]` p. 5 prints it
-second, and prints `mut` for the second `imm` (§20e).  `[as printed]` -/
+second, and prints `mut` for the second `imm`.  `[as printed]` -/
 def ResU.UpdImm (ρ₁ ρ₂ : ResU Loc Val) : Prop :=
   ∀ (l : Loc) (s : LSet) (v : Val) (χ : ResU Loc Val) (h : χ.InStratum s.join),
     ρ₁.FlatAt l (CellU.immOf s v χ h) ↔ ρ₂.FlatAt l (CellU.immOf s v χ h)
@@ -2235,7 +2232,7 @@ Row 5.27, continued.
 
 ### 5.62 · — [CONF] Fig. 18b's unguarded ↭, and the `wp` row read at it — · not in [TR] §5 · `[repair]`
 
-The second printed reading of ↭ (`docs/axiom-ledger.md` D3), kept alongside [TR]'s; `BoCa.Fig16.BoLo.wp_eq_wpU` proves the two readings give the same `SProp` inside the `wp` row, so nothing downstream has to choose. Adjudicated at `docs/axiom-ledger.md` D3 with `BoCa/Fig16.lean` §20e and `BoCa/Fig16Wp.lean` §2: both readings of ↭ are printed rows in the same documents, so both are carried and the choice is closed by proof rather than fiat — `BoCa.Fig16.BoLo.wp_eq_wpU` shows [TR]'s two guards follow from the `#`s that `wp` already quantifies over — and what survives away from `wp` is named. `BoCa.Fig16.ResU.Upd` is itself `[as printed]` against [CONF] Fig. 18b, so this row bundles a printed item with two declarations of ours
+The second printed reading of ↭ (`docs/adjudications.md` D3), kept alongside [TR]'s; `BoCa.Fig16.BoLo.wp_eq_wpU` proves the two readings give the same `SProp` inside the `wp` row, so nothing downstream has to choose. Adjudicated at `docs/adjudications.md` D3: both readings of ↭ are printed rows in the same documents, so both are carried and the choice is closed by proof rather than fiat — `BoCa.Fig16.BoLo.wp_eq_wpU` shows [TR]'s two guards follow from the `#`s that `wp` already quantifies over — and what survives away from `wp` is named. `BoCa.Fig16.ResU.Upd` is itself `[as printed]` against [CONF] Fig. 18b, so this row bundles a printed item with two declarations of ours
 -/
 /-- `ρ₁ ↭ ρ₂` as `[CONF]` Fig. 18b (p. 415:22) prints it: the two clauses, and
 **no** validity guard.  `[as printed]` -/
@@ -2257,7 +2254,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 /-!
 ### 5.33 · `wp (e) {Q̂} (ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v. (⟦ρ_f ● ρ⟧,e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧,v) ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺∣own = ∅ ∧ Q̂(v)(ρ′)` · [TR] p. 6, proposition row 5 · `[repair]`
 
-The row's own shape is transcribed exactly — every partial term bound and related by its graph, ↭ at [TR]'s guarded reading, the own-free side condition as `BoCa.Fig16.BoLo.NoOwn` — but `→*` is `BoCa.BoLo.Steps`, the completed machine of rows 3.14, 3.30 and 3.31, so this `wp` is strictly WEAKER than the printed row. Adjudicated at `docs/boca-rules.md` §12.42, `docs/axiom-ledger.md` D6 and `BoCa/Fig16Wp.lean`'s "What the machine costs": [TR] §3's `Kont` is elided rather than exact, and [CONF] Corollary 3.3's conclusion is unreachable on the machine as printed at a closed term p. 2 types at `1` (`BoCa.TR3.derives_wSeq`, `BoCa.TR3.corThree_unreachable`); every addition is a frame, and `BoCa/TR3.lean` re-proves §6.7 over the printed machine with `BoCa.TR3.wp_le_fig16` between  **And at the typed world (`docs/boca-rules.md` §12.72)**: `∀ρ_f # ρ` ranges over the frames completing `ρ` to a `BoCa.Fig16.LogRel.Typed.TW` world at the record list, tagged, and the post-configuration is one too, with the same records and list members; every other conjunct is this row's. The settled reading that §6 quantifies over resources that arise; §12.68's configuration is one no program produces, and `BoCa.Fig16.LogRel.ViewWitness.excluded` shows the typed world excludes it (§12.73)
+The row's own shape is transcribed exactly — every partial term bound and related by its graph, ↭ at [TR]'s guarded reading, the own-free side condition as `BoCa.Fig16.BoLo.NoOwn` — but `→*` is `BoCa.BoLo.Steps`, the completed machine of rows 3.14, 3.30 and 3.31, so this `wp` is strictly WEAKER than the printed row. Adjudicated at `docs/adjudications.md` §12.42 and D6: [TR] §3's `Kont` is elided rather than exact, and [CONF] Corollary 3.3's conclusion is unreachable on the machine as printed at a closed term p. 2 types at `1` (`BoCa.TR3.derives_wSeq`, `BoCa.TR3.corThree_unreachable`); every addition is a frame, and `BoCa.TR3.wp` re-proves §6.7 over the printed machine with `BoCa.TR3.wp_le_fig16` between  **And at the typed world (`docs/adjudications.md` §12.72)**: `∀ρ_f # ρ` ranges over the frames completing `ρ` to a `BoCa.Fig16.LogRel.Typed.TW` world at the record list, tagged, and the post-configuration is one too, with the same records and list members; every other conjunct is this row's. The settled reading that §6 quantifies over resources that arise; §12.68's configuration is one no program produces, and `BoCa.Fig16.LogRel.ViewWitness.excluded` shows the typed world excludes it (§12.73)
 -/
 /-- **`wp(e){Q̂}`** — `[TR]` p. 6's last-but-one row, on the printed carrier.
 
@@ -2287,13 +2284,13 @@ Row 5.62, continued.
 -/
 /-- **`wp` with `[CONF]` Fig. 18b's `↭`** — the same row of `[TR]` p. 6 with the
 unguarded `ResU.Upd` where `wp` above takes `[TR]` p. 5's guarded `ResU.UpdV`.
-`BoCa/Wp.lean` offers the pair the same way, and `wp_updV_iff_upd` below is what
-closes ledger D3 for this file: on the printed carrier the two readings are the
+`wp_updV_iff_upd` below is what
+closes `docs/adjudications.md` D3 for this file: on the printed carrier the two readings are the
 same proposition.
 
 `[variant: `wp` above with the `↭` of `[CONF]` Fig. 18b (p. 415:22) in place of
 `[TR]` p. 5's, and otherwise identical — so it inherits `wp`'s own departures,
-the larger machine of ledger D6 among them.]` -/
+the larger machine of `docs/adjudications.md` D6 among them.]` -/
 def wpU (e : Expr) (Q : Val → WProp) : WProp := fun ρ =>
   ∀ ρf : WRes, ResU.Hash ρf ρ →
     ∃ (ρ' ρp fρ fρ' fρ'p π : WRes) (v : Val) (μ μ' : Heap),

@@ -9,8 +9,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the pieces of Lemmas 6.18 and 6.20: the sites of a composite, the witness families of each walk and how they split across `●`, and inclusion–exclusion over shared `imm` cells.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the pieces of Lemmas 6.18 and 6.20: the sites of a composite, the witness families of each walk and how they split across `●`, and inclusion–exclusion over shared `imm` cells.
 -/
 
 noncomputable section
@@ -246,7 +245,7 @@ variable {Loc Val : Type}
 variable {R : CellU Loc Val → CellU Loc Val → Prop}
 variable {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
 
-/-- **The exclusive family, entry by entry.**  `ExWits.mem` (§20a) is the
+/-- **The exclusive family, entry by entry.**  `ExWits.mem` is the
 forward half without the tag; this adds the tag and the converse, fixing the
 relation by its entries, which makes cutting and concatenating it one-liners.
 Proved by induction on the list rather than on the derivation, which avoids the
@@ -291,7 +290,7 @@ exclusive family.**  With `ResU.Sites.split_pairs` this is the cut [TR] 6.18's
 forward direction makes.  Nothing has to be re-derived: the composite's cell at
 such a location *is* `ρ₁`'s cell, so the walk paired with it is already a walk
 of `ρ₁`'s witness.
-`[about ours: `ExWits` is §17's family relation, convention G6's reading of the
+`[about ours: `ExWits` is the family relation, convention G6's reading of the
 printed comprehension]` -/
 theorem ExWits.to_compS_left {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ)
     {w w₁ : List (Loc × ResU Loc Val)} (hw : ExWits R C ρ w)
@@ -438,7 +437,7 @@ namespace BoCa.Fig16
 
 /-- `BoCa.Fig16.List.perm_of_keys` with the permutation of the key lists
 replaced by same-membership, which is the form `ResU.Sites` hands over.
-`[about ours: a restatement of §20a's list lemma; it is about `List`, not about
+`[about ours: a restatement of the list lemma; it is about `List`, not about
 any printed row]` -/
 theorem List.perm_of_keys_mem {α β : Type} {w w' : List (α × β)}
     (hk : (w.map Prod.fst).Nodup) (hk' : (w'.map Prod.fst).Nodup)

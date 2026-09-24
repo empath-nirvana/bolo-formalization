@@ -8,8 +8,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the cell- and resource-level compositions `●` and `○` and compatibilities `▶◀` and `⋈` as graphs: functionality, symmetry, the specification of each clause, erasure and witnesses.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the cell- and resource-level compositions `●` and `○` and compatibilities `▶◀` and `⋈` as graphs: functionality, symmetry, the specification of each clause, erasure and witnesses.
 -/
 
 noncomputable section
@@ -314,7 +313,7 @@ theorem SPropS.conj_comm {a b : Life} (P : Val → SPropS Loc Val a)
 
 /-- `○` is commutative on cells — the cell half of `[TR]` Lemma 6.2 (p. 6).
 `[about ours: the cell-level fact the resource-level Lemma 6.2 is proved from;
-6.2 itself is `ResU.Comp.comm` in §20]` -/
+6.2 itself is `ResU.Comp.comm`]` -/
 theorem CellU.CompR.comm {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ) :
     CellU.CompR ψ₂ ψ₁ ψ := by
   cases h with
@@ -367,8 +366,8 @@ theorem ResU.compR_spec (ρ₁ ρ₂ : ResU Loc Val) (h : ResU.CompatR ρ₁ ρ�
   ⟨h, fun l => optCompR_optComp (ρ₁.get l) (ρ₂.get l) _⟩
 
 /-- `ρ₁ ⋈ ρ₂` iff `ρ₁ ○ ρ₂` is defined — the `○` twin of `[TR]` Lemma 6.9
-(p. 7).  The paper states 6.9 at `●` only and never states this; with §15's
-reading of `⋈` it is the same proof.
+(p. 7).  The paper states 6.9 at `●` only and never states this; with the
+reading of `⋈` in `docs/adjudications.md` §12.35 it is the same proof.
 `[about ours: the `○` analogue of 6.9, which the paper does not state]` -/
 theorem ResU.compR_defined_iff (ρ₁ ρ₂ : ResU Loc Val) :
     (∃ ρ, ResU.CompR ρ₁ ρ₂ ρ) ↔ ResU.CompatR ρ₁ ρ₂ :=

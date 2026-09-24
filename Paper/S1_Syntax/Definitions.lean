@@ -31,10 +31,8 @@ printed form, the page, a tag, and the reason the Lean has the shape it has:
 * `[about ours]` — a declaration the paper does not print, placed here only
   because Lean needs it before the next printed row.
 
-Row numbers are those of the source repository's `docs/definition-inventory.md`;
-citations of `docs/…` and `BoCa/…` are to that repository (`borrow_lang` at
-`970a9d0`).  Declaration names are the source's, unchanged, so that
-`Bridge/Names.csv` can check each one against its original.
+Row numbers are those of `Paper/INDEX.md` (*Definitions*); `§N` citations are
+to `docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -208,7 +206,7 @@ De Bruijn: the binder is dropped, the body is an `Expr` as the printed `λx.e`'s
 
 ### 1.8 · `Val ::= … ∣ Λ.e` · [TR] p. 1 · `[repair]`
 
-Two printed-distinct value formers become one term. `BoCa.Derives.lolliI` and `BoCa.Derives.allI` conclude about the same `.val (.lam e)`, and `BoCa.Derives.allE` types `.app e (.val .unit)`, which `BoCa.Derives.lolliE` also types at `T₁ = 1`: typing is syntax-directed at neither λ nor application, and every inversion on those shapes carries both cases. [TR] p. 2's ∀I prints the term as `Λ.e`, so the print does keep them apart. Adjudicated at `docs/boca-rules.md` §12.14, with the consequence at §12.27: the print cannot be taken as printed, since [TR] p. 2's ∀E concludes `e[]`, a term in no `Expr` production and in no ↦ rule, while [TR] p. 4's own `𝒱⟦∀ 'a ⊏ @b. T⟧δ(v) ≜ ∀ α ⊏ @bδ. ℰ⟦T⟧δ(v ())` applies `v` to `()`, which only ⊸↦ reduces — so a `Λ.e` kept distinct from `λ` never steps. [CONF] p. 415:8 says outright that `Λ.e` is shorthand for `λ_.e`, and the authority used is [TR] p. 4 against [TR] p. 1, not [CONF] Fig. 1
+Two printed-distinct value formers become one term. `BoCa.Derives.lolliI` and `BoCa.Derives.allI` conclude about the same `.val (.lam e)`, and `BoCa.Derives.allE` types `.app e (.val .unit)`, which `BoCa.Derives.lolliE` also types at `T₁ = 1`: typing is syntax-directed at neither λ nor application, and every inversion on those shapes carries both cases. [TR] p. 2's ∀I prints the term as `Λ.e`, so the print does keep them apart. Adjudicated at `docs/adjudications.md` §12.14, with the consequence at §12.27: the print cannot be taken as printed, since [TR] p. 2's ∀E concludes `e[]`, a term in no `Expr` production and in no ↦ rule, while [TR] p. 4's own `𝒱⟦∀ 'a ⊏ @b. T⟧δ(v) ≜ ∀ α ⊏ @bδ. ℰ⟦T⟧δ(v ())` applies `v` to `()`, which only ⊸↦ reduces — so a `Λ.e` kept distinct from `λ` never steps. [CONF] p. 415:8 says outright that `Λ.e` is shorthand for `λ_.e`, and the authority used is [TR] p. 4 against [TR] p. 1, not [CONF] Fig. 1
 -/
 def lam (body : Expr) : Val := ⟨.lam body, .lam⟩
 
@@ -275,7 +273,7 @@ namespace BoCa.Lifetime
 
 Nat-indexed names, so freshness is "one past the largest in scope" (`BoCa.Ty.lifeBound`) and `BoCa.Lifetime.varName` pretty-prints `'a, 'b, …`. Same reducible-`Nat` collision as row 1.2
 -/
-/-- Lifetime variables.  Nat-indexed rather than named: freshness (§7) is then
+/-- Lifetime variables.  Nat-indexed rather than named: freshness (`LifeCtx.freshVar`) is then
     "one more than the largest in scope", and the pretty-printer recovers
     `'a`, `'b`, … for the tests. -/
 abbrev LifeVar := Nat
@@ -283,7 +281,7 @@ abbrev LifeVar := Nat
 /-!
 ### 1.26 · `Life ∋ @a, @b… ::= '` · [TR] p. 1 · `[encoding]`
 
-p. 1 prints a BARE apostrophe with no variable; Lean reads it as `'a`, a `LifeVar`. Forced — on the literal reading `Life` has no variables and `LifeVar`, `LifeCtx : LifeVar ⇀ Life`, `∀'a ⊏ @b.T` and ⟦Δ⟧ all go vacuous; [CONF] Fig. 7 (p. 415:8) prints `'a` and [TR] p. 3's `@aδ` has the case `@a = 'a`. A repair of the print, not a representation change (`docs/boca-rules.md` §12.8)
+p. 1 prints a BARE apostrophe with no variable; Lean reads it as `'a`, a `LifeVar`. Forced — on the literal reading `Life` has no variables and `LifeVar`, `LifeCtx : LifeVar ⇀ Life`, `∀'a ⊏ @b.T` and ⟦Δ⟧ all go vacuous; [CONF] Fig. 7 (p. 415:8) prints `'a` and [TR] p. 3's `@aδ` has the case `@a = 'a`. A repair of the print, not a representation change (`docs/adjudications.md` §12.8)
 
 ### 1.27 · `Life ::= … ∣ ⊤` · [TR] p. 1 · `[as printed]`
 

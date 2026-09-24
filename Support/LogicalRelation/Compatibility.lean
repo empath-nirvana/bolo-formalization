@@ -31,8 +31,7 @@ import Support.Statics.Presupposed
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-what the compatibility lemmas share at the literal judgment: `𝒢⟦Γ⟧` split along the context, `wp` monotone and bound with a frame, `𝒱⟦−⟧` under substitution and instantiation, the members of a lifetime, the hypotheses 6.172–6.175 add (`…Side`) and the derivations that carry them (`DerivesIn`).  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+what the compatibility lemmas share at the literal judgment: `𝒢⟦Γ⟧` split along the context, `wp` monotone and bound with a frame, `𝒱⟦−⟧` under substitution and instantiation, the members of a lifetime, the hypotheses 6.172–6.175 add (`…Side`) and the derivations that carry them (`DerivesIn`).
 -/
 
 noncomputable section
@@ -337,7 +336,7 @@ premise the two refutations below need: `1E` and `⊕I` are only refuted at an
 `e₁` that is not already a value, and this is one — `[TR]` p. 2's `⊸E` types it
 at `1` (`TR3.derives_wFreeAlloc`) and the printed `alloc↦`, `free↦` and the
 printed frame `e K` run it to `()` (`TR3.run_free_alloc`).
-`[about ours: `[TR]` p. 4's `ℰ⟦1⟧` over `BoCa/TR3.lean`'s printed machine]` -/
+`[about ours: `[TR]` p. 4's `ℰ⟦1⟧` over `TR3.Steps`, the printed machine]` -/
 theorem tr3_eDen_freeAlloc (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty := by
   have hb := TR3.wp_bind (.appR (.val (.prim .free)) .hole) TR3.wAlloc
@@ -420,7 +419,7 @@ the same ask; `ImmAt` fixes the licence to the index, which is what `reb_α`
 establishes, and `CtxLicence` is the licence `Δ ⊢ Γ ⊐ @a` supplies.  At a
 FIXED `α` this is far weaker than asking `⊔β̄ ⊑ ⊓β̄`: the set `{1, 5}` is not
 flat and satisfies it at `7`.
-`[about ours: §8a's slot condition, as `LifeMembers` at one licence]` -/
+`[about ours: the slot condition, as `LifeMembers` at one licence]` -/
 def ImmAt (α : Life) (ρ : WRes) : Prop := LifeMembers (fun x => α ⊑ x) ρ
 
 /-- The shortest lifetime `T` itself declares, following `OutlivesRules`'
@@ -658,7 +657,7 @@ inductive DerivesIn : LifeCtx → Ctx Ty → Expr → Ty → Prop where
       DerivesIn Δ Γ withswap (axWithswapTy a T₁ T₂)
 
 /-- `AllISide` off `Δ ⊢ @b`, `Δ ⊢ Γ` and a well-scoped `Δ`.
-`[about ours: §12a's `∀I` side, from [TR] p. 2's `Δ ⊢ T`]` -/
+`[about ours: the `∀I` side, from [TR] p. 2's `Δ ⊢ T`]` -/
 theorem allISide_of_scopedB {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {b : Lifetime.Life}
     (hΔ : Δ.Ok) (hx : Δ.find? x = none) (hb : b.wf Δ = true)
     (hΓ : Ctx.ScopedB Δ Γ) : AllISide Δ Γ x b :=
@@ -667,21 +666,21 @@ theorem allISide_of_scopedB {Δ : LifeCtx} {Γ : Ctx Ty} {x : LifeVar} {b : Life
     fun s hs hl => not_lfree_of_scopedB hx (hΓ s hs hl)⟩
 
 /-- `Withbor1Side` off `Δ ⊢ T₁` and `Δ ⊢ T₂`; the form asks nothing else.
-`[about ours: §12a's `withbor1` side, from [TR] p. 2's `Δ ⊢ T`]` -/
+`[about ours: the `withbor1` side, from [TR] p. 2's `Δ ⊢ T`]` -/
 theorem withbor1Side_of_scopedB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
     (hx : Δ.find? x = none) (h₁ : T₁.scopedB Δ = true) (h₂ : T₂.scopedB Δ = true) :
     Withbor1Side x T₁ T₂ :=
   ⟨not_lfree_of_scopedB hx h₁, not_lfree_of_scopedB hx h₂⟩
 
 /-- `Withbor2Side` off `Δ ⊢ T₁` and `Δ ⊢ T₂`.
-`[about ours: §12a's `withbor2` side, from [TR] p. 2's `Δ ⊢ T`]` -/
+`[about ours: the `withbor2` side, from [TR] p. 2's `Δ ⊢ T`]` -/
 theorem withbor2Side_of_scopedB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
     (hx : Δ.find? x = none) (h₁ : T₁.scopedB Δ = true) (h₂ : T₂.scopedB Δ = true) :
     Withbor2Side x T₁ T₂ :=
   ⟨not_lfree_of_scopedB hx h₁, not_lfree_of_scopedB hx h₂⟩
 
 /-- `Withbor3Side`, the same two conditions as `Withbor2Side`.
-`[about ours: §12a's `withbor3` side, from [TR] p. 2's `Δ ⊢ T`]` -/
+`[about ours: the `withbor3` side, from [TR] p. 2's `Δ ⊢ T`]` -/
 theorem withbor3Side_of_scopedB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
     (hx : Δ.find? x = none) (h₁ : T₁.scopedB Δ = true) (h₂ : T₂.scopedB Δ = true) :
     Withbor3Side x T₁ T₂ :=
@@ -689,7 +688,7 @@ theorem withbor3Side_of_scopedB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
 
 /-- `WithloadSide` off `Δ ⊢ T₁`, `Δ ⊢ T₂` and 6.150's escrow, which is not one
 of these.
-`[about ours: §12a's `withload` side, with its freshness from [TR] p. 2]` -/
+`[about ours: the `withload` side, with its freshness from [TR] p. 2]` -/
 theorem withloadSide_of_scopedB {Δ : LifeCtx} {x : LifeVar} {T₁ T₂ : Ty}
     (hesc : ∀ (δ : LSub) (vℓ : Val), RebEscrow
       (fun β v' => ⌜vℓ = v'⌝ ⋆ vDen (T₁.immReborrow (.var x)) (δ.extend x β) vℓ))
@@ -708,7 +707,7 @@ Its five sides are of two kinds, and only one of them is about the carrier.
   `allISide_of_wfB` and the four beside it derive all of them from `Ty.wfB`
   and `Lifetime.LifeCtx.Ok`, and `BoCa.wfTy_of_wfB` ties `Ty.wfB` to the
   transcribed `BoCa.WfTy`.  `Derives` consumes that judgment at no
-  constructor (`docs/definition-inventory.md` row 2.19), which is why the
+  constructor (definition row 2.19), which is why the
   sides are not among its premises: `allI_fresh_refuted` is a `Derives.allI`
   node whose bound mentions its own binder.
 * `WithloadSide`'s escrow is [TR] 6.150's own inheritance from 6.55.
@@ -771,7 +770,7 @@ theorem witness : Derives ⟨[]⟩ [] (.val (.lam (.val .unit)))
 `FundamentalPropertyOverRules` quantifies over `Derives` and over every `Δ` and
 `Γ`.  The judgment half of the difference is this bridge; the other half is
 that its quantifier carries neither presupposition, which is [TR] p. 2's boxed
-"Presumes ⊧ ∆" and `Δ ⊢ Γ` and which `docs/definition-inventory.md` row 2.19
+"Presumes ⊧ ∆" and `Δ ⊢ Γ` and which definition row 2.19
 records `Derives` consuming nowhere.  `FundamentalProperty` — the antecedent
 under those presuppositions — needs neither, and `fundamentalProperty` proves
 it outright.

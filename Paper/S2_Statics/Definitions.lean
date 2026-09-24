@@ -47,10 +47,8 @@ printed form, the page, a tag, and the reason the Lean has the shape it has:
 * `[about ours]` — a declaration the paper does not print, placed here only
   because Lean needs it before the next printed row.
 
-Row numbers are those of the source repository's `docs/definition-inventory.md`;
-citations of `docs/…` and `BoCa/…` are to that repository (`borrow_lang` at
-`970a9d0`).  Declaration names are the source's, unchanged, so that
-`Bridge/Names.csv` can check each one against its original.
+Row numbers are those of `Paper/INDEX.md` (*Definitions*); `§N` citations are
+to `docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -83,11 +81,11 @@ namespace BoCa
 /-!
 ### 2.39 · `Δ ⊢ swap : Ref T₁ ⊸ T₂ ⊸ Ref T₂ ⊗ T₁` · [TR] p. 3 (type), p. 4 (term) · `[repair]`
 
-The TYPE is as printed. The TERM is not: `BoCa.swap` is [CONF] Fig. 3b's `λx.λy₂. let y₁ = load x; store x y₂; (x,y₁)` where [TR] p. 4 prints `λx.λy. let z = load x; store x y; (x,y)` (row 3.24). Adjudicated at `docs/boca-rules.md` §12.20 and at `BoCa.swap`: [TR] p. 4's body binds `z`, never uses it, and returns the NEW payload, contradicting the type printed on the same axiom line, whose second component is `T₁`; [CONF] Fig. 3b's body matches that type, and [TR]'s own proof of Lemma 6.169 (p. 44) evaluates `let z = load v₁; store v₁ v₂; (v₁, z)`.
+The TYPE is as printed. The TERM is not: `BoCa.swap` is [CONF] Fig. 3b's `λx.λy₂. let y₁ = load x; store x y₂; (x,y₁)` where [TR] p. 4 prints `λx.λy. let z = load x; store x y; (x,y)` (row 3.24). Adjudicated at `docs/adjudications.md` §12.20 and at `BoCa.swap`: [TR] p. 4's body binds `z`, never uses it, and returns the NEW payload, contradicting the type printed on the same axiom line, whose second component is `T₁`; [CONF] Fig. 3b's body matches that type, and [TR]'s own proof of Lemma 6.169 (p. 44) evaluates `let z = load v₁; store v₁ v₂; (v₁, z)`.
 
 ### 3.24 · `swap ≜ λx.λy.let z = load x; store x y; (x, y)` · [TR] p. 4 · `[repair]`
 
-The Lean returns `(x, z)`, the OLD payload ([CONF] Fig. 3b, p. 415:4), where [TR] p. 4 prints `(x, y)`, the new one, with `z` bound and unused. No Lean declaration carries [TR] p. 4's printed body. Adjudicated at `docs/boca-rules.md` §12.20 and at `BoCa.swap`, three ways on the pages: [TR] p. 4's printed body binds `z` and never uses it and contradicts the type [TR] p. 3 prints for `swap`; [CONF] Fig. 3b's body matches that type; and [TR]'s own proof of Lemma 6.169 (p. 44) evaluates `let z = load v₁; store v₁ v₂; (v₁, z)`, returning the old payload
+The Lean returns `(x, z)`, the OLD payload ([CONF] Fig. 3b, p. 415:4), where [TR] p. 4 prints `(x, y)`, the new one, with `z` bound and unused. No Lean declaration carries [TR] p. 4's printed body. Adjudicated at `docs/adjudications.md` §12.20 and at `BoCa.swap`, three ways on the pages: [TR] p. 4's printed body binds `z` and never uses it and contradicts the type [TR] p. 3 prints for `swap`; [CONF] Fig. 3b's body matches that type; and [TR]'s own proof of Lemma 6.169 (p. 44) evaluates `let z = load v₁; store v₁ v₂; (v₁, z)`, returning the old payload
 -/
 /-- `swap ≜ λx.λy₂. let y₁ = load x; store x y₂; (x, y₁)` — **[CONF] Fig. 3b**
     (p. 415:4), not [TR] p. 4.  §12.20.
@@ -161,17 +159,17 @@ namespace BoCa
 /-!
 ### 2.44 · `Δ ⊢ withbor : Ref T₁ ⊸ (∀ 'a ⊏ ⊓Δ. Imm 'a T₁ ⊸ ['a] T₂) ⊸ Ref T₁ ⊗ T₂` · [TR] p. 3 (type), p. 4 (term) · `[as printed]`
 
-Type as printed (the inner `Imm` is the bare constructor, unlike `withload`'s). The TERM is [CONF] Fig. 15's `λx.λf.(x, f () x)`, not [TR] p. 4's `λx.λf.(x, f x)` (row 3.27). The ∀ binder is schematic, as printed: the constructor takes `(x : LifeVar)` with the freshness premise `Δ.find? x = none` that §12.44 argues for ∀I, and concludes at `axWithbor1Ty x Δ.meetOfDom T₁ T₂`. It was pinned to `BoCa.Lifetime.LifeCtx.freshVar`, which made the rule one instance of the printed one — `BoCa.Ty` equality is syntactic, so no other α-variant was derivable — and §12.45 found against it. Unpinning weakens nothing: `BoCa.Lifetime.LifeCtx.freshVar_fresh` supplies the premise, so every derivation that existed survives. The other two differences are adjudicated: the term by `docs/boca-rules.md` §12.20 (row 3.27), `⊓Δ` by §12.15 with `BoCa/Life.lean` §7. The same unpinning covers `BoCa.Derives.withbor2Ax`, `BoCa.Derives.withbor3Ax` and `BoCa.Derives.withloadAx`
+Type as printed (the inner `Imm` is the bare constructor, unlike `withload`'s). The TERM is [CONF] Fig. 15's `λx.λf.(x, f () x)`, not [TR] p. 4's `λx.λf.(x, f x)` (row 3.27). The ∀ binder is schematic, as printed: the constructor takes `(x : LifeVar)` with the freshness premise `Δ.find? x = none` that §12.44 argues for ∀I, and concludes at `axWithbor1Ty x Δ.meetOfDom T₁ T₂`. It was pinned to `BoCa.Lifetime.LifeCtx.freshVar`, which made the rule one instance of the printed one — `BoCa.Ty` equality is syntactic, so no other α-variant was derivable — and §12.45 found against it. Unpinning weakens nothing: `BoCa.Lifetime.LifeCtx.freshVar_fresh` supplies the premise, so every derivation that existed survives. The other two differences are adjudicated: the term by `docs/adjudications.md` §12.20 (row 3.27), `⊓Δ` by §12.15 (`BoCa.Lifetime.LifeCtx.meetOfDom`). The same unpinning covers `BoCa.Derives.withbor2Ax`, `BoCa.Derives.withbor3Ax` and `BoCa.Derives.withloadAx`
 
 ### 3.27 · `withbor ≜ λx.λf.(x, f x)` · [TR] p. 4 · `[repair]`
 
-The Lean is `λx.λf.(x, f () x)` — [CONF] Fig. 15, p. 415:17 — adding the lifetime application the print omits. Adjudicated at `docs/boca-rules.md` §12.20 and at `BoCa.withbor`: [TR] p. 4's own `𝒱⟦∀ 'a ⊏ @b. T⟧δ(v) ≜ ∀ α ⊏ @bδ. ℰ⟦T⟧δ(v ())` makes the callback a thunk, so the printed body hands the borrower `x` as its lifetime argument and the borrow never arrives — the term cannot be taken as printed against the type printed beside it. [TR]'s own proof of Lemma 6.172 (p. 46) writes `wp (v_f () ℓ)`
+The Lean is `λx.λf.(x, f () x)` — [CONF] Fig. 15, p. 415:17 — adding the lifetime application the print omits. Adjudicated at `docs/adjudications.md` §12.20 and at `BoCa.withbor`: [TR] p. 4's own `𝒱⟦∀ 'a ⊏ @b. T⟧δ(v) ≜ ∀ α ⊏ @bδ. ℰ⟦T⟧δ(v ())` makes the callback a thunk, so the printed body hands the borrower `x` as its lifetime argument and the borrow never arrives — the term cannot be taken as printed against the type printed beside it. [TR]'s own proof of Lemma 6.172 (p. 46) writes `wp (v_f () ℓ)`
 -/
 /-- `withbor ≜ λx.λf. (x, f () x)`  — [CONF] **Fig. 15** (p. 415:17).  Uses the
     linear `x` twice: it hands the borrower a borrow of `x` and *also* returns
     `x` itself.
 
-    **The two documents print different bodies here; docs/boca-rules.md
+    **The two documents print different bodies here; docs/adjudications.md
     §12.20.  [variant: [CONF] Fig. 15's body, not [TR] p. 4's.]**
     [TR] p. 4 and [CONF] p. 415:6 both print
     `withbor ≜ λx.λf. (x, f x)`, without the lifetime application.  That is the
@@ -210,7 +208,7 @@ def axWithbor1Ty (x : LifeVar) (bnd : Life) (T₁ T₂ : Ty) : Ty :=
 /-!
 ### 2.45 · `Δ ⊢ withbor : Ref T₁ ⊸ (∀ 'a ⊏ ⊓Δ. Mut 'a T₁ ⊸ ['a] T₂) ⊸ Ref T₁ ⊗ T₂`, side condition `Δ ⊢ T₁ ⊐ @b` on this line · [TR] p. 3 · `[repair]`
 
-The side condition sits on the second `withbor` line and nowhere else, with `@b` free. Two departures: `BoCa.Lifetime.LifeCtx.Defines` is not printed at all, and the free `@b` is quantified existentially rather than left a rule-scheme parameter (`docs/boca-rules.md` §12.9). The term is again [CONF]'s. The `Δ.Defines b` conjunct is stated there and argued nowhere
+The side condition sits on the second `withbor` line and nowhere else, with `@b` free. Two departures: `BoCa.Lifetime.LifeCtx.Defines` is not printed at all, and the free `@b` is quantified existentially rather than left a rule-scheme parameter (`docs/adjudications.md` §12.9). The term is again [CONF]'s. The `Δ.Defines b` conjunct is stated there and argued nowhere
 -/
 /-- `(2) Ref T₁ ⊸ (∀'a ⊏ ⊓Δ. Mut 'a T₁ ⊸ ['a]T₂) ⊸ Ref T₁ ⊗ T₂`, side
     condition `Δ ⊢ T₁ ⊐ @b` (§12.9, existential). -/
@@ -222,7 +220,7 @@ def axWithbor2Ty (x : LifeVar) (bnd : Life) (T₁ T₂ : Ty) : Ty :=
 /-!
 ### 2.46 · `Δ ⊢ withbor : Mut @a T₁ ⊸ (∀ 'b ⊏ ⊓Δ. Mut 'b T₁ ⊸ ['b] T₂) ⊸ Mut @a T₁ ⊗ T₂` · [TR] p. 3 · `[repair]`
 
-Type as printed, with no side condition — correct, the printed side condition is on line 2 only. The term is [CONF] Fig. 15's again, and [TR] Lemma 6.174, which is meant to discharge this constructor, proves its semantic side only under `Δ ⊢ T₁ ⊐ @a`, which row 2.28's two printed premises do not give. The term is `docs/boca-rules.md` §12.20 (row 3.27); the gap between this rule and [TR] Lemma 6.174 is §12.32, which quotes [TR] l. 2624's "Have `Δ ⊢ T₁ ⊐ @a` by well-formedness of the type `Mut @a T₁`", verifies at 1200 dpi that p. 2's well-formedness rule has two premises and no such presupposition, and decides to follow the print rather than the lemma, with the cost restated at both sites. §12.32's own pointer to `BoCa/Ty.lean`'s `Ty.wf` is dead (77e515a) and its sentence that the compatibility lemmas are not proved here has been falsified by `BoCa/Compat.lean` — though not for this constructor, so the entry's argument stands
+Type as printed, with no side condition — correct, the printed side condition is on line 2 only. The term is [CONF] Fig. 15's again, and [TR] Lemma 6.174, which is meant to discharge this constructor, proves its semantic side only under `Δ ⊢ T₁ ⊐ @a`, which row 2.28's two printed premises do not give. The term is `docs/adjudications.md` §12.20 (row 3.27); the gap between this rule and [TR] Lemma 6.174 is §12.32, which quotes [TR] l. 2624's "Have `Δ ⊢ T₁ ⊐ @a` by well-formedness of the type `Mut @a T₁`", verifies at 1200 dpi that p. 2's well-formedness rule has two premises and no such presupposition, and decides to follow the print rather than the lemma, with the cost restated at both sites. The compatibility lemmas are proved (`Paper/S6_8_FundamentalProperty/Lemmas.lean`), and this constructor's is the one §12.32 concerns
 -/
 /-- `(3) Mut @a T₁ ⊸ (∀'b ⊏ ⊓Δ. Mut 'b T₁ ⊸ ['b]T₂) ⊸ Mut @a T₁ ⊗ T₂` -/
 def axWithbor3Ty (a : Life) (x : LifeVar) (bnd : Life) (T₁ T₂ : Ty) : Ty :=
@@ -237,11 +235,11 @@ namespace BoCa
 /-!
 ### 2.47 · `Δ ⊢ withload : Imm @a T₁ ⊸ (∀ 'b ⊏ ⊓Δ. Imm̲ 'b T₁ ⊸ ['b] T₂) ⊸ T₂` (leading `Imm` UNDERLINED) · [TR] p. 3 (type), p. 4 (term) · `[repair]`
 
-The underline is genuinely there and the Lean reads it right — `BoCa.Ty.immReborrow`, not the constructor. But the TERM is [CONF] Fig. 14's `λx.λf. f () (load x)`, not [TR] p. 4's `λx.λf.(x, f (load x))`, which returns a pair where the ascribed type returns a bare `T₂` (row 3.28). Two adjudications. The underline is `docs/boca-rules.md` §12.28, re-verified at 600 dpi in `BoCa/Ty.lean`'s preamble, and the type calls `BoCa.Ty.immReborrow` accordingly. The term is §12.20: [TR] p. 4's body returns a pair where the type both documents print returns a bare `T₂`, and drops the lifetime application the thunked callback needs; [CONF] Fig. 14 matches, and [TR]'s own proof of Lemma 6.175 (p. 47) unfolds `withload` to `λf. f () (load v)`. The pinned binder shared with row 2.44 is that row's finding
+The underline is genuinely there and the Lean reads it right — `BoCa.Ty.immReborrow`, not the constructor. But the TERM is [CONF] Fig. 14's `λx.λf. f () (load x)`, not [TR] p. 4's `λx.λf.(x, f (load x))`, which returns a pair where the ascribed type returns a bare `T₂` (row 3.28). Two adjudications. The underline is `docs/adjudications.md` §12.28, and the type calls `BoCa.Ty.immReborrow` accordingly. The term is §12.20: [TR] p. 4's body returns a pair where the type both documents print returns a bare `T₂`, and drops the lifetime application the thunked callback needs; [CONF] Fig. 14 matches, and [TR]'s own proof of Lemma 6.175 (p. 47) unfolds `withload` to `λf. f () (load v)`. The pinned binder shared with row 2.44 is that row's finding
 
 ### 3.28 · `withload ≜ λx.λf.(x, f (load x))` · [TR] p. 4 · `[repair]`
 
-The Lean is `λx.λf. f () (load x)` — [CONF] Fig. 14, p. 415:16 — differing twice: added thunk forcing, dropped pair. Adjudicated at `docs/boca-rules.md` §12.20 and at `BoCa.withload`: the type both documents print returns a bare `T₂` where [TR] p. 4's body returns a pair, and the same p. 4 ∀ clause forces the thunk. [TR]'s own proof of Lemma 6.175 (p. 47) unfolds `withload` to `λf. f () (load v)`, which is [CONF] Fig. 14's body exactly
+The Lean is `λx.λf. f () (load x)` — [CONF] Fig. 14, p. 415:16 — differing twice: added thunk forcing, dropped pair. Adjudicated at `docs/adjudications.md` §12.20 and at `BoCa.withload`: the type both documents print returns a bare `T₂` where [TR] p. 4's body returns a pair, and the same p. 4 ∀ clause forces the thunk. [TR]'s own proof of Lemma 6.175 (p. 47) unfolds `withload` to `λf. f () (load v)`, which is [CONF] Fig. 14's body exactly
 -/
 /-- `withload ≜ λx λf. f () (load x)` — [CONF] **Fig. 14** (p. 415:16).
 
@@ -283,7 +281,7 @@ Underlines checked on a 300 dpi render of the page: present on the right-hand si
 
 ### 2.50 · — no printed clause — · [TR] p. 3 · `[repair]`
 
-p. 3 prints eight clauses; the Lean has ten. The `Mut` clause is imported from [CONF] Fig. 9; the `Unk` clause has no source at all and is forced by totality (the metafunction is otherwise undefined on `Unk`, `[@a] Unk`, `Unk ⊗ T`, `Unk ⊕ T`). Both extra clauses are separately adjudicated. `mut` is `docs/boca-rules.md` §12.10: [CONF] Fig. 9 prints `Imm̲ 'b (Mut @a T) ≜ Imm 'b T` and [CONF] p. 415:11 devotes a paragraph to it, and without it the metafunction is undefined on `Mut`, leaving `withload` unusable on any payload holding a mutable borrow. `unk` is §12.11, forced by totality, with `𝒱⟦Unk⟧δ(v) ≜ emp` as the justification and the one alternative shown unsound. `BoCa.Ty.immReborrow_idem` machine-checks the fixpoint claim. §12.10's pointer to `BoCa/MutTests.lean` is dead (77e515a); nothing in the argument rests on it
+p. 3 prints eight clauses; the Lean has ten. The `Mut` clause is imported from [CONF] Fig. 9; the `Unk` clause has no source at all and is forced by totality (the metafunction is otherwise undefined on `Unk`, `[@a] Unk`, `Unk ⊗ T`, `Unk ⊕ T`). Both extra clauses are separately adjudicated. `mut` is `docs/adjudications.md` §12.10: [CONF] Fig. 9 prints `Imm̲ 'b (Mut @a T) ≜ Imm 'b T` and [CONF] p. 415:11 devotes a paragraph to it, and without it the metafunction is undefined on `Mut`, leaving `withload` unusable on any payload holding a mutable borrow. `unk` is §12.11, forced by totality, with `𝒱⟦Unk⟧δ(v) ≜ emp` as the justification and the one alternative shown unsound. `BoCa.Ty.immReborrow_idem` machine-checks the fixpoint claim.
 -/
 /-- `Imm̲ 'b T`, the reborrow metafunction.  Structural, hence total. -/
 def Ty.immReborrow (b : Life) : Ty → Ty
@@ -340,7 +338,7 @@ namespace BoCa.Lifetime
 /-!
 ### 2.54 · `@aδ ≜ δ('a)`, `⊤`, `@b₁δ ⊓ @b₂δ` at `@a = @b₁ ⊔ @b₂`, `@b₁δ ⊔ @b₂δ` at `@a = @b₁ ⊔ @b₂` · [TR] p. 3 · `[repair]`
 
-As printed the metafunction is not a function: its last two clauses carry the IDENTICAL guard `@a = @b₁ ⊔ @b₂` and different values (confirmed on a 300 dpi render of p. 3). The Lean sends syntactic ⊔ to the semantic ⊔ and syntactic ⊓ to the semantic ⊓, i.e. it reads the third clause's guard as ⊓ — [CONF] Fig. 11's homomorphic version (`docs/boca-rules.md` §12.7). The other repair, keeping the third clause and correcting the fourth guard, would make the interpretation anti-homomorphic. Partiality is `Option`: `@aδ` is undefined when a variable escapes `dom(δ)`, which is what `Δ ⊨ @a` quantifies over. Adjudicated at `docs/boca-rules.md` §12.7 and restated in `BoCa/Life.lean` §3: as printed the metafunction is not a function, so it cannot be taken as printed, and [CONF] Fig. 11 prints the homomorphic pair the Lean implements
+As printed the metafunction is not a function: its last two clauses carry the IDENTICAL guard `@a = @b₁ ⊔ @b₂` and different values (confirmed on a 300 dpi render of p. 3). The Lean sends syntactic ⊔ to the semantic ⊔ and syntactic ⊓ to the semantic ⊓, i.e. it reads the third clause's guard as ⊓ — [CONF] Fig. 11's homomorphic version (`docs/adjudications.md` §12.7). The other repair, keeping the third clause and correcting the fourth guard, would make the interpretation anti-homomorphic. Partiality is `Option`: `@aδ` is undefined when a variable escapes `dom(δ)`, which is what `Δ ⊨ @a` quantifies over. Adjudicated at `docs/adjudications.md` §12.7: as printed the metafunction is not a function, so it cannot be taken as printed, and [CONF] Fig. 11 prints the homomorphic pair the Lean implements
 -/
 def Life.interp (δ : LSub) : Life → Option Nat
   | .var x    => δ.find? x
@@ -376,8 +374,8 @@ Nonemptiness of the printed set is inhabitation of the predicate that defines it
 -/
 /-- `⊨ Δ ≜ ⟦Δ⟧ ≠ ∅`.  ([TR] p. 3.)
 
-    Not decidable as stated — an existential over an infinite set.  §5 gives a
-    decidable *sufficient* condition (`LifeCtx.Ok`) together with the witness
+    Not decidable as stated — an existential over an infinite set.  `Life.wf`
+    gives a decidable *sufficient* condition (`LifeCtx.Ok`) together with the witness
     that discharges it. -/
 def LifeCtx.Sat (Δ : LifeCtx) : Prop := ∃ δ, Δ.Models δ
 
@@ -444,7 +442,7 @@ The absence is faithful: `Δ ⊢ Unk` is underivable, so no type mentioning `Unk
     constructors; `Unk` has none, so no type mentioning it is well formed.
     Verified at 400 dpi: `1`, `⊗`, `⊕`, `⊸`, `Ref`, `∀`, `[@a]`, `Imm`, `Mut`.
 
-    No rule of §4 below has a premise of this judgment.  Its box on that page
+    No typing rule below has a premise of this judgment.  Its box on that page
     reads `Δ ⊢ T   Presumes ⊧ Δ`; the typing judgment's box carries no such
     annotation (§C.26). -/
 inductive WfTy : LifeCtx → Ty → Prop where
@@ -537,7 +535,7 @@ inductive OutlivesRules (Δ : LifeCtx) (a : Life) : Ty → Prop where
 Row 2.30, continued.
 -/
 /-- `Δ ⊢ T ⊐ @a`.  [TR] p. 2's judgment-form header presupposes `⊨ Δ` and
-    `Δ ⊨ @a`, and prints nothing after `@a` (600 dpi, `CTy.lean` §4), so this
+    `Δ ⊨ @a`, and prints nothing after `@a` (600 dpi), so this
     is exactly `OutlivesRules` — the index is unrestricted, `⊤` included.
     §C.25. -/
 def Outlives (Δ : LifeCtx) (T : Ty) (a : Life) : Prop :=
@@ -565,7 +563,7 @@ open BoCa.Lifetime
 /-!
 ### 2.58 · `Δ ⊨ Γ ⊐ @a` — premise of [l]I, NEVER DEFINED · [TR] p. 2 (used); nowhere (defined) · `[repair]`
 
-The print's turnstile is semantic and undefined; the Lean's is [CONF] Fig. 7's syntactic pointwise `∀x ∈ dom(Γ). Δ ⊢ Γ(x) ⊐ @a`, with `dom(Γ)` read as the live slots. Because the lift is vacuous on a dead Γ, this is the mechanism behind row 2.13. Adjudicated at `docs/boca-rules.md` §12.6 and at the declaration: the premise is undefined in [TR] (pp. 2–3), so there is nothing to take as printed, and [CONF] Fig. 7 spells it out as `∀x ∈ dom(Γ). Δ ⊢ Γ(x) ⊐ a`, Fig. 6 carrying the same shape at a coarser index. Reading `dom(Γ)` as the live slots is argued at the declaration and follows from row 2.1's positional context
+The print's turnstile is semantic and undefined; the Lean's is [CONF] Fig. 7's syntactic pointwise `∀x ∈ dom(Γ). Δ ⊢ Γ(x) ⊐ @a`, with `dom(Γ)` read as the live slots. Because the lift is vacuous on a dead Γ, this is the mechanism behind row 2.13. Adjudicated at `docs/adjudications.md` §12.6 and at the declaration: the premise is undefined in [TR] (pp. 2–3), so there is nothing to take as printed, and [CONF] Fig. 7 spells it out as `∀x ∈ dom(Γ). Δ ⊢ Γ(x) ⊐ a`, Fig. 6 carrying the same shape at a coarser index. Reading `dom(Γ)` as the live slots is argued at the declaration and follows from row 2.1's positional context
 -/
 /-- `Δ ⊨ Γ ⊐ @a`, the premise of the context-directed `[]I`, read as [CONF]
     Figs. 6/7 spell it out: `∀x ∈ dom(Γ). Δ ⊢ Γ(x) ⊐ @a` (§12.6).  `dom(Γ)` is
@@ -638,19 +636,19 @@ Single premise, no well-formedness side condition on `T₁`; the binder slot is 
 
 ### 2.10 · ⊸E: `Δ; Γ₁ ⊢ e₁ : T₁`, `Δ; Γ₂ ⊢ e₂ : T₁ ⊸ T₂` / `Δ; Γ₁,Γ₂ ⊢ e₁ e₂ : T₂` · [TR] p. 2 · `[repair]`
 
-The print applies the ARGUMENT to the FUNCTION — `e₁ : T₁` on the left of the conclusion — where the Lean concludes `.app f a`, function on the left. The flip is almost certainly right ([TR] p. 1's own production is `e₂ e₁` and p. 4's β-rule is `(µ,(λx.e) v) ↦ (µ,e[v/x])`), but it is a difference from the page. Adjudicated at `docs/boca-rules.md` §12.2, with §12.1: the printed conclusion contradicts the same document twice, since [TR] p. 1 prints the production as `e₂ e₁` and p. 4's β-rule is `(µ,(λx.e) v) ↦ (µ,e[v/x])`, function on the left, and §12.1 reads the same order off p. 3's `e K` and `K v` frames. Premise numbering is kept, so `Γ₁` is still the argument's
+The print applies the ARGUMENT to the FUNCTION — `e₁ : T₁` on the left of the conclusion — where the Lean concludes `.app f a`, function on the left. The flip is almost certainly right ([TR] p. 1's own production is `e₂ e₁` and p. 4's β-rule is `(µ,(λx.e) v) ↦ (µ,e[v/x])`), but it is a difference from the page. Adjudicated at `docs/adjudications.md` §12.2, with §12.1: the printed conclusion contradicts the same document twice, since [TR] p. 1 prints the production as `e₂ e₁` and p. 4's β-rule is `(µ,(λx.e) v) ↦ (µ,e[v/x])`, function on the left, and §12.1 reads the same order off p. 3's `e K` and `K v` frames. Premise numbering is kept, so `Γ₁` is still the argument's
 
 ### 2.11 · ∀I: `Δ, ('a ⊏ @b); Γ ⊢ e : T` / `Δ; Γ ⊢ Λ.e : ∀ 'a ⊏ @b. T` · [TR] p. 2 · `[repair]`
 
-Two things the print does not say: `Λ.e ≜ λ_.e` (row 1.8), so one `Expr` carries both a ∀ type and a ⊸ type; and an unprinted freshness premise `Δ.find? x = none`. This also falsifies `BoCa/Derives.lean`'s header claim that no constructor carries a side condition the print does not carry. The collapse is adjudicated at `docs/boca-rules.md` §12.14 (row 1.8). The freshness premise is not adjudicated anywhere: `docs/axiom-ledger.md` C14 is about `BoCa.LogRel.allI_compat`'s side conditions and not about the rule, and every other mention restates the premise as a given. [TR] p. 2's ∀I has one premise and [CONF] Fig. 7's has one
+Two things the print does not say: `Λ.e ≜ λ_.e` (row 1.8), so one `Expr` carries both a ∀ type and a ⊸ type; and an unprinted freshness premise `Δ.find? x = none`. The collapse is adjudicated at `docs/adjudications.md` §12.14 (row 1.8). The freshness premise is not adjudicated anywhere: `docs/adjudications.md` C14 is about the compatibility lemma's side conditions and not about the rule, and every other mention restates the premise as a given. [TR] p. 2's ∀I has one premise and [CONF] Fig. 7's has one
 
 ### 2.12 · ∀E: `Δ; Γ ⊢ e : ∀ 'a ⊏ @b. T`, `Δ ⊨ @a ⊏ @b` / `Δ; Γ ⊢ e[] : T[@a/'a]` · [TR] p. 2 · `[repair]`
 
-`e[] ≜ e ()`, so the conclusion term is literally a ⊸E redex and the two elimination rules are not disjoint on terms. Adjudicated at `docs/boca-rules.md` §12.14: `e[]` is in neither [TR] p. 1's `Expr` grammar nor p. 4's ↦ box, so nothing steps it and it cannot be taken as printed; [CONF] Fig. 7 concludes `Δ; Γ ⊢ e () : T[a/'a]` and [TR] p. 4's `𝒱⟦∀⟧` writes `v ()`. Both printed premises are present in the constructor, and the overlap the reading creates is carried as an explicit open hypothesis of `BoCa.LogRel.fundamental_of_open` rather than hidden
+`e[] ≜ e ()`, so the conclusion term is literally a ⊸E redex and the two elimination rules are not disjoint on terms. Adjudicated at `docs/adjudications.md` §12.14: `e[]` is in neither [TR] p. 1's `Expr` grammar nor p. 4's ↦ box, so nothing steps it and it cannot be taken as printed; [CONF] Fig. 7 concludes `Δ; Γ ⊢ e () : T[a/'a]` and [TR] p. 4's `𝒱⟦∀⟧` writes `v ()`. Both printed premises are present in the constructor, and the overlap the reading creates is carried as an explicit open hypothesis of `BoCa.LogRel.fundamental_of_open` rather than hidden
 
 ### 2.13 · [l]I: `Δ; Γ ⊢ e : T`, `Δ ⊨ Γ ⊐ @a` / `Δ; Γ ⊢ □e : [@a] T` · [TR] p. 2 · `[repair]`
 
-[TR] never defines the semantic `Δ ⊨ Γ ⊐ @a` (row 2.58); the Lean substitutes [CONF] Fig. 7's syntactic pointwise lift over the live slots. With Γ all-dead that premise is provably vacuous (`BoCa.Ctx.Dead.outlives`), so `[@a] T` is derivable at an `@a` that Δ does not bind — nothing in the rule requires `BoCa.Lifetime.LifeCtx.Defines`. Adjudicated at `docs/boca-rules.md` §12.6 for the undefined premise and §C.25 for the refusal to strengthen the index, which it checks at 600 dpi, and both machine-checked witnesses are live again: `BoCa.Programs.d_boxTop` is `Δ; • ⊢ λx.x : [⊤](1 ⊸ 1)`, the derivation §C.25 argues about, and `BoCa.Programs.d_outerBorrow` is §12.24's other half, `[]I` at an outer borrow's lifetime with the borrow live in the context.  §C.25's pointer to `BoCa/Ground.lean` is stale and is not load-bearing
+[TR] never defines the semantic `Δ ⊨ Γ ⊐ @a` (row 2.58); the Lean substitutes [CONF] Fig. 7's syntactic pointwise lift over the live slots. With Γ all-dead that premise is provably vacuous (`BoCa.Ctx.Dead.outlives`), so `[@a] T` is derivable at an `@a` that Δ does not bind — nothing in the rule requires `BoCa.Lifetime.LifeCtx.Defines`. Adjudicated at `docs/adjudications.md` §12.6 for the undefined premise and §C.25 for the refusal to strengthen the index, which it checks at 600 dpi, and both machine-checked witnesses are live again: `BoCa.Programs.d_boxTop` is `Δ; • ⊢ λx.x : [⊤](1 ⊸ 1)`, the derivation §C.25 argues about, and `BoCa.Programs.d_outerBorrow` is §12.24's other half, `[]I` at an outer borrow's lifetime with the borrow live in the context.
 
 ### 2.14 · [l]E: `Δ; Γ ⊢ □e : [@a] T` / `Δ; Γ ⊢ □e : T` · [TR] p. 2 · `[encoding]`
 
@@ -666,11 +664,11 @@ The same two encoding choices as row 2.15; the type is symbol for symbol
 
 ### 2.17 · ⊑Imm: `Δ; Γ ⊢ e : Imm @b T`, `Δ ⊨ @a ⊑ @b` / `Δ; Γ ⊢ e : Imm @b T` · [TR] p. 2 · `[repair]`
 
-[TR] prints `Imm @b T` in BOTH premise and conclusion, so `@a` is unused and the printed rule is the identity; the Lean concludes `Imm @a T`. The repair is what makes [TR] Lemma 6.167, whose conclusion is at `@a`, discharge the rule. Adjudicated at `docs/boca-rules.md` §12.4: as printed the rule is the identity, `@a` occurring nowhere but in the unused entailment premise, so it cannot be taken as printed. Three corroborations, each read on its page: [CONF] Fig. 7's `Imm ⊑` concludes `Δ; Γ ⊢ e : Imm @a T`, [CONF] Fig. 9's `Mut ⊑` likewise, and [TR] Lemma 6.167 concludes `Δ; Γ ⊨ e : Imm @a T`
+[TR] prints `Imm @b T` in BOTH premise and conclusion, so `@a` is unused and the printed rule is the identity; the Lean concludes `Imm @a T`. The repair is what makes [TR] Lemma 6.167, whose conclusion is at `@a`, discharge the rule. Adjudicated at `docs/adjudications.md` §12.4: as printed the rule is the identity, `@a` occurring nowhere but in the unused entailment premise, so it cannot be taken as printed. Three corroborations, each read on its page: [CONF] Fig. 7's `Imm ⊑` concludes `Δ; Γ ⊢ e : Imm @a T`, [CONF] Fig. 9's `Mut ⊑` likewise, and [TR] Lemma 6.167 concludes `Δ; Γ ⊨ e : Imm @a T`
 
 ### 2.18 · ⊑Mut: `Δ; Γ ⊢ e : Mut @b T`, `Δ ⊨ @a ⊑ @b` / `Δ; Γ ⊢ e : Mut @b T` · [TR] p. 2 · `[repair]`
 
-The identical printed defect and the identical repair, against [TR] Lemma 6.168. Adjudicated at `docs/boca-rules.md` §12.4, the same argument at the same printed defect, corroborated by [CONF] Fig. 9's `Mut ⊑` and by [TR] Lemma 6.168, whose conclusion is `Δ; Γ ⊨ e : Mut @a T`
+The identical printed defect and the identical repair, against [TR] Lemma 6.168. Adjudicated at `docs/adjudications.md` §12.4, the same argument at the same printed defect, corroborated by [CONF] Fig. 9's `Mut ⊑` and by [TR] Lemma 6.168, whose conclusion is `Δ; Γ ⊨ e : Mut @a T`
 -/
 /-- The declarative typing judgment of [TR] §2 p. 2 together with [CONF]
     Figs. 6–9, with the repairs listed in the header.
@@ -678,7 +676,7 @@ The identical printed defect and the identical repair, against [TR] Lemma 6.168.
     Read `Derives Δ Γ e T` as "`Δ; Γ ⊢ e : T`, and `e` consumes exactly the
     live slots of `Γ`". -/
 inductive Derives : LifeCtx → Ctx Ty → Expr → Ty → Prop where
-  ---------------------------------------------------------------- core, §2
+  ---------------------------------------------------------------- core
   /-- `ID`:  `Δ; x : T ⊢ x : T`. -/
   | var {Δ Γ i T} (h : Ctx.Solo Γ i T) : Derives Δ Γ (.var i) T
   /-- `1I`:  `Δ; • ⊢ () : 1`. -/
@@ -727,7 +725,7 @@ inductive Derives : LifeCtx → Ctx Ty → Expr → Ty → Prop where
   | lolliE {Δ Γ Γ₁ Γ₂ f a T₁ T₂} (hs : Ctx.Split Γ Γ₁ Γ₂)
       (ha : Derives Δ Γ₁ a T₁) (hf : Derives Δ Γ₂ f (.lolli T₁ T₂)) :
       Derives Δ Γ (.app f a) T₂
-  ------------------------------------------------------- lifetimes, §5, §12.14
+  ------------------------------------------------------- lifetimes, §12.14
   /-- `∀I`.  [TR] p. 2 prints the single premise `Δ, ('a ⊏ @b); Γ ⊢ e : T`
       (400 dpi) — no `Δ ⊨ @b`.  `Λ.e ≜ λ_.e`, so the term is a `λ` and the
       premise's context has **no** binder: in de Bruijn that is a slot pushed
@@ -760,7 +758,7 @@ inductive Derives : LifeCtx → Ctx Ty → Expr → Ty → Prop where
       nothing; three places give `@a`: [CONF] Fig. 7 (`Imm ⊑`, p. 415:8),
       [CONF] Fig. 9 (p. 415:10), and [TR]'s own Lemma 6.167 (`⊑imm-compat`,
       p. 43), whose conclusion is `Δ; Γ ⊨ e : Imm @a T`.  `⊑` is the carrier's
-      lattice order, `Life.lean` §2 and §12.3. -/
+      lattice order, §12.3. -/
   | immSub {Δ Γ e a b T} (h : Derives Δ Γ e (.imm b T))
       (hle : Δ.EntailsLe a b) :
       Derives Δ Γ e (.imm a T)
@@ -769,7 +767,7 @@ inductive Derives : LifeCtx → Ctx Ty → Expr → Ty → Prop where
   | mutSub {Δ Γ e a b T} (h : Derives Δ Γ e (.mut b T))
       (hle : Δ.EntailsLe a b) :
       Derives Δ Γ e (.mut a T)
-  ---------------------------------------------------------- memory, §2
+  ---------------------------------------------------------- memory
   /-- `Δ; • ⊢ alloc : T ⊸ Ref T`.  [TR] p. 2 prints it with an empty premise
       bar (400 dpi): `T` is schematic and unconstrained. -/
   | allocAx {Δ Γ T} (hΓ : Ctx.Dead Γ) :
@@ -777,7 +775,7 @@ inductive Derives : LifeCtx → Ctx Ty → Expr → Ty → Prop where
   /-- `Δ; • ⊢ free : Ref T ⊸ T`, likewise premise-free. -/
   | freeAx {Δ Γ T} (hΓ : Ctx.Dead Γ) :
       Derives Δ Γ (.val (.prim .free)) (.lolli (.ref T) T)
-  ------------------------------------------------- the axiom table, §8 / [TR] p. 3
+  ------------------------------------------------- the axiom table, [TR] p. 3
   /-  [TR] p. 3 prints these as a table of `Δ ⊢ term : Type` lines with no
       premise column at all (400 dpi); the single side condition anywhere in it
       is `Δ ⊢ T₁ ⊐ @b` beside `withbor`'s second form.  So the schematic `T₁`,

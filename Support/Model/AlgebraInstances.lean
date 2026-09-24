@@ -9,8 +9,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-Lemmas 6.2 and 6.3 at `○`, Lemmas 6.41 and 6.42 as one statement, and the lifetime of a `●` composite.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+Lemmas 6.2 and 6.3 at `○`, Lemmas 6.41 and 6.42 as one statement, and the lifetime of a `●` composite.
 -/
 
 noncomputable section

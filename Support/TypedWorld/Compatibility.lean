@@ -39,8 +39,7 @@ import Support.TypedWorld.Wp
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the compatibility lemmas at `SemX` (source `BoCa/TypedFundamental.lean`): `𝒢X⟦Γ⟧` split along the context, `wpTS` monotone and bound with a frame, the stratified connectives, and 6.152–6.176 as `_compatX`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the compatibility lemmas at `SemX`: `𝒢X⟦Γ⟧` split along the context, `wpTS` monotone and bound with a frame, the stratified connectives, and 6.152–6.176 as `_compatX`.
 -/
 
 noncomputable section

@@ -81,7 +81,7 @@ namespace BoCa
     linear `x` twice: it hands the borrower a borrow of `x` and *also* returns
     `x` itself.
 
-    **The two documents print different bodies here; docs/boca-rules.md
+    **The two documents print different bodies here; docs/adjudications.md
     §12.20.  [variant: [CONF] Fig. 15's body, not [TR] p. 4's.]**
     [TR] p. 4 and [CONF] p. 415:6 both print
     `withbor ≜ λx.λf. (x, f x)`, without the lifetime application.  That is the
@@ -248,7 +248,7 @@ inductive OutlivesRules (Δ : LifeCtx) (a : Life) : Ty → Prop where
   | mut    {b T}   : Δ.EntailsLt a b                           → OutlivesRules Δ a (.mut b T)
 
 /-- `Δ ⊢ T ⊐ @a`.  [TR] p. 2's judgment-form header presupposes `⊨ Δ` and
-    `Δ ⊨ @a`, and prints nothing after `@a` (600 dpi, `CTy.lean` §4), so this
+    `Δ ⊨ @a`, and prints nothing after `@a` (600 dpi), so this
     is exactly `OutlivesRules` — the index is unrestricted, `⊤` included.
     §C.25. -/
 def Outlives (Δ : LifeCtx) (T : Ty) (a : Life) : Prop :=

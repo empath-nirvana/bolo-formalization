@@ -112,7 +112,7 @@ end BoCa.BoLo
 namespace BoCa
 
 /-- `copy ≜ λx. (x, x)`  — the conference paper calls it `dupl`
-    (docs/boca-rules.md §12.21).  Uses the linear `x` twice. -/
+    (docs/adjudications.md §12.21).  Uses the linear `x` twice. -/
 def copy : Expr := .val (.lam (.pair v0 v0))
 
 /-- `forget ≜ λx. ()`  — never uses `x`, so it needs weakening. -/

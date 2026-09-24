@@ -14,8 +14,7 @@ import Support.Model.Notation
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the propositions of `[TR]` p. 6 as used by §6.2: entailment, `emp`, the outlives relation `@ρ ⊐ α` and the `wp` row at the unguarded `↭`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the propositions of `[TR]` p. 6 as used by §6.2: entailment, `emp`, the outlives relation `@ρ ⊐ α` and the `wp` row at the unguarded `↭`.
 -/
 
 noncomputable section
@@ -140,7 +139,7 @@ theorem hash_valid {ρ₁ ρ₂ : WRes} (h : ResU.Hash ρ₁ ρ₂) :
 /-- **The two readings of `↭` agree inside the row.**  `ResU.UpdV` is
 `ResU.Upd` with `✓` on each side, and the row already asserts both: `✓ρ` is the
 printed `ρ_f # ρ` through `[TR]` Lemma 6.10, and `✓(ρ′ ● ρ⁺)` is the printed
-`ρ⁺ # (ρ_f ● ρ′)` through `[TR]` Lemma 6.11.  So ledger D3 does not separate the two
+`ρ⁺ # (ρ_f ● ρ′)` through `[TR]` Lemma 6.11.  So `docs/adjudications.md` D3 does not separate the two
 documents here.  `[about ours: the two printed `↭`s, read inside the printed
 row]` -/
 theorem wp_updV_iff_upd (e : Expr) (Q : Val → WProp) (ρ : WRes) :

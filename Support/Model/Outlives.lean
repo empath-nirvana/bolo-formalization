@@ -22,8 +22,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-`@ρ ⊐ α` across `⦇−⦈`, the walks and `↭` (the steps Lemma 6.50's one sentence elides), and *“there are no borrows at any lifetime shorter than `α`”*.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+`@ρ ⊐ α` across `⦇−⦈`, the walks and `↭` (the steps Lemma 6.50's one sentence elides), and *“there are no borrows at any lifetime shorter than `α`”*.
 -/
 
 noncomputable section
@@ -115,8 +114,8 @@ theorem inStratum_restrict {α : Life} {ρ : WRes} {k : Kind} (h : ρ.InStratum 
   fun l ψ e => h l ψ (ResU.restrict_eq_some.mp e).1
 
 /-- `Res_α` is closed under `◐` whenever `Cell_α` is closed under the cell
-operation, which §12's schema then instantiates at `●` and at `○`.
-`[about ours: `Res_α` at §12's composition schema]` -/
+operation, which the schema then instantiates at `●` and at `○`.
+`[about ours: `Res_α` at the composition schema]` -/
 theorem inStratum_comp {α : Life}
     {R : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}
     {C : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val → Prop}

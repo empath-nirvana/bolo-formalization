@@ -27,8 +27,7 @@ import Support.Model.Walks
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-Lemma 6.59's closing sentence, clause by clause: the reborrowed location, the attribution of cells to `ρᵢ`, and the case off `dom(ρ_reb)`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+Lemma 6.59's closing sentence, clause by clause: the reborrowed location, the attribution of cells to `ρᵢ`, and the case off `dom(ρ_reb)`.
 -/
 
 noncomputable section
@@ -406,7 +405,7 @@ has none of the three.
 
 Both `ρ_reb` and `ρᵢ` are `imm`-only — `ρ_reb` by `ResU.reb_imm_image`, `ρᵢ`
 because it is one `imm` cell — so `ex(L ● ρ_reb)_●` and `ex(L ● ρᵢ)_●` are both
-`ex(L)_●`.  The swap of §25e therefore moves nothing in the exclusive walk, and
+`ex(L)_●`.  The swap therefore moves nothing in the exclusive walk, and
 the whole of `[TR]` 6.59's closing sentence lives in the aliasable one.
 `[about ours: `ex(−)_◐` at a resource carrying `imm` cells only]` -/
 theorem ExW.eq_empty_of_immOnly {R : CellU Loc Val → CellU Loc Val → Prop}
@@ -456,7 +455,7 @@ theorem ResU.ex_eq_of_swap_immOnly {L F G Lf Lg eF eG : ResU Loc Val}
 
 /-- **`ρ|dom(ρ′ᵢ|imm)` outlives `β`.**  `[TR]` 6.59's closing sentence says
 *all* components besides `ρ_reb` outlive `β`, and the printed hypotheses name
-only `ρ_b` and `ρ′`, with 6.52 supplying `ρ⁺ ⊟ ρ_reb`.  §24a lists those three.
+only `ρ_b` and `ρ′`, with 6.52 supplying `ρ⁺ ⊟ ρ_reb`.  Those are three.
 The fourth — the `imm`-part of `ρ`, a factor of the print's left side — is
 named by the sentence and by no hypothesis, and it is **derived**: at an `imm`
 source cell the image cell is `imm` over a subset of its lifetime set and so in
@@ -822,7 +821,7 @@ variable {Loc Val : Type}
 /-- **What `↭` leaves at an ancestor `ρ_reb` reaches.**  `ρ_reb`'s cell
 `imm({β}, v, χ)` stands between the two sides: the hypothesis pins
 `ψ ○ (d ○ imm({β}, v, χ))` and the goal asks about `ψ ○ d`.  Composing with an
-`imm` cell only joins lifetime sets (§25f), so the `{β}` may be cancelled off
+`imm` cell only joins lifetime sets, so the `{β}` may be cancelled off
 both — `ψ` misses `β` because its component outlives `β` — and `ψ` is absorbed
 by `d` alone.
 

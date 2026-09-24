@@ -23,14 +23,14 @@ This module does NOT import `Paper` or `Support`.  The modules under
 `Challenge/` replicate, verbatim, the declarations the statement reaches:
 the syntax ([TR] §1), the typing judgment `DerivesWf` and what it uses ([TR] §2
 as the library reads it), and the machine `BoLo.Steps` with the empty memory
-([TR] §3).  Each is copied from the source file its path names, under the same
+([TR] §3).  Each is copied from the file its path names, under the same
 namespaces, `open`s and names; `Challenge/X/Y.lean` holds the declarations of
 `X/Y.lean`.  Nothing of the model ([TR] §§4–6: the logical relation,
 resources, `wp`, the typed world) is here, so a pass trusts none of its repairs.
 
-Why one module per source file: Lean reuses a pattern-matching auxiliary
+Why one module per file: Lean reuses a pattern-matching auxiliary
 (`f.match_1`) for a later definition of the same shape, and which auxiliaries
-are candidates depends on module boundaries.  With the source's boundaries the
+are candidates depends on module boundaries.  With the same boundaries the
 same auxiliaries are generated and reused, so the values agree constant for
 constant.  For the same reason two definitions the statement does not reach are
 copied, `Lifetime.Life.depth` and `Ty.wfB`: `Life.mentions` and `Ty.scopedB`

@@ -14,8 +14,7 @@ import Support.TypedWorld.Records
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the typed worlds: value shapes `vShape`, the family `TW` of configurations the printed proofs' operations produce, tagging, and `[TR]` p. 6's `wp` over them (`wpTS`, row 5.33's repair).  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the typed worlds: value shapes `vShape`, the family `TW` of configurations the printed proofs' operations produce, tagging, and `[TR]` p. 6's `wp` over them (`wpTS`, row 5.33's repair).
 -/
 
 noncomputable section
@@ -61,7 +60,7 @@ chain view of one, at any record, a sub-record included).  `reb`'s `β` is below
 of the world, as 6.150's H11 takes it.  The typing premises are at `vShape`, `𝒱⟦T⟧`'s wp-free
 shape: a premise at the program's relation would put `TW` under the negative occurrence of
 `wpTS` in that relation's `⊸` clause.
-`[about ours: the configurations §6 quantifies over, as a family; docs/boca-rules.md §12.72]` -/
+`[about ours: the configurations §6 quantifies over, as a family; docs/adjudications.md §12.72]` -/
 inductive TW : WRes → List FrameRec → List FrameRec → Prop
   | empty : TW PMap.empty [] []
   | alloc {W W' : WRes} {ps rs : List FrameRec} {μ : BoCa.BoLo.Heap} {l : Loc} {v : Val} :
@@ -139,7 +138,7 @@ completions `ρ_f ● ρ` that are `TW` worlds at the list's records, tagged, an
 post-configuration is one too, with the same records proper and the same list members: a
 record 6.64 creates inside a run is ended before the run returns.  Every other conjunct is
 `Fig16.BoLo.wp`'s, verbatim.  `[about ours: [TR] p. 6's wp relativised to tagged typed worlds;
-docs/boca-rules.md §12.72]` -/
+docs/adjudications.md §12.72]` -/
 def wpTS (ls : List SRec) (e : Expr) (Q : List SRec → Val → WProp) : WProp := fun ρ =>
   ∀ (ρf fρ : WRes) (ps : List FrameRec), ResU.Hash ρf ρ → ResU.CompS ρf ρ fρ →
     TW fρ ps (rsOf ls) → Tagged fρ ps ls →

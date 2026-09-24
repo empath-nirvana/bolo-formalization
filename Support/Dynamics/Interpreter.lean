@@ -6,8 +6,7 @@ import Support.Syntax.Terms
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-an executable interpreter — memories as association lists, a step function, a fuelled run — which `[TR]` does not print (it gives a relation) and which no result of the paper uses.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+an executable interpreter — memories as association lists, a step function, a fuelled run — which `[TR]` does not print (it gives a relation) and which no result of the paper uses.
 -/
 
 noncomputable section
@@ -17,7 +16,7 @@ namespace BoCa
 /-!
 ### 3.10 · `Mem ∋ µ : Loc ⇀ Val` (the executable counterpart) · [TR] p. 3 · `[repair]`
 
-The `next` field is not in the print and makes `BoCa.step`'s allocation deterministic where `alloc↦` is nondeterministic in `ℓ`. Adjudicated at `BoCa/Wp.lean`'s convention W2 and `BoCa/TR3.lean` §1: [TR] p. 3's `alloc↦` is nondeterministic in `ℓ` and a total function cannot implement it, so the executable machine allocates at `µ.next`; `docs/axiom-ledger.md` D8 records that nothing bridges the two. The printed map is implemented separately as `BoCa.BoLo.Heap`, on which every `wp` theorem is proved, so the difference is confined to an artifact neither document prints
+The `next` field is not in the print and makes `BoCa.step`'s allocation deterministic where `alloc↦` is nondeterministic in `ℓ`. Adjudicated at convention W2 (`docs/adjudications.md`): [TR] p. 3's `alloc↦` is nondeterministic in `ℓ` and a total function cannot implement it, so the executable machine allocates at `µ.next`; `docs/adjudications.md` D8 records that nothing bridges the two. The printed map is implemented separately as `BoCa.BoLo.Heap`, on which every `wp` theorem is proved, so the difference is confined to an artifact neither document prints
 -/
 structure Mem where
   cells : List (Loc × Val)
@@ -54,7 +53,7 @@ inductive Step where
 /-!
 ### 3.37 · — no printed counterpart; the print gives a relation — · [TR] p. 4 · `[repair]`
 
-A deterministic executable machine where the print gives a relation; it adds the `K; e` and `injᵢ K` congruences. Nothing in the `wp` development depends on it. Every difference is adjudicated: determinism by `BoCa/Wp.lean`'s W2 and `docs/axiom-ledger.md` D8, the two congruences by `docs/boca-rules.md` §12.42, evaluation order by §12.1. That closes the one difference §12.42 had ruled ours when it narrowed `BoCa.BoLo.Head.seq` and the executable machine did not follow
+A deterministic executable machine where the print gives a relation; it adds the `K; e` and `injᵢ K` congruences. Nothing in the `wp` development depends on it. Every difference is adjudicated: determinism by `docs/adjudications.md` W2 and D8, the two congruences by `docs/adjudications.md` §12.42, evaluation order by §12.1. That closes the one difference §12.42 had ruled ours when it narrowed `BoCa.BoLo.Head.seq` and the executable machine did not follow
 -/
 /-- Apply a primitive value to one argument.
 

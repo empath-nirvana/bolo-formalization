@@ -9,8 +9,7 @@ import Support.Model.WalkSplitting
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-cell-level compatibility read off tags, values and witnesses, and `○` at an `imm` cell.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+cell-level compatibility read off tags, values and witnesses, and `○` at an `imm` cell.
 -/
 
 noncomputable section
@@ -22,8 +21,8 @@ variable {Loc Val : Type}
 p. 5's defining equation binds one `v` and one `ρ` across two `imm` cells and
 leaves the two lifetime sets free, so `▶◀` says precisely: both tags are `imm`,
 the values agree, the witnesses agree.  Left to right is `CellU.CompatS.kinds`
-and `CellU.CompatS.imm_imm` (§10); right to left rebuilds both cells through
-`CellU.rep` (§7).  Every "agree up to lifetimes" in `[TR]` §6.1 is this.
+and `CellU.CompatS.imm_imm`; right to left rebuilds both cells through
+`CellU.rep`.  Every "agree up to lifetimes" in `[TR]` §6.1 is this.
 `[about ours: `CellU.erase` and `CellU.wit` are this file's projections; what
 the equivalence says is the printed phrase "agree up to lifetimes"]` -/
 theorem CellU.compatS_iff {ψ₁ ψ₂ : CellU Loc Val} :
@@ -74,7 +73,7 @@ theorem CellU.CompR.imm_left {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR �
 `own` only when both operands are, so where it is not, at least one operand is
 not `own` and the composite carries that operand's witness.  This is the
 bookkeeping 6.14's "the same value and subresource inside of it" needs, since
-`CellU.CompR.wit` (§13) compares two operands only when neither is `own`. -/
+`CellU.CompR.wit` compares two operands only when neither is `own`. -/
 theorem CellU.CompR.wit_of_ne_own {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ ψ₂ ψ)
     (hk : ψ.kind ≠ Kind.own) :
     (ψ₁.kind ≠ Kind.own ∧ ψ.wit = ψ₁.wit) ∨ (ψ₂.kind ≠ Kind.own ∧ ψ.wit = ψ₂.wit) := by

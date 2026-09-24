@@ -9,8 +9,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the associativity and commutativity machinery behind Lemmas 6.1–6.4: cell-level associativity of `○` clause by clause, the laws of the schema `◐`, and the iterated composition `⨀` up to permutation.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the associativity and commutativity machinery behind Lemmas 6.1–6.4: cell-level associativity of `○` clause by clause, the laws of the schema `◐`, and the iterated composition `⨀` up to permutation.
 -/
 
 noncomputable section

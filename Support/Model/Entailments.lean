@@ -22,8 +22,7 @@ import Support.Model.Update
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-what §6.5–§6.6's entailments need beyond the propositions: `⫤⊨` reflexive and extensional, a `●`-factor of a reborrowed `imm` cell and the clauses that admit it, `reb_α` at `∅` and its outlives bound, and the join-indexed conclusion 6.115's literal reading measures.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+what §6.5–§6.6's entailments need beyond the propositions: `⫤⊨` reflexive and extensional, a `●`-factor of a reborrowed `imm` cell and the clauses that admit it, `reb_α` at `∅` and its outlives bound, and the join-indexed conclusion 6.115's literal reading measures.
 -/
 
 noncomputable section
@@ -184,8 +183,8 @@ theorem wp_lower {e : Expr} {Q : Val → WProp} {ρ ρf fρ : WRes} {μ : Heap}
   cases ResU.Lower.functional h₅ hl
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ', h₁, h₂, h₃, h₆, h₇, h₈, h₉, hA, hB, hC⟩
 
-/-- The walks of a single owned cell are `[TR]`-side folklore and `Fig16` §21
-has them: the exclusive walk is the cell, the aliasable walk is `∅`.  So
+/-- The walks of a single owned cell are `[TR]`-side
+folklore: the exclusive walk is the cell, the aliasable walk is `∅`.  So
 `⦇ρ ● ℓ↦own(v)⦈ = ⦇ρ⦈ ● ℓ↦own(v)` as a Kleene equality, which is what the
 `alloc`, `free`, `load` and `store` proofs each spend one sentence on.
 `[about ours: the sentence `[TR]` 6.141–6.145 share, at the walks]` -/
@@ -380,7 +379,7 @@ theorem hash_compS_own {ρf ρ ρ' σ : WRes} {μ : Heap} {l : BoCa.Loc} {v : Va
   exact ⟨σ', hxσ', ⟨hxσ'.1, σ', hxσ', ⟨t, ht⟩⟩, hlow⟩
 
 /-- `Loc ≜ ℕ` is infinite.  **Ours**: neither document says `Loc` is infinite,
-and `Fig16` §3 keeps it a hypothesis for that reason; at `[TR]` §3's concrete
+and it is kept a hypothesis for that reason; at `[TR]` §3's concrete
 `Loc` it is a theorem.
 `[about ours: the infinitude of `Loc`, which neither document states]` -/
 theorem loc_infinite : PMap.Infinite BoCa.Loc := by

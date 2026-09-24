@@ -8,8 +8,7 @@ import Support.Model.Prelude
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the exclusive walk `ex(ρ)_◐` and `imm`-free resources, and the functionality of the walks `ex`, `ag` and of `⦇−⦈`, `⟦−⟧` (the witness families they range over).  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the exclusive walk `ex(ρ)_◐` and `imm`-free resources, and the functionality of the walks `ex`, `ag` and of `⦇−⦈`, `⟦−⟧` (the witness families they range over).
 -/
 
 noncomputable section
@@ -125,7 +124,7 @@ theorem ResU.Sites.perm {ρ : ResU Loc Val} {k : Kind} {d d' : List Loc}
 single-valuedness, which `ResU.Comp.functional` takes, and the cell halves of
 `[TR]` Lemmas 6.2 and 6.3.  All three are proved above at both values of `◐`;
 this only names them together.
-`[about ours: the hypotheses of §12's schema, collected]` -/
+`[about ours: the hypotheses of the schema, collected]` -/
 structure ResU.CompLaws (C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop) :
     Prop where
   /-- `◐` is a partial function on cells. -/
@@ -190,7 +189,7 @@ theorem ResU.Comp.comm_of_laws (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R 
 /-- `⨀` is single-valued at a *fixed* list: each step is `ResU.Comp`, which
 `ResU.Comp.functional` shows single-valued.  The order-independence is
 `BigComp.perm`.
-`[about ours: `BigComp` is §16's fold shape for a printed iterated operator]` -/
+`[about ours: `BigComp` is the fold shape for a printed iterated operator]` -/
 theorem BigComp.functional (hC : ResU.CompLaws C)
     {l : List (ResU Loc Val)} {b b' : ResU Loc Val}
     (h : BigComp R C l b) (h' : BigComp R C l b') : b = b' := by

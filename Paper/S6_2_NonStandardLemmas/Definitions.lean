@@ -22,7 +22,7 @@ import Support.Model.Prelude
   lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`."*
 
 `ResU.SubKeep` is Definition 6.3 read with that sentence, which fixes the cell
-the third bullet leaves free and makes `⊟` a term (source `docs/boca-rules.md`
+the third bullet leaves free and makes `⊟` a term (`docs/adjudications.md`
 §12.64); `ResU.Sub` is the bullets alone, kept for comparison.
 
 **How this file reads.**  Each printed item is a row of `[TR]`'s section, in the
@@ -39,10 +39,8 @@ printed form, the page, a tag, and the reason the Lean has the shape it has:
 * `[about ours]` — a declaration the paper does not print, placed here only
   because Lean needs it before the next printed row.
 
-Row numbers are those of the source repository's `docs/definition-inventory.md`;
-citations of `docs/…` and `BoCa/…` are to that repository (`borrow_lang` at
-`970a9d0`).  Declaration names are the source's, unchanged, so that
-`Bridge/Names.csv` can check each one against its original.
+Row numbers are those of `Paper/INDEX.md` (*Definitions*); `§N` citations are
+to `docs/adjudications.md`.
 -/
 
 noncomputable section
@@ -121,12 +119,12 @@ def ResU.SimForm (σ₁ σ₂ : ResU Loc Val) : Prop :=
 /-!
 ### 5.66 · `ρ ⊟ ρ′ ≜ ρ∣own,mut ● ρ″ where …` — [TR] Definition 6.3, not a p. 5 row · [TR] p. 17 · `[repair]`
 
-The fourth bullet's second sub-case prints `ρ′(ℓ) = imm(ᾱ ∖ β̄, ρᵢ, v)` with a single prime, which its own hypothesis contradicts; `ρ″` is what [TR] Lemma 6.52's proof and the surrounding prose require. Adjudicated at `docs/boca-rules.md` §12.34, and `BoCa.Fig16.ResU.SubL` with `BoCa.Fig16.ResU.subClauseL_forces_empty` is the literal reading carried alongside, shown degenerate. The declaration existed with `[variant: …]` from the start; **the row did not**, so the definition layer had no record of it. **The third bullet is also short a clause**, and it is printed one line below the definition: *"removing the lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`"*. Off `dom(ρ′)` every lifetime of `ρ(ℓ)` is one "only in `ρ`", so `ρ″(ℓ) = ρ(ℓ)` and not merely `ℓ ∈ dom(ρ″)`; `BoCa.Fig16.ResU.SubKeep` is the bullet read through that sentence and `BoCa.Fig16.ResU.SubKeep.toSub` the implication. On it `⊟` is a function (`BoCa.Fig16.ResU.SubKeep.functional`) — which is what licenses [TR]'s writing `ρ ⊟ ρ′` as a term — and [TR] 6.52's equation holds of every admissible value (`BoCa.Fig16.ResU.SubKeep.compS`). `BoCa.Fig16.ResU.sub_not_functional` measures the bullet's own glyphs, not `⊟`; adjudicated at `docs/boca-rules.md` §12.58, which is the correction to §12.38
+The fourth bullet's second sub-case prints `ρ′(ℓ) = imm(ᾱ ∖ β̄, ρᵢ, v)` with a single prime, which its own hypothesis contradicts; `ρ″` is what [TR] Lemma 6.52's proof and the surrounding prose require. Adjudicated at `docs/adjudications.md` §12.34, and `BoCa.Fig16.ResU.SubL` with `BoCa.Fig16.ResU.subClauseL_forces_empty` is the literal reading carried alongside, shown degenerate. The declaration existed with `[variant: …]` from the start; **the row did not**, so the definition layer had no record of it. **The third bullet is also short a clause**, and it is printed one line below the definition: *"removing the lifetimes of borrows from `ρ′`, but keeping the lifetimes only in `ρ`"*. Off `dom(ρ′)` every lifetime of `ρ(ℓ)` is one "only in `ρ`", so `ρ″(ℓ) = ρ(ℓ)` and not merely `ℓ ∈ dom(ρ″)`; `BoCa.Fig16.ResU.SubKeep` is the bullet read through that sentence and `BoCa.Fig16.ResU.SubKeep.toSub` the implication. On it `⊟` is a function (`BoCa.Fig16.ResU.SubKeep.functional`) — which is what licenses [TR]'s writing `ρ ⊟ ρ′` as a term — and [TR] 6.52's equation holds of every admissible value (`BoCa.Fig16.ResU.SubKeep.compS`). `BoCa.Fig16.ResU.sub_not_functional` measures the bullet's own glyphs, not `⊟`; adjudicated at `docs/adjudications.md` §12.58, which is the correction to §12.38
 -/
 /-- The fourth bullet of `[TR]` Definition 6.3 (p. 17), with the second
 sub-case read as a constraint on `ρ″`.
 `[variant: the print writes `ρ′(ℓ) = imm(ᾱ ∖ β̄, ρᵢ, v)` with a single prime,
-which its own hypothesis contradicts (§19); `ρ″` is what 6.52's proof and the
+which its own hypothesis contradicts; `ρ″` is what 6.52's proof and the
 surrounding prose require]` -/
 def ResU.SubClause (ρ ρ' ρ'' : ResU Loc Val) : Prop :=
   ∀ (l : Loc) (s s' : LSet) (v : Val) (ρi : ResU Loc Val)
@@ -159,9 +157,9 @@ Row 5.66, continued.
 there.  That paragraph is part of the definition, so this is an **incomplete
 transcription**, kept beside `ResU.SubKeep` — which is Definition 6.3 — for
 comparison and as what `ResU.sub_not_functional` measures.  Prefer `SubKeep`
-in new work.  `docs/boca-rules.md` §12.64.
+in new work.  `docs/adjudications.md` §12.64.
 `[variant: Definition 6.3's bullets without its paragraph; the last sub-case's
-single prime is read as `ρ″`, see §19 and `ResU.subClauseL_forces_empty`]` -/
+single prime is read as `ρ″`, see `docs/adjudications.md` §12.34]` -/
 def ResU.Sub (ρ ρ' χ : ResU Loc Val) : Prop :=
   ∃ ρ'' : ResU Loc Val,
     ρ'.exclPart = PMap.empty ∧
@@ -175,7 +173,7 @@ Row 5.66, continued.
 -/
 /-- `ρ ⊟ ρ′ = χ` — `[TR]` Definition 6.3 on the literal reading of the last
 sub-case.  The sub-case itself is the print's, glyph for glyph, and so is `≤`
-(`[CONF]` p. 415:24 fn. 1, §16).  The tag is not `[as printed]` for the one
+(`[CONF]` p. 415:24 fn. 1).  The tag is not `[as printed]` for the one
 remaining reason: the body restricts on **two** tags at once, `ρ|own,mut`, and
 `[TR]` p. 5 prints `ρ|ι` with a single `ι`, so that operand has no defining row
 on any page.
@@ -213,7 +211,7 @@ says a thing is: the displayed bullets *together with* the paragraph that
 disambiguates them.  Transcribing the bullets alone is an incomplete
 transcription, not a faithful one, and completing it from the prose is not a
 departure — `ResU.Sub` is the partial reading, kept beside this one for
-comparison and for `ResU.sub_not_functional`.  `docs/boca-rules.md` §12.64.
+comparison and for `ResU.sub_not_functional`.  `docs/adjudications.md` §12.64.
 `[as printed]` (`[TR]` p. 17, the four bullets and the paragraph one line below
 them; the fourth bullet's single prime read as `ρ″`, as `ResU.Sub`) -/
 def ResU.SubKeep (ρ ρ' χ : ResU Loc Val) : Prop :=

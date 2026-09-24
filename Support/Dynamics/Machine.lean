@@ -9,8 +9,7 @@ import Support.Syntax.Terms
 
 `[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
 paper's definitions and results need in Lean and the paper leaves implicit:
-the machines' plumbing: frame composition and the reflexive-transitive closure `→*` for both machines, and for `[TR]` §3's printed machine the inversion of its steps at `inj₁ e` and `e₁; e₂`, the saturated primitives, and the closed terms `alloc ()`, `free (alloc ())`, `inj₁ (free (alloc ()))` and `free (alloc ()); ()`.  Declaration names are the source repository's (`borrow_lang` at
-`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+the machines' plumbing: frame composition and the reflexive-transitive closure `→*` for both machines, and for `[TR]` §3's printed machine the inversion of its steps at `inj₁ e` and `e₁; e₂`, the saturated primitives, and the closed terms `alloc ()`, `free (alloc ())`, `inj₁ (free (alloc ()))` and `free (alloc ()); ()`.
 -/
 
 noncomputable section
@@ -146,11 +145,11 @@ def wAlloc : Expr := .app (.val (.prim .alloc)) (.val .unit)
 /-- `free (alloc ())` — a redex, not a value, and closed. -/
 def wFreeAlloc : Expr := .app (.val (.prim .free)) wAlloc
 
-/-- `inj₁ (free (alloc ()))` — §3a's gap, at a component no reading makes a
+/-- `inj₁ (free (alloc ()))` — the `injᵢ K` gap, at a component no reading makes a
 value. -/
 def wInj : Expr := .inj₁ wFreeAlloc
 
-/-- `(free (alloc ())); ()` — §3c's gap. -/
+/-- `(free (alloc ())); ()` — the `K; e` gap. -/
 def wSeq : Expr := .seq wFreeAlloc (.val .unit)
 
 /-- `Δ; • ⊢ alloc () : Ref 1`, by `⊸E` on the `alloc` axiom over `1I`. -/
@@ -163,7 +162,7 @@ theorem derives_wFreeAlloc (Δ : BoCa.Lifetime.LifeCtx) :
     Derives Δ [] wFreeAlloc .unit :=
   .lolliE .nil (derives_wAlloc Δ) (.freeAx .nil)
 
-/-- The seven printed frames are seven of `BoCa/Wp.lean`'s ten. -/
+/-- The seven printed frames are seven of `BoLo.Kont`'s ten. -/
 def Kont.toWp : Kont → BoCa.BoLo.Kont
   | .hole         => .hole
   | .pairL K e    => .pairL K.toWp e
@@ -205,7 +204,7 @@ end BoCa.BoLo
 namespace BoCa.TR3
 open BoCa.BoLo (Heap)
 
-/-- Each printed head rule is a run of `BoCa/Wp.lean`'s machine — one step
+/-- Each printed head rule is a run of `BoLo.Steps` — one step
 each, `store↦` included. -/
 theorem Head.toWp {μ μ' : Heap} {e e' : Expr} (h : Head μ e μ' e') :
     BoCa.BoLo.Steps μ e μ' e' := by
@@ -297,8 +296,8 @@ end BoCa.BoLo
 namespace BoCa.TR3
 open BoCa.BoLo (Heap)
 
-/-- **The printed `→*` is contained in `BoCa/Wp.lean`'s.**  So every `wp` of §5
-implies `BoCa/Fig16Wp.lean`'s, and each rule below is at least as strong as its
+/-- **The printed `→*` is contained in `BoLo.Steps`.**  So every `TR3.wp`
+implies `Fig16.BoLo.wp`, and each rule below is at least as strong as its
 counterpart there.
 `[about ours: the two machines, `[TR]` §3's and convention W2's]` -/
 theorem Steps.toWp {μ μ' : Heap} {e e' : Expr} (h : Steps μ e μ' e') :
