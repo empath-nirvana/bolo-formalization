@@ -1,0 +1,508 @@
+import Paper.S1_Syntax.Definitions
+import Paper.S2_Statics.Definitions
+import Paper.S3_Dynamics.Definitions
+import Paper.S5_Model.Definitions
+import Paper.S6_1_StandardLemmas.Lemmas
+import Support.Lifetimes.Interpretation
+import Support.LogicalRelation.ClosingSubstitutions
+import Support.Model.Algebra
+import Support.Model.AlgebraInstances
+import Support.Model.Cells
+import Support.Model.FlatteningCells
+import Support.Model.Outlives
+import Support.Model.Prelude
+import Support.Model.Singletons
+import Support.Model.WalkSplitting
+import Support.TypedWorld.Images
+import Support.TypedWorld.Invariant
+import Support.TypedWorld.Records
+import Support.TypedWorld.World
+
+/-!
+# Support — TypedWorld — Wp
+
+`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
+paper's definitions and results need in Lean and the paper leaves implicit:
+stratified record lists and `wp` at a tagged typed world (source `BoCa/TypedWp.lean`): relevance, the Kripke order, the stratified `Mut` clause, tags, and the frame steps that only regroup.  Declaration names are the source repository's (`borrow_lang` at
+`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+-/
+
+noncomputable section
+
+namespace BoCa.Fig16.LogRel.Typed
+open BoCa
+open BoCa.Fig16
+open BoCa.Fig16.BoLo
+open BoCa.BoLo (Heap Steps Step1 Head Kont)
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
+
+theorem Rel.of_compS_left {r : FrameRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
+    (h : Rel r ρ₁) : Rel r ρ := by
+  obtain ⟨m, ψ, e, k, hm⟩ := h
+  obtain ⟨ψ', e', k', -⟩ := compS_get_left' hc e
+  exact ⟨m, ψ', e', k'.trans k, hm⟩
+
+theorem Rel.of_compS_right {r : FrameRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
+    (h : Rel r ρ₂) : Rel r ρ :=
+  Rel.of_compS_left (ResU.CompS.comm hc) h
+
+theorem Keeps.left {rs rs' : List FrameRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
+    (h : Keeps rs rs' ρ) : Keeps rs rs' ρ₁ :=
+  fun r hr hrel => h r hr (hrel.of_compS_left hc)
+
+theorem Keeps.right {rs rs' : List FrameRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
+    (h : Keeps rs rs' ρ) : Keeps rs rs' ρ₂ :=
+  fun r hr hrel => h r hr (hrel.of_compS_right hc)
+
+/-- `Keeps` composes: what `rs″` keeps of `rs′` it keeps of `rs`, if `rs′` kept it. -/
+theorem Keeps.trans {rs rs' rs'' : List FrameRec} {ρ : WRes} (h₁ : Keeps rs rs' ρ)
+    (h₂ : Keeps rs' rs'' ρ) : Keeps rs rs'' ρ :=
+  fun r hr hrel => h₂ r (h₁ r hr hrel) hrel
+
+/-- `Coh` needs only a record relevant to the borrow's cell. -/
+theorem coh_keeps {rs rs' : List FrameRec} {l : Loc} {S : Ty} {δ : LSub} {ψ : CellU Loc Val}
+    (hk : Keeps rs rs' (ResU.single l ψ)) (hψ : ψ.kind = Kind.imm) (h : Coh rs l S δ) :
+    Coh rs' l S δ := by
+  rcases h with ⟨r, hr, hm, hT, hag⟩ | ⟨r, hr, p, u, hch, hag⟩
+  · exact Or.inl ⟨r, hk r hr ⟨l, ψ, ResU.single_get_self _ _, hψ, Or.inl hm⟩, hm, hT, hag⟩
+  · exact Or.inr ⟨r, hk r hr ⟨l, ψ, ResU.single_get_self _ _, hψ, Or.inr ⟨p, S, u, hch⟩⟩,
+      p, u, hch, hag⟩
+
+theorem mem_rsOf {ls : List SRec} {r : FrameRec} : r ∈ rsOf ls ↔ ∃ t, (r, t) ∈ ls := by
+  simp [rsOf]
+
+/-- Only `imm` cells compose, so a non-`imm` cell of a part is the whole's cell. -/
+theorem compS_get_left_nonImm {ρ₁ ρ₂ ρ : WRes} (h : ResU.CompS ρ₁ ρ₂ ρ) {l : Loc}
+    {ψ₁ : CellU Loc Val} (e₁ : ρ₁.get l = some ψ₁) (hk : ψ₁.kind ≠ Kind.imm) :
+    ρ.get l = some ψ₁ := by
+  rcases ResU.Comp.get h l with ⟨f₁, -, -⟩ | ⟨χ, f₁, -, f⟩ | ⟨χ, f₁, -, -⟩ |
+      ⟨χ₁, χ₂, χ, f₁, -, -, hC⟩
+  · rw [e₁] at f₁; cases f₁
+  · rw [e₁] at f₁; cases Option.some.inj f₁; exact f
+  · rw [e₁] at f₁; cases f₁
+  · rw [e₁] at f₁; cases Option.some.inj f₁
+    obtain ⟨_, _, _, _, _, _, _, h₁, _, _⟩ := hC
+    exact absurd (by rw [h₁]; rfl) hk
+
+/-- A borrow cell of a part is a borrow cell of the whole, at the same or a shorter
+lifetime: `●` unions the lifetime sets of two `imm` cells (`CellU.CompS.at`). -/
+theorem CellIn.of_left {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ) {b : Life}
+    (h : CellIn ρ₁ b) : CellIn ρ b := by
+  obtain ⟨m, ψ, e, k, hb⟩ := h
+  rcases ResU.Comp.get hc m with ⟨f₁, -, -⟩ | ⟨χ, f₁, -, f⟩ | ⟨χ, f₁, -, -⟩ |
+      ⟨χ₁, χ₂, χ, f₁, -, f, hC⟩
+  · rw [e] at f₁; cases f₁
+  · rw [e] at f₁; cases Option.some.inj f₁; exact ⟨m, _, f, k, hb⟩
+  · rw [e] at f₁; cases f₁
+  · rw [e] at f₁; cases Option.some.inj f₁
+    refine ⟨m, χ, f, by rw [CellU.CompS.kind hC]; simp, ?_⟩
+    rw [CellU.CompS.at hC]
+    exact le_trans inf_le_left hb
+
+theorem CellIn.of_right {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ) {b : Life}
+    (h : CellIn ρ₂ b) : CellIn ρ b := CellIn.of_left (ResU.CompS.comm hc) h
+
+/-- A borrow cell of a resource in `Res_α` is strictly longer-lived than `α`. -/
+theorem CellIn.of_stratum {σ : WRes} {α b : Life} (hσ : σ.InStratum α) (h : CellIn σ b) :
+    b ⊐ α := by
+  obtain ⟨m, ψ, e, k, hb⟩ := h
+  have := hσ m ψ e
+  have hat : ψ.at ⊐ α := by
+    cases ψ
+    · exact absurd rfl k
+    · exact this
+    · exact this
+  exact lt_of_lt_of_le hat hb
+
+/-- A cell at `m` is a borrow cell at its own lifetime. -/
+theorem CellIn.single {l : Loc} {ψ : CellU Loc Val} (k : ψ.kind ≠ Kind.own) :
+    CellIn (ResU.single l ψ) ψ.at := ⟨l, ψ, ResU.single_get_self _ _, k, le_rfl⟩
+
+theorem Ext.left {ls ls' : List SRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
+    (h : Ext ls ls' ρ) : Ext ls ls' ρ₁ :=
+  ⟨h.1.left hc, fun b hb => h.2 b (hb.of_left hc)⟩
+
+theorem Ext.right {ls ls' : List SRec} {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ ρ)
+    (h : Ext ls ls' ρ) : Ext ls ls' ρ₂ :=
+  ⟨h.1.right hc, fun b hb => h.2 b (hb.of_right hc)⟩
+
+theorem Ext.trans {ls ls' ls'' : List SRec} {ρ : WRes} (h₁ : Ext ls ls' ρ)
+    (h₂ : Ext ls' ls'' ρ) : Ext ls ls'' ρ :=
+  ⟨h₁.1.trans h₂.1, fun b hb x hx => (h₁.2 b hb x hx).trans (h₂.2 b hb x hx)⟩
+
+/-- The stored list is `Ext`-below the current one at the cell's content: `σ ∈ Res_b`, so
+every `mut` cell of `σ` is longer-lived than `b`, and `ls₀` and `ls` agree above `b`. -/
+theorem ext_stored_current {ls ls₀ : List SRec} {b c : Life} {σ : WRes}
+    (hσ : σ.InStratum c) (hbc : b ⊑ c) (hls₀ : ∀ x, x ∈ ls₀ ↔ (x ∈ ls ∧ x.2 ⊐ b)) :
+    Ext ls₀ ls σ := by
+  refine ⟨fun r hr _ => ?_, fun b' hb' x hx => ?_⟩
+  · obtain ⟨t, ht⟩ := mem_rsOf.mp hr
+    exact mem_rsOf.mpr ⟨t, ((hls₀ _).mp ht).1⟩
+  · have hbb : b' ⊐ b := lt_of_le_of_lt hbc (hb'.of_stratum hσ)
+    have hxb : x.2 ⊐ b := lt_trans hbb hx
+    exact ⟨fun h => ((hls₀ x).mp h).1, fun h => (hls₀ x).mpr ⟨h, hxb⟩⟩
+
+/-- **The stratification fact at a write**: every record relevant to the new content is
+strictly longer-lived than the cell.  `[about ours]` -/
+def LifeBound (ls : List SRec) (σ : WRes) (b : Life) : Prop :=
+  ∀ x ∈ ls, Rel x.1 σ → x.2 ⊐ b
+
+/-- **At a lifetime shorter than every record, the stratified list is the whole list**:
+`[TR]` 6.65 picks `α ⊏ γ ⊓ β` after `ρf` is fixed, and the list is finite. -/
+theorem strat_fresh {ls : List SRec} {b : Life} (h : ∀ x ∈ ls, x.2 ⊐ b) :
+    ∀ x, x ∈ ls ↔ (x ∈ ls ∧ x.2 ⊐ b) :=
+  fun x => ⟨fun hx => ⟨hx, h x hx⟩, fun hx => hx.1⟩
+
+/-- A lifetime shorter than every record of a list exists. -/
+theorem exists_fresh (ls : List SRec) : ∃ b : Life, ∀ x ∈ ls, x.2 ⊐ b := by
+  refine ⟨OrderDual.toDual ((ls.map fun x => OrderDual.ofDual x.2).sum + 1), fun x hx => ?_⟩
+  show OrderDual.ofDual x.2 < (ls.map fun x => OrderDual.ofDual x.2).sum + 1
+  have : OrderDual.ofDual x.2 ≤ (ls.map fun x => OrderDual.ofDual x.2).sum :=
+    List.le_sum_of_mem (List.mem_map_of_mem hx)
+  omega
+
+/-- Every record proper has a frame lifetime.  `[about ours]` -/
+def LinLife (W : WRes) (ps : List FrameRec) : Prop := ∀ p ∈ ps, ∃ α, FrameLife W p α
+
+theorem frameLife_of_ag {W W' : WRes} {p : FrameRec} {α : Life}
+    (t : ∀ a, AgW W' a → AgW W a) (h : FrameLife W p α) : FrameLife W' p α :=
+  ⟨fun a ha => h.1 a (t a ha), fun a ha => h.2 a (t a ha)⟩
+
+/-- A step whose `ag` loses lifetimes only keeps `FrameLife`. -/
+theorem frameLife_back {W W' : WRes} {p : FrameRec} {α : Life} (h : FrameLife W p α)
+    (hb : ∀ a', AgW W' a' → ∃ aW, AgW W aW ∧ ICpAt aW a' p.le ∧
+      ∀ m, LinLoc p m → ICpAt aW a' m) : FrameLife W' p α := by
+  refine ⟨fun a' ha' ζ t e ht y hy => ?_, fun a' ha' m hm ψ s e hs x hx => ?_⟩
+  · obtain ⟨aW, haW, h₁, -⟩ := hb a' ha'
+    obtain ⟨ζ', t', e', ht', hy'⟩ := (h₁ ζ e).ls ht hy
+    exact h.1 aW haW ζ' t' e' ht' y hy'
+  · obtain ⟨aW, haW, -, h₂⟩ := hb a' ha'
+    obtain ⟨ψ', s', e', hs', hx'⟩ := (h₂ m hm ψ e).ls hs hx
+    exact h.2 aW haW m hm ψ' s' e' hs' x hx'
+
+theorem linLife_of_ag {W W' : WRes} {ps : List FrameRec} (t : ∀ a, AgW W' a → AgW W a)
+    (h : LinLife W ps) : LinLife W' ps := fun p hp => by
+  obtain ⟨α, hα⟩ := h p hp
+  exact ⟨α, frameLife_of_ag t hα⟩
+
+/-- **A reborrow keeps `FrameLife`**: a new view is at a lifetime of `ag(W)` or at `β`, and
+`β` is below the frame (`W.InStratum β`); the frame's own cell gets no `β`, since the
+escrow reborrowed has no `own` or `mut` cell there. -/
+theorem frameLife_reb_like {W W' c w₀ : WRes} {le : Loc} {s : LSet} {v : Val}
+    {hs : w₀.InStratum s.join} {β : Life} (hvW : ResU.Valid W)
+    (hle : W.get le = some (CellU.immOf s v w₀ hs)) (hreb : ResU.Reb β w₀ c)
+    (hW : ResU.CompS W c W') (hβ : W.InStratum β) {p : FrameRec} {α : Life}
+    (hex : ∀ ζ : CellU Loc Val, w₀.get p.le = some ζ → ζ.kind = Kind.imm)
+    (hcell : ∀ a, AgW W a → ∃ ζ : CellU Loc Val, a.get p.le = some ζ ∧ ζ.kind = Kind.imm)
+    (h : FrameLife W p α) : FrameLife W' p α := by
+  obtain ⟨aW, haW⟩ := agW_of_valid hvW
+  have newls : ∀ a', AgW W' a' → ∀ m (ψ : CellU Loc Val) s' x, a'.get m = some ψ →
+      ψ.lsOf = some s' → s'.mem x →
+      (∃ (ζ : CellU Loc Val) (t : LSet), aW.get m = some ζ ∧ ζ.lsOf = some t ∧ t.mem x) ∨
+      (x = β ∧ ∃ ζ : CellU Loc Val, w₀.get m = some ζ ∧ ζ.kind ≠ Kind.imm) := by
+    intro a' ha' m ψ s' x e hs' hx
+    obtain ⟨aW', ac, haW', hac, hcomp⟩ := (AgW.split hW).mp ha'
+    rw [AgW.functional haW' haW] at hcomp
+    rcases ResU.CompR.lsOf_inv hcomp e hs' hx with h₁ | ⟨ξ, t₁, e₁, ht₁, hx₁⟩
+    · exact Or.inl h₁
+    · rcases img_ls haW hle hreb (fun _ _ e => e) hac e₁ ht₁ hx₁ with h₂ | ⟨rfl, -, h₃⟩
+      · exact Or.inl h₂
+      · exact Or.inr ⟨rfl, h₃⟩
+  have hβα : β ⊏ α := by
+    obtain ⟨ζ, e, k⟩ := hcell aW haW
+    obtain ⟨t, ht⟩ := lsOf_of_imm k
+    have h₁ : t.meet ⊐ β := CellU.sqsupset_of_lsOf ht (AgW.inStratum haW β hβ _ ζ e)
+    rw [h.1 aW haW ζ t e ht t.meet t.meet_mem] at h₁
+    exact h₁
+  refine ⟨fun a' ha' ζ t e ht y hy => ?_, fun a' ha' m hm ψ s' e hs' x hx => ?_⟩
+  · rcases newls a' ha' p.le ζ t y e ht hy with ⟨ζ', t', e', ht', hy'⟩ | ⟨-, ζ', e', k'⟩
+    · exact h.1 aW haW ζ' t' e' ht' y hy'
+    · exact absurd (hex ζ' e') k'
+  · rcases newls a' ha' m ψ s' x e hs' hx with ⟨ζ', t', e', ht', hx'⟩ | ⟨rfl, -⟩
+    · exact h.2 aW haW m hm ζ' t' e' ht' x hx'
+    · exact hβα
+
+theorem lsOf_singleton_mem {α y : Life} {v : Val} {R : WRes}
+    {h : R.InStratum (LSet.singleton α).join} {t : LSet}
+    (ht : (CellU.immOf (LSet.singleton α) v R h).lsOf = some t) (hy : t.mem y) : y = α := by
+  rw [CellU.lsOf_immOf] at ht
+  cases Option.some.inj ht
+  exact hy
+
+/-- **`immFrame` keeps `LinLife`**: the new record's cell is `imm({α}, …)` and its lineage
+carries no view (its cells were in `ex(W)_●`); an old record's cells are not `ℓ`. -/
+theorem frameLife_frame {W X Z R W' : WRes} {ps rs : List FrameRec} {l : Loc} {v : Val}
+    {α : Life} (T : Ty) (δ : LSub) {hα : R.InStratum (LSet.singleton α).join}
+    (hvW : ResU.Valid W)
+    (hX : ResU.CompS (ResU.single l (CellU.ownOf v)) R X) (hW : ResU.CompS X Z W)
+    (hW' : ResU.CompS (ResU.single l (CellU.immOf (LSet.singleton α) v R hα)) Z W')
+    (hTI : TI W ps rs) :
+    FrameLife W' ⟨l, v, R, T, δ⟩ α ∧ ∀ p ∈ ps, ∀ β, FrameLife W p β → FrameLife W' p β := by
+  obtain ⟨σ₀, eW, aW, heW, haW, -⟩ := id hvW
+  obtain ⟨eR, heR, hRW, hRl⟩ := frame_ex hX hW heW
+  have Wl : W.get l = some (CellU.ownOf v) :=
+    (ResU.CompS.get_left_of_ne_imm hW
+      (ResU.CompS.get_left_of_ne_imm hX (ResU.single_get_self _ _) (by simp)).2 (by simp)).2
+  have lNone : aW.get l = none := by
+    cases e : aW.get l with
+    | none => rfl
+    | some ζ => exact (ex_ag_disjoint hvW heW haW (ExS.get_of_ne_imm heW Wl (by simp)) e).elim
+  -- the walk of `ag(W′)` against `ag(W)`
+  have walks : ∀ a', AgW W' a' → ∃ z σc pc rw₀ eR',
+      ExS R eR' ∧ ResU.CompR rw₀ z aW ∧ ResU.CompR eR' rw₀ pc ∧
+      ResU.CompR (ResU.single l (CellU.immOf (LSet.singleton α) v R hα)) pc σc ∧
+      ResU.CompR σc z a' := by
+    intro a' ha'
+    obtain ⟨eW', aW', rw₀, z, eR', σc, pc, -, haW', -, hrz, heR', -, -, hpc, hcp, hcz⟩ :=
+      frame_walks hX hW hW' hvW ha'
+    rw [AgW.functional haW' haW] at hrz
+    exact ⟨z, σc, pc, rw₀, eR', heR', hrz, hpc, hcp, hcz⟩
+  have backI : ∀ a', AgW W' a' → ∀ m, m ≠ l → ICpAt aW a' m := by
+    intro a' ha' m hm
+    obtain ⟨z, σc, pc, rw₀, eR', heR', hrz, hpc, hcp, hcz⟩ := walks a' ha'
+    exact icpAt_comp hcz (icpAt_comp hcp (icpAt_none (single_ne _ hm))
+      (icpAt_comp hpc (icpAt_of_immFree (ExS.immFree heR') m) (icpAt_left hrz m)))
+      (icpAt_right hrz m)
+  refine ⟨⟨fun a' ha' ζ t e ht y hy => ?_, fun a' ha' m hm ψ s e hs x hx => ?_⟩,
+    fun p hp β hβ => ?_⟩
+  -- the new record
+  · obtain ⟨z, σc, pc, rw₀, eR', heR', hrz, hpc, hcp, hcz⟩ := walks a' ha'
+    rcases ResU.CompR.lsOf_inv hcz e ht hy with ⟨ξ, t₁, e₁, ht₁, hy₁⟩ | ⟨ξ, -, e₁, -⟩
+    · rcases ResU.CompR.lsOf_inv hcp e₁ ht₁ hy₁ with ⟨ξ₂, t₂, e₂, ht₂, hy₂⟩ |
+          ⟨ξ₂, t₂, e₂, ht₂, hy₂⟩
+      · obtain ⟨-, rfl⟩ := ResU.single_get_eq_some e₂
+        exact lsOf_singleton_mem ht₂ hy₂
+      · rcases ResU.CompR.lsOf_inv hpc e₂ ht₂ hy₂ with ⟨ξ₃, t₃, e₃, ht₃, -⟩ | ⟨ξ₃, -, e₃, -⟩
+        · exact absurd (CellU.kind_of_lsOf ht₃) (ExS.immFree heR' _ _ e₃)
+        · obtain ⟨_, e₄⟩ := comp_some hrz e₃
+          rw [lNone] at e₄; cases e₄
+    · obtain ⟨_, e₄⟩ := comp_some_r hrz e₁
+      rw [lNone] at e₄; cases e₄
+  · exfalso
+    obtain ⟨d, ⟨q, hq⟩, ζ, eζ, kζ⟩ := hm
+    have eRm : eR.get m = some ζ := xpath_ex heR hq.xpath eζ kζ
+    have hml : m ≠ l := fun e' => by rw [e', hRl] at eRm; cases eRm
+    have aNone : aW.get m = none := by
+      cases ea : aW.get m with
+      | none => rfl
+      | some ξ => exact (ex_ag_disjoint hvW heW haW (hRW m ζ eRm kζ) ea).elim
+    obtain ⟨ξ, eξ, -⟩ := backI a' ha' m hml ψ e (CellU.kind_of_lsOf hs)
+    rw [aNone] at eξ; cases eξ
+  -- an old record
+  · have hmem := hTI.2.2.2.2.2.2.1
+    refine frameLife_back hβ (fun a' ha' => ⟨aW, haW, backI a' ha' p.le (fun e => ?_),
+      fun m hm => backI a' ha' m (fun e => ?_)⟩)
+    · obtain ⟨ψ, eψ, -⟩ := hTI.2.1 p hp aW haW
+      rw [e, lNone] at eψ; cases eψ
+    · obtain ⟨d, hd, ζ, eζ, kζ⟩ := hm
+      have hdr : d ∈ rs := (hmem d).mpr ⟨p, hp, hd⟩
+      obtain ⟨ξ, eξ⟩ := exIn_support (hTI.exIn hdr) eζ kζ aW haW
+      rw [e, lNone] at eξ; cases eξ
+
+theorem linLife_frame {W X Z R W' : WRes} {ps rs : List FrameRec} {l : Loc} {v : Val}
+    {α : Life} {T : Ty} {δ : LSub} {hα : R.InStratum (LSet.singleton α).join}
+    (hvW : ResU.Valid W)
+    (hX : ResU.CompS (ResU.single l (CellU.ownOf v)) R X) (hW : ResU.CompS X Z W)
+    (hW' : ResU.CompS (ResU.single l (CellU.immOf (LSet.singleton α) v R hα)) Z W')
+    (hTI : TI W ps rs) (h : LinLife W ps) :
+    LinLife W' (⟨l, v, R, T, δ⟩ :: ps) := by
+  obtain ⟨hnew, hold⟩ := frameLife_frame T δ hvW hX hW hW' hTI
+  intro p hp
+  rcases List.mem_cons.mp hp with rfl | hp
+  · exact ⟨α, hnew⟩
+  · obtain ⟨β, hβ⟩ := h p hp
+    exact ⟨β, hold p hp β hβ⟩
+
+/-- **Every `TW` world satisfies `LinLife`.** -/
+theorem TW.linLife {W : WRes} {ps rs : List FrameRec} (h : TW W ps rs) : LinLife W ps := by
+  induction h with
+  | empty => intro p hp; exact absurd hp (by simp)
+  | alloc _ _ _ hW _ ih => exact linLife_of_ag (fun a ha => alloc_ag hW ha) ih
+  | immFrame T δ hα hW₀ hadm hX hW hden hW' hv hds ih =>
+      exact linLife_frame hW₀.valid hX hW hW' hW₀.inv ih
+  | @reb W W' c ps rs r le s β hs x hW₀ hr hle hx hreb hden hβ hW hv ih =>
+      have hTI := hW₀.inv
+      intro p hp
+      obtain ⟨α, hα⟩ := ih p hp
+      have hpR : p ∈ rs := (hTI.2.2.2.2.2.2.1 p).mpr ⟨p, hp, DescR.refl p⟩
+      refine ⟨α, frameLife_reb_like hW₀.valid hle hreb hW hβ (fun ζ e => ?_)
+        (fun a ha => by obtain ⟨ψ, e, k, -⟩ := hTI.2.1 p hp a ha; exact ⟨ψ, e, k⟩) hα⟩
+      rcases CellU.rep ζ with ⟨u, rfl⟩ | ⟨s₁, v₁, χ₁, h₁, rfl⟩ | ⟨b₁, v₁, χ₁, h₁, P, hw, rfl⟩
+      · exact (hTI.2.2.2.1 p hpR r hr u e).elim
+      · exact CellU.kind_immOf _ _ _ _
+      · exact (hTI.2.2.2.2.2.1.1 p hp (mutAt_of_cell hle (MutAt.top e (by simp)))).elim
+  | @rebDeep W W' c ps rs r p₀ l₁ S₀ u₀ s w₀ hs β x hW₀ hr hch hcell hx hreb hden hβ hW hv
+      ih =>
+      have hTI := hW₀.inv
+      have hvW := hW₀.valid
+      obtain ⟨aW, haW⟩ := agW_of_valid hvW
+      obtain ⟨χ, eχ, kχ, -, wχ⟩ := AgW.get_imm haW hcell (CellU.kind_immOf _ _ _ _)
+      rw [CellU.wit_immOf] at wχ
+      obtain ⟨-, -, hw₀own, -, -⟩ :=
+        hTI.1.1 r hr p₀ l₁ S₀ u₀ hch aW haW χ eχ (by rw [kχ]; simp)
+      rw [wχ] at hw₀own
+      intro p hp
+      obtain ⟨α, hα⟩ := ih p hp
+      have hpR : p ∈ rs := (hTI.2.2.2.2.2.2.1 p).mpr ⟨p, hp, DescR.refl p⟩
+      refine ⟨α, frameLife_reb_like hvW hcell hreb hW hβ (fun ζ e => ?_)
+        (fun a ha => by obtain ⟨ψ, e, k, -⟩ := hTI.2.1 p hp a ha; exact ⟨ψ, e, k⟩) hα⟩
+      rcases CellU.rep ζ with ⟨u, rfl⟩ | ⟨s₁, v₁, χ₁, h₁, rfl⟩ | ⟨b₁, v₁, χ₁, h₁, P, hw, rfl⟩
+      · exact (hTI.2.2.2.1 p hpR r hr u (hw₀own _ u e)).elim
+      · exact CellU.kind_immOf _ _ _ _
+      · exact (hTI.2.2.2.2.2.1.1 p hp (mutAt_of_cell hcell (MutAt.top e (by simp)))).elim
+  | mutFold hW₀ hX hW hW' _ ih =>
+      exact linLife_of_ag (fun a ha => (mut_fold_ag hX hW hW' a).mpr ha) ih
+  | mutUnfold hW₀ hW hX hW' _ ih =>
+      exact linLife_of_ag (fun a ha => (mut_fold_ag hX hW' hW a).mp ha) ih
+  | free hW₀ hW _ ih => exact linLife_of_ag (fun a ha => (own_cell_ag hW a).mpr ha) ih
+  | store hW₀ hW hW' _ ih =>
+      exact linLife_of_ag (fun a ha => (own_cell_ag hW a).mpr ((own_cell_ag hW' a).mp ha)) ih
+  | @immEnd W Y X' W' ps rs ps' rs' r s hs hW₀ hr hc hX' hW' hv hps hrs ih =>
+      have hvW := hW₀.valid
+      obtain ⟨aW, haW⟩ := agW_of_valid hvW
+      intro p hp
+      obtain ⟨α, hα⟩ := ih p ((hps p).mp hp).1
+      have backI : ∀ a', AgW W' a' → ∀ m, ICpAt aW a' m := by
+        intro a' ha' m
+        obtain ⟨aσ, aY, eR, aR, pR, heR, -, hpR, hcp, hσY, hRY⟩ := end_walks hc hX' hW' haW ha'
+        exact icpAt_comp hRY (icpAt_trans (icpAt_right hpR m)
+          (icpAt_trans (icpAt_right hcp m) (icpAt_left hσY m))) (icpAt_right hσY m)
+      exact ⟨α, frameLife_back hα (fun a' ha' =>
+        ⟨aW, haW, backI a' ha' _, fun m _ => backI a' ha' m⟩)⟩
+  | rebEnd r hW₀ hr hle hreb hW hβ ih =>
+      obtain ⟨aW, haW⟩ := agW_of_valid hW₀.valid
+      intro p hp
+      obtain ⟨α, hα⟩ := ih p hp
+      refine ⟨α, frameLife_back hα (fun a' ha' => ?_)⟩
+      obtain ⟨a'', acr, ha'', -, hcomp⟩ := (AgW.split hW).mp haW
+      rw [AgW.functional ha'' ha'] at hcomp
+      exact ⟨aW, haW, icpAt_left hcomp _, fun m _ => icpAt_left hcomp m⟩
+  | rebEndDeep r hW₀ hr hch hle hreb hW hβ ih =>
+      obtain ⟨aW, haW⟩ := agW_of_valid hW₀.valid
+      intro p hp
+      obtain ⟨α, hα⟩ := ih p hp
+      refine ⟨α, frameLife_back hα (fun a' ha' => ?_)⟩
+      obtain ⟨a'', acr, ha'', -, hcomp⟩ := (AgW.split hW).mp haW
+      rw [AgW.functional ha'' ha'] at hcomp
+      exact ⟨aW, haW, icpAt_left hcomp _, fun m _ => icpAt_left hcomp m⟩
+
+/-- A cell a record `x` is relevant through, other than the frame's own cell, is a lineage
+location of every record proper whose lineage holds `x`. -/
+theorem linLoc_of_rel {p x : FrameRec} (hpx : DescR p x) {m : Loc}
+    (hm : m = x.le ∨ ∃ q S u, Chain x.R x.T x.v q m S u) :
+    (x = p ∧ m = p.le) ∨ LinLoc p m := by
+  rcases hm with rfl | ⟨q, S, u, hch⟩
+  · rcases hpx.cases with rfl | ⟨q, hq, hqq⟩
+    · exact Or.inl ⟨rfl, rfl⟩
+    · obtain ⟨d', hd', -, -, ζ, eζ, kζ, -⟩ := hqq.last hq
+      exact Or.inr ⟨d', hd', ζ, eζ, by rw [kζ]; simp⟩
+  · exact Or.inr ⟨x, hpx, _, hch.own, by simp⟩
+
+/-- A part of `W` has its `imm` cells' lifetimes in `ag(W)`. -/
+theorem ag_ls_of_le {σ W aW : WRes} (hle : ResU.Le σ W) (haW : AgW W aW) {m : Loc}
+    {ψ : CellU Loc Val} (e : σ.get m = some ψ) {s : LSet} (hs : ψ.lsOf = some s) {y : Life}
+    (hy : s.mem y) : ∃ (ζ : CellU Loc Val) (t : LSet), aW.get m = some ζ ∧ ζ.lsOf = some t ∧ t.mem y := by
+  obtain ⟨τ, hτ⟩ := hle
+  exact (icp_trans (icpAt_left (ResU.CompS.toCompR hτ) m ψ e) (icpAt_agW haW m)).ls hs hy
+
+/-- **`LifeBound` at a write**: content in `Res_b` that is a part of the
+world is relevant only to records tagged `⊐ b`. -/
+theorem lifeBound_of_tagged {W : WRes} {ps : List FrameRec} {ls : List SRec} {σ : WRes}
+    {b : Life} (hvW : ResU.Valid W) (htag : Tagged W ps ls) (hle : ResU.Le σ W)
+    (hσ : σ.InStratum b) : LifeBound ls σ b := by
+  intro x hx hrel
+  obtain ⟨p, -, hpx, hFL⟩ := htag x hx
+  obtain ⟨aW, haW⟩ := agW_of_valid hvW
+  obtain ⟨m, ψ, e, k, hm⟩ := hrel
+  obtain ⟨s, hs'⟩ := lsOf_of_imm k
+  have hlow : s.meet ⊐ b := CellU.sqsupset_of_lsOf hs' (hσ m ψ e)
+  obtain ⟨ζ, t, eζ, ht, hmt⟩ := ag_ls_of_le hle haW e hs' s.meet_mem
+  rcases linLoc_of_rel hpx hm with ⟨-, rfl⟩ | hL
+  · have := hFL.1 aW haW ζ t eζ ht s.meet hmt
+    rw [this] at hlow; exact hlow
+  · exact lt_trans hlow (hFL.2 aW haW m hL ζ t eζ ht s.meet hmt)
+
+theorem tagged_of_frameLife {W W' : WRes} {ps : List FrameRec} {ls : List SRec}
+    (t : ∀ p α, FrameLife W p α → FrameLife W' p α) (h : Tagged W ps ls) : Tagged W' ps ls :=
+  fun x hx => by
+    obtain ⟨p, hp, hd, hf⟩ := h x hx
+    exact ⟨p, hp, hd, t p x.2 hf⟩
+
+theorem tagged_of_ag {W W' : WRes} {ps : List FrameRec} {ls : List SRec}
+    (t : ∀ a, AgW W' a → AgW W a) (h : Tagged W ps ls) : Tagged W' ps ls :=
+  tagged_of_frameLife (fun _ _ hf => frameLife_of_ag t hf) h
+
+/-- **Same members give `Ext` at every resource.** -/
+theorem ext_of_same {ls ls' : List SRec} (h : ∀ x, x ∈ ls' ↔ x ∈ ls) (ρ : WRes) :
+    Ext ls ls' ρ :=
+  ⟨fun r hr _ => by
+      obtain ⟨t, ht⟩ := mem_rsOf.mp hr
+      exact mem_rsOf.mpr ⟨t, (h _).mpr ht⟩,
+    fun _ _ x _ => (h x).symm⟩
+
+/-- **`ls′` is `ls` with records at `α` added.**  `[about ours]` -/
+def AddAt (ls ls' : List SRec) (α : Life) : Prop :=
+  (∀ x ∈ ls, x ∈ ls') ∧ ∀ x ∈ ls', x ∉ ls → x.2 = α
+
+/-- **Adding records at `α` is `Ext` at a resource in `Res_α`** (6.64's entry). -/
+theorem ext_add {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
+    (hρ : ρ.InStratum α) : Ext ls ls' ρ := by
+  refine ⟨fun r hr _ => ?_, fun b hb x hx => ⟨h.1 x, fun h' => ?_⟩⟩
+  · obtain ⟨t, ht⟩ := mem_rsOf.mp hr
+    exact mem_rsOf.mpr ⟨t, h.1 _ ht⟩
+  · by_contra hn
+    have e := h.2 x h' hn
+    rw [e] at hx
+    exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
+
+/-- **Dropping records at `α` is `Ext` at a resource in `Res_α` none of whose relevant records
+is dropped** (6.64's exit). -/
+theorem ext_drop {ls ls' : List SRec} {α : Life} (h : AddAt ls ls' α) {ρ : WRes}
+    (hρ : ρ.InStratum α) (hk : ∀ r ∈ rsOf ls', Rel r ρ → r ∈ rsOf ls) : Ext ls' ls ρ := by
+  refine ⟨hk, fun b hb x hx => ⟨fun h' => ?_, h.1 x⟩⟩
+  by_contra hn
+  have e := h.2 x h' hn
+  rw [e] at hx
+  exact lt_irrefl _ (lt_trans hx (hb.of_stratum hρ))
+
+/-- **A resource in `Res_α`, whose `imm` cells are in `ag(W)` and none at `p.le`, holds no view
+at `p`'s lineage** — `[TR]` 6.52's *"there are no borrows … at any lifetime shorter than α"*
+read through `FrameLife`. -/
+theorem not_rel_lineage {W : WRes} {p : FrameRec} {α : Life} (hFL : FrameLife W p α)
+    {aW : WRes} (haW : AgW W aW) {ρ : WRes} (hicp : ∀ m, ICpAt aW ρ m)
+    (hα : ρ.InStratum α) (hl : ∀ ψ : CellU Loc Val, ρ.get p.le = some ψ → ψ.kind ≠ Kind.imm)
+    {x : FrameRec} (hpx : DescR p x) : ¬ Rel x ρ := by
+  rintro ⟨m, ψ, e, k, hm⟩
+  obtain ⟨s, hs⟩ := lsOf_of_imm k
+  have hlow : s.meet ⊐ α := CellU.sqsupset_of_lsOf hs (hα m ψ e)
+  obtain ⟨ζ, t, eζ, ht, hmt⟩ := (hicp m ψ e).ls hs s.meet_mem
+  rcases linLoc_of_rel hpx hm with ⟨-, rfl⟩ | hL
+  · exact hl ψ e k
+  · exact lt_asymm hlow (hFL.2 aW haW m hL ζ t eζ ht s.meet hmt)
+
+/-- `FrameLife` names the lifetime of a record's cell. -/
+theorem frameLife_eq {W : WRes} {p : FrameRec} {α β : Life} (hFL : FrameLife W p α)
+    {aW : WRes} (haW : AgW W aW) {ζ : CellU Loc Val} {t : LSet} (e : aW.get p.le = some ζ)
+    (ht : ζ.lsOf = some t) (hβ : t.mem β) : β = α :=
+  hFL.1 aW haW ζ t e ht β hβ
+
+/-- The tagged list after `immFrame`. -/
+def frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) : List SRec :=
+  (p, α) :: (ds.map (fun d => (d, α)) ++ ls)
+
+theorem rsOf_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) :
+    rsOf (frameList p ds α ls) = p :: (ds ++ rsOf ls) := by
+  simp [frameList, rsOf, Function.comp_def]
+
+theorem addAt_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : List SRec) :
+    AddAt ls (frameList p ds α ls) α := by
+  refine ⟨fun x hx => by simp [frameList, hx], fun x hx hn => ?_⟩
+  simp only [frameList, List.mem_cons, List.mem_append, List.mem_map] at hx
+  rcases hx with rfl | ⟨d, -, rfl⟩ | hx
+  · rfl
+  · rfl
+  · exact absurd hx hn
+
+end BoCa.Fig16.LogRel.Typed
+
+end

@@ -124,7 +124,7 @@
   ],
   [
    "BoCa.Life",
-   ".*LSub\\.extend",
+   ".*LSub\\.(extend|find\\?_extend)",
    "Lifetimes/Interpretation"
   ],
   [
@@ -201,6 +201,16 @@
    "BoCa.TypedFundamental",
    "BoCa.Fig16.LogRel.Typed.(vX|ptoImmS|ptoMutS|CohE|vP|gSepX|gDenX|SemX)",
    "TypedWorld/Relation"
+  ],
+  [
+   "BoCa.DefectB",
+   "BoCa\\.DefectB\\.(restrict_empty|agW_empty)",
+   "Model/Empty"
+  ],
+  [
+   "BoCa.RebWp",
+   "BoCa\\.Fig16\\.BoLo\\.(agW_empty|exW_empty)",
+   "Model/Empty"
   ]
  ],
  "support_names": {
@@ -211,7 +221,13 @@
   "Support/Model/Compatibility@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/Compatibility",
   "Support/Model/Compatibility@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/FlatteningCells",
   "Support/Model/Walks@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/Walks",
-  "Support/Model/Walks@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/RelaxedWalks"
+  "Support/Model/Walks@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/RelaxedWalks",
+  "Support/Model/CellFacts@After:Paper/S4_LogicalRelation/Definitions": "Support/Model/CellFacts",
+  "Support/Model/CellFacts@After:Paper/LiteralReadings/S6_6_ReborrowingEntailments": "Support/Model/Strata",
+  "Support/Model/Propositions@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/Propositions",
+  "Support/Model/Propositions@After:Paper/S6_4_StandardEntailments/Lemmas": "Support/Model/Entailments",
+  "Support/Model/Surgery@After:Paper/S6_2_NonStandardLemmas/Remarks": "Support/Model/Surgery",
+  "Support/Model/Surgery@After:Paper/S5_Model/Remarks": "Support/Model/FrameSurgery"
  },
  "order2": [
   "Paper/S1_Syntax/Definitions",
@@ -225,7 +241,14 @@
   "Paper/S6_2_NonStandardLemmas/Lemmas",
   "Paper/S4_LogicalRelation/Remarks",
   "Paper/S5_Model/Remarks",
-  "Paper/LiteralReadings/S4_LogicalRelation"
+  "Paper/S6_3_FrameAndAntiFrame/Lemmas",
+  "Paper/S6_4_StandardEntailments/Lemmas",
+  "Paper/S6_5_NonStandardEntailments/Lemmas",
+  "Paper/S6_6_ReborrowingEntailments/Lemmas",
+  "Paper/LiteralReadings/S4_LogicalRelation",
+  "Paper/LiteralReadings/S6_4_StandardEntailments",
+  "Paper/LiteralReadings/S6_5_NonStandardEntailments",
+  "Paper/LiteralReadings/S6_6_ReborrowingEntailments"
  ],
  "sections": {
   "S6_1": {
@@ -245,11 +268,51 @@
     16,
     63
    ]
+  },
+  "S6_3": {
+   "file": "Paper/S6_3_FrameAndAntiFrame/Lemmas",
+   "title": "§6.3 Frame and Anti-Frame",
+   "pages": "pp. 22–27",
+   "range": [
+    64,
+    66
+   ]
+  },
+  "S6_4": {
+   "file": "Paper/S6_4_StandardEntailments/Lemmas",
+   "title": "§6.4 Standard Entailments",
+   "pages": "pp. 27–29",
+   "range": [
+    67,
+    95
+   ]
+  },
+  "S6_5": {
+   "file": "Paper/S6_5_NonStandardEntailments/Lemmas",
+   "title": "§6.5 Non-standard Entailments",
+   "pages": "pp. 29–32",
+   "range": [
+    96,
+    119
+   ]
+  },
+  "S6_6": {
+   "file": "Paper/S6_6_ReborrowingEntailments/Lemmas",
+   "title": "§6.6 Reborrowing Entailments",
+   "pages": "pp. 32–35",
+   "range": [
+    120,
+    134
+   ]
   }
  },
  "stage2_sections": [
   "S6_1",
-  "S6_2"
+  "S6_2",
+  "S6_3",
+  "S6_4",
+  "S6_5",
+  "S6_6"
  ],
  "remark_rows": [
   "5.67"
@@ -455,6 +518,59 @@
    1,
    999999,
    "LogicalRelation/Facts"
+  ],
+  [
+   "BoCa.TypedImage",
+   1,
+   999999,
+   "TypedWorld/Images"
+  ],
+  [
+   "BoCa.TypedWorld",
+   1,
+   999999,
+   "TypedWorld/Invariant"
+  ],
+  [
+   "BoCa.TypedWp",
+   1,
+   999999,
+   "TypedWorld/Wp"
+  ],
+  [
+   "BoCa.TypedRel",
+   1,
+   1419,
+   "TypedWorld/RelationFacts"
+  ],
+  [
+   "BoCa.TypedRel",
+   1420,
+   2092,
+   "TypedWorld/FrameRules"
+  ],
+  [
+   "BoCa.TypedRel",
+   2093,
+   999999,
+   "TypedWorld/ReborrowShapes"
+  ],
+  [
+   "BoCa.TypedReborrow",
+   1,
+   999999,
+   "TypedWorld/Reborrow"
+  ],
+  [
+   "BoCa.TypedFundamental",
+   1,
+   999999,
+   "TypedWorld/Compatibility"
   ]
- ]
+ ],
+ "literal_target": {
+  "S6_4": "Paper/LiteralReadings/S6_4_StandardEntailments",
+  "S6_5": "Paper/LiteralReadings/S6_5_NonStandardEntailments",
+  "S6_6": "Paper/LiteralReadings/S6_6_ReborrowingEntailments"
+ }
 }

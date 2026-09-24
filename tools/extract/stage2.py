@@ -8,6 +8,14 @@ SECFILE = {k: v["file"] for k, v in CFG["sections"].items()}
 
 # ---------------------------------------------------------------- the results
 RESULTS = {}      # row -> record
+def is_conf(r): return r.startswith("3.")
+def default_aliases(row, kind, name):
+    """`TR.lemma_6_N` (`CONF.<kind>_3_N` for a [CONF] result), and the printed name `TR.«name»`"""
+    if is_conf(row):
+        return ["CONF.%s_%s" % (kind.lower(), row.replace(".", "_"))]
+    out = ["TR.lemma_" + row.replace(".", "_")]
+    if name: out.append("TR." + (name if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_']*", name) else "«%s»" % name))
+    return out
 def parse_results(path, sec):
     cur = None
     for line in open(path, encoding="utf-8").read().split("\n"):
@@ -18,14 +26,16 @@ def parse_results(path, sec):
             ds = []
             for i, d in enumerate(x.strip() for x in decls.split(",") if x.strip()):
                 if "=" in d:
-                    n, a = d.split("=", 1); ds.append((n.strip(), a.strip()))
+                    n, *a = [x.strip() for x in d.split("=")]; ds.append((n, a))
                 else:
-                    ds.append((d, "TR.lemma_" + row.replace(".", "_") if i == 0 else None))
+                    ds.append((d, default_aliases(row, kind, name) if i == 0 else []))
             cur = dict(row=row, kind=kind, page=page, decls=ds, name=name, sec=sec,
-                       file=SECFILE[sec], stmt=[], proof=[], remark=[])
+                       file=SECFILE[sec], stmt=[], proof=[], remark=[], extra=[])
             RESULTS[row] = cur
         elif cur is None or not line.strip() and not cur["proof"]:
             continue
+        elif line.startswith("+ "):
+            k, n = line[2:].split(None, 1); cur["extra"].append((k, n.strip()))
         elif line.startswith("> "):
             cur["stmt"].append(line[2:])
         elif line.startswith("~ "):
@@ -34,8 +44,14 @@ def parse_results(path, sec):
             cur["proof"].append(line)
 for sec in CFG["stage2_sections"]:
     parse_results("results/%s.txt" % sec, sec)
-def nrow(r): return tuple(int(x) for x in r.split("."))
+def nrow(r): return (is_conf(r),) + tuple(int(x) for x in r.split("."))
 
+_seen = {}
+for r, R0 in RESULTS.items():
+    for n, al in R0["decls"]:
+        for a in al:
+            if a in _seen: raise Exception("alias %s given twice (%s, %s)" % (a, _seen[a], r))
+            _seen[a] = r
 PROWS = {}
 for o in ROWS:
     if o["doc"].startswith("paper"):
@@ -55,6 +71,13 @@ for r in sorted(RESULTS, key=nrow):
         u = unit_of_owner[own[n]]
         DECL_UNIT[n] = u
         RU.setdefault(u, r)
+EXTRA = {}        # unit -> (row, "tw" | "lit" | "beside"): a declaration the record cites that is not the result
+for r in sorted(RESULTS, key=nrow):
+    for k, n in RESULTS[r]["extra"]:
+        if n not in D: raise Exception("no declaration %s for %s" % (n, r))
+        u = unit_of_owner[own[n]]
+        DECL_UNIT[n] = u
+        if u not in RU: EXTRA.setdefault(u, (r, k))
 REMARK = {}       # remark unit -> definition row
 for u in DEFERRED:
     REMARK[u] = sorted(unit_rows[u], key=rowkey)[0]
@@ -62,12 +85,14 @@ for r in CFG["remark_rows"]:
     for u, rs in unit_rows.items():
         if r in rs and u not in sel1 and u not in RU and D[owners_of(u)[0]]["kind"] == "thm":
             REMARK.setdefault(u, r)
-sel = select(sel1 | set(RU) | set(REMARK))
+sel = select(sel1 | set(RU) | set(REMARK) | set(EXTRA))
 
 pre = {}
 for u in sel:
     if u in RU: pre[u] = RESULTS[RU[u]]["file"]
     elif u in REMARK: pre[u] = CFG["remark_target"][REMARK[u]]
+    elif u in EXTRA and EXTRA[u][1] == "lit": pre[u] = CFG["literal_target"][RESULTS[EXTRA[u][0]]["sec"]]
+    elif u in EXTRA and EXTRA[u][1] == "beside": pre[u] = RESULTS[EXTRA[u][0]]["file"]
     elif u in sel1: pre[u] = TGT1[u] if TGT1[u].startswith("Paper") else None
     else: pre[u] = None
     if pre[u] and pre[u].startswith("Paper") and pre[u] not in ORDER:
@@ -129,24 +154,33 @@ def users_in(u, f):
         if tgt[x] == f and x in RU and HOME[x] == f and x != u and u in closure(x): out.add(RU[x])
         if tgt[x] == f and x in REMARK and HOME[x] == f and x != u and u in closure(x): out.add(REMARK[x])
     return sorted(out, key=nrow)
+def al_txt(al):
+    if not al: return ""
+    return (", alias " if len(al) == 1 else ", aliases ") + ", ".join("`%s`" % a for a in al)
 def lean_line(r, f):
     R0 = RESULTS[r]
     if not R0["decls"]:
         return "**Lean.** None in this repository."
+    
     bits = []
     for n, a in R0["decls"]:
         u = DECL_UNIT[n]
         if tgt[u] != f and u in RU and RU[u] != r:
             tags = source_tags(n)
             bits.append("`%s`%s%s — the declaration of %s, in %s: the same statement, printed twice" % (
-                n, (", alias `%s`" % a) if a else "", (", source tag " + " ".join(tags)) if tags else "",
+                n, al_txt(a), (", source tag " + " ".join(tags)) if tags else "",
                 lemma_title(RU[u]), rel(tgt[u])))
             continue
         where = "" if tgt[u] == f else " — declared in %s, ahead of this subsection: the Lean of %s there needs it" % (
             rel(tgt[u]), labels(users_in(u, tgt[u])) or "a result")
         tags = source_tags(n)
-        bits.append("`%s`%s%s%s" % (n, (", alias `%s`" % a) if a else "", (", source tag " + " ".join(tags)) if tags else "", where))
-    return "**Lean.** " + "; ".join(bits) + "."
+        bits.append("`%s`%s%s%s" % (n, al_txt(a), (", source tag " + " ".join(tags)) if tags else "", where))
+    out = "**Lean.** " + "; ".join(bits) + "."
+    for k, head in (("beside", "Also here"), ("tw", "Typed-world version"), ("lit", "Literal reading")):
+        xs = [n for kk, n in R0["extra"] if kk == k and EXTRA.get(DECL_UNIT[n], (None,))[0] == r]
+        if xs:
+            out += "\n\n**%s.** %s." % (head, "; ".join("`%s`%s" % (n, "" if tgt[DECL_UNIT[n]] == f else ", in " + rel(tgt[DECL_UNIT[n]])) for n in xs))
+    return out
 def record(r, f):
     R0 = RESULTS[r]
     P = PROWS.get(r, {})
@@ -167,7 +201,7 @@ def def_record(r, f, units_elsewhere=()):
     return "/-!\n" + "\n".join(out) + "\n-/"
 def alias_lines(u):
     r = RU[u]
-    ls = ["alias %s := %s" % (a, n) for n, a in RESULTS[r]["decls"] if a and DECL_UNIT[n] == u]
+    ls = ["alias %s := %s" % (a, n) for n, al in RESULTS[r]["decls"] if DECL_UNIT[n] == u for a in al]
     return "\n".join(ls)
 
 # rows homed in each paper file whose Lean is not there: records without a declaration
@@ -176,7 +210,7 @@ for r, R0 in RESULTS.items():
     f = R0["file"]
     if not any(tgt[DECL_UNIT[n]] == f for n, a in R0["decls"]):
         txt = record(r, f)
-        al = ["alias %s := %s" % (a, n) for n, a in R0["decls"] if a]
+        al = ["alias %s := %s" % (a, n) for n, als in R0["decls"] for a in als]
         if al: txt += "\n" + "\n".join(al)
         PSEUDO[f].append((rowkey(r), txt))
 REMARK_ROWS = collections.defaultdict(list)
@@ -193,10 +227,18 @@ class Hook:
         self.seen = collections.defaultdict(set); self.done = collections.defaultdict(set)
         self.inline_run = {}
         self.keys = {}
+    def extra_edges(self):
+        """an alias names its declaration, so a record's file imports the file declaring it"""
+        e = collections.defaultdict(set)
+        for r, R0 in RESULTS.items():
+            for n, al in R0["decls"]:
+                if al and tgt[DECL_UNIT[n]] != R0["file"]: e[R0["file"]].add(tgt[DECL_UNIT[n]])
+        return e
     def inherit_all(self, f):
         return f in STAGE2_FILES
     def row_of(self, u, f, default):
         if u in RU and HOME[u] == f: return RU[u]
+        if u in EXTRA and not (u in RU or u in REMARK) and f.startswith("Paper"): return EXTRA[u][0]
         if u in REMARK and HOME[u] == f: return REMARK[u]
         if u in HOISTED and tgt[u] == f: return None
         if u not in sel1: return None
@@ -215,6 +257,17 @@ class Hook:
         return out
     def before(self, u, f):
         if u in sel1: return None
+        if u in EXTRA and not (u in RU or u in REMARK):
+            r, k = EXTRA[u]
+            if k == "beside" and tgt[u] == RESULTS[r]["file"]:
+                self.inline_run[f] = None
+                return "/-! A declaration the record of %s cites. -/" % lemma_title(r)
+            what = {"tw": "typed-world version", "lit": "literal reading", "beside": "cited declaration"}[k]
+            self.inline_run[f] = None
+            if (r, k) in self.seen[f]: return "/-! %s, %s, continued. -/" % (lemma_title(r), what)
+            self.seen[f].add((r, k))
+            return ("/-!\n### %s — %s\n\nThe printed statement, the printed proof and the adjudication are in "
+                    "%s, under the record of %s.\n-/") % (lemma_title(r), what, rel(RESULTS[r]["file"]), lemma_title(r))
         if u in RU and HOME[u] == f:
             self.inline_run[f] = None
             r = RU[u]
@@ -261,14 +314,15 @@ json.dump(dict(order=order, tgt={"%s:%d" % u: t for u, t in tgt.items()}, strip=
                hoisted={"%s:%d" % u: t for u, t in HOISTED.items()}), open("stage2.json", "w"), indent=0)
 extra = []
 for r, R0 in sorted(RESULTS.items(), key=lambda t: nrow(t[0])):
-    for n, a in R0["decls"]:
-        if a:
+    for n, als in R0["decls"]:
+        for a in als:
             u = DECL_UNIT[n]
             extra.append(dict(name=a, source_name=n, private="no", kind=D[n]["kind"], target=R0["file"] + ".lean",
                               source=u[0].replace(".", "/") + ".lean:" + D[own[n]]["s"].split(":")[0], rows=r))
 def rows_of(u):
     rs = set(unit_rows.get(u, []))
     rs |= {r for r, R0 in RESULTS.items() for n, a in R0["decls"] if DECL_UNIT[n] == u}
+    if u in EXTRA: rs.add(EXTRA[u][0])
     return ";".join(sorted(rs, key=rowkey))
 rows = write_bridge(sel, tgt, strip, OUT + "/Bridge/Names.csv", extra=extra, rows_of=rows_of)
 print("files", len(order)); print("bridge rows", len(rows), "aliases", len(extra), "hoisted", len(HOISTED), "inline", len(inline))

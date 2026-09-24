@@ -254,10 +254,52 @@ file sits just before the first paper file that needs it.
    0 mismatches; `check-hygiene.sh` 0 forbidden keywords, 2,674 constants within
    `[propext, Classical.choice, Quot.sound]`.
 
+3. **§6.3–§6.6 — done (2c).**  Theorems and Lemmas 6.64–6.134, 71 records in four
+   files, 145 aliases.  The record format is 2b's, with three additions (the
+   syntax of `tools/extract/results/*.txt`: `@@` header, `>` statement, proof, `~`
+   remark, and `+ beside|tw|lit NAME`):
+   * **The printed name as a second alias.**  §§6.3–6.6 name almost every rule, and
+     the name is `TR.«name»` beside `TR.lemma_6_N` (`TR.refl`, `TR.«Imm Frame»`,
+     `TR.«↺⋆»`, `TR.«И-mono»`).  Names are transcribed from the rendered page,
+     small capitals as lower case and without the typesetting space (`[]-mono`,
+     `!l`, `Иf`).  6.72 (`∧l`) and 6.73 (`∨r`) are schematic in `i ∈ {1, 2}` and are
+     two declarations each, aliased `TR.lemma_6_72_1`/`TR.«∧l₁»` and so on.  6.130 and
+     6.134 print no name.
+   * **Cited declarations.**  `+ beside` puts a declaration the record cites next to
+     the result (the dereliction instance of 6.84, the stronger wildcard readings of
+     6.95 and 6.119, 6.115's equal-index case, 6.130's scope lemmas, 6.131's
+     all-types induction); the record lists them under *Also here*.
+   * **Typed-world versions.**  `+ tw` names the source's version of the result at
+     `wpTS`/`𝒱X`/`vShape` (6.64–6.66, 6.113's stratified `I-mono`, 6.131, 6.132).
+     They stay in `Support/TypedWorld/`, with a heading pointing back to the record,
+     and the record names them under *Typed-world version*.  Pulling them in brings
+     most of the typed world with them (≈ 6,100 lines); `Support/TypedWorld/` is split
+     by source module — `Images`, `Invariant`, `Wp`, `RelationFacts`, `FrameRules`,
+     `ReborrowShapes` (and in 2e `Reborrow`, `Compatibility`) — after stage 1's
+     `Records`, `World`, `Relation`.
+   * **Literal readings.**  `+ lit` sends a measurement of a printed statement read
+     literally to `Paper/LiteralReadings/S6_N_…` (6.84's and 6.88's and 6.102's
+     premises checked, 6.115's printed index `α ⊔ β` measured, 6.130's hypothesis
+     shown not free, 6.131's `Ref`-chain residual as a `def … : Prop`).
+
+   Lemma 6.112 (`Иf`) is declared in §6.3's file, ahead of its subsection: the
+   printed proofs of 6.64 and 6.65 open with it.  New support files:
+   `Support/Model/FrameSurgery` (the swaps §6.3 spends at both ends of the run),
+   `Support/Model/Entailments`, `Support/Model/Strata`, `Support/Model/Empty`.  The
+   generator changes: a support unit no paper file needs is layered after the last
+   paper file, and a record's file imports the file declaring its aliased
+   declaration.  `scripts/check-bridge.py` now treats `simp`'s instantiated lemmas
+   (`…._simp_N_M`, numbered per environment) as auxiliaries, and digests an
+   auxiliary's type after replacing the auxiliaries it names, to a fixpoint (Lean
+   shares one abstracted proof between declarations of a module, so the source's
+   `inner._proof_1` is this repository's `mutInv._proof_1`).
+
+   Checks at the end of 2c: `lake build` clean; `check-bridge.sh` 2,831
+   declarations compared, 0 mismatches; `check-hygiene.sh` 0 forbidden keywords,
+   3,496 constants within `[propext, Classical.choice, Quot.sound]`.
+
 Still to come, in this order:
 
-3. **§6.3–§6.6** (6.64–6.134): the frame rules and the entailments over
-   `Fig16.BoLo`, and `↺V₁–↺V₃` from `Fig16LogRel` §2.
 4. **§6.7** (6.135–6.150): `Fig16Wp.lean`, `RebWp.lean`, with each rule's
    `TR3.…` re-proof over the printed machine beside it, and the stuck-form
    measurements into `LiteralReadings`.

@@ -117,6 +117,16 @@ theorem cellUpd_of_upd {ρ₁ ρ₂ σ₁ σ₂ : WRes} (h : ResU.Upd ρ₁ ρ�
 theorem CellUpd.refl (o : Option (CellU BoCa.Loc BoCa.Val)) : CellUpd o o :=
   ⟨fun _ _ _ _ => Iff.rfl, fun _ _ => Iff.rfl⟩
 
+/-- `(ρ₁ ● ρ₂) ● ρ₃` regrouped as `ρ₁ ● (ρ₂ ● ρ₃)`. -/
+theorem compS_reassoc {a b c ab x : WRes} (h₁ : ResU.CompS a b ab)
+    (h₂ : ResU.CompS ab c x) : ∃ bc, ResU.CompS b c bc ∧ ResU.CompS a bc x :=
+  (ResU.CompS.assoc a b c x).mpr ⟨ab, h₁, h₂⟩
+
+/-- `ρ₁ ● (ρ₂ ● ρ₃)` regrouped as `(ρ₁ ● ρ₂) ● ρ₃`. -/
+theorem compS_reassoc' {a b c bc x : WRes} (h₁ : ResU.CompS b c bc)
+    (h₂ : ResU.CompS a bc x) : ∃ ab, ResU.CompS a b ab ∧ ResU.CompS ab c x :=
+  (ResU.CompS.assoc a b c x).mp ⟨bc, h₁, h₂⟩
+
 end BoCa.Fig16.BoLo
 
 end

@@ -14,8 +14,11 @@ import Support.Model.Cells
 import Support.Model.ClosingSentence
 import Support.Model.Compatibility
 import Support.Model.Composition
+import Support.Model.Empty
+import Support.Model.Entailments
 import Support.Model.Flattening
 import Support.Model.FlatteningCells
+import Support.Model.FrameSurgery
 import Support.Model.Lifetimes
 import Support.Model.Notation
 import Support.Model.Outlives
@@ -27,6 +30,7 @@ import Support.Model.ReborrowLowering
 import Support.Model.RelaxedWalks
 import Support.Model.Restriction
 import Support.Model.Singletons
+import Support.Model.Strata
 import Support.Model.Subtraction
 import Support.Model.Surgery
 import Support.Model.Update
@@ -35,6 +39,12 @@ import Support.Model.Walks
 import Support.Model.WalkSplitting
 import Support.Statics.Contexts
 import Support.Syntax.Terms
+import Support.TypedWorld.FrameRules
+import Support.TypedWorld.Images
+import Support.TypedWorld.Invariant
+import Support.TypedWorld.ReborrowShapes
 import Support.TypedWorld.Records
 import Support.TypedWorld.Relation
+import Support.TypedWorld.RelationFacts
 import Support.TypedWorld.World
+import Support.TypedWorld.Wp

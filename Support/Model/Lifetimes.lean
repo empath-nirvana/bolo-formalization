@@ -13,6 +13,8 @@ noncomputable section
 
 namespace BoCa.Fig16
 
+theorem Life.sqsupset_iff (a b : Life) : a ⊐ b ↔ b < a := Iff.rfl
+
 theorem Life.top_sqsubseteq (a : Life) : a ⊑ ⊤ := le_top
 
 theorem Life.meet_comm (a b : Life) : a ⊓ b = b ⊓ a := inf_comm ..

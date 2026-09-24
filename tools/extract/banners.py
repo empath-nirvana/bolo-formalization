@@ -345,3 +345,101 @@ SUPPORT_WHAT.update({
  "Support/Model/ClosingSentence": "Lemma 6.59's closing sentence, clause by clause: the reborrowed location, the attribution of cells to `ρᵢ`, and the case off `dom(ρ_reb)`",
  "Support/LogicalRelation/Facts": "`⌜p⌝ ⋆ P` and the context relation read pointwise",
 })
+
+TYPED_NOTE = """
+**The typed world.**  A result whose statement the source also proves at the typed
+world — `wpTS` (row 5.33's repair) or the repaired relation `𝒱X`/`vShape` (rows
+4.4–4.14's) — names that declaration in its record under *Typed-world version*; the
+declaration itself is in `Support/TypedWorld/`, where a heading points back here.
+"""
+
+banners["Paper/S6_3_FrameAndAntiFrame/Lemmas"] = """/-!
+# [TR] §6.3 Frame and Anti-Frame  (physical pp. 22–27), Theorems 6.64–6.66
+
+The three frame rules at the printed `wp` (`[TR]` p. 6): Imm Frame (6.64), Mut Frame
+(6.65) and Anti Frame (6.66).  Each proof builds a *"fictional"* borrow cell —
+`ℓ ↦ imm({α}, v, ρ_P̂(v))` or `ℓ ↦ mut(α, v, ρ_P̂(v), P̂)` — in place of
+`ℓ ↦ own(v) ● ρ_P̂(v)`, runs `e` against it, and trades it back with the surgery
+lemmas of §6.2 (6.24–6.29, 6.34, 6.38, 6.39).  The printed proofs of 6.64 and 6.65
+open with Lemma 6.112 (`Иf`, §6.5), which is therefore declared in this file, ahead of
+its subsection.
+""" + RESULTS_READING + TYPED_NOTE + "-/\n"
+
+banners["Paper/S6_4_StandardEntailments/Lemmas"] = """/-!
+# [TR] §6.4 Standard Entailments  (physical pp. 27–29), Lemmas 6.67–6.95
+
+The sequent rules of the propositions of `[TR]` p. 6 that do not unfold the
+carrier: `⊨` reflexive and transitive (6.67, 6.68), the connectives `⊤ ⊥ ∧ ∨ ⇒ ∀ ∃`
+(6.69–6.80), `⌜−⌝` (6.81, 6.82), `!` (6.83–6.89), `⋆` and `–⋆` (6.90–6.94), and
+exclusivity of `ℓ ↦ v` (6.95).  Each is printed with its name, which is the second
+alias `TR.«name»`; a rule the print states schematically in `i ∈ {1, 2}` (6.72, 6.73)
+is two declarations with aliases `TR.lemma_6_N_i`.
+""" + RESULTS_READING + "-/\n"
+
+banners["Paper/S6_5_NonStandardEntailments/Lemmas"] = """/-!
+# [TR] §6.5 Non-standard Entailments  (physical pp. 29–32), Lemmas 6.96–6.119
+
+The rules of the lifetime modality `[α]` (6.96–6.107), of the freshness quantifier
+`Иα` (6.108–6.112), of immutable points-to `ℓ ↦I_α P̂` (6.113–6.116) and of mutable
+points-to `ℓ ↦M_α P̂` (6.117–6.119).  Lemma 6.112 is declared in §6.3's file, whose
+printed proofs open with it; its record and aliases are here.
+""" + RESULTS_READING + TYPED_NOTE + "-/\n"
+
+banners["Paper/S6_6_ReborrowingEntailments/Lemmas"] = """/-!
+# [TR] §6.6 Reborrowing Entailments  (physical pp. 32–35), Lemmas 6.120–6.134
+
+The rules of the reborrowing modality `↺_α` (6.120–6.130), and the three lemmas that
+carry the logical relation through it: `↺V₁` (6.131, by induction on the type),
+`↺V₂` (6.132) and `↺V₃` (6.133), and 6.134, which 6.175 applies.
+""" + RESULTS_READING + TYPED_NOTE + "-/\n"
+
+LITERAL_READING = """
+**How this file reads.**  Each run opens with the result it measures and says where
+that result's record is.  The declarations are the source's, with their tags; a
+`[about ours: …]` tag names what is measured.  Nothing in the paper tree depends on
+this file.
+"""
+
+banners["Paper/LiteralReadings/S6_4_StandardEntailments"] = """/-!
+# Literal readings — [TR] §6.4
+
+Measurements of §6.4's rules where the Lean adds a premise the printed statement
+omits and the printed proof uses:
+
+* 6.84 (`!l`): `bang_L_needs_premise`, the premise `P ⊨ Q` checked at the values
+  where dropping it leaves `!P ⊨ Q` standing alone;
+* 6.88 (`!∀`): `bang_all_needs_nonempty`, the index type the printed proof's
+  *"Suppose `X ≠ ∅`"* excludes.
+""" + LITERAL_READING + "-/\n"
+
+banners["Paper/LiteralReadings/S6_5_NonStandardEntailments"] = """/-!
+# Literal readings — [TR] §6.5
+
+* 6.102 (`[]∀`): `box_all_needs_nonempty`, the empty index type at a resource that
+  holds a borrow, which the printed proof's *"Suppose `X ≠ ∅`"* excludes;
+* 6.115 (`I-ag`): `not_iAgreeAtJoin`, the printed index `α ⊔ β` of the conclusion
+  measured against the cells `{1}` and `{2}` under row 5.30's `α ⊑ ⊔β̄`.
+""" + LITERAL_READING + "-/\n"
+
+banners["Paper/LiteralReadings/S6_6_ReborrowingEntailments"] = """/-!
+# Literal readings — [TR] §6.6
+
+* 6.130: `reborrow_emp_outside_stratum`, a resource outside `Res_α` against
+  `↺_α emp` — the hypothesis the Lean adds is not free;
+* 6.131 (`↺V₁`): `RefPrintedChainResidual`, what the `Ref` bullet's printed chain
+  leaves at our objects, recorded as a `def … : Prop` and not derived; no
+  obstruction to it is verified.
+""" + LITERAL_READING + "-/\n"
+
+SUPPORT_WHAT.update({
+ "Support/Model/Entailments": "what §6.5–§6.6's entailments need beyond the propositions: `⫤⊨` reflexive and extensional, a `●`-factor of a reborrowed `imm` cell and the clauses that admit it, `reb_α` at `∅` and its outlives bound, and the join-indexed conclusion 6.115's literal reading measures",
+ "Support/Model/FrameSurgery": "the swaps §6.3's frame rules spend at both ends of the run: `ℓ ↦ own(v) ● ρ_P̂(v)` against the `mut` or `imm` cell that borrows it, under a frame, lowered and validated",
+ "Support/Model/Strata": "every resource lies in some stratum: `Res = ⋃_α Res_α`",
+ "Support/Model/Empty": "the walks and restrictions of the empty resource",
+ "Support/TypedWorld/Images": "the typed world's first layer (source `BoCa/TypedImage.lean`): composition read cell by cell, walks through an escrow, the `immFrame` and `alloc` steps, roots and `Ref` chains, and typed reborrow images",
+ "Support/TypedWorld/Invariant": "the family `TW` and its invariant (source `BoCa/TypedWorld.lean`): `mut` cells at any depth, `Mut` positions, coherence, sub-records and lineages, and preservation of the invariant by every step",
+ "Support/TypedWorld/Wp": "stratified record lists and `wp` at a tagged typed world (source `BoCa/TypedWp.lean`): relevance, the Kripke order, the stratified `Mut` clause, tags, and the frame steps that only regroup",
+ "Support/TypedWorld/RelationFacts": "the repaired relation `𝒱X` read at substitutions (source `BoCa/TypedRel.lean`): monotonicity, the `imm` cell at the observable view, reading, writing and making a `mut` cell, 6.60 at `𝒱X`, congruence in `δ`, and the choosers' inputs",
+ "Support/TypedWorld/FrameRules": "`[TR]` Theorems 6.64, 6.65 and 6.66 at `wpTS`, with the record list carried",
+ "Support/TypedWorld/ReborrowShapes": "`[TR]` Lemmas 6.131 and 6.132 at the shape relation `vShape`",
+})

@@ -77,6 +77,18 @@ theorem CellU.mutOf_inj {b : Life} {v₁ v₂ : Val} {ρ₁ ρ₂ : ResU Loc Val
       rw [ResS.toS_toStratum] at hz
       exact hz
 
+/-- **The meet-compare implies membership in the stratum, at every `α`.**  `@ψ`
+is `⊤` on an `own` cell and `Res_α` asks nothing of it, so a bound on `@ρ` is a
+bound on the borrow cells alone — which is all `Res_α` constrains. -/
+theorem ResU.inStratum_of_atLife {ρ : ResU Loc Val} {a α : Life} (ha : ρ.AtLife a)
+    (h : a ⊐ α) : ρ.InStratum α := by
+  intro l ψ e
+  have hle : a ⊑ ψ.at := ha.1 l ψ e
+  cases ψ with
+  | own v => exact trivial
+  | imm i => exact lt_of_lt_of_le h hle
+  | «mut» m => exact lt_of_lt_of_le h hle
+
 end BoCa.Fig16
 
 end

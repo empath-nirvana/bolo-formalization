@@ -4,8 +4,10 @@ import Paper.S6_1_StandardLemmas.Lemmas
 import Paper.S6_2_NonStandardLemmas.Definitions
 import Support.Model.Cells
 import Support.Model.Composition
+import Support.Model.FlatteningCells
 import Support.Model.Prelude
 import Support.Model.Singletons
+import Support.Model.Walks
 
 /-!
 # Support — Model — Update
@@ -53,9 +55,41 @@ theorem ResU.upd_of_flat {ρ₁ ρ₂ σ₁ σ₂ : ResU Loc Val} (h₁ : ρ₁.
 theorem ResU.Upd.symm {ρ₁ ρ₂ : ResU Loc Val} (h : ρ₁.Upd ρ₂) : ρ₂.Upd ρ₁ :=
   ⟨fun l s v χ hs => (h.1 l s v χ hs).symm, fun l b P => (h.2 l b P).symm⟩
 
+theorem ResU.dom_single (l : Loc) (ψ : CellU Loc Val) :
+    ResU.Dom (ResU.single l ψ) [l] := by
+  classical
+  refine ⟨by simp, fun l' => ⟨fun hm => ?_, fun ⟨χ, hg⟩ => ?_⟩⟩
+  · cases List.mem_singleton.mp hm
+    exact ⟨ψ, ResU.single_get_self _ _⟩
+  · exact List.mem_singleton.mpr (ResU.single_get_eq_some hg).1
+
 open Classical in
 theorem ResU.del_get_ne (ρ : ResU Loc Val) {l l' : Loc} (h : l' ≠ l) :
     (ρ.del l).get l' = ρ.get l' := if_neg h
+
+/-- `ρ ≤ ρ` — take the empty frame in `[CONF]` p. 415:24's footnote.
+`[about ours: reflexivity of the printed order]` -/
+theorem ResU.Le.refl (ρ : ResU Loc Val) : ResU.Le ρ ρ :=
+  ⟨PMap.empty, ResU.comp_empty_right ρ⟩
+
+/-- `≤` is transitive — the two frames compose by `[TR]` Lemma 6.3.  `[TR]`
+6.127's second bullet (p. 33) chains it: *"`ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥
+⨀_{ℓ∈dom(π′)} π′(ℓ)`."*
+`[about ours: transitivity of the printed order]` -/
+theorem ResU.Le.trans {ρ σ τ : ResU Loc Val} (h₁ : ResU.Le ρ σ) (h₂ : ResU.Le σ τ) :
+    ResU.Le ρ τ :=
+  ResU.Comp.factor_trans (fun _ _ _ hc => CellU.CompS.compat hc) ResU.compLawsS
+    h₁.choose_spec h₂.choose_spec
+
+/-- `∅ ≤ ρ` — the empty resource is a `●`-part of every resource, `ρ` itself
+being the frame.
+`[about ours: the least element of the printed order]` -/
+theorem ResU.Le.empty (ρ : ResU Loc Val) : ResU.Le (PMap.empty : ResU Loc Val) ρ := by
+  refine ⟨ρ, ResU.Compat.of_disjoint (fun _ => Or.inl rfl), fun l => ?_⟩
+  show OptComp CellU.CompS none (ρ.get l) (ρ.get l)
+  cases e : ρ.get l with
+  | none => rfl
+  | some ψ => rfl
 
 /-- `⨀{ρ} = ρ`, by `[TR]` Lemma 6.4.
 `[about ours: the one-element instance of the fold behind the printed iterated
@@ -63,6 +97,42 @@ operator]` -/
 theorem BigComp.single {R : CellU Loc Val → CellU Loc Val → Prop}
     {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} (ρ : ResU Loc Val) :
     BigComp R C [ρ] ρ := BigComp.cons BigComp.nil (ResU.comp_empty_right ρ)
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16.RebExample
+
+private def mutWit (w : Nat) : ResU Nat Nat := ResU.single 1 (CellU.ownOf w)
+
+private theorem mutWit_stratum (w : Nat) (α : Life) : (mutWit w).InStratum α := by
+  intro l ψ e
+  obtain ⟨-, rfl⟩ := ResU.single_get_eq_some e
+  exact trivial
+
+private def mutInv : Nat → SPropS Nat Nat 3 := fun _ _ => True
+
+private def mutCell (v w : Nat) : CellU Nat Nat :=
+  CellU.mutOf 3 v (mutWit w) (mutWit_stratum w 3) mutInv trivial
+
+/-- `ρ ≜ ℓ₀ ↦ mut(3, v, ℓ₁ ↦ own(w), λ_ _. ⊤)`. -/
+def mutRes (v w : Nat) : ResU Nat Nat := ResU.single 0 (mutCell v w)
+
+private theorem mutRes_zero (v w : Nat) : (mutRes v w).get 0 = some (mutCell v w) :=
+  ResU.single_get_self _ _
+
+/-- **`reb_α` is not satisfied by everything.**  `@ρ ⊐ α` refuses a lifetime the
+resource does not outlive: `@ρ = 3` here, so no `ρ′` whatever is a reborrow of
+`ρ` at `α = 1`.
+`[about ours: a non-inhabitant of the printed set]` -/
+theorem not_reb_of_at (v w : Nat) (ρ' : ResU Nat Nat) : ¬ ResU.Reb 1 (mutRes v w) ρ' := by
+  rintro ⟨hs, -⟩
+  have hn : (3 : Nat) < 1 := hs 0 (mutCell v w) (mutRes_zero v w)
+  omega
+
+end BoCa.Fig16.RebExample
+
+namespace BoCa.Fig16
+variable {Loc Val : Type}
 
 theorem CellU.Sim.symm {ψ ψ' : CellU Loc Val} (h : CellU.Sim ψ ψ') :
     CellU.Sim ψ' ψ := by

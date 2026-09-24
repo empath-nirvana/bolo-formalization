@@ -5,7 +5,9 @@ import Paper.S6_1_StandardLemmas.Lemmas
 import Support.Dynamics.Machine
 import Support.Model.Algebra
 import Support.Model.AlgebraInstances
+import Support.Model.CellFacts
 import Support.Model.Composition
+import Support.Model.Notation
 
 /-!
 # Support — Model — Propositions
@@ -24,11 +26,16 @@ variable {Loc Val : Type}
 /-- `P ⊨ Q`. -/
 def Entails (P Q : SPropU Loc Val) : Prop := ∀ ρ, P ρ → Q ρ
 
+/-- `P ⫤⊨ Q`. -/
+def BiEntails (P Q : SPropU Loc Val) : Prop := Entails P Q ∧ Entails Q P
+
 end BoCa.Fig16.BoLo
 
 namespace BoCa.Fig16.BoLo
 
 @[inherit_doc] scoped infix:25 " ⊨ " => Entails
+
+@[inherit_doc] scoped infix:25 " ⫤⊨ " => BiEntails
 
 end BoCa.Fig16.BoLo
 
@@ -45,6 +52,21 @@ theorem compS_empty_left (ρ : ResU Loc Val) : ResU.CompS PMap.empty ρ ρ :=
 theorem eq_of_compS_empty_left {ρ₂ ρ : ResU Loc Val} (h : ResU.CompS PMap.empty ρ₂ ρ) :
     ρ = ρ₂ :=
   ResU.CompS.functional h (compS_empty_left ρ₂)
+
+/-- The direction 6.91 does not print: `P ⋆ (Q ⋆ R) ⊨ (P ⋆ Q) ⋆ R`.  `[TR]`
+6.65's proof needs it to read `ℓ ↦ v ⋆ P̂(v) ⋆ (Nα. …)` as `(ℓ ↦ v ⋆ P̂(v)) ⋆
+(Nα. …)` before 6.112 applies to it.  `[about ours: the converse of `[TR]`
+6.91, which prints one direction]` -/
+theorem sep_assoc' (P Q R : SPropU Loc Val) : (P ⋆ (Q ⋆ R)) ⊨ (P ⋆ Q) ⋆ R := by
+  rintro ρ ⟨ρ₁, ρ₂, hc, hp, ρ₃, ρ₄, hc₂, hq, hr⟩
+  obtain ⟨y, hy₁, hy₂⟩ := (ResU.CompS.assoc ρ₁ ρ₃ ρ₄ ρ).mp ⟨ρ₂, hc₂, hc⟩
+  exact ⟨y, ρ₄, hy₂, ⟨ρ₁, ρ₃, hy₁, hp, hq⟩, hr⟩
+
+/-- A bound on the meet bounds the borrow cells in particular, so the
+meet-compare implies the relation at every `α`.  `@ψ = ⊤` on an `own` cell, and
+`Res_α` asks nothing of it. -/
+theorem outlives_of_atLife {ρ : ResU Loc Val} {a α : Life} (ha : ρ.AtLife a)
+    (h : a ⊐ α) : Outlives ρ α := ResU.inStratum_of_atLife ha h
 
 theorem Outlives.mono {ρ : ResU Loc Val} {α β : Life} (h : β ⊑ α) (ho : Outlives ρ α) :
     Outlives ρ β := ResU.InStratum.mono h ho
@@ -80,6 +102,8 @@ theorem outlives_comp {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ�
     · rw [e] at f; cases Option.some.inj f; exact h₂ l _ f₂
     · rw [e] at f; cases Option.some.inj f
       exact (CellU.CompS.inStratum hC α).mpr ⟨h₁ l _ f₁, h₂ l _ f₂⟩
+
+theorem ptoAny_of_own (l : Loc) (v : Val) : ptoOwn l v ⊨ ptoAny l := fun _ h => ⟨_, h⟩
 
 /-- **`ℓ ↦M_α P̂` is inhabited exactly where the cell is.**  The printed
 equation `ρ = ℓ ↦ mut(β, v, ρ′, P̂)` pins the cell's own invariant, so the `P̂` a

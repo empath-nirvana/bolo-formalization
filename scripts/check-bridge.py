@@ -20,21 +20,25 @@ PRIV = re.compile(r"_private\.[\w.]+?\.\d+\.")
 HYG = re.compile(r"[^\s(){}\[\]:,]*_@\.[^\s(){}\[\]:,]*_hyg\.\d+")
 def norm(s): return HYG.sub("_h", PRIV.sub("", s))
 # Auxiliary declarations Lean generates (matchers, structural-recursion
-# functionals, abstracted proofs, notation macros) are named by position or by
+# functionals, abstracted proofs, `simp`'s instantiated lemmas, notation macros) are named by position or by
 # module, and Lean shares one matcher between declarations with the same match
 # shape.  They are not compared by name: a reference to one (with or without a
 # universe instantiation `.{u}`) is replaced by a digest of its own type, which is
 # what identifies it.
 AUXREF = re.compile(r"[^\s(){}\[\]:,]+\.(?:match_\d+|_sparseCasesOn_\d+|proof_\d+|_proof_\d+)(?![\w])(?!\.[^{])")
-AUXDECL = re.compile(r"(\.(match_\d+(_\d+)?|_sparseCasesOn_\d+|proof_\d+|_proof_\d+|_f|_sunfold|_unsafe_rec|splitter|eq_\d+|eq_def|below|brecOn|binductionOn)$)|_aux_|^_h$")
+AUXDECL = re.compile(r"(\.(match_\d+(_\d+)?|_sparseCasesOn_\d+|proof_\d+|_proof_\d+|_simp_\d+(_\d+)*|_f|_sunfold|_unsafe_rec|splitter|eq_\d+|eq_def|below|brecOn|binductionOn)$)|_aux_|^_h$")
 def load(p):
     raw = {}
     for line in open(p, encoding="utf-8"):
         n, k, t, v = line.rstrip("\n").split("\t", 3)
         raw[norm(n)] = (k, norm(t), norm(v))
-    dig = {n: "AUX#" + hashlib.sha1(t.encode()).hexdigest()[:12]
-           for n, (k, t, v) in raw.items() if AUXREF.fullmatch(n)}
+    # an auxiliary's own type may name another auxiliary (Lean shares one abstracted
+    # proof between declarations of a module), so the digests are taken to a fixpoint
+    aux = {n: t for n, (k, t, v) in raw.items() if AUXREF.fullmatch(n)}
+    dig = {}
     sub = lambda s: AUXREF.sub(lambda m: dig.get(m.group(0), m.group(0)), s)
+    for _ in range(8):
+        dig = {n: "AUX#" + hashlib.sha1(sub(t).encode()).hexdigest()[:12] for n, t in aux.items()}
     return {n: (k, sub(t), sub(v)) for n, (k, t, v) in raw.items() if not AUXDECL.search(n)}
 new, old = load(sys.argv[1]), load(sys.argv[2])
 root = pathlib.Path(__file__).resolve().parent.parent

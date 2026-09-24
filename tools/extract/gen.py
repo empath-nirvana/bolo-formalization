@@ -243,10 +243,11 @@ def assign(sel, pre=None, pin=None, latest=False):
     for t, us in bytopic.items():
         if latest:
             # as few layers as the intervals allow, each unit in the latest layer it fits
+            H = lambda u: min(hi(u), len(ORDER))   # nothing in the paper tree needs it: after the last file
             pts = []
-            for u in sorted(us, key=hi):
-                if not any(lo(u) <= p < hi(u) for p in pts): pts.append(hi(u) - 1)
-            layer = {u: max(p for p in pts if lo(u) <= p < hi(u)) for u in us}
+            for u in sorted(us, key=H):
+                if not any(lo(u) <= p < H(u) for p in pts): pts.append(H(u) - 1)
+            layer = {u: max(p for p in pts if lo(u) <= p < H(u)) for u in us}
             for p in sorted(set(layer.values())):
                 name = "Support/" + t if len(pts) == 1 else "Support/" + t + "@After:" + ORDER[p]
                 name = CFG.get("support_names", {}).get(name, name)
@@ -436,6 +437,9 @@ def emit(sel, tgt, banners, header_of=None, extra_files=(), hook=None):
     SUPPORT_BANNER = banners["__support__"]; SUPPORT_WHAT = banners["__what__"]
     files = sorted(set(tgt[u] for u in sel))
     g = file_graph(sel, tgt)
+    if hook and hasattr(hook, "extra_edges"):
+        for f, ds in hook.extra_edges().items():
+            g[f] |= {d for d in ds if d != f}
     order = topo_files(files, g)
     # private stripping
     strip = set()

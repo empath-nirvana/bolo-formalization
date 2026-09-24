@@ -284,6 +284,19 @@ theorem CellU.CompR.wit {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompR ψ₁ 
   | immMut s v ρ hs b hb P hP => rw [CellU.wit_immOf, CellU.wit_mutOf]
   | mutImm s v ρ hs b hb P hP => rw [CellU.wit_mutOf, CellU.wit_immOf]
 
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+
+/-- The inner cell: `mut(3, 5, ∅, λv._. v = 5)`. -/
+def inner : CellU Nat Nat :=
+  CellU.mutOf 3 5 PMap.empty (fun _ _ e => by simp at e) (fun v _ => v = 5) rfl
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+variable {Loc Val : Type}
+
 theorem CellU.compS_comm (ψ₁ ψ₂ : CellU Loc Val) (h : ψ₁.CompatS ψ₂) :
     CellU.compS ψ₁ ψ₂ h = CellU.compS ψ₂ ψ₁ h.symm := by
   obtain ⟨s₁, s₂, v, ρ, k₁, k₂, k₃, e₁, e₂, e₃⟩ := CellU.compS_spec ψ₂ ψ₁ h.symm

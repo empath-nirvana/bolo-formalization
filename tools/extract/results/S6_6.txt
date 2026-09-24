@@ -1,0 +1,73 @@
+@@ 6.120 | Lemma | p. 32 | BoCa.Fig16.BoLo.reborrow_mono | ↺-mono
+> P ⊨ Q
+> ──────────────
+> ↺_α P ⊨ ↺_α Q
+Proof. Suppose `P ⊨ Q`, and let `P(ρ′)` for some `ρ′ ∈ reb_α(ρ)`.  Choose `ρ′`; by `P ⊨ Q` at `ρ′`, `Q(ρ′)`.
+
+@@ 6.121 | Lemma | p. 32 | BoCa.Fig16.BoLo.reborrow_ptoOwn | ↺↦
+> ℓ ↦ v ⋆ [α]P̂(v) ⊨ ↺_α ℓ ↦I_α P̂
+Proof. Let `ρ = ρ₁ ● ρ₂` with `ρ₁ = ℓ ↦ own(v)`, `P̂(v)(ρ₂)` and `@ρ₂ ⊐ α`.  Choose `ρ′ ∈ reb_α(ρ)` to be `ℓ ↦ imm({α}, v, ρ₂)`, and `β̃, v, ρ′` to be `{α}, v, ρ₂`.  What remains is `ℓ ↦ imm({α}, v, ρ₂) ∈ reb_α(ρ)`; choose `π` to be `ℓ ↦ ρ`.  It suffices that: `@ρ ⊐ α` — since `ρ = ℓ ↦ own(v) ● ρ₂`, it suffices that `@(ℓ ↦ own(v)) ⊐ α`, which holds by definition, and `@ρ₂ ⊐ α`, which is given; `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)` — since `dom(π) = {ℓ}` and `π(ℓ) = ρ`, this is `ρ ≥ ρ`; and the clause for each `ℓ ∈ dom(π)` — since `ρ(ℓ) = own(v)`, it is `(ℓ ↦ imm({α}, v, ρ₂))(ℓ) = imm({α}, v, π(ℓ) ∖ ℓ)`, by inspection.
+
+@@ 6.122 | Lemma | p. 32 | BoCa.Fig16.BoLo.reborrow_ptoMut | ↺m
+> [α](ℓ ↦M_β P̂) ⊨ ↺_α(ℓ ↦I_α P̂)
+Proof. Let `ρ = ℓ ↦ mut(β, v, ρ′, P̂)` (which implies `P̂(v)`) with `@ρ ⊐ α`, for some `β ⊒ α`, `v`, `ρ′`.  Choose `ℓ ↦ imm({α}, v, ρ′)` for the reborrow and `{α}, v, ρ′` for `β̃, v, ρ′`; it remains that `ℓ ↦ imm({α}, v, ρ′) ∈ reb_α(ρ)`.  Choose `π` to be `ℓ ↦ ρ`: `@ρ ⊐ α` is given; `ρ ≥ ⨀ π(ℓ)` is `ρ ≥ ρ`; and since `ρ(ℓ) = mut(β, v, ρ′, P̂)` the clause is `(ℓ ↦ imm({α}, v, ρ′))(ℓ) = imm({α}, v, ρ′) ∧ dom(π(ℓ)) = {ℓ}`, by inspection.
+
+@@ 6.123 | Lemma | p. 32 | BoCa.Fig16.BoLo.reborrow_ptoImm | ↺i
+> [α](ℓ ↦I_β P̂) ⊨ ↺_α(ℓ ↦I_β P̂)
+Proof. Let `ρ = ℓ ↦ imm(β̃, v, ρ′)` with `P̂(v)(ρ′)`, `β ⊑ ⊔β̃` and `@ρ ⊐ α`.  Choose `ℓ ↦ imm(β̃, v, ρ′)` for the reborrow and `β̃, v, ρ′` for the cell; it remains that `ℓ ↦ imm(β̃, v, ρ′) ∈ reb_α(ρ)`.  Choose `π` to be `ℓ ↦ ρ`: `@ρ ⊐ α` is given; `ρ ≥ ⨀ π(ℓ)` is `ρ ≥ ρ`; and since `ρ(ℓ) = imm(β̃, v, ρ′)` the clause is `(ℓ ↦ imm(β̃, v, ρ′))(ℓ) = ρ(ℓ) ∧ dom(π(ℓ)) = {ℓ}`, by inspection.
+
+@@ 6.124 | Lemma | p. 33 | BoCa.Fig16.BoLo.reborrow_pure | ↺⌜⌝
+> ⌜P⌝ ⊨ ↺_α ⌜P⌝
+Proof. Let `ρ = ∅` and `P`.  Choose `ρ′ ∈ reb_α(ρ)` to be `∅`; it remains that `∅ ∈ reb_α(ρ)`.  Choose `π` to be `∅`; since `dom(∅) = ∅` this is `@∅ ⊐ α` and `∅ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)`, which hold by definition.
+
+@@ 6.125 | Lemma | p. 33 | BoCa.Fig16.BoLo.reborrow_star | ↺⋆
+> ↺_α P ⋆ ↺_α Q ⊨ ↺_α(P ⋆ Q)
+Proof. Let `ρ = ρ₁ ● ρ₂` with `P(ρ′₁)` and `Q(ρ′₂)` for `ρ′₁ ∈ reb_α(ρ₁)` and `ρ′₂ ∈ reb_α(ρ₂)`.  By Lemma 6.61, `ρ′₁ ● ρ′₂ ∈ reb_α(ρ₁ ● ρ₂)`; choose it.  The remaining obligations are immediate.
+
+@@ 6.126 | Lemma | p. 33 | BoCa.Fig16.BoLo.reborrow_or | ↺∨
+> ↺_α P ∨ ↺_α Q ⫤⊨ ↺_α(P ∨ Q)
+Proof. Case `⊨`: let `(∃ρ′ ∈ reb_α(ρ). P(ρ′)) ∨ (∃ρ′ ∈ reb_α(ρ). Q(ρ′))`; in either case choose that `ρ′` and discharge the disjunction on the same side.  Case `⫤`: let `P(ρ′) ∨ Q(ρ′)` for some `ρ′ ∈ reb_α(ρ)`; in either case take the matching side of the disjunction and choose `ρ′`.
+
+@@ 6.127 | Lemma | p. 33 | BoCa.Fig16.BoLo.reborrow_weak | ↺-weak
+> ↺_α(P ⋆ Q) ⊨ ↺_α P
+Proof. Let `ρ′ = ρ′₁ ● ρ′₂` with `P(ρ′₁)` and `Q(ρ′₂)`, for some `ρ′ ∈ reb_α(ρ)`.  Choose `ρ′₁`; `P(ρ′₁)` is immediate and it remains that `ρ′₁ ∈ reb_α(ρ)`.  Unfolding `ρ′ ∈ reb_α(ρ)`: `@ρ ⊐ α` (H1), `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ)` (H2), and `∀ℓ ∈ dom(π), v, ρ″. F(ℓ, v, ρ, ρ′, ρ″, π)` (H3) for some `π : dom(ρ′) → Res`, where `F(ℓ, v, ρ, ρ′, ρ″, π) = ℓ ∈ dom(π(ℓ)) ∧ (ρ(ℓ) = own(v) ⇒ ρ′(ℓ) = imm({α}, v, π(ℓ) ∖ ℓ)) ∧ (ρ(ℓ) = mut(−, v, ρ″, −) ⇒ ρ′(ℓ) = imm({α}, v, ρ″) ∧ dom(π(ℓ)) = {ℓ}) ∧ (ρ(ℓ) = imm(−, −, −) ⇒ ρ′(ℓ) = ρ(ℓ) ∧ dom(π(ℓ)) = {ℓ})`.  Let `π′` be `π` restricted to `dom(ρ′₁)`, and choose it.  `@ρ ⊐ α` is H1.  `ρ ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`: since `π′ ⊆ π`, `ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`.  For `ℓ ∈ dom(π′)`, `v`, `ρ″`: `ℓ ∈ dom(π)`, so H3 gives `F(ℓ, v, ρ, ρ′, ρ″, π)`; *"by inspection of `F`, we observe that all usages of `π` are of the form `π(ℓ)`.  Since `π(ℓ) = π′(ℓ)`, we obtain `F(ℓ, v, ρ, ρ′₁, ρ″, π′)`."*
+
+@@ 6.128 | Lemma | p. 34 | BoCa.Fig16.BoLo.reborrow_ex | ↺∃
+> ∃x. ↺_α P(x) ⫤⊨ ↺_α ∃x. P(x)
+Proof. Case `⊨`: let `P̂(x)(ρ′)` for some `x` and `ρ′ ∈ reb_α(ρ)`; choose `x` and `ρ′`.  Case `⫤`: let `P̂(x)(ρ′)` for some `ρ′ ∈ reb_α(ρ)` and `x`; choose `ρ′` and `x`.  In both, `P̂(x)(ρ′)` is immediate.
+
+@@ 6.129 | Lemma | p. 34 | BoCa.Fig16.BoLo.reborrow_all | ↺∀
+> ∀x. ↺_α P(x) ⫤⊨ ↺_α ∀x. P(x)
+Proof. Let `∀x. P̂(x)(ρ′)` for some `ρ′ ∈ reb_α(ρ)`.  Let `x` be arbitrary and choose `ρ′`.  Instantiate `∀x. P̂(x)(ρ′)` at `x` to obtain `P̂(x)(ρ′)`.
+
+@@ 6.130 | Lemma | p. 34 | BoCa.Fig16.BoLo.reborrow_emp
+> P ⊨ ↺_α emp
+Proof. Suppose `ρ ∈ P`.  Then `∅` vacuously satisfies the conditions needed to be a reborrowed version of `ρ`, so `ρ ∈ ↺_α emp`.
+
++ beside BoCa.Fig16.BoLo.reb_emp_iff
++ beside BoCa.Fig16.BoLo.reborrow_emp_iff
++ beside BoCa.Fig16.BoLo.reborrow_emp_box
++ beside BoCa.Fig16.BoLo.reborrow_emp_ptoOwn
++ lit BoCa.Fig16.BoLo.reborrow_emp_outside_stratum
+@@ 6.131 | Lemma | p. 34 | BoCa.Fig16.LogRel.reborrow_vDen_ne_unk | ↺V₁
+> [δ('a)] 𝒱⟦T⟧δ(v) ⊨ ↺_δ('a) 𝒱⟦Imm̲ 'a T⟧δ(v) for all T ≠ Unk.
+Proof. By induction on `T`, with `δ('a) = α`.  `T = 1`: unfold to `[α]⌜v = ()⌝ ⊨ ↺_α ⌜v = ()⌝`; apply `[]L` and `↺⌜⌝`.  `T = T₁ ⊗ T₂`: unfold; apply `[]∃`, `∃L`, `[]⋆`, `[]L` to reach `⌜v = (v₁, v₂)⌝ ⋆ [α]𝒱⟦T₁⟧δ(v₁) ⋆ [α]𝒱⟦T₂⟧δ(v₂)` on the left; apply `↺∃`, `∃R`, `↺⋆`, `↺⌜⌝` to reach `⌜v = (v₁, v₂)⌝ ⋆ ↺_α 𝒱⟦Imm̲ 'a T₁⟧δ(v₁) ⋆ ↺_α 𝒱⟦Imm̲ 'a T₂⟧δ(v₂)` on the right; apply IH.  `T = T₁ ⊕ T₂`: analogous, with `↺∨` for `↺⋆`.  `T = T₁ ⊸ T₂`: the goal unfolds to `[α]𝒱⟦T₁ ⊸ T₂⟧δ(v) ⊨ ↺_α emp`; apply Lemma 6.130.  `T = ∀'a ⊏ @b. T′`: analogous to `⊸`.  `T = [@a]T′`: unfold to `[α][@aδ]𝒱⟦T′⟧δ(v)`; apply `[]L`; apply IH.  `T = Ref T′`: unfold to `[α]∃ℓ, v′. ⌜v = ℓ⌝ ⋆ ℓ ↦ v′ ⋆ 𝒱⟦T′⟧δ(v′)`; apply `[]∃`, `∃L`, `[]⋆`, `[]L`; apply IH, giving `⌜v = ℓ⌝ ⋆ ℓ ↦ v′ ⋆ ↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′)`; apply Lemma 6.130, giving `↺_α emp ⋆ ↺_α 𝒱⟦Imm̲ 'a T′⟧δ(v′)`; apply `↺⋆`; done because `emp` is a unit for `⋆`.  `T = Imm @b T′`: unfold to `[α]∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦I_{@bδ} 𝒱⟦T′⟧δ`; apply `[]∃`, `[]⋆`, `[]L`; apply `↺i`; apply `↺⌜⌝`, `↺⋆`, `↺∃`; fold `𝒱⟦Imm @b T′⟧`.  `T = Mut @b T′`: the goal's right side is `↺_α 𝒱⟦Imm α T′⟧δ(v)`; unfold, apply `[]∃`, `[]⋆`, `[]L`; apply `↺m`, giving `↺_α(ℓ ↦I_α 𝒱⟦T′⟧δ)`; apply `↺⌜⌝`, `↺⋆`, `↺∃`; fold `𝒱⟦Imm α T′⟧`.  `T = Unk`: impossible.
+
++ beside BoCa.Fig16.LogRel.reborrow_vDen
++ beside BoCa.Fig16.BoLo.reborrow_star_pure
++ lit BoCa.Fig16.LogRel.RefPrintedChainResidual
++ tw BoCa.Fig16.LogRel.Typed.reborrow_vShape
++ tw BoCa.Fig16.LogRel.Typed.image_vX_of_shape
+@@ 6.132 | Lemma | p. 35 | BoCa.Fig16.LogRel.reborrow_vDen_fresh | ↺V₂
+> If 'a not free in T then 𝒱⟦T⟧δ(v) ⊨ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)
+Proof. A table of steps.  Apply `ИR`, `Иmono` and fix `α ⊏ ⨅δ` arbitrary: `[α]𝒱⟦T⟧δ(v) ⊨ [α]↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.  Apply `[]R`: `[α]𝒱⟦T⟧δ(v) ⊨ ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.  Have `𝒱⟦T⟧δ = 𝒱⟦T⟧δ['a↦α]` because `'a` is not free in `T`: `[α]𝒱⟦T⟧δ['a↦α](v) ⊨ ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α](v)`.  Apply `↺V₁`.
+
++ tw BoCa.Fig16.LogRel.Typed.six132_shape
++ tw BoCa.Fig16.LogRel.Typed.six132_shape_fresh
+@@ 6.133 | Lemma | p. 35 | BoCa.Fig16.LogRel.ptoImm_reborrow_vDen_fresh | ↺V₃
+> If 'b not free in T then ℓ ↦I_α 𝒱⟦T⟧δ ⊨ ℓ ↦I_α Иβ. ↺_β 𝒱⟦Imm̲ 'b T⟧δ['b↦β]
+Proof. Apply `↺V₂` and `I-mono`.
+
+@@ 6.134 | Lemma | p. 35 | BoCa.Fig16.LogRel.pure_sep_reborrow_vDen_fresh
+> ⌜x = y⌝ ⋆ Иα. ↺_α 𝒱⟦Imm̲ 'a T⟧δ['a↦α] ⊨ Иα. ↺_α(⌜x = y⌝ ⋆ 𝒱⟦Imm̲ 'a T⟧δ['a↦α])
+Proof. By unfolding and substituting for `x = y`.

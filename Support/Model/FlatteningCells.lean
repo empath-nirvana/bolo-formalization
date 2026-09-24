@@ -179,6 +179,61 @@ theorem BigComp.mem_factor (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ�
           · obtain ⟨υ, hυ⟩ := ih hb x hx'
             exact ResU.Comp.factor_trans hR hC hυ (ResU.Comp.comm_of_laws hR hC hc)
 
+/-- **A sub-family folds to a factor of the whole family's fold.**  This is
+`BigComp.mem_factor` at a sub-family rather than at one member, and it is the
+whole of `[TR]` 6.127's second bullet (p. 33): *"Since `π′ ⊆ π`,
+`ρ ≥ ⨀_{ℓ∈dom(π)} π(ℓ) ≥ ⨀_{ℓ∈dom(π′)} π′(ℓ)`."*  Dropping an entry from a
+defined fold leaves a defined fold and moves the dropped entry into the frame,
+which is [TR] 6.2 and 6.3 at each step of the drop.
+`[about ours: `BigComp` is §16's fold shape; the step is `[TR]` 6.127's own]` -/
+theorem BigComp.sublist (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
+    {l l' : List (ResU Loc Val)} (hs : List.Sublist l' l) :
+    ∀ {b : ResU Loc Val}, BigComp R C l b →
+      ∃ b' f, BigComp R C l' b' ∧ ResU.Comp R C b' f b := by
+  induction hs with
+  | slnil =>
+      intro b h
+      cases h
+      exact ⟨PMap.empty, PMap.empty, BigComp.nil, ResU.comp_empty_right _⟩
+  | cons a _ ih =>
+      intro b h
+      cases h with
+      | cons hτ hcσ =>
+          obtain ⟨b', f, hb', hcf⟩ := ih hτ
+          obtain ⟨x, hx⟩ :=
+            ResU.Comp.factor_trans hR hC hcf (ResU.Comp.comm_of_laws hR hC hcσ)
+          exact ⟨b', x, hb', hx⟩
+  | cons_cons a _ ih =>
+      intro b h
+      cases h with
+      | cons hτ hcσ =>
+          obtain ⟨b', f, hb', hcf⟩ := ih hτ
+          obtain ⟨y, hy₁, hy₂⟩ :=
+            (ResU.Comp.assoc hR hC.assoc a b' f b).mp ⟨_, hcf, hcσ⟩
+          exact ⟨y, f, BigComp.cons hb' hy₁, hy₂⟩
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+variable {Loc Val : Type}
+
+/-- `BigComp.sublist` at `●`, read in the order `[CONF]` p. 415:24 footnote 1
+defines: the sub-family's fold is `≤` the whole family's.
+`[about ours: `BigComp.sublist` at `●`]` -/
+theorem BigComp.leS_of_sublist {l l' : List (ResU Loc Val)} (hs : List.Sublist l' l)
+    {b : ResU Loc Val} (h : BigComp CellU.CompatS CellU.CompS l b) :
+    ∃ b', BigComp CellU.CompatS CellU.CompS l' b' ∧ ResU.Le b' b := by
+  obtain ⟨b', f, hb', hcf⟩ :=
+    BigComp.sublist (fun _ _ _ hc => CellU.CompS.compat hc) ResU.compLawsS hs h
+  exact ⟨b', hb', f, hcf⟩
+
+end BoCa.Fig16
+
+namespace BoCa.Fig16
+variable {Loc Val : Type}
+variable {R : CellU Loc Val → CellU Loc Val → Prop}
+variable {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
+
 /-- **`ex(ρᵥ)_◐` is a factor of `ex(ρ)_◐` wherever `ρ(ℓ) = mut(_,_,ρᵥ,_)`.**  The
 walk composes the family `{ex(ρ′)_◐ | ∃ℓ. ρ(ℓ) = mut(_,_,ρ′,_)}`, and `ℓ` indexes
 one of its entries (convention G6), so the entry is a factor of `⨀` and `⨀` is a
