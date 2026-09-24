@@ -27,6 +27,11 @@ theorem CellU.ownOf_ne_immOf {v v' : Val} {s : LSet} {ρ : ResU Loc Val}
     {h : ρ.InStratum s.join} : ownOf v ≠ immOf s v' ρ h := by
   intro e; simp [ownOf, immOf] at e
 
+theorem CellU.ownOf_ne_mutOf {v v' : Val} {b : Life} {ρ : ResU Loc Val}
+    {h : ρ.InStratum b} {P : Val → SPropS Loc Val b} {hw : P v' ⟨ρ, h⟩} :
+    ownOf v ≠ mutOf b v' ρ h P hw := by
+  intro e; simp [ownOf, mutOf] at e
+
 theorem CellU.immOf_ne_mutOf {s : LSet} {v v' : Val} {ρ ρ' : ResU Loc Val}
     {h : ρ.InStratum s.join} {b : Life} {h' : ρ'.InStratum b}
     {P : Val → SPropS Loc Val b} {hw : P v' ⟨ρ', h'⟩} :

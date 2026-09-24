@@ -21,11 +21,14 @@ Paper/                                 what the paper prints, in its order
   S2_Statics/Definitions.lean          [TR] §2, pp. 2–3
   S3_Dynamics/Definitions.lean         [TR] §3, pp. 3–4
   S4_LogicalRelation/Definitions.lean  [TR] §4, p. 4   (the literal reading; each row records its repair)
+  S4_LogicalRelation/Remarks.lean      theorems about §4's definitions whose proofs use §6
   S5_Model/Definitions.lean            [TR] §5, pp. 4–6
-  S6_1_StandardLemmas/Lemmas.lean      [TR] §6.1 ─┐
+  S5_Model/Remarks.lean                theorems about §5's definitions whose proofs use §6
+  S6_1_StandardLemmas/Lemmas.lean      [TR] §6.1, Lemmas 6.1–6.15 (Stage 2b)
   S6_2_NonStandardLemmas/Definitions.lean   Definitions 6.1, 6.2, 6.3
-  S6_2_NonStandardLemmas/Lemmas.lean   [TR] §6.2  │
-  S6_3_FrameAndAntiFrame/Lemmas.lean   [TR] §6.3  │ skeletons in Stage 1:
+  S6_2_NonStandardLemmas/Remarks.lean  theorems about Definition 6.2's ∼
+  S6_2_NonStandardLemmas/Lemmas.lean   [TR] §6.2, Lemmas 6.16–6.63 (Stage 2b)
+  S6_3_FrameAndAntiFrame/Lemmas.lean   [TR] §6.3 ─┐ skeletons:
   S6_4_StandardEntailments/Lemmas.lean [TR] §6.4  │ banner + the list of results
   S6_5_NonStandardEntailments/…        [TR] §6.5  │ and the declaration planned
   S6_6_ReborrowingEntailments/…        [TR] §6.6  │ for each
@@ -40,8 +43,14 @@ Support/                               [about ours]: what makes the paper tree g
   Statics/Contexts                     contexts as slot lists, and their splitting
   Dynamics/Machine, Interpreter        the machines' `→*`; an executable interpreter no result uses
   Model/Prelude, Notation, Cells       arithmetic, casts, bijections, ι; the notation of p. 6; cell facts
-  LogicalRelation/ClosingSubstitutions, ClosedJudgment
-                                       γ(e) and free lifetime variables; ⊨ at the empty resource
+  Model/Lifetimes, CellFacts, Composition, Singletons, Walks, Algebra, WalkSplitting,
+        Flattening, Compatibility      the carrier's algebra: what §6.1's results need
+  Model/AlgebraInstances, RelaxedWalks, FlatteningCells, Subtraction, Update, UpdateFrame,
+        Propositions, Outlives, Ancestors, Reborrow, ReborrowFrame, Restriction,
+        ReborrowLowering, Surgery, ClosingSentence
+                                       what §6.2's results need beyond §6.1's
+  LogicalRelation/ClosingSubstitutions, ClosedJudgment, Facts
+                                       γ(e) and free lifetime variables; ⊨ at ∅; ⌜p⌝ ⋆ P
   TypedWorld/Records, World, Relation  the typed world: records; TW and wpTS (row 5.33's repair);
                                        the repaired relation vX, gDenX, SemX (rows 4.4–4.14's repairs)
 Bridge/Names.csv                       every declaration here → its source declaration
@@ -53,7 +62,10 @@ tools/extract/                         the generator that produced Paper/, Suppo
 `tools/extract/run.sh` regenerates every Lean file here from the source
 repository and builds; the Lean files are its output and are not edited by
 hand.  `tools/extract/cfg.json` holds the placement decisions below, and
-`tools/extract/banners.py` the section banners.
+`tools/extract/banners.py` the section banners, and `tools/extract/results/S6_*.txt`
+the numbered results' records (statement, transcribed proof, declarations and
+aliases).  `tools/extract/stage2.py` is the driver; `gen.py` holds the selection,
+layering and emission it shares.
 
 Each `Definitions.lean` opens with a banner transcribing its section's display
 from `[TR]`, then gives the printed items as rows of the source's
@@ -183,24 +195,67 @@ Checks, all passing:
     Sentences of inventory notes that record history (deletions, migrations,
     earlier scorings) are dropped.
 
-## Stage 2 — proposed
+## Stage 2
 
-1. **Remaining definitions' remarks — done (2a).**  `tools/extract/stage2.py`
-   carries the eight deferred theorem rows and row 5.67's theorems:
-   `Paper/S4_LogicalRelation/Remarks.lean` (4.16's two directions, 4.18's
-   `sem_iff`), `Paper/S5_Model/Remarks.lean` (5.62's `wp_eq_wpU`, 5.67's
-   theorems, the record of 5.56), `Paper/S6_2_NonStandardLemmas/Remarks.lean`
-   (Definition 6.2's `Sim.trans` and `upd_iff_sim`, and 5.56's `BigComp.perm`,
-   which `upd_iff_sim` uses), and 4.17's `MutImmGap.inRel_same` into
-   `Paper/LiteralReadings/S4_LogicalRelation.lean`, which now comes last.  The
-   Remarks files follow the §6 files in import order (`cfg.json` `order2`), and
-   what they need that the paper does not print is in `Support/Model/*` by topic.
-   A row's theorem that an earlier file needs is declared there under a heading
-   saying so, and the row's record says where.
-2. **§6.1–§6.2** (lemmas 6.1–6.63; `Fig16.lean` §20–§20e, `Reborrow.lean`,
-   `Ancestor.lean`), with `Support/Model/*` for the walks, the functional-walk
-   apparatus and the reborrow surgery.  This is the largest block (≈ 2,500 lines
-   of results, ≈ 11,000 of support).
+Stage 1's placement is pinned: `stage2.py` recomputes it with stage 1's file
+order and keeps it, so the §§1–5 files do not move.  New support is layered by
+the latest paper file it can follow (`assign(…, latest=True)`), so a `Support/`
+file sits just before the first paper file that needs it.
+
+1. **Remaining definitions' remarks — done (2a).**  The eight deferred theorem
+   rows and row 5.67's theorems: `Paper/S4_LogicalRelation/Remarks.lean`
+   (4.16's two directions, 4.18's `sem_iff`), `Paper/S5_Model/Remarks.lean`
+   (5.62's `wp_eq_wpU`, and the records of 5.56 and 5.67),
+   `Paper/S6_2_NonStandardLemmas/Remarks.lean` (Definition 6.2's `Sim.trans`
+   and `upd_iff_sim`, which 6.39 and 6.59 use), and 4.17's literal
+   `MutImmGap.inRel_same` into `Paper/LiteralReadings/S4_LogicalRelation.lean`,
+   which now comes last.  A row's theorem that an earlier paper file needs is
+   declared there under a heading saying so, and its row's record says where:
+   `BigComp.perm` (5.56), `CellU.compatR_iff` and `CompatS.disjoint_of_immFree`
+   (5.67) are declared in §6.1's file, `AgW.nonimm_beneath_imm` and
+   `flat_eq_ag_at` (5.67) in §6.2's.
+2. **§6.1–§6.2 — done (2b).**  Lemmas 6.1–6.63, 63 records, 62 moved
+   declarations, 63 aliases `TR.lemma_6_N` (6.58 has two, `_left`/`_right`; 6.40
+   has none).  Each record: number, page, the inventory's status, the printed
+   statement quoted (symbols the text extraction garbles restored: `⦇ρ⦈`, `⟦ρ⟧`,
+   `◐`, `▸◁`, subscripts), the printed proof transcribed compactly in its own
+   order, the declaration(s) with the source docstring's tag, and the inventory
+   note (sentences about the old carrier dropped).  §§6.1–6.2 print no names,
+   so there is no second alias.  Specific rows:
+   * 6.10 and 6.35 are one declaration (`Valid.split`), the same statement
+     printed twice; 6.35's record says so and aliases it.
+   * 6.40 has no declaration here: the source inventory scores it `variant`
+     and cites only the old carrier's `BoLo.valid_own_congr`.
+   * 6.47 and 6.49 carry both readings of `↭` (`Upd.refl`/`UpdV.refl`,
+     `UpdV.trans`/`Upd.trans`); the alias is to the inventory's first-named.
+   * 6.63's inventory row cites the old carrier's `Resource.Res.lt_down`; the
+     printed carrier's statement is `Fig16.Life.down_sqsubset`, used here.
+
+   **Forward citations.**  `[TR]`'s proofs of 6.7, 6.10 and 6.15 (§6.1) cite
+   6.18, 6.20 and 6.36 (§6.2), and Lean needs 6.30 and 6.31 with them; §6.2's
+   proofs cite §6.1 throughout.  So the two files cannot each hold their own
+   declarations in one import order.  The rule applied (`stage2.py`,
+   "ahead of its subsection"): a result whose declaration an earlier paper file
+   needs is declared in that file under a heading naming the printed citation,
+   and its record and alias stay in its own subsection's file.  Five results
+   (6.18, 6.20, 6.30, 6.31, 6.36) and three definition-row theorems are declared
+   in §6.1's file this way.  Within a file, a result a printed-earlier result
+   needs moves up to just before it (6.42 before 6.17, 6.41 before 6.21, 6.32
+   and 6.33 before 6.26, 6.63 before 6.27).
+
+   **`[about ours]` inside the lemma files.**  71 unprinted declarations sit
+   between results because they need a result above and a result below needs
+   them (44 in §6.1's file, 26 in §6.2's, 1 in LiteralReadings); each run is
+   headed with the result it serves.  Everything else unprinted is in
+   `Support/Model/*` (532 units over both stages' support).
+
+   Checks at the end of 2b: `lake build` clean; `check-bridge.sh` 2,205
+   declarations compared (the 63 aliases against the declarations they name),
+   0 mismatches; `check-hygiene.sh` 0 forbidden keywords, 2,674 constants within
+   `[propext, Classical.choice, Quot.sound]`.
+
+Still to come, in this order:
+
 3. **§6.3–§6.6** (6.64–6.134): the frame rules and the entailments over
    `Fig16.BoLo`, and `↺V₁–↺V₃` from `Fig16LogRel` §2.
 4. **§6.7** (6.135–6.150): `Fig16Wp.lean`, `RebWp.lean`, with each rule's

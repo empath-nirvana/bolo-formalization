@@ -247,7 +247,10 @@
    ]
   }
  },
- "stage2_sections": [],
+ "stage2_sections": [
+  "S6_1",
+  "S6_2"
+ ],
  "remark_rows": [
   "5.67"
  ],

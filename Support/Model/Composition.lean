@@ -242,17 +242,6 @@ theorem ResU.compS_spec (ρ₁ ρ₂ : ResU Loc Val) (h : ResU.CompatS ρ₁ ρ�
     ResU.CompS ρ₁ ρ₂ (ρ₁.compS ρ₂ h) :=
   ⟨h, fun l => optCompS_optComp (ρ₁.get l) (ρ₂.get l) _⟩
 
-/-- `ρ₁ ▶◀ ρ₂` iff `ρ₁ ● ρ₂` is defined — `[TR]` Lemma 6.9 (p. 7, 600 dpi),
-whose own proof is "By definition".  `ResU.Comp` carries the printed guard as
-its first conjunct, so the forward direction is that conjunct and nothing more.
-The content is the converse — building the composite from `▶◀` alone, which
-goes through `CellU.compS_defined_iff` at every overlapping location.
-Stated on this file's carrier, which is Fig. 16 on the settled reading of the
-`fin` mark (§3, and the `[variant: …]` at `Res`).  `[as printed]` -/
-theorem ResU.compS_defined_iff (ρ₁ ρ₂ : ResU Loc Val) :
-    (∃ ρ, ResU.CompS ρ₁ ρ₂ ρ) ↔ ResU.CompatS ρ₁ ρ₂ :=
-  ⟨fun ⟨_, h⟩ => h.1, fun h => ⟨_, ResU.compS_spec ρ₁ ρ₂ h⟩⟩
-
 /-- `●` merges cells over a common value, so it preserves the erasure. -/
 theorem CellU.CompS.erase {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁ ψ₂ ψ) :
     ψ.erase = ψ₁.erase ∧ ψ.erase = ψ₂.erase := by
@@ -338,10 +327,39 @@ theorem CellU.CompatR.symm {ψ₁ ψ₂ : CellU Loc Val} (h : ψ₁.CompatR ψ�
 theorem CellU.CompatR.of_compatS {ψ₁ ψ₂ : CellU Loc Val} (h : ψ₁.CompatS ψ₂) :
     ψ₁.CompatR ψ₂ := ⟨_, CellU.CompR.strict h⟩
 
+theorem ResU.CompatR.symm {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.CompatR ρ₁ ρ₂) :
+    ResU.CompatR ρ₂ ρ₁ := ResU.Compat.comm (fun _ _ a => a.symm) h
+
 theorem ResU.CompR.functional {ρ₁ ρ₂ ρ ρ' : ResU Loc Val}
     (h : ResU.CompR ρ₁ ρ₂ ρ) (h' : ResU.CompR ρ₁ ρ₂ ρ') : ρ = ρ' :=
   ResU.Comp.functional (R := CellU.CompatR) (C := CellU.CompR)
     (fun _ _ _ _ a b => CellU.CompR.functional a b) h h'
+
+theorem CellU.compR_spec (ψ₁ ψ₂ : CellU Loc Val) (h : ψ₁.CompatR ψ₂) :
+    CellU.CompR ψ₁ ψ₂ (CellU.compR ψ₁ ψ₂ h) := h.choose_spec
+
+theorem optCompR_optComp (o₁ o₂ : Option (CellU Loc Val))
+    (k : ∀ ψ₁ ψ₂, o₁ = some ψ₁ → o₂ = some ψ₂ → CellU.CompatR ψ₁ ψ₂) :
+    OptComp CellU.CompR o₁ o₂ (optCompR o₁ o₂ k) := by
+  cases o₁ with
+  | none => cases o₂ with
+    | none => rfl
+    | some ψ => rfl
+  | some ψ₁ => cases o₂ with
+    | none => rfl
+    | some ψ₂ => exact ⟨_, rfl, CellU.compR_spec _ _ _⟩
+
+theorem ResU.compR_spec (ρ₁ ρ₂ : ResU Loc Val) (h : ResU.CompatR ρ₁ ρ₂) :
+    ResU.CompR ρ₁ ρ₂ (ρ₁.compR ρ₂ h) :=
+  ⟨h, fun l => optCompR_optComp (ρ₁.get l) (ρ₂.get l) _⟩
+
+/-- `ρ₁ ⋈ ρ₂` iff `ρ₁ ○ ρ₂` is defined — the `○` twin of `[TR]` Lemma 6.9
+(p. 7).  The paper states 6.9 at `●` only and never states this; with §15's
+reading of `⋈` it is the same proof.
+`[about ours: the `○` analogue of 6.9, which the paper does not state]` -/
+theorem ResU.compR_defined_iff (ρ₁ ρ₂ : ResU Loc Val) :
+    (∃ ρ, ResU.CompR ρ₁ ρ₂ ρ) ↔ ResU.CompatR ρ₁ ρ₂ :=
+  ⟨fun ⟨_, h⟩ => h.1, fun h => ⟨_, ResU.compR_spec ρ₁ ρ₂ h⟩⟩
 
 end BoCa.Fig16
 

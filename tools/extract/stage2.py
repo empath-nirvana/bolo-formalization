@@ -99,7 +99,13 @@ for p in probs: print("PROB", p)
 # ---------------------------------------------------------------- records
 def rel(f): return "`%s.lean`" % f
 def label(r): return ("Lemma " + r) if r in RESULTS else ("row %s's theorem" % r)
-def labels(rs): return ", ".join(label(x) for x in rs)
+def labels(rs):
+    lem = [x for x in rs if x in RESULTS]; oth = [label(x) for x in rs if x not in RESULTS]
+    out = []
+    if lem:
+        nums = lem[0] if len(lem) == 1 else ", ".join(lem[:-1]) + " and " + lem[-1]
+        out.append(("Lemma " if len(lem) == 1 else "Lemmas ") + nums)
+    return ", ".join(out + oth)
 def lemma_title(r):
     R0 = RESULTS[r]
     t = "%s %s" % (R0["kind"], r)
@@ -136,7 +142,7 @@ def lean_line(r, f):
                 n, (", alias `%s`" % a) if a else "", (", source tag " + " ".join(tags)) if tags else "",
                 lemma_title(RU[u]), rel(tgt[u])))
             continue
-        where = "" if tgt[u] == f else " — declared in %s, ahead of this subsection: the Lean of %s there uses it" % (
+        where = "" if tgt[u] == f else " — declared in %s, ahead of this subsection: the Lean of %s there needs it" % (
             rel(tgt[u]), labels(users_in(u, tgt[u])) or "a result")
         tags = source_tags(n)
         bits.append("`%s`%s%s%s" % (n, (", alias `%s`" % a) if a else "", (", source tag " + " ".join(tags)) if tags else "", where))
@@ -146,7 +152,7 @@ def record(r, f):
     P = PROWS.get(r, {})
     out = ["## %s · `[TR]` %s · inventory `%s`" % (lemma_title(r), R0["page"], P.get("status", "—")), ""]
     out += ["> " + x for x in R0["stmt"]]
-    out += ["", "**Printed proof, transcribed.** " + "\n".join(R0["proof"]).strip()]
+    out += ["", "**Printed proof, transcribed.** " + re.sub(r"^Proof\.\s*", "", "\n".join(R0["proof"]).strip())]
     if R0["remark"]: out += ["", "\n".join(R0["remark"])]
     out += ["", lean_line(r, f)]
     note = inventory_note(r) if r in PROWS else ""
@@ -156,7 +162,7 @@ def def_record(r, f, units_elsewhere=()):
     info = DEFROWS[r]; tag = STATUS_TAG.get(info["status"], info["status"])
     out = ["### %s · %s · %s · `%s`" % (r, info["printed"], info["page"], tag), "", dehistory(info["note"])]
     for u in units_elsewhere:
-        out += ["", "`%s` is declared in %s, ahead of this file: the Lean of %s there uses it." % (
+        out += ["", "`%s` is declared in %s, ahead of this file: the Lean of %s there needs it." % (
             owners_of(u)[0], rel(tgt[u]), labels(users_in(u, tgt[u])) or "a result")]
     return "/-!\n" + "\n".join(out) + "\n-/"
 def alias_lines(u):
@@ -226,12 +232,12 @@ class Hook:
             if u in RU:
                 r = RU[u]
                 return ("/-!\n### %s's declaration, ahead of its subsection\n\n`[TR]` prints %s in %s (%s).  "
-                        "The Lean of %s in this file uses it, so it is declared here; its statement, printed proof "
+                        "The Lean of %s in this file needs it, so it is declared here; its statement, printed proof "
                         "and alias are in %s.\n-/") % (lemma_title(r), lemma_title(r), CFG["sections"][RESULTS[r]["sec"]]["title"].split(" ")[0],
                         RESULTS[r]["page"], labels(users) or "a result", rel(HOME[u]))
             r = REMARK[u]
             return ("/-!\n### Row %s's theorem `%s`, ahead of its file\n\nA remark on a printed definition of `[TR]` §%s; "
-                    "its proof uses results of §6, and the Lean of %s in this file uses it, so it is declared here.  "
+                    "its proof uses results of §6, and the Lean of %s in this file needs it, so it is declared here.  "
                     "The row is recorded in %s.\n-/") % (r, owners_of(u)[0], r.split(".")[0],
                     labels(users) or "a result", rel(HOME[u]))
         if f.startswith("Paper"):

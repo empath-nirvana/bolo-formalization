@@ -1,59 +1,59 @@
 @@ 6.1 | Lemma | p. 6 | BoCa.Fig16.ResU.compat_comm_iff
-> TODO
-Proof. TODO
+> ρ₁ ▸◁ ρ₂ = ρ₂ ▸◁ ρ₁
+Proof. By definition, and the fact that `▸◁` is commutative on cells: at `▸◂` commutativity is immediate; at `▷◁` the first case is the previous one, and the second is immediate since sets are unordered.
 
 @@ 6.2 | Lemma | p. 6 | BoCa.Fig16.ResU.Comp.comm
-> TODO
-Proof. TODO
+> ρ₁ ◐ ρ₂ = ρ₂ ◐ ρ₁
+Proof. Composability follows from Lemma 6.1.  The rest follows from commutativity of composition on cells: at `●` it is immediate because `∪` is commutative; at `○` the first two cases are immediate, and the other two follow from noting that `ψᵢ` is invariant under changing the order of the cells.
 
 @@ 6.3 | Lemma | p. 6 | BoCa.Fig16.ResU.Comp.assoc
-> TODO
-Proof. TODO
+> ρ₁ ◐ (ρ₂ ◐ ρ₃) = ρ₁ ◐ ρ₂ ◐ ρ₃
+Proof. Unfolding `◐`, the only interesting case is `ℓ ∈ dom(ρ₁) ∩ dom(ρ₂) ∩ dom(ρ₃)`.  At `●`, associativity of `∪`.  At `○`, split on `ρ₂ ○ ρ₃`: the first case is immediate; the second follows from `imm` always being preserved by `○`; in the third, if `ρ₁(ℓ)` is owned the `mut` is the result, if it is `mut` use associativity of `⊓` and `∧`, and if it is `imm` the result is `imm` either way; in the fourth, owned gives the `mut`, `mut` is immediate, `imm` gives `imm` either way; in the fifth, owned gives the `imm`, `mut` gives the `imm`, and `imm` combines the `imm`s.
 
 @@ 6.4 | Lemma | p. 7 | BoCa.Fig16.ResU.comp_empty_right
-> TODO
-Proof. TODO
+> ρ ◐ ∅ = ρ
+Proof. By definition `dom(ρ) ∩ ∅ = ∅`, so `▸◁` holds immediately, and the result is trivially `ρ`.
 
 @@ 6.5 | Lemma | p. 7 | BoCa.Fig16.ResU.hash_empty_right
-> TODO
-Proof. TODO
+> If ✓ρ then ρ # ∅
+Proof. Immediate by definition.
 
 @@ 6.6 | Lemma | p. 7 | BoCa.Fig16.ResU.hash_symm_iff
-> TODO
-Proof. TODO
+> ρ₁ # ρ₂ if and only if ρ₂ # ρ₁
+Proof. From Lemma 6.2, and unfolding `⦇−⦈` with Lemmas 6.20 and 6.18.
 
 @@ 6.7 | Lemma | p. 7 | BoCa.Fig16.ResU.Lower.split
-> TODO
-Proof. TODO
+> If ρ₁ # ρ₂ then ⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁⟧ ∪ ⟦ρ₂⟧.
+Proof. By Lemmas 6.20 and 6.18 with Lemma 6.36, every `ℓ ∈ dom(⟦ρ₁ ● ρ₂⟧)` is in `dom(ex(ρ₁)_●)`, in `dom(ex(ρ₂)_●)`, or in `dom(ag(ρ₁) ○ ag(ρ₂))`.  In the first two cases we are done; in the third we are done unless `ℓ ∈ dom(ag(ρ₁)) ∩ dom(ag(ρ₂))`, and then the definition of `○` gives `⟦ag(ρ₁)(ℓ)⟧ = ⟦ag(ρ₂)(ℓ)⟧`.
 
 @@ 6.8 | Lemma | p. 7 | BoCa.Fig16.ResU.Lower.congr
-> TODO
-Proof. TODO
+> If ⟦ρ₂⟧ = ⟦ρ₃⟧ and ρ₁ # ρ₂ and ρ₁ # ρ₃ then ⟦ρ₁ ● ρ₂⟧ = ⟦ρ₁ ● ρ₃⟧
+Proof. Immediate by Lemma 6.7, rewriting with `⟦ρ₂⟧ = ⟦ρ₃⟧`.
 
 @@ 6.9 | Lemma | p. 7 | BoCa.Fig16.ResU.compS_defined_iff
-> TODO
-Proof. TODO
+> ρ₁ ▸◂ ρ₂ iff ρ₁ ● ρ₂ is defined.
+Proof. By definition.
 
 @@ 6.10 | Lemma | p. 7 | BoCa.Fig16.ResU.Valid.split
-> TODO
-Proof. TODO
+> If ✓(ρ₁ ● ρ₂) then ✓ρ₁ and ✓ρ₂
+Proof. By unfolding and applying Lemmas 6.18 and 6.20.
 
 @@ 6.11 | Lemma | p. 7 | BoCa.Fig16.ResU.Hash.split
-> TODO
-Proof. TODO
+> If ρ₁ ● ρ₂ # ρ₃ then ρ₁ # ρ₃ and ρ₂ # ρ₃
+Proof. Definedness of `ρ₁ ● ρ₃` and `ρ₂ ● ρ₃` follows from unfolding definitions; `✓(ρ₁ ● ρ₃)` and `✓(ρ₂ ● ρ₃)` follow from Lemma 6.10 applied to `✓(ρ₁ ● ρ₂ ● ρ₃)`.
 
 @@ 6.12 | Lemma | p. 7 | BoCa.Fig16.ResU.compatS_of_compR
-> TODO
-Proof. TODO
+> If ρ₁ ● ρ₂ and ρ₁ ● ρ₃ and ρ₂ ○ ρ₃ are all defined, then so is ρ₁ ● (ρ₂ ○ ρ₃).
+Proof. The own-or-mut cells of `ρ₁` are disjoint from those of `ρ₂` and `ρ₃`, hence from those of `ρ₂ ○ ρ₃`, because `○` introduces no new own-or-mut cells.  At a location where `(ρ₂ ○ ρ₃)(ℓ)` is an `imm` cell, either (1) both operands are `imm` cells over one value and one witness, `imm(α₁, v, ρ)` and `imm(α₂, v, ρ)`, so the composite is `imm(α₁ ∪ α₂, v, ρ)` and is composable with `ρ₁(ℓ)` by `ρ₁ ▸◂ ρ₂`; or (2) one operand is `imm` and the other own-or-mut (without loss of generality `ρ₂`'s), so `ℓ ∉ dom(ρ₁)` and `ℓ` is not in the overlap.  So the `imm` cells of `ρ₁` agree on overlap with those of `ρ₂ ○ ρ₃` up to lifetimes.
 
 @@ 6.13 | Lemma | p. 7 | BoCa.Fig16.ResU.compatS_of_pairwise
-> TODO
-Proof. TODO
+> If ρ₁ ● ρ₂ and ρ₁ ● ρ₃ and ρ₂ ● ρ₃ are all defined, then so is ρ₁ ● ρ₂ ● ρ₃.
+Proof. The own-or-mut cells of `ρ₁, ρ₂, ρ₃` are pairwise disjoint, hence mutually disjoint, and the `imm` cells pairwise agree up to lifetimes, hence mutually agree up to lifetimes.
 
 @@ 6.14 | Lemma | p. 8 | BoCa.Fig16.ResU.compatR_of_pairwise
-> TODO
-Proof. TODO
+> If ρ₁ ○ ρ₂ and ρ₁ ○ ρ₃ and ρ₂ ○ ρ₃ are all defined, then so is ρ₁ ○ ρ₂ ○ ρ₃.
+Proof. Analogous to Lemma 6.13.  The only wrinkle is that `○`, unlike `●`, merges `imm` cells with `own` and `mut` cells; but it does so only when the own-or-mut cell has the same value and subresource inside it, so the composites still agree on overlapping `imm` cells up to lifetimes.
 
 @@ 6.15 | Lemma | p. 8 | BoCa.Fig16.ResU.hash_of_pairwise
-> TODO
-Proof. TODO
+> If ρ₁ # ρ₂ and ρ₂ # ρ₃ and ρ₁ # ρ₃ then ρ₁ # ρ₂ ● ρ₃.
+Proof. The composite `ρ₁ ● ρ₂ ● ρ₃` is defined by Lemma 6.13, so it remains to show `✓(ρ₁ ● ρ₂ ● ρ₃)`, which by Lemmas 6.18 and 6.20 is definedness of `ex(ρ₁)_● ● ex(ρ₂)_● ● ex(ρ₃)_● ● (ag(ρ₁) ○ ag(ρ₂) ○ ag(ρ₃))`.  By assumption the three flattenings `⦇ρᵢ ● ρⱼ⦈ = ex(ρᵢ)_● ● ex(ρⱼ)_● ● (ag(ρᵢ) ○ ag(ρⱼ))` are defined, so the `ex(ρᵢ)_●` are pairwise `●`-composable and the `ag(ρᵢ)` pairwise `○`-composable, and Lemmas 6.13 and 6.14 give the two triple composites.  By two applications of Lemma 6.12 it remains that `ex(ρ₁)_● ● ex(ρ₂)_● ● ex(ρ₃)_● ● ag(ρᵢ)` is defined for each `i`; for `i = 1`, `ex(ρ₁)_●`, `ex(ρ₂)_● ● ex(ρ₃)_●` and `ag(ρ₁)` are pairwise composable by assumption, so Lemma 6.13 applies, and the other two are analogous.

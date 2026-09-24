@@ -2,10 +2,10 @@ import Paper.S1_Syntax.Definitions
 import Paper.S2_Statics.Definitions
 import Paper.S4_LogicalRelation.Definitions
 import Paper.S5_Model.Definitions
+import Paper.S6_1_StandardLemmas.Lemmas
 import Support.LogicalRelation.ClosedJudgment
 import Support.LogicalRelation.ClosingSubstitutions
 import Support.LogicalRelation.Facts
-import Support.Model.Algebra
 import Support.Model.Propositions
 import Support.Statics.Contexts
 

@@ -1,6 +1,10 @@
 import Paper.S1_Syntax.Definitions
+import Paper.S3_Dynamics.Definitions
 import Paper.S5_Model.Definitions
+import Paper.S6_1_StandardLemmas.Lemmas
+import Support.Dynamics.Machine
 import Support.Model.Algebra
+import Support.Model.AlgebraInstances
 import Support.Model.Composition
 
 /-!
@@ -17,6 +21,20 @@ noncomputable section
 namespace BoCa.Fig16.BoLo
 variable {Loc Val : Type}
 
+/-- `P ⊨ Q`. -/
+def Entails (P Q : SPropU Loc Val) : Prop := ∀ ρ, P ρ → Q ρ
+
+end BoCa.Fig16.BoLo
+
+namespace BoCa.Fig16.BoLo
+
+@[inherit_doc] scoped infix:25 " ⊨ " => Entails
+
+end BoCa.Fig16.BoLo
+
+namespace BoCa.Fig16.BoLo
+variable {Loc Val : Type}
+
 theorem emp_empty : (emp : SPropU Loc Val) PMap.empty := ⟨rfl, trivial⟩
 
 /-- `∅ ● ρ = ρ` — `[TR]` Lemma 6.4 with the operands transposed, which Lemma 6.2
@@ -27,6 +45,41 @@ theorem compS_empty_left (ρ : ResU Loc Val) : ResU.CompS PMap.empty ρ ρ :=
 theorem eq_of_compS_empty_left {ρ₂ ρ : ResU Loc Val} (h : ResU.CompS PMap.empty ρ₂ ρ) :
     ρ = ρ₂ :=
   ResU.CompS.functional h (compS_empty_left ρ₂)
+
+theorem Outlives.mono {ρ : ResU Loc Val} {α β : Life} (h : β ⊑ α) (ho : Outlives ρ α) :
+    Outlives ρ β := ResU.InStratum.mono h ho
+
+/-- The lifetime of a strict composite bounds each operand's and is bounded by
+them — `[TR]` Lemma 6.45 read at `[α]`'s own conjunct.  `[as printed]` -/
+theorem outlives_comp {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ) (α : Life) :
+    Outlives ρ α ↔ (Outlives ρ₁ α ∧ Outlives ρ₂ α) := by
+  constructor
+  · intro hρ
+    constructor
+    · intro l ψ₁ e₁
+      rcases h.get l with ⟨f₁, -, -⟩ | ⟨χ, f₁, -, f⟩ | ⟨χ, f₁, -, -⟩ |
+          ⟨χ₁, χ₂, χ, f₁, -, f, hC⟩
+      · rw [e₁] at f₁; exact absurd f₁ (by simp)
+      · rw [e₁] at f₁; cases Option.some.inj f₁; exact hρ l _ f
+      · rw [e₁] at f₁; exact absurd f₁ (by simp)
+      · rw [e₁] at f₁; cases Option.some.inj f₁
+        exact ((CellU.CompS.inStratum hC α).mp (hρ l _ f)).1
+    · intro l ψ₂ e₂
+      rcases h.get l with ⟨-, f₂, -⟩ | ⟨χ, -, f₂, -⟩ | ⟨χ, -, f₂, f⟩ |
+          ⟨χ₁, χ₂, χ, -, f₂, f, hC⟩
+      · rw [e₂] at f₂; exact absurd f₂ (by simp)
+      · rw [e₂] at f₂; exact absurd f₂ (by simp)
+      · rw [e₂] at f₂; cases Option.some.inj f₂; exact hρ l _ f
+      · rw [e₂] at f₂; cases Option.some.inj f₂
+        exact ((CellU.CompS.inStratum hC α).mp (hρ l _ f)).2
+  · rintro ⟨h₁, h₂⟩ l ψ e
+    rcases h.get l with ⟨-, -, f⟩ | ⟨χ, f₁, -, f⟩ | ⟨χ, -, f₂, f⟩ |
+        ⟨χ₁, χ₂, χ, f₁, f₂, f, hC⟩
+    · rw [e] at f; exact absurd f (by simp)
+    · rw [e] at f; cases Option.some.inj f; exact h₁ l _ f₁
+    · rw [e] at f; cases Option.some.inj f; exact h₂ l _ f₂
+    · rw [e] at f; cases Option.some.inj f
+      exact (CellU.CompS.inStratum hC α).mpr ⟨h₁ l _ f₁, h₂ l _ f₂⟩
 
 /-- **`ℓ ↦M_α P̂` is inhabited exactly where the cell is.**  The printed
 equation `ρ = ℓ ↦ mut(β, v, ρ′, P̂)` pins the cell's own invariant, so the `P̂` a
@@ -52,6 +105,34 @@ theorem hash_valid_comp {ρ₁ ρ₂ σ : WRes} (h : ResU.Hash ρ₁ ρ₂)
   obtain ⟨x, hx, hv⟩ := h.2
   cases ResU.CompS.functional hx hc
   exact hv
+
+/-- `ρ₁ # ρ₂` gives `✓ρ₁` and `✓ρ₂` — `[TR]` Lemma 6.10 at the composite `#`
+asserts is valid.  `[as printed]` (6.10, at the bundled `#`) -/
+theorem hash_valid {ρ₁ ρ₂ : WRes} (h : ResU.Hash ρ₁ ρ₂) :
+    ResU.Valid ρ₁ ∧ ResU.Valid ρ₂ := by
+  obtain ⟨σ, hσ, hv⟩ := h.2
+  exact ResU.Valid.split hσ hv
+
+/-- **The two readings of `↭` agree inside the row.**  `ResU.UpdV` is
+`ResU.Upd` with `✓` on each side, and the row already asserts both: `✓ρ` is the
+printed `ρ_f # ρ` through `[TR]` Lemma 6.10, and `✓(ρ′ ● ρ⁺)` is the printed
+`ρ⁺ # (ρ_f ● ρ′)` through `[TR]` Lemma 6.11.  So ledger D3 does not separate the two
+documents here.  `[about ours: the two printed `↭`s, read inside the printed
+row]` -/
+theorem wp_updV_iff_upd (e : Expr) (Q : Val → WProp) (ρ : WRes) :
+    wp e Q ρ ↔ wpU e Q ρ := by
+  constructor
+  · intro hw ρf hf
+    obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+      hA, hB, hC⟩ := hw ρf hf
+    exact ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+      hA.1, hB, hC⟩
+  · intro hw ρf hf
+    obtain ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+      hA, hB, hC⟩ := hw ρf hf
+    obtain ⟨-, hp'⟩ := ResU.Hash.split h₂ (ResU.hash_symm h₃)
+    exact ⟨ρ', ρp, fρ, fρ', fρ'p, π, v, μ, μ', h₁, h₂, h₃, h₄, h₅, h₆, h₇, h₈, h₉,
+      ⟨hA, (hash_valid hf).2, hash_valid_comp hp' h₉⟩, hB, hC⟩
 
 end BoCa.Fig16.BoLo
 

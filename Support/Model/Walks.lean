@@ -202,43 +202,6 @@ theorem BigComp.functional (hC : ResU.CompLaws C)
           cases ih hτ'
           exact ResU.Comp.functional hC.functional hc hc'
 
-/-- Exchanging the first two entries of the fold leaves value and definedness
-alone.  Reading `hc₂ : σ₂ ◐ τ = χ` and `hc₁ : σ₁ ◐ χ = b`: Lemma 6.3
-reassociates to `(σ₁ ◐ σ₂) ◐ τ = b`, Lemma 6.2 turns the head pair round, and
-6.3 again puts `σ₂` outside, which is the transposed fold.  `swap` is the only
-`List.Perm` constructor that is not structural, so this is the whole content of
-`BigComp.of_perm`.
-`[about ours: `[TR]` Lemmas 6.2 and 6.3 read at one step of §16's fold]` -/
-theorem BigComp.swap (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
-    {σ₁ σ₂ : ResU Loc Val} {l : List (ResU Loc Val)} {b : ResU Loc Val}
-    (h : BigComp R C (σ₁ :: σ₂ :: l) b) : BigComp R C (σ₂ :: σ₁ :: l) b := by
-  cases h with
-  | cons h₁ hc₁ =>
-      cases h₁ with
-      | cons h₂ hc₂ =>
-          obtain ⟨y, h₁₂, hy⟩ :=
-            (ResU.Comp.assoc hR hC.assoc _ _ _ b).mp ⟨_, hc₂, hc₁⟩
-          obtain ⟨x, hx, hb⟩ :=
-            (ResU.Comp.assoc hR hC.assoc _ _ _ b).mpr
-              ⟨y, ResU.Comp.comm_of_laws hR hC h₁₂, hy⟩
-          exact BigComp.cons (BigComp.cons h₂ hx) hb
-
-/-- Reordering the folded list carries the graph across unchanged — definedness
-travels with the value, which is what settles §16's worry that the existential
-over orderings could make `⨀` newly defined.
-`[about ours: the order-independence of §16's fold, in transport form]` -/
-theorem BigComp.of_perm (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂) (hC : ResU.CompLaws C)
-    {l l' : List (ResU Loc Val)} (hp : l.Perm l') :
-    ∀ {b : ResU Loc Val}, BigComp R C l b → BigComp R C l' b := by
-  induction hp with
-  | nil => exact fun h => h
-  | cons σ _ ih =>
-      intro b h
-      cases h with
-      | cons hτ hc => exact BigComp.cons (ih hτ) hc
-  | swap σ₁ σ₂ l => exact fun h => BigComp.swap hR hC h
-  | trans _ _ ih₁ ih₂ => exact fun h => ih₂ (ih₁ h)
-
 /-- Reading the exclusive family off its list: an entry is a `mut` location of
 `ρ` paired with *a* walk of that cell's witness.  Proved by induction on the
 list rather than on the derivation, which avoids the mutual recursor. -/

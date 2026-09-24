@@ -1,7 +1,10 @@
 import Paper.S1_Syntax.Definitions
+import Paper.S2_Statics.Definitions
+import Paper.S4_LogicalRelation.Definitions
 import Paper.S5_Model.Definitions
 import Support.Model.Notation
 import Support.Model.Propositions
+import Support.Statics.Contexts
 
 /-!
 # Support — LogicalRelation — Facts
@@ -17,7 +20,7 @@ noncomputable section
 namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
-open BoCa.Lifetime (LifeCtx LifeVar)
+open BoCa.Lifetime (LSub LifeCtx LifeVar)
 open BoCa.BoLo (Heap Steps Step1 Head Kont)
 
 /-- `(⌜p⌝ ⋆ P)(ρ) ⟺ p ∧ P(ρ)`.
@@ -32,6 +35,9 @@ theorem pure_sep_iff {p : Prop} {P : WProp} {ρ : WRes} : (⌜p⌝ ⋆ P) ρ ↔
 
 theorem pure_sep_mk {p : Prop} {P : WProp} {ρ : WRes} (hp : p) (hP : P ρ) :
     (⌜p⌝ ⋆ P) ρ := pure_sep_iff.mpr ⟨hp, hP⟩
+
+theorem gDen_iff {δ : LSub} {Γ : Ctx Ty} {γ : List Val} {ρ : WRes} :
+    gDen δ Γ γ ρ ↔ (Ctx.LiveWithin Γ γ ∧ gSep δ Γ γ ρ) := pure_sep_iff
 
 end BoCa.Fig16.LogRel
 

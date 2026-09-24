@@ -1,0 +1,122 @@
+import Paper.S1_Syntax.Definitions
+import Paper.S5_Model.Definitions
+import Paper.S6_1_StandardLemmas.Lemmas
+import Support.Model.Flattening
+import Support.Model.Update
+import Support.Model.Walks
+
+/-!
+# Support — Model — UpdateFrame
+
+`[about ours]`.  Nothing in this file is printed in the paper.  It holds what the
+paper's definitions and results need in Lean and the paper leaves implicit:
+the pointwise route through Lemma 6.48: `⦇−⦈` of a `○`-composite and the cell-level update.  Declaration names are the source repository's (`borrow_lang` at
+`970a9d0`), unchanged; `Bridge/Names.csv` maps each to its origin.
+-/
+
+noncomputable section
+
+namespace BoCa.Fig16.BoLo
+open BoCa.Fig16
+open BoCa.BoLo (Heap Steps Step1 Head Kont)
+
+theorem optComp_left_none
+    {C C' : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val →
+      CellU BoCa.Loc BoCa.Val → Prop}
+    {o₂ o : Option (CellU BoCa.Loc BoCa.Val)} (h : OptComp C none o₂ o) :
+    OptComp C' none o₂ o := by
+  cases o₂ <;> exact h
+
+theorem optComp_right_none
+    {C C' : CellU BoCa.Loc BoCa.Val → CellU BoCa.Loc BoCa.Val →
+      CellU BoCa.Loc BoCa.Val → Prop}
+    {o₁ o : Option (CellU BoCa.Loc BoCa.Val)} (h : OptComp C o₁ none o) :
+    OptComp C' o₁ none o := by
+  cases o₁ <;> exact h
+
+/-- **`⦇ρ₁ ● ρ₂⦈ = ⦇ρ₁⦈ ○ ⦇ρ₂⦈.**  `[TR]` 6.48's proof takes this apart into
+the three domains `ex(ρ₁)`, `ex(ρ₂)` and `ag(ρ₁) ○ ag(ρ₂)`; here it is one
+equation, from `Fig16.ResU.Flat.split_factors` (6.18 and 6.20) plus `[TR]`
+Lemma 6.36 — the exclusive part is `imm`-free, so it is disjoint from the
+aliasable part and the two exclusive parts are disjoint from each other, and at
+a location where one operand is silent `●` and `○` agree.
+`[about ours: the factorisation `[TR]` 6.48's proof performs, as an equation
+between flattenings]` -/
+theorem flat_compR {ρ₁ ρ₂ ρ₁₂ σ : WRes} (h : ResU.CompS ρ₁ ρ₂ ρ₁₂)
+    (hσ : ResU.Flat ρ₁₂ σ) :
+    ∃ σ₁ σ₂, ResU.Flat ρ₁ σ₁ ∧ ResU.Flat ρ₂ σ₂ ∧ ResU.CompR σ₁ σ₂ σ := by
+  obtain ⟨e₁, e₂, e, a₁, a₂, a, σ₁, σ₂, he₁, he₂, hec, ha₁, ha₂, hac, hc, hσ₁, hσ₂⟩ :=
+    ResU.Flat.split_factors h hσ
+  have himm : e.ImmFree := ResU.ImmFree.compS hec (ExS.immFree he₁) (ExS.immFree he₂)
+  have hdisj := ResU.CompatS.disjoint_of_immFree himm hc.1
+  have hd12 := ResU.CompatS.disjoint_of_immFree (ExS.immFree he₁) hec.1
+  have key : ∀ l, (σ₁.get l = e₁.get l ∧ σ₂.get l = e₂.get l ∧ σ.get l = e.get l)
+      ∨ (σ₁.get l = a₁.get l ∧ σ₂.get l = a₂.get l ∧ σ.get l = a.get l) := by
+    intro l
+    rcases hdisj l with hnoE | hnoA
+    · obtain ⟨f₁, f₂⟩ := (ResU.Comp.eq_none_iff hec l).mp hnoE
+      exact Or.inr ⟨ResU.Comp.get_of_left_none hσ₁ f₁,
+        ResU.Comp.get_of_left_none hσ₂ f₂, ResU.Comp.get_of_left_none hc hnoE⟩
+    · obtain ⟨g₁, g₂⟩ := (ResU.Comp.eq_none_iff hac l).mp hnoA
+      exact Or.inl ⟨ResU.Comp.get_of_right_none hσ₁ g₁,
+        ResU.Comp.get_of_right_none hσ₂ g₂, ResU.Comp.get_of_right_none hc hnoA⟩
+  refine ⟨σ₁, σ₂, ⟨e₁, a₁, he₁, ha₁, hσ₁⟩, ⟨e₂, a₂, he₂, ha₂, hσ₂⟩, ?_, ?_⟩
+  · intro l ψ₁ ψ₂ f₁ f₂
+    rcases key l with ⟨k₁, k₂, -⟩ | ⟨k₁, k₂, -⟩
+    · rw [k₁] at f₁; rw [k₂] at f₂
+      rcases hd12 l with hn | hn
+      · rw [hn] at f₁; exact absurd f₁ (by simp)
+      · rw [hn] at f₂; exact absurd f₂ (by simp)
+    · rw [k₁] at f₁; rw [k₂] at f₂; exact hac.1 l ψ₁ ψ₂ f₁ f₂
+  · intro l
+    rcases key l with ⟨k₁, k₂, k⟩ | ⟨k₁, k₂, k⟩
+    · rw [k₁, k₂, k]
+      have hp := hec.2 l
+      rcases hd12 l with hn | hn
+      · rw [hn] at hp ⊢; exact optComp_left_none hp
+      · rw [hn] at hp ⊢; exact optComp_right_none hp
+    · rw [k₁, k₂, k]; exact hac.2 l
+
+/-- `ψ` is a `mut` cell of lifetime `b` and invariant `P̂` — the data `↭`'s
+second clause fixes, with the value and the witness left free as the print's two
+underscores leave them. -/
+def IsMutSig (ψ : CellU BoCa.Loc BoCa.Val) (b : Life)
+    (P : Val → SPropS BoCa.Loc BoCa.Val b) : Prop :=
+  ∃ (v : Val) (χ : WRes) (h : χ.InStratum b) (hw : P v ⟨χ, h⟩),
+    ψ = CellU.mutOf b v χ h P hw
+
+/-- `↭`'s two clauses at one location of the two flattenings: an `imm` cell is
+fixed outright, and a `mut` cell's lifetime and invariant are fixed while its
+value and witness are free.  `Fig16.ResU.UpdImm` and `Fig16.ResU.UpdMut` are the
+conjunction of this over all locations.
+`[about ours: `[TR]` p. 5's `↭`, at one location of the flattenings]` -/
+def CellUpd (o o' : Option (CellU BoCa.Loc BoCa.Val)) : Prop :=
+  (∀ (s : LSet) (v : Val) (χ : WRes) (h : χ.InStratum s.join),
+      o = some (CellU.immOf s v χ h) ↔ o' = some (CellU.immOf s v χ h)) ∧
+  (∀ (b : Life) (P : Val → SPropS BoCa.Loc BoCa.Val b),
+      (∃ ψ, o = some ψ ∧ IsMutSig ψ b P) ↔ (∃ ψ, o' = some ψ ∧ IsMutSig ψ b P))
+
+/-- `↭` read at one location of the two flattenings. -/
+theorem cellUpd_of_upd {ρ₁ ρ₂ σ₁ σ₂ : WRes} (h : ResU.Upd ρ₁ ρ₂)
+    (h₁ : ResU.Flat ρ₁ σ₁) (h₂ : ResU.Flat ρ₂ σ₂) (l : BoCa.Loc) :
+    CellUpd (σ₁.get l) (σ₂.get l) := by
+  refine ⟨fun s v χ hh => ?_, fun b P => ?_⟩
+  · rw [← ResU.flatAt_iff h₁, ← ResU.flatAt_iff h₂]
+    exact h.1 l s v χ hh
+  · constructor
+    · rintro ⟨ψ, hψ, v, χ, hh, hw, rfl⟩
+      obtain ⟨v', χ', hh', hw', hg⟩ :=
+        (h.2 l b P).mp ⟨v, χ, hh, hw, (ResU.flatAt_iff h₁ _ _).mpr hψ⟩
+      exact ⟨_, (ResU.flatAt_iff h₂ _ _).mp hg, ⟨v', χ', hh', hw', rfl⟩⟩
+    · rintro ⟨ψ, hψ, v, χ, hh, hw, rfl⟩
+      obtain ⟨v', χ', hh', hw', hg⟩ :=
+        (h.2 l b P).mpr ⟨v, χ, hh, hw, (ResU.flatAt_iff h₂ _ _).mpr hψ⟩
+      exact ⟨_, (ResU.flatAt_iff h₁ _ _).mp hg, ⟨v', χ', hh', hw', rfl⟩⟩
+
+/-- `CellUpd` is reflexive. -/
+theorem CellUpd.refl (o : Option (CellU BoCa.Loc BoCa.Val)) : CellUpd o o :=
+  ⟨fun _ _ _ _ => Iff.rfl, fun _ _ => Iff.rfl⟩
+
+end BoCa.Fig16.BoLo
+
+end

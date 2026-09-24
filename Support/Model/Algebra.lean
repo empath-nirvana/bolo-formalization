@@ -59,34 +59,6 @@ theorem CellU.CompS.comm {ψ₁ ψ₂ ψ : CellU Loc Val} (h : CellU.CompS ψ₁
   rw [e₃]
   exact CellU.immOf_congr hu rfl rfl h₃ _
 
-/-- **`[TR]` Lemma 6.2** (p. 6): `ρ₁ ◐ ρ₂ = ρ₂ ◐ ρ₁`.  As a graph this is
-definedness and value together, which is the print's equation between partial
-expressions.  Stated once in the schema and discharged below at both `●` and
-`○`, which is how the print proves it.  `[as printed]` -/
-theorem ResU.Comp.comm {R : CellU Loc Val → CellU Loc Val → Prop}
-    {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
-    (hR : ∀ ψ₁ ψ₂, R ψ₁ ψ₂ → R ψ₂ ψ₁)
-    (hC : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → C ψ₂ ψ₁ ψ)
-    {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.Comp R C ρ₁ ρ₂ ρ) :
-    ResU.Comp R C ρ₂ ρ₁ ρ := by
-  refine ⟨ResU.Compat.comm hR h.1, fun l => ?_⟩
-  rcases h.get l with ⟨e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ |
-      ⟨ψ₁, ψ₂, ψ, e₁, e₂, e, hC'⟩ <;> rw [e₁, e₂]
-  · exact e
-  · exact e
-  · exact e
-  · exact ⟨ψ, e, hC _ _ _ hC'⟩
-
-/-- `[TR]` Lemma 6.2 at `●`.  `[as printed]` -/
-theorem ResU.CompS.comm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompS ρ₁ ρ₂ ρ) :
-    ResU.CompS ρ₂ ρ₁ ρ :=
-  ResU.Comp.comm (fun _ _ a => a.symm) (fun _ _ _ a => a.comm) h
-
-/-- `[TR]` Lemma 6.2 at `○`.  `[as printed]` -/
-theorem ResU.CompR.comm {ρ₁ ρ₂ ρ : ResU Loc Val} (h : ResU.CompR ρ₁ ρ₂ ρ) :
-    ResU.CompR ρ₂ ρ₁ ρ :=
-  ResU.Comp.comm (fun _ _ a => a.symm) (fun _ _ _ a => a.comm) h
-
 /-- `●` is associative on cells.  Both sides compose three `imm` cells over one
 `v` and one `ρ`, and the lifetime set of the result is the three-fold union
 either way, so this is `LSet.union_assoc` and nothing else — which is what
@@ -651,49 +623,6 @@ theorem ResU.Comp.swap {R : CellU Loc Val → CellU Loc Val → Prop}
   · exact fun h => ⟨fun l ψ₁ ψ₂ e₁ e₂ => h.1 l ψ₂ ψ₁ e₂ e₁,
       fun l => (OptComp.swap _ _ _).mpr (h.2 l)⟩
 
-/-- **`[TR]` Lemma 6.3** (p. 6, its `○` case on p. 7):
-`ρ₁ ◐ (ρ₂ ◐ ρ₃) = ρ₁ ◐ ρ₂ ◐ ρ₃`.  Both sides are partial, so the printed
-equation is the Kleene equality of the two partial expressions: at every result
-`w`, one side is defined with value `w` exactly when the other is.  Stated once
-in the schema, as the print states it; `hR` and `hC` are the print's own facts
-about the cell-level `◐` the schema is instantiated at, discharged below at both
-`●` and `○`, which is how the print proves it.  `[as printed]` -/
-theorem ResU.Comp.assoc {R : CellU Loc Val → CellU Loc Val → Prop}
-    {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop}
-    (hR : ∀ ψ₁ ψ₂ ψ, C ψ₁ ψ₂ ψ → R ψ₁ ψ₂)
-    (hC : ∀ ψ₁ ψ₂ ψ₃ ω, (∃ χ, C ψ₂ ψ₃ χ ∧ C ψ₁ χ ω) ↔ (∃ υ, C ψ₁ ψ₂ υ ∧ C υ ψ₃ ω))
-    (ρ₁ ρ₂ ρ₃ w : ResU Loc Val) :
-    (∃ x, ResU.Comp R C ρ₂ ρ₃ x ∧ ResU.Comp R C ρ₁ x w) ↔
-    (∃ y, ResU.Comp R C ρ₁ ρ₂ y ∧ ResU.Comp R C y ρ₃ w) := by
-  constructor
-  · rintro ⟨x, h₂₃, h₁x⟩
-    exact ResU.Comp.assoc_left hR (fun a b c d => (hC a b c d).mp) h₂₃ h₁x
-  · rintro ⟨y, h₁₂, hy₃⟩
-    obtain ⟨x, hx, hw⟩ :=
-      ResU.Comp.assoc_left (R := fun a b => R b a) (C := fun a b c => C b a c)
-        (fun ψ₁ ψ₂ ψ h => hR ψ₂ ψ₁ ψ h)
-        (fun ψ₁ ψ₂ ψ₃ ω h => (hC ψ₃ ψ₂ ψ₁ ω).mpr h)
-        ((ResU.Comp.swap _ _ _).mpr h₁₂) ((ResU.Comp.swap _ _ _).mpr hy₃)
-    exact ⟨x, (ResU.Comp.swap _ _ _).mp hx, (ResU.Comp.swap _ _ _).mp hw⟩
-
-/-- `[TR]` Lemma 6.3 at `●`.  `[as printed]` -/
-theorem ResU.CompS.assoc (ρ₁ ρ₂ ρ₃ w : ResU Loc Val) :
-    (∃ x, ResU.CompS ρ₂ ρ₃ x ∧ ResU.CompS ρ₁ x w) ↔
-    (∃ y, ResU.CompS ρ₁ ρ₂ y ∧ ResU.CompS y ρ₃ w) :=
-  ResU.Comp.assoc (fun _ _ _ h => CellU.CompS.compat h)
-    (fun ψ₁ ψ₂ ψ₃ ω => CellU.compS_assoc ψ₁ ψ₂ ψ₃ ω) ρ₁ ρ₂ ρ₃ w
-
-/-- **`[TR]` Lemma 6.4** (p. 7): `ρ ◐ ∅ = ρ`.  Definedness and value together,
-in the schema, hence at both `●` and `○`.  `[as printed]` -/
-theorem ResU.comp_empty_right {R : CellU Loc Val → CellU Loc Val → Prop}
-    {C : CellU Loc Val → CellU Loc Val → CellU Loc Val → Prop} (ρ : ResU Loc Val) :
-    ResU.Comp R C ρ PMap.empty ρ := by
-  refine ⟨ResU.Compat.of_disjoint (fun _ => Or.inr rfl), fun l => ?_⟩
-  show OptComp C (ρ.get l) none (ρ.get l)
-  cases e : ρ.get l with
-  | none => rfl
-  | some ψ => rfl
-
 /-- `ρ ○ ρ = ρ` — clause (1) of `○` read pointwise.  Stronger than the instance
 `[TR]` Lemma 6.19 needs, which is at `⦇ρ⦈_○` alone.
 `[about ours: an unconditional resource-level fact; 6.19 is its instance]` -/
@@ -706,41 +635,6 @@ theorem ResU.compR_self (ρ : ResU Loc Val) : ResU.CompR ρ ρ ρ := by
     cases e : ρ.get l with
     | none => rfl
     | some ψ => exact ⟨ψ, rfl, CellU.CompR.same ψ⟩
-
-/-- **`[TR]` Lemma 6.31** (p. 11): if `ρ ▶◀ ρ′` then `ρ ○ ρ′ = ρ ● ρ′`.  As an
-equality of graphs, which is definedness and value together.  `[as printed]` -/
-theorem ResU.compR_iff_compS {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.CompatS ρ₁ ρ₂)
-    (σ : ResU Loc Val) : ResU.CompR ρ₁ ρ₂ σ ↔ ResU.CompS ρ₁ ρ₂ σ := by
-  constructor
-  · intro hr
-    refine ⟨h, fun l => ?_⟩
-    rcases hr.get l with ⟨e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ |
-        ⟨ψ₁, ψ₂, ψ, e₁, e₂, e, hC⟩ <;> rw [e₁, e₂]
-    · exact e
-    · exact e
-    · exact e
-    · have hk := h l _ _ e₁ e₂
-      have hψ : ψ = CellU.compS _ _ hk :=
-        CellU.CompR.functional hC (CellU.CompR.strict hk)
-      exact ⟨ψ, e, hψ ▸ CellU.compS_spec _ _ hk⟩
-  · intro hs
-    refine ⟨fun l ψ₁ ψ₂ e₁ e₂ => CellU.CompatR.of_compatS (h l ψ₁ ψ₂ e₁ e₂), fun l => ?_⟩
-    rcases hs.get l with ⟨e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ | ⟨ψ, e₁, e₂, e⟩ |
-        ⟨ψ₁, ψ₂, ψ, e₁, e₂, e, hC⟩ <;> rw [e₁, e₂]
-    · exact e
-    · exact e
-    · exact e
-    · have hk := h l _ _ e₁ e₂
-      have hψ : ψ = CellU.compS _ _ hk :=
-        CellU.CompS.functional hC (CellU.compS_spec _ _ hk)
-      exact ⟨ψ, e, hψ ▸ CellU.CompR.strict hk⟩
-
-/-- **`[TR]` Lemma 6.6** (p. 7), one direction: `ρ₁ # ρ₂` implies `ρ₂ # ρ₁`.
-`[as printed]` -/
-theorem ResU.hash_symm {ρ₁ ρ₂ : ResU Loc Val} (h : ResU.Hash ρ₁ ρ₂) :
-    ResU.Hash ρ₂ ρ₁ := by
-  obtain ⟨hc, ρ, hcomp, hv⟩ := h
-  exact ⟨hc.symm, ρ, hcomp.comm, hv⟩
 
 end BoCa.Fig16
 
