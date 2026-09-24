@@ -1402,8 +1402,8 @@ always stated through the unfolding already proved equivalent to the printed rel
 
 ### §12.57 `reb_α`'s escrowed witness and the resources the calculus produces
 
-**The configuration.**  `DefectB.rebA β v u` is `0 ↦ imm({β}, v, 1↦own(u))`: a shared
-reborrow of location 0 whose witness claims location 1.  `DefectB.reb_rho2_rebA` shows it is a
+**The configuration.**  `DeepReborrow.rebA β v u` is `0 ↦ imm({β}, v, 1↦own(u))`: a shared
+reborrow of location 0 whose witness claims location 1.  `DeepReborrow.reb_rho2_rebA` shows it is a
 reborrow, by `reb_β`'s `own` clause with witness `π(0)/0 = 1↦own(u)`, of
 `0↦own(v) ⊎ 1↦own(u)`.  At `v = ()` the escrow corresponds to no program: compare, in Rust,
 
@@ -1454,7 +1454,7 @@ grounds the subset reading of `reb_α`'s `imm` clause adopted at §12.67(b) (def
 sentence inside 6.55's proof — *"`ρ` and `ρ′` differ only by potentially changing from own or
 mut to imm, but witnesses and values always stay the same"* (§12.60).  It is a named
 hypothesis on `Fig16.ResU.six53` and `Fig16.ResU.six55`, which are scored `proved*`.
-`Fig16.BoLo.defectB_not_rebEscrow` shows the configuration above is exactly what it excludes.
+`Fig16.BoLo.deepReborrow_not_rebEscrow` shows the configuration above is exactly what it excludes.
 
 ### §12.58 Definition 6.3's third bullet and the paragraph below it
 
@@ -1504,7 +1504,7 @@ the definition does: `Fig16.ResU.RebAt`'s first conjunct is `ℓ ∈ dom(π(ℓ)
 discharges what looks like per-location prose.
 
 **Consequence for §12.57.**  The two Rust programs there, and the observation that
-`DefectB.rebA`'s escrowed witness lies in no semantic type's image, stand.  The reason `rebA`
+`DeepReborrow.rebA`'s escrowed witness lies in no semantic type's image, stand.  The reason `rebA`
 is not a reborrow of a resource the calculus produces is the semantic-type criterion, not a
 condition of `reb_α`: against `reb_α` as printed, `rebA` is a legal reborrow.
 
@@ -1602,9 +1602,9 @@ notation is a family the binder scopes.
 picks one `β` below both `И` bounds and every later step reads `P̂` at that one `β`.  The
 `β`-independent statement is the instance at a `P̂` constant in its first argument, which is
 what Fig. 14's `(I Reborrow)` step applies and what `Fig16.BoLo.wp_reborrow_emp_applies`
-exercises.  `DefectB.wp_reborrow_unreconciled_at_split_view` is written at the same indexed
+exercises.  `DeepReborrow.wp_reborrow_unreconciled_at_split_view` is written at the same indexed
 shape, so the two results line up argument for argument and
-`Fig16.BoLo.defectB_not_rebEscrow` is the whole of what separates them.
+`Fig16.BoLo.deepReborrow_not_rebEscrow` is the whole of what separates them.
 
 ### §12.62 [TR] 6.130's `P` is one of the printed `SProp_α`, and `↺_α emp` is `Res_α`
 
@@ -1789,7 +1789,7 @@ closure lemmas read as its recursor.
 step asks that every recorded lifetime be outstanding, a condition of the same species as
 `✓` — [CONF] 415:21's "every pair of aliases map to the same object and each has an immutable
 ancestor", which is likewise absent from `Res`'s grammar and assumed by `wp`: *"The weakest
-precondition assumes validity of the pre-resource."*  `Fig16.LogRel.MutImmGap.cell` and `Fig16.LogRel.MutImmGap.lset` are the
+precondition assumes validity of the pre-resource."*  `Fig16.LogRel.MutImmCell.cell` and `Fig16.LogRel.MutImmCell.lset` are the
 cell and lifetime set at which, under the literal `α ⊑ ⊔β̄`, `𝒱⟦Mut @a (Imm @b 1)⟧` is empty.
 With the connective at `⊓β̄` (§12.67(a)), 6.60's `Imm` case needs no licence on the recorded
 borrows.
@@ -1829,9 +1829,9 @@ index `α` by the longest among them"*, and [TR] p. 6 prints `⊔`. Read literal
 requires the following. 6.60's `Imm` step does not follow, because `⊔β̄` and `@ρ = ⊓β̄` bound
 different members. Also, `𝒱⟦Mut @a T⟧δ` is empty whenever `T` has a top-level `Imm`, because
 `𝒱⟦Imm @b T′⟧δ` then leaves every stratum. The library records the cell behind that
-measurement, an `imm` cell recording `{α₀, β}` (`Fig16.LogRel.MutImmGap.cell`,
-`Fig16.LogRel.MutImmGap.lset_meet`). Under the `⊓β̄` reading this cell is in `𝒱⟦Imm @b 1⟧δ`
-only where `@bδ ⊑ α₀ ⊓ β`, and `Fig16.LogRel.MutImmGap.inRel_same` is the case `β = α₀`.
+measurement, an `imm` cell recording `{α₀, β}` (`Fig16.LogRel.MutImmCell.cell`,
+`Fig16.LogRel.MutImmCell.lset_meet`). Under the `⊓β̄` reading this cell is in `𝒱⟦Imm @b 1⟧δ`
+only where `@bδ ⊑ α₀ ⊓ β`, and `Fig16.LogRel.MutImmCell.inRel_same` is the case `β = α₀`.
 
 **What the `⊓β̄` reading costs.** [TR] 6.115 (`I-ag`) concludes at `α ⊔ β`. Over the
 connective at `⊓β̄`, two cells at `{1}` and `{2}` compose to `{1, 2}`, whose meet
@@ -1879,7 +1879,7 @@ value and witness, in every stratum the source cell is in.
 * An argument `ℓ₂ ↦ imm({1}, ℓ₀, ρ″)`, whose witness owns `ℓ₀`.
 * A callback resource that holds the view `ℓ₀ ↦ imm({1}, (ℓ₁,()), ∅)`.
 
-`ρ₁ ● ρ₂` is `✓` (`DefectB.Valid_composite`), and the callback is in its type
+`ρ₁ ● ρ₂` is `✓` (`DeepReborrow.Valid_composite`), and the callback is in its type
 (`Fig16.LogRel.ViewWitness.f_den`). `withload` hands the callback `ℓ₀`, and the callback gets
 stuck (`Fig16.LogRel.ViewWitness.run_stuck`). So three things are refused at this
 configuration:

@@ -26,9 +26,9 @@ import Support.Syntax.Terms
   (`stuck_wInj`, `stuck_wSeq`), `TR3.wp` is false at such a term
   (`wp_inj₁_false`, `wp_seq_false`, with `wp_stuck_false_nonvacuous`), and
   `TR3.wp` is strictly below the library's `wp` (`wp_lt_fig16`);
-* 6.150 (`↺ rule`): `DefectB.wp_reborrow_unreconciled_at_split_view`, the
+* 6.150 (`↺ rule`): `DeepReborrow.wp_reborrow_unreconciled_at_split_view`, the
   entailment written without the hypothesis `RebEscrow`, measured at a configuration
-  built in this file (namespace `DefectB`), and `defectB_not_rebEscrow`,
+  built in this file (namespace `DeepReborrow`), and `deepReborrow_not_rebEscrow`,
   that configuration outside `RebEscrow` — the two stand together.
 
 **How this file reads.**  Each run opens with the result it measures and says where
@@ -129,7 +129,7 @@ theorem wp_lt_fig16 (l : BoCa.Loc) :
 
 end BoCa.TR3
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -199,9 +199,9 @@ theorem mk3_ne {a b c l : Nat} (x y z : CellU Nat BoCa.Val) (ha : l ≠ a) (hb :
   show (if l = a then some x else if l = b then some y else if l = c then some z else none) = none
   rw [if_neg ha, if_neg hb, if_neg hc]
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -428,7 +428,7 @@ theorem flat_composite : ResU.Flat (comp α β v u w) (sigma α β v u w) :=
   ⟨PMap.empty, sigma α β v u w, exS_comp α β v u w, agW_comp α β v u w,
     ResU.comp_empty_left _⟩
 
-/-- **The counterexample state is valid** (defect B's `Valid_composite`). -/
+/-- **The configuration's composite is valid.** -/
 theorem Valid_composite : ResU.Valid (comp α β v u w) :=
   ⟨_, flat_composite α β v u w⟩
 
@@ -465,7 +465,7 @@ theorem rebA_0 : (rebA β v u).get 0 =
     some (CellU.immOf (LSet.singleton β) v (witU u) (witU_stratum u _)) :=
   ResU.single_get_self _ _
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
 namespace BoCa.Fig16.BoLo
 open BoCa.Fig16
@@ -476,7 +476,7 @@ open BoCa.BoLo (Heap Steps)
 
 The printed statement, the printed proof and the adjudication are in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean`, under the record of Theorem 6.150 (↺ rule).
 -/
-/-- **The `DefectB` configuration fails `RebEscrow`'s escrow half.**
+/-- **The `DeepReborrow` configuration fails `RebEscrow`'s escrow half.**
 `ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)` reborrows at `β` to `rebA β = 0↦imm({β}, 𝓋, 1↦own(𝓋))`
 — the `own` clause of `reb_β`, whose witness `reb_β` fabricates — while
 `ag(comp)`, the aliasable walk of the very composite the refutation is taken at,
@@ -484,31 +484,31 @@ carries `0↦imm({β}, 𝓋, ∅)` there.  `∅ ≠ 1↦own(𝓋)`, which is exa
 `Fig16.EscrowAgree` forbids.  The refutation is written at the same `β`-indexed
 `P̂` the rule above takes, so the escrow conjunct is the whole of what
 separates the two results.
-`[about ours: the `DefectB` witness measured against this rule's added
+`[about ours: the `DeepReborrow` witness measured against this rule's added
 hypothesis]` -/
-theorem defectB_not_rebEscrow (b : Life) :
-    ResU.Reb b (BoCa.DefectB.rho2 BoCa.DefectB.𝓋 BoCa.DefectB.𝓋)
-        (BoCa.DefectB.rebA b BoCa.DefectB.𝓋 BoCa.DefectB.𝓋) →
+theorem deepReborrow_not_rebEscrow (b : Life) :
+    ResU.Reb b (BoCa.DeepReborrow.rho2 BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋)
+        (BoCa.DeepReborrow.rebA b BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋) →
     ¬ ∀ r a : WRes, AgW r a →
-        EscrowAgree (BoCa.DefectB.rho2 BoCa.DefectB.𝓋 BoCa.DefectB.𝓋)
-          (BoCa.DefectB.rebA b BoCa.DefectB.𝓋 BoCa.DefectB.𝓋) a := by
+        EscrowAgree (BoCa.DeepReborrow.rho2 BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋)
+          (BoCa.DeepReborrow.rebA b BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋) a := by
   intro _ h
-  have hwit := h _ _ (BoCa.DefectB.agW_comp ⊤ b BoCa.DefectB.𝓋 BoCa.DefectB.𝓋 BoCa.DefectB.𝓋)
-    0 BoCa.DefectB.𝓋 _ _ (BoCa.DefectB.rho2_0 _ _)
-    (BoCa.DefectB.rebA_0 b BoCa.DefectB.𝓋 BoCa.DefectB.𝓋)
-    (BoCa.DefectB.sigma_0 ⊤ b BoCa.DefectB.𝓋 BoCa.DefectB.𝓋 BoCa.DefectB.𝓋)
+  have hwit := h _ _ (BoCa.DeepReborrow.agW_comp ⊤ b BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋)
+    0 BoCa.DeepReborrow.𝓋 _ _ (BoCa.DeepReborrow.rho2_0 _ _)
+    (BoCa.DeepReborrow.rebA_0 b BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋)
+    (BoCa.DeepReborrow.sigma_0 ⊤ b BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋 BoCa.DeepReborrow.𝓋)
     (by rw [CellU.kind_immOf]; exact fun c => Kind.noConfusion c)
-    (by rw [BoCa.DefectB.cellF_kind]; exact fun c => Kind.noConfusion c)
-  rw [BoCa.DefectB.cellF_wit, CellU.wit_immOf] at hwit
-  have hg : (PMap.empty : WRes).get 1 = (BoCa.DefectB.witU BoCa.DefectB.𝓋).get 1 := by
+    (by rw [BoCa.DeepReborrow.cellF_kind]; exact fun c => Kind.noConfusion c)
+  rw [BoCa.DeepReborrow.cellF_wit, CellU.wit_immOf] at hwit
+  have hg : (PMap.empty : WRes).get 1 = (BoCa.DeepReborrow.witU BoCa.DeepReborrow.𝓋).get 1 := by
     rw [hwit]
-  rw [PMap.empty_get, show (BoCa.DefectB.witU BoCa.DefectB.𝓋).get 1
-      = some (CellU.ownOf BoCa.DefectB.𝓋) from ResU.single_get_self _ _] at hg
+  rw [PMap.empty_get, show (BoCa.DeepReborrow.witU BoCa.DeepReborrow.𝓋).get 1
+      = some (CellU.ownOf BoCa.DeepReborrow.𝓋) from ResU.single_get_self _ _] at hg
   exact absurd hg (by simp)
 
 end BoCa.Fig16.BoLo
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -516,8 +516,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 variable (α β : Life) (v u w : BoCa.Val)
 
 /-! `[about ours]` — what the Lean of Lemma 6.150 needs; the paper prints nothing here. -/
-/-- **Defect B's `conclusion_fails`, generalised over the shallow cell's
-lifetime and value.**  The shallow imm `0↦imm(s, x, ∅)` and the deep reborrow
+/-- **The shallow and the deep `imm` cell are incompatible**, at any lifetime and
+value of the shallow cell.  The shallow imm `0↦imm(s, x, ∅)` and the deep reborrow
 `rebA β = 0↦imm({β}, v, 1↦own(u))` are strict-INCOMPATIBLE — their witnesses
 (`∅` vs `1↦own(u)`) differ. -/
 theorem noCompat (b : Life) (x : BoCa.Val) (c : Life) :
@@ -544,9 +544,9 @@ theorem rho2_del_0 : (rho2 v u).del 0 = witU u := by
     · rw [ResU.del_get_ne _ e0, rho2_ne v u e0 e1,
         show (witU u).get l = none from ResU.single_get_ne _ e1]
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -557,9 +557,9 @@ theorem mem_single {ρ p : ResU Nat BoCa.Val} {l : Nat}
   have he := List.mem_singleton.mp hm
   exact ⟨congrArg Prod.fst he, congrArg Prod.snd he⟩
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -593,9 +593,9 @@ theorem reb_rho2_rebA (hβ : (⊤ : Life) ⊐ β) :
     rw [rho2_0] at e
     exact absurd (Option.some.inj e) CellU.ownOf_ne_immOf
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -666,9 +666,9 @@ theorem lhs_holds :
         cases Option.some.inj e; exact ha
       · rw [ResU.single_get_ne _ hk] at e; exact absurd e (by simp)
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -686,7 +686,7 @@ proof (p. 39) spends the three composition lemmas, which are unstated on this
 carrier, so what is refuted below is a strictly weaker transcription than the
 one the paper proves.
 
-The witness is defect B — a valid composite holding a shallow view
+The configuration is `DeepReborrow` — a valid composite holding a shallow view
 `imm({β}, 𝓋, ∅)` at location 0, whose real owner sits inside the borrow cell's
 witness `ρ″ = 0↦own(𝓋) ⊎ 1↦own(𝓋)`: two views of one location disagreeing on
 ownership, which our `✓` does not exclude (`CompR.immOwn` checks the value and
@@ -694,7 +694,7 @@ not the witness) and which our frame calculus quantifies over.  The escrow our
 `reb_α` leaves is not pinned, because the lemma that pins it — 6.53, whose proof
 asserts *"witnesses and values always stay the same"* — is not transcribed.
 `Fig16.BoLo.RebEscrow` is that escrow taken as a hypothesis, and
-`Fig16.BoLo.defectB_not_rebEscrow` refutes it at this very configuration, so
+`Fig16.BoLo.deepReborrow_not_rebEscrow` refutes it at this very configuration, so
 the rule below and `Fig16.BoLo.wp_reborrow` stand together.
 `[about ours: our own `↺` row, written without 6.53/6.55/6.61, at one resource
 our `✓` admits — not a claim about the paper's rule.]` -/
@@ -707,6 +707,6 @@ theorem wp_reborrow_unreconciled_at_split_view :
   intro hent
   exact no_wp_var Qpost (Valid_composite ⊤ ⊤ 𝓋 𝓋 𝓋) (hent _ lhs_holds)
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
 end

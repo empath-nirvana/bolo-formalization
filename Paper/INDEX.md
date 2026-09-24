@@ -353,7 +353,7 @@ Every numbered result of `[TR]` §6 and `[CONF]` §3, and every printed definiti
 | 4.14 | `Δ; Γ ⊨ e : T ≜ !∀ δ,γ. 𝒟⟦Δ⟧(δ) ─⋆ 𝒢⟦Γ⟧δ(γ) ─⋆ ℰ⟦T⟧δ(γ(e))` | `[repair]` | `Paper/S4_LogicalRelation/Definitions.lean`, `Support/TypedWorld/Relation.lean` | `Fig16.LogRel.SemTy`, `Fig16.LogRel.Typed.SemX` |
 | 4.15 | — no printed counterpart — | `[repair]` | `Paper/S4_LogicalRelation/Definitions.lean` | `Fig16.LogRel.LtLife`, `Fig16.LogRel.atLife` |
 | 4.16 | — no printed counterpart — | `[repair]` | `Paper/S4_LogicalRelation/Definitions.lean`, `Paper/S4_LogicalRelation/Remarks.lean` | `Fig16.LogRel.Supported`, `Fig16.LogRel.supported_iff`, `Fig16.LogRel.vDen_mut_of_supported`, `Fig16.LogRel.vDen_mut_supported` |
-| 4.17 | — no printed counterpart — | `[repair]` | `Paper/LiteralReadings/S4_LogicalRelation.lean` | `Fig16.LogRel.MutGapClosed.Tgap`, `Fig16.LogRel.MutImmGap.cell`, `Fig16.LogRel.MutImmGap.inRel_same`, `Fig16.LogRel.MutImmGap.lset` |
+| 4.17 | — no printed counterpart — | `[repair]` | `Paper/LiteralReadings/S4_LogicalRelation.lean` | `Fig16.LogRel.MutPayloadSubst.Tpayload`, `Fig16.LogRel.MutImmCell.cell`, `Fig16.LogRel.MutImmCell.inRel_same`, `Fig16.LogRel.MutImmCell.lset` |
 | 4.18 | — no printed counterpart — | `[about ours]` | `Paper/S4_LogicalRelation/Remarks.lean`, `Support/LogicalRelation/ClosedJudgment.lean` | `Fig16.LogRel.Sem`, `Fig16.LogRel.sem_iff` |
 | 5.1 | `SProp_α ≜ Res_α → ℙ` | `[as printed]` | `Paper/S5_Model/Definitions.lean` | `Fig16.SProp` |
 | 5.2 | `Res_α ≜ Loc ⇀ Cell_α` | `[repair]` | `Paper/S5_Model/Definitions.lean` | `Fig16.PMap`, `Fig16.Res` |

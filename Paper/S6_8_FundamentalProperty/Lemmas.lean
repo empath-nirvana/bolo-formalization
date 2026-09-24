@@ -365,9 +365,9 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.unitE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Literal reading.** `BoCa.Fig16.LogRel.unitE_refuted_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.TR3.derives_wSeq`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
+**Literal reading.** `BoCa.Fig16.LogRel.unitE_refused_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.TR3.derives_wSeq`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Note.** `Fig16.LogRel.unitE_compat`, on the printed carrier, `[as printed]`. **False over [TR] §3's own machine**, and checked: it binds `e₁` under the frame `K; e`, which the printed `K` grammar does not have, and the printed `1↦` fires only at a literal `()`. `Fig16.LogRel.unitE_refuted_on_TR3` exhibits both premises and the negated conclusion at `e₁ = free (alloc ())`, `e₂ = ()`, `T = 1` — a closed instance [TR] p. 2's `1E` types (`TR3.derives_wSeq`).
+**Note.** `Fig16.LogRel.unitE_compat`, on the printed carrier, `[as printed]`. **False over [TR] §3's own machine**, and checked: it binds `e₁` under the frame `K; e`, which the printed `K` grammar does not have, and the printed `1↦` fires only at a literal `()`. `Fig16.LogRel.unitE_refused_on_TR3` exhibits both premises and the negated conclusion at `e₁ = free (alloc ())`, `e₂ = ()`, `T = 1` — a closed instance [TR] p. 2's `1E` types (`TR3.derives_wSeq`).
 -/
 /-- **`[TR]` Lemma 6.154** (`1E-compat`, p. 40) `[as printed]`:
 
@@ -532,9 +532,9 @@ Schematic in `i`, as Lemma 6.72: one declaration per `i`.
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.sumI₁_compatX`, in `Support/TypedWorld/Compatibility.lean`; `BoCa.Fig16.LogRel.Typed.sumI₂_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Literal reading.** `BoCa.Fig16.LogRel.sumI₁_refuted_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.TR3.derives_wInj`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
+**Literal reading.** `BoCa.Fig16.LogRel.sumI₁_refused_on_TR3`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`; `BoCa.TR3.derives_wInj`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
-**Note.** `Fig16.LogRel.sumI₁_compat`, `sumI₂_compat`, on the printed carrier, `[as printed]` — [TR] prints one rule schematic in `i` and these are its two instances (rule 6). **False over [TR] §3's own machine**, and checked: it binds `e` under the frame `injᵢ K`, which the printed `K` grammar does not have. `Fig16.LogRel.sumI₁_refuted_on_TR3` exhibits the premise and the negated conclusion at `e = free (alloc ())` — a closed instance [TR] p. 2's `⊕I` types (`TR3.derives_wInj`).
+**Note.** `Fig16.LogRel.sumI₁_compat`, `sumI₂_compat`, on the printed carrier, `[as printed]` — [TR] prints one rule schematic in `i` and these are its two instances (rule 6). **False over [TR] §3's own machine**, and checked: it binds `e` under the frame `injᵢ K`, which the printed `K` grammar does not have. `Fig16.LogRel.sumI₁_refused_on_TR3` exhibits the premise and the negated conclusion at `e = free (alloc ())` — a closed instance [TR] p. 2's `⊕I` types (`TR3.derives_wInj`).
 -/
 /-- **`[TR]` Lemma 6.157** (`⊕I-compat`, p. 41) `[as printed]` at `i = 1`:
 
@@ -872,7 +872,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 **Typed-world version.** `BoCa.Fig16.LogRel.Typed.allE_compatX`, in `Support/TypedWorld/Compatibility.lean`.
 
-**Literal reading.** `BoCa.Fig16.LogRel.MutGapClosed.gap_closed`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
+**Literal reading.** `BoCa.Fig16.LogRel.MutPayloadSubst.subst_eq`, in `Paper/LiteralReadings/S6_8_FundamentalProperty.lean`.
 
 **Note.** `Fig16.LogRel.allE_compat`, on the printed carrier, `[as printed]`: H1, the printed `Δ ⊨ @a ⊏ @b` as `LifeCtx.EntailsLt`, and the conclusion at `T[@a/'a]` (`Ty.instLife`); the proof's closing `Δ-subst` is `Fig16.LogRel.vDen_instLife`. Both have one cause, the code-valued `mut` invariant: `MutGap` refutes the lemma without the second, `RenameGap` refutes the α-invariance the first stands in for, and `vDen_mut_payload_det` mentions no binder, so no change to how `∀` binds retires `MutClosed`. A de Bruijn binder retires `NoCapture` alone.
 -/

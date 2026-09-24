@@ -221,7 +221,7 @@ terms `inj₁ (free (alloc ()))` and `free (alloc ()); ()`, both typed by p. 2, 
 step (`TR3.stuck_wInj`, `TR3.stuck_wSeq`), so `[CONF]` Corollary 3.3's conclusion is
 not reachable there for them (`TR3.corThree_unreachable`); under `α ⊑ ⊔β̄`,
 `𝒱⟦Mut @a (Imm @b 1)⟧` is empty at the cell and lifetime set
-`Fig16.LogRel.MutImmGap` builds; and at the literal logical relation, a `withload` node
+`Fig16.LogRel.MutImmCell` builds; and at the literal logical relation, a `withload` node
 of this carrier at which the Fundamental Property's conclusion at `Sem` is refused
 without `WithloadEscrow` (`Fig16.LogRel.ViewWitness.fundamentalProperty_refused`),
 a configuration that is not a typed world (`ViewWitness.excluded`).  These are

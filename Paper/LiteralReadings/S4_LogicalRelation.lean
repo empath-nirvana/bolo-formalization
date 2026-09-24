@@ -12,7 +12,7 @@ Declarations that measure a printed definition read literally, where the
 library uses a repaired one.  They are kept so the adjudication can be checked,
 and nothing in the paper tree depends on them.
 
-* `MutImmGap` (row 4.17): the cell and lifetime set at which, under the literal
+* `MutImmCell` (row 4.17): the cell and lifetime set at which, under the literal
   `α ⊑ ⊔β̄` of `ℓ ↦ Imm α P̂`, `𝒱⟦Mut @a (Imm @b 1)⟧` is empty.
 
 **How this file reads.**  Each printed item is a row of `[TR]`'s section, in the
@@ -35,7 +35,7 @@ to `docs/adjudications.md`.
 
 noncomputable section
 
-namespace BoCa.Fig16.LogRel.MutImmGap
+namespace BoCa.Fig16.LogRel.MutImmCell
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
@@ -44,7 +44,7 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 ### 4.17 · — no printed counterpart — · [TR] p. 4 · `[repair]`
 
-An `imm` cell recording `{α₀, β}`, outside `Res_β`; with the connective at `⊓β̄` (row 5.30) it is in `𝒱⟦Imm @b 1⟧δ` only where `@bδ ⊑ α₀ ⊓ β`, and `BoCa.Fig16.LogRel.MutImmGap.inRel_same` is the case `β = α₀`. Adjudicated at `docs/adjudications.md` §12.67(a): at the literal `⊔β̄` this cell emptied `𝒱⟦Mut @a (Imm @b 1)⟧δ`, and the declarations that measured that reading are removed
+An `imm` cell recording `{α₀, β}`, outside `Res_β`; with the connective at `⊓β̄` (row 5.30) it is in `𝒱⟦Imm @b 1⟧δ` only where `@bδ ⊑ α₀ ⊓ β`, and `BoCa.Fig16.LogRel.MutImmCell.inRel_same` is the case `β = α₀`. Adjudicated at `docs/adjudications.md` §12.67(a): at the literal `⊔β̄` this cell emptied `𝒱⟦Mut @a (Imm @b 1)⟧δ`, and the declarations that measured that reading are removed
 -/
 /-- `β̄ = {α₀, β}`. -/
 def lset (α₀ β : Life) : LSet := (LSet.singleton α₀).union (LSet.singleton β)
@@ -70,9 +70,9 @@ theorem inRel_same {δ : LSub} {b : Lifetime.Life} {α₀ : Life} (hb : b.interp
   exact ⟨lset α₀ α₀, .unit, PMap.empty, empty_inStratum _, rfl, ⟨rfl, rfl⟩,
     by rw [lset_meet, inf_idem]⟩
 
-end BoCa.Fig16.LogRel.MutImmGap
+end BoCa.Fig16.LogRel.MutImmCell
 
-namespace BoCa.Fig16.LogRel.MutGapClosed
+namespace BoCa.Fig16.LogRel.MutPayloadSubst
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
@@ -81,11 +81,10 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 /-!
 Row 4.17, continued.
 -/
-/-- `LogRel.MutGap.Tgap`: `Mut ⊤ (Imm 'x 1)`, whose PAYLOAD mentions the
-substituted variable.  `LogRel.MutGap` is the machine-checked refutation of
-`𝒱⟦T[⊤/'x]⟧δ = 𝒱⟦T⟧_{δ['x↦⊤]}` at this type over `ResI`. -/
-def Tgap : Ty := .mut .top (.imm (.var 0) .unit)
+/-- `Mut ⊤ (Imm 'x 1)`: a `Mut` type whose payload mentions the variable `∀E`
+substitutes. -/
+def Tpayload : Ty := .mut .top (.imm (.var 0) .unit)
 
-end BoCa.Fig16.LogRel.MutGapClosed
+end BoCa.Fig16.LogRel.MutPayloadSubst
 
 end

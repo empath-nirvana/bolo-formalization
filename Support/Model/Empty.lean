@@ -59,7 +59,7 @@ theorem lower_empty : ResU.Lower (PMap.empty : WRes) (fun _ => none) :=
 
 end BoCa.Fig16.BoLo
 
-namespace BoCa.DefectB
+namespace BoCa.DeepReborrow
 open BoCa
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
@@ -79,6 +79,6 @@ theorem agW_empty : AgW (PMap.empty : ResU Nat BoCa.Val) PMap.empty := by
       by rintro ⟨ψ, e, -⟩; cases e⟩⟩
   · rw [restrict_empty]; exact ResU.comp_empty_right _
 
-end BoCa.DefectB
+end BoCa.DeepReborrow
 
 end

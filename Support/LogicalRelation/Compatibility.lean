@@ -193,7 +193,7 @@ theorem vDen_mut_congr {δ₁ δ₂ : LSub} {a₁ a₂ : Lifetime.Life} {T₁ T�
 
 end BoCa.Fig16.LogRel
 
-namespace BoCa.Fig16.LogRel.MutGapClosed
+namespace BoCa.Fig16.LogRel.MutPayloadSubst
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
@@ -214,7 +214,7 @@ theorem imm_eq (δ : LSub) :
   show atLife _ _ _ ρ = atLife _ _ _ ρ
   simp only [atLife, interp_congr δ, hu]
 
-end BoCa.Fig16.LogRel.MutGapClosed
+end BoCa.Fig16.LogRel.MutPayloadSubst
 
 namespace BoCa.Fig16.LogRel
 open BoCa.Fig16

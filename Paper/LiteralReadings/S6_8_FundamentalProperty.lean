@@ -51,10 +51,11 @@ import Support.TypedWorld.World
   `fundamentalProperty_of`) and `not_everyDerivationInRegime`; and `SemArising`,
   which is not a route to the row (`sem_of_semArising` concludes at `gDenB`);
 * 6.154, 6.155, 6.157, 6.169, 6.170: each compatibility lemma's step measured over
-  `[TR]` §3's printed machine (`…_refuted_on_TR3`, `…_step_on_TR3`,
+  `[TR]` §3's printed machine (`…_refused_on_TR3`, `…_step_on_TR3`,
   `swap_step_blocked_on_TR3`), at the closed terms `[TR]` p. 2 types there;
-* 6.162: `MutGapClosed.gap_closed`, the old carrier's counterexample type run
-  through the printed `mut` cell, which stores the predicate.
+* 6.162: `MutPayloadSubst.subst_eq`, the substitution step at a `Mut` type whose
+  payload mentions the substituted variable, through the printed `mut` cell, which
+  stores the predicate.
 
 **How this file reads.**  Each run opens with the result it measures and says where
 that result's record is.  Each declaration carries its tag; an
@@ -374,7 +375,7 @@ So this is a fact about the seven productions `TR3.Kont` transcribes
 literally, and 6.154 is not in question.
 `[about ours: 6.154's own statement, over `TR3.Steps`, the literal reading of
 an elided figure]` -/
-theorem unitE_refuted_on_TR3 (δ : LSub) :
+theorem unitE_refused_on_TR3 (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty
     ∧ TR3.wp (.val .unit) (vDen .unit δ) PMap.empty
     ∧ ¬ TR3.wp TR3.wSeq (vDen .unit δ) PMap.empty :=
@@ -436,7 +437,7 @@ p. 2's `⊕I` types (`TR3.derives_wInj`) — is stuck.  `docs/adjudications.md` 
 §3 is elided, so this measures the elision and not 6.157.
 `[about ours: 6.157's own statement, over `TR3.Steps`, the literal reading of
 an elided figure]` -/
-theorem sumI₁_refuted_on_TR3 (δ : LSub) :
+theorem sumI₁_refused_on_TR3 (δ : LSub) :
     TR3.wp TR3.wFreeAlloc (vDen .unit δ) PMap.empty
     ∧ ¬ TR3.wp TR3.wInj (vDen (.sum .unit .unit) δ) PMap.empty :=
   ⟨tr3_eDen_freeAlloc δ,
@@ -445,7 +446,7 @@ theorem sumI₁_refuted_on_TR3 (δ : LSub) :
 
 end BoCa.Fig16.LogRel
 
-namespace BoCa.Fig16.LogRel.MutGapClosed
+namespace BoCa.Fig16.LogRel.MutPayloadSubst
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
@@ -456,18 +457,19 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 
 The printed statement, the printed proof and the adjudication are in `Paper/S6_8_FundamentalProperty/Lemmas.lean`, under the record of Lemma 6.162 (∀E-compat).
 -/
-/-- **…and therefore so do the two `Mut` types.**  On `ResI` this is false
-(`LogRel.MutGap.rhs_fails`), which is what forces `LogRel`'s `Ty.MutClosed`; on
-the printed carrier it is `vDen_mut_congr` and one page reference.
-`[about ours: the counterexample, at the printed cell]` -/
-theorem gap_closed (δ : LSub) :
-    vDen (Tgap.applyLSub [(0, .top)]) δ = vDen Tgap (δ.extend 0 Life.top) := by
+/-- **Substitution into a `Mut` type's payload commutes with `𝒱⟦−⟧`**, at
+`Tpayload`: `𝒱⟦T[⊤/'x]⟧δ = 𝒱⟦T⟧_{δ['x↦⊤]}`.  The printed `mut` cell stores the
+payload predicate, so this is `vDen_mut_congr` at the payload's two readings.
+`[about ours: 6.162's substitution step at a `Mut` type whose payload mentions the
+substituted variable]` -/
+theorem subst_eq (δ : LSub) :
+    vDen (Tpayload.applyLSub [(0, .top)]) δ = vDen Tpayload (δ.extend 0 Life.top) := by
   show vDen (.mut .top (.imm .top .unit)) δ
       = vDen (.mut .top (.imm (.var 0) .unit)) (δ.extend 0 Life.top)
   exact (vDen_mut_congr (δ₁ := δ.extend 0 Life.top) (δ₂ := δ)
     (a₁ := .top) (a₂ := .top) rfl (imm_eq δ)).symm
 
-end BoCa.Fig16.LogRel.MutGapClosed
+end BoCa.Fig16.LogRel.MutPayloadSubst
 
 namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
@@ -836,34 +838,34 @@ theorem models : Δ₀.Models δ₀ := by
 def T₁ : Ty := .ref (.tensor (.ref .unit) .unit)
 
 /-- The borrowed argument `ℓ₂ ↦ imm({1}, ℓ₀, ℓ₀↦own((ℓ₁,())) ⊎ ℓ₁↦own(()))`. -/
-noncomputable def ρ₁ : WRes := ResU.single 2 (DefectB.cellB 1 v0 Val.unit (Val.loc 0))
+noncomputable def ρ₁ : WRes := ResU.single 2 (DeepReborrow.cellB 1 v0 Val.unit (Val.loc 0))
 
 /-- The callback's resource: the `imm` view `ℓ₀ ↦ imm({1}, (ℓ₁,()), ∅)`. -/
-noncomputable def ρ₂ : WRes := ResU.single 0 (DefectB.cellF 1 v0)
+noncomputable def ρ₂ : WRes := ResU.single 0 (DeepReborrow.cellF 1 v0)
 
-theorem hc₁₂ : ResU.CompS ρ₁ ρ₂ (DefectB.comp 1 1 v0 Val.unit (Val.loc 0)) :=
-  DefectB.bcell_frame_comp _ _ _ _ _
+theorem hc₁₂ : ResU.CompS ρ₁ ρ₂ (DeepReborrow.comp 1 1 v0 Val.unit (Val.loc 0)) :=
+  DeepReborrow.bcell_frame_comp _ _ _ _ _
 
-theorem hvalid : ResU.Valid (DefectB.comp 1 1 v0 Val.unit (Val.loc 0)) :=
-  DefectB.Valid_composite _ _ _ _ _
+theorem hvalid : ResU.Valid (DeepReborrow.comp 1 1 v0 Val.unit (Val.loc 0)) :=
+  DeepReborrow.Valid_composite _ _ _ _ _
 
 theorem rho2_comp (v u : Val) :
     ResU.CompS (ResU.single 0 (CellU.ownOf v)) (ResU.single 1 (CellU.ownOf u))
-      (DefectB.rho2 v u) := by
+      (DeepReborrow.rho2 v u) := by
   refine ⟨ResU.Compat.of_disjoint (fun l => ?_), fun l => ?_⟩
   · by_cases e0 : l = 0
     · subst e0; exact Or.inr (ResU.single_get_ne _ (by decide))
     · exact Or.inl (ResU.single_get_ne _ e0)
   · by_cases e0 : l = 0
     · subst e0
-      rw [ResU.single_get_ne _ (by decide : (0:Nat) ≠ 1), ResU.single_get_self, DefectB.rho2_0]
+      rw [ResU.single_get_ne _ (by decide : (0:Nat) ≠ 1), ResU.single_get_self, DeepReborrow.rho2_0]
       exact rfl
     · by_cases e1 : l = 1
       · subst e1
         rw [ResU.single_get_self, ResU.single_get_ne _ (by decide : (1:Nat) ≠ 0),
-          DefectB.rho2_1]
+          DeepReborrow.rho2_1]
         exact rfl
-      · rw [ResU.single_get_ne _ e1, ResU.single_get_ne _ e0, DefectB.rho2_ne _ _ e0 e1]
+      · rw [ResU.single_get_ne _ e1, ResU.single_get_ne _ e0, DeepReborrow.rho2_ne _ _ e0 e1]
         exact rfl
 
 theorem ref_unit_den (δ : LSub) (l : Loc) :
@@ -871,7 +873,7 @@ theorem ref_unit_den (δ : LSub) (l : Loc) :
   ⟨l, Val.unit, pure_sep_mk rfl ⟨_, PMap.empty, ResU.comp_empty_right _, rfl, rfl, rfl⟩⟩
 
 theorem payload_den (δ : LSub) :
-    vDen T₁ δ (Val.loc 0) (DefectB.rho2 v0 Val.unit) := by
+    vDen T₁ δ (Val.loc 0) (DeepReborrow.rho2 v0 Val.unit) := by
   refine ⟨0, v0, pure_sep_mk rfl ⟨_, _, rho2_comp v0 Val.unit, rfl, ?_⟩⟩
   refine ⟨Val.loc 1, Val.unit, pure_sep_mk rfl ⟨_, PMap.empty, ResU.comp_empty_right _,
     ref_unit_den δ 1, rfl, rfl⟩⟩
@@ -954,7 +956,7 @@ theorem f_den : vDen (.all 2 Δ₀.meetOfDom
     intro l ψ e; exact absurd e (by simp)
   · intro ρf fρ μ hf hfc hμ
     have h0 : μ 0 = some v0 :=
-      lower_read (ψ := DefectB.cellF 1 v0) (ResU.single_get_self 0 _) ⟨_, hc⟩ hfc hμ
+      lower_read (ψ := DeepReborrow.cellF 1 v0) (ResU.single_get_self 0 _) ⟨_, hc⟩ hfc hμ
     have hkv : μ k = some (Val.pair p q) :=
       lower_read (ResU.single_get_self k _) ⟨_, ResU.CompS.comm hc⟩ hfc hμ
     exact run_legit μ k hk0 p q h0 hkv
@@ -969,7 +971,7 @@ def WithloadSem : Prop :=
   Sem Δ₀ [] withload (axWithloadTy (.var 1) 2 Δ₀.meetOfDom T₁ .unit)
 
 /-- **Our carrier refuses `WithloadSem`.**  The argument is `ρ₁`, the callback
-`vf` at `ρ₂`; `ρ₁ ● ρ₂` is `✓` (`DefectB.Valid_composite`), `vf` is in the
+`vf` at `ρ₂`; `ρ₁ ● ρ₂` is `✓` (`DeepReborrow.Valid_composite`), `vf` is in the
 callback type (`f_den`), and the run gets stuck (`run_stuck`).
 `[about ours: `WithloadSem` at the view-witness configuration]` -/
 theorem withloadSem_refused : ¬ WithloadSem := by
@@ -999,7 +1001,7 @@ theorem withloadSem_refused : ¬ WithloadSem := by
   rw [hμe] at hμ₂'
   -- the memory holds `ℓ₂ ↦ ℓ₀`
   have h2 : μ₂ 2 = some (Val.loc 0) :=
-    lower_read (ψ := DefectB.cellB 1 v0 Val.unit (Val.loc 0)) (ResU.single_get_self 2 _)
+    lower_read (ψ := DeepReborrow.cellB 1 v0 Val.unit (Val.loc 0)) (ResU.single_get_self 2 _)
       ⟨_, hx⟩ hc₂ hμ₂
   -- stage 3: `(withload ℓ₂) vf`; frame `ρ⁺` of stage 2
   have hw₃ := hQ₂ vf ρ₂ fρ'₂ f_den (ResU.CompS.comm hc₂')
@@ -1059,24 +1061,24 @@ theorem not_vShape_pair_empty (δ : LSub) (u : Val) :
 /-- The view at `ℓ₀` and the borrow at `ℓ₂` show in `ag(W)` for every world `W` holding
 `ρ₁ ● ρ₂`, over their values and witnesses. -/
 theorem ag_cells {W F a : WRes}
-    (hc : ResU.CompS (DefectB.comp 1 1 v0 Val.unit (Val.loc 0)) F W) (ha : AgW W a) :
+    (hc : ResU.CompS (DeepReborrow.comp 1 1 v0 Val.unit (Val.loc 0)) F W) (ha : AgW W a) :
     (∃ ζ : CellU Loc Val, a.get 0 = some ζ ∧ ζ.kind = Kind.imm ∧ ζ.erase = v0 ∧
       ζ.wit = PMap.empty) ∧
     (∃ ζ : CellU Loc Val, a.get 2 = some ζ ∧ ζ.kind = Kind.imm ∧ ζ.erase = Val.loc 0 ∧
-      ζ.wit = DefectB.rho2 v0 Val.unit) := by
-  obtain ⟨ψ₀, e₀, k₀, w₀, r₀⟩ := compS_get_left' hc (DefectB.comp_0 1 1 v0 Val.unit (Val.loc 0))
-  obtain ⟨ψ₂, e₂, k₂, w₂, r₂⟩ := compS_get_left' hc (DefectB.comp_2 1 1 v0 Val.unit (Val.loc 0))
-  obtain ⟨ζ₀, f₀, g₀, h₀, i₀, -⟩ := icpAt_agW ha 0 ψ₀ e₀ (k₀.trans (DefectB.cellF_kind 1 v0))
-  obtain ⟨ζ₂, f₂, g₂, h₂, i₂, -⟩ := icpAt_agW ha 2 ψ₂ e₂ (k₂.trans (DefectB.cellB_kind 1 v0 Val.unit (Val.loc 0)))
-  exact ⟨⟨ζ₀, f₀, g₀, h₀.trans (r₀.trans rfl), i₀.trans (w₀.trans (DefectB.cellF_wit 1 v0))⟩,
-    ⟨ζ₂, f₂, g₂, h₂.trans (r₂.trans rfl), i₂.trans (w₂.trans (DefectB.cellB_wit 1 v0 Val.unit (Val.loc 0)))⟩⟩
+      ζ.wit = DeepReborrow.rho2 v0 Val.unit) := by
+  obtain ⟨ψ₀, e₀, k₀, w₀, r₀⟩ := compS_get_left' hc (DeepReborrow.comp_0 1 1 v0 Val.unit (Val.loc 0))
+  obtain ⟨ψ₂, e₂, k₂, w₂, r₂⟩ := compS_get_left' hc (DeepReborrow.comp_2 1 1 v0 Val.unit (Val.loc 0))
+  obtain ⟨ζ₀, f₀, g₀, h₀, i₀, -⟩ := icpAt_agW ha 0 ψ₀ e₀ (k₀.trans (DeepReborrow.cellF_kind 1 v0))
+  obtain ⟨ζ₂, f₂, g₂, h₂, i₂, -⟩ := icpAt_agW ha 2 ψ₂ e₂ (k₂.trans (DeepReborrow.cellB_kind 1 v0 Val.unit (Val.loc 0)))
+  exact ⟨⟨ζ₀, f₀, g₀, h₀.trans (r₀.trans rfl), i₀.trans (w₀.trans (DeepReborrow.cellF_wit 1 v0))⟩,
+    ⟨ζ₂, f₂, g₂, h₂.trans (r₂.trans rfl), i₂.trans (w₂.trans (DeepReborrow.cellB_wit 1 v0 Val.unit (Val.loc 0)))⟩⟩
 
 /-- A record whose chain reaches `ℓ₀` at pointee `Ref 1 ⊗ 1` refuses the view there: its
 witness `∅` is not of that shape (`DeepInv`). -/
 theorem chain_refuses {W F a : WRes} {ps rs : List FrameRec} (hT : TI W ps rs) {r : FrameRec}
     (hr : r ∈ rs) {p : Option Loc} {u : Val}
     (hch : Chain r.R r.T r.v p 0 (.tensor (.ref .unit) .unit) u)
-    (hc : ResU.CompS (DefectB.comp 1 1 v0 Val.unit (Val.loc 0)) F W) (ha : AgW W a) : False := by
+    (hc : ResU.CompS (DeepReborrow.comp 1 1 v0 Val.unit (Val.loc 0)) F W) (ha : AgW W a) : False := by
   obtain ⟨⟨ζ, e, k, -, w⟩, -⟩ := ag_cells hc ha
   obtain ⟨-, hs, -⟩ := hT.1.1 r hr p 0 _ u hch a ha ζ e (by rw [k]; simp)
   rw [w] at hs
@@ -1092,7 +1094,7 @@ shape — its witness `∅` is not.  So the run `withloadSem_refused` builds nee
 stage, a world `wpTS` does not quantify over.
 `[about ours: the view-witness configuration against `TW` and `𝒱X`]` -/
 theorem excluded {W F : WRes} {ps : List FrameRec} {ls : List SRec} {δ : LSub}
-    (hc : ResU.CompS (DefectB.comp 1 1 v0 Val.unit (Val.loc 0)) F W)
+    (hc : ResU.CompS (DeepReborrow.comp 1 1 v0 Val.unit (Val.loc 0)) F W)
     (hW : TW W ps (rsOf ls)) (harg : vP (.imm (.var 1) T₁) ls δ (Val.loc 2) ρ₁) : False := by
   have hT := hW.inv
   obtain ⟨a, ha⟩ := agW_of_valid hW.valid
@@ -1111,9 +1113,9 @@ theorem excluded {W F : WRes} {ps : List FrameRec} {ls : List SRec} {δ : LSub}
     have hψ : ζ₂ = ψ := Option.some.inj eψ
     subst hψ
     have hv' : r.v = Val.loc 0 := rψ.symm.trans r₂
-    have hR : r.R = DefectB.rho2 v0 Val.unit := wψ.symm.trans w₂
+    have hR : r.R = DeepReborrow.rho2 v0 Val.unit := wψ.symm.trans w₂
     have hch : Chain r.R r.T r.v none 0 (.tensor (.ref .unit) .unit) v0 := by
-      rw [hv', ← hTy, hR]; exact Chain.one hstep (DefectB.rho2_0 _ _)
+      rw [hv', ← hTy, hR]; exact Chain.one hstep (DeepReborrow.rho2_0 _ _)
     exact chain_refuses hT hr hch hc ha
   · -- a chain position at `ℓ₂`: the pointee's next step is `ℓ₀`
     obtain ⟨e, he, hl⟩ := hT.exIn hr a ha
@@ -1129,7 +1131,7 @@ theorem excluded {W F : WRes} {ps : List FrameRec} {ls : List SRec} {δ : LSub}
     subst hu
     obtain ⟨-, -, hown, -⟩ := hT.1.1 r hr p 2 T₁ _ hch a ha ζ₂ e₂ (by rw [k₂]; simp)
     have h0 : r.R.get 0 = some (CellU.ownOf v0) :=
-      hown 0 v0 (by rw [w₂]; exact DefectB.rho2_0 _ _)
+      hown 0 v0 (by rw [w₂]; exact DeepReborrow.rho2_0 _ _)
     exact chain_refuses hT hr (hch.snoc hstep h0) hc ha
 
 end BoCa.Fig16.LogRel.ViewWitness

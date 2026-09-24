@@ -66,7 +66,7 @@ theorem single_ne {l l' : Loc} (ψ : CellU Loc Val) (h : l' ≠ l) : (ResU.singl
   ResU.single_get_ne ψ h
 
 theorem flat_empty : ResU.Flat (PMap.empty : WRes) PMap.empty :=
-  ⟨_, _, ExW.empty_of_all_imm (fun l ψ e => absurd e (by simp)), DefectB.agW_empty,
+  ⟨_, _, ExW.empty_of_all_imm (fun l ψ e => absurd e (by simp)), DeepReborrow.agW_empty,
     ResU.comp_empty_left _⟩
 
 theorem comp_some {R : CellU Loc Val → CellU Loc Val → Prop}

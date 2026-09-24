@@ -13,7 +13,7 @@ closing substitutions `γ(e)`, free lifetime variables of a type, and the empty 
 
 noncomputable section
 
-namespace BoCa.Fig16.LogRel.MutImmGap
+namespace BoCa.Fig16.LogRel.MutImmCell
 open BoCa.Fig16
 open BoCa.Fig16.BoLo
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
@@ -23,7 +23,7 @@ theorem empty_inStratum (b : Life) :
     ResU.InStratum (Loc := BoCa.Loc) (Val := BoCa.Val) b PMap.empty :=
   fun _ _ e => absurd e (by simp)
 
-end BoCa.Fig16.LogRel.MutImmGap
+end BoCa.Fig16.LogRel.MutImmCell
 
 namespace BoCa.Fig16.LogRel
 open BoCa.Fig16
