@@ -140,7 +140,8 @@ Each item below is not derived; no obstruction to it has been verified.
   its configuration names (a bump allocator, for instance).  The exhibited run of `wpTS` need
   not be fresh, and that a well-typed program always has a fresh run is not derived.  The
   exhibited run's own statements (`pure_heap`'s first half, the run in `closed_pure`) are
-  unconditional.
+  unconditional.  `FreshExistence.lean` states the missing fact and shows the semantic
+  relation alone does not give it (below).
 * **Runs that are not fresh.**  An allocator that reuses a location the program still names
   is outside these statements for untyped terms.  For well-typed terms it would need a
   typing invariant along the run (no dangling name is ever used), which the semantic proof of
@@ -163,6 +164,50 @@ Each item below is not derived; no obstruction to it has been verified.
   the lent contents to the result and the new contents.  The write footprint
   (`wpTS_footprint`) bounds the change; the functional statement is not attempted.
 
+## State-monad correspondence (stage 2): where it stands
+
+The next question of issue #1 is whether a well-typed program *with* exclusive state in its
+interface (owned `Ref`, `Mut` borrows) denotes a state-passing function
+`args × State → result × State`, with the pure fragment as the case of an empty state, and
+with states compared up to renaming of freshly allocated cells so that a `Ref` escaping into
+the result can grow the state.  The planned steps were: (1) every well-typed program has a
+fresh run; (2) the denotation `⟦e⟧`, read off the determinacy of fresh runs; (3) adequacy,
+every run computes `⟦e⟧` up to renaming; (4) a `Mut` borrow as a lens, the lent cell after the
+scope being the `put` of what the callback did; (5) examples.
+
+**The work stops at step 1.**  Steps 2–5 are not attempted: a denotation read off fresh runs,
+and its adequacy for *every* run, both rest on step 1, and without it they would only restate
+`pure_result`'s conditional form.
+
+| statement | at `DerivesWf` | at `SemX` |
+|---|---|---|
+| from every tagged typed world, the program has a fresh run to a value (`FreshRunsExistSyn`, `FreshRunsExistSem`) | not derived | does not hold, `not_freshRunsExistSem` at `peek 0` |
+
+From the empty world, every run of `peek 0` to a value allocates `0` so that its `load 0`
+succeeds; `0` is named by the term, so no fresh run reaches a value.  `pure_result_every_run`
+records what `FreshRunsExistSyn` would give: every run of a program of the pure fragment,
+from the world's heap or from any heap agreeing on what the arguments reach, returns the
+exhibited value.
+
+What a proof of `FreshRunsExistSyn` needs, and why it is not in reach here: a run can be
+renamed into a fresh one exactly as long as it never reads through a name whose location it
+freed and then reallocated.  That is a property of the states *along* a run.  The semantic
+relation constrains a run only through its final world, and `DerivesWf` does not type a run's
+intermediate terms: they mention locations, which no typing rule types
+(`derivesWf_locFree`), and the axiom terms' reducts duplicate a lent location
+(`withbor ≜ λx.λf.(x, f () x)` reduces to `(ℓ, f () ℓ)`).  An invariant of intermediate states
+would need a run-time typing of borrow states, which neither document prints and this
+development does not have.  No obstruction to `FreshRunsExistSyn` itself is verified.
+
+**Related work, for the later steps.**  The intended correspondence is the one the linear
+state monad gives: a program threading an owned state is a function of that state.  The
+converse direction, realising every such function by a BoCa program, is a separate question
+and is not attempted.  For `Mut` borrows, the forward-and-backward reading of Aeneas (Ho and
+Protzenko, ICFP 2022), where a function taking a mutable borrow is translated into a forward
+function and a backward function returning the borrow's final value, and the prophecy
+reading of RustHorn (Matsushita, Tsukada and Kobayashi, ESOP 2020), where a mutable borrow
+is a pair of its current and final values, are the natural points of comparison for step 4.
+
 ## Files
 
 | file | contents |
@@ -175,4 +220,5 @@ Each item below is not derived; no obstruction to it has been verified.
 | `Read.lean` | the read footprint of every run, and of well-typed programs |
 | `Pure.lean` | the fragment; `pure_heap`, `pure_result`, `closed_pure` |
 | `Boundary.lean` | `peek`; `readFootprintSyn`, `not_readFootprintSem` |
+| `FreshExistence.lean` | `FreshRunsExistSyn` (not derived), `not_freshRunsExistSem` at `peek 0`, `pure_result_every_run` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |

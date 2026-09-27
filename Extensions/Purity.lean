@@ -10,3 +10,4 @@ import Purity.Frozen
 import Purity.Pure
 import Purity.Boundary
 import Purity.Examples
+import Purity.FreshExistence
