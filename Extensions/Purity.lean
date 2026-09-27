@@ -18,3 +18,4 @@ import Purity.Policy
 import Purity.PolicyRuns
 import Purity.FreshRuns
 import Purity.Independence
+import Purity.Arises

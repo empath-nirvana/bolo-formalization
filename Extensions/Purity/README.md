@@ -183,7 +183,7 @@ and its adequacy for *every* run, both rest on step 1, and without it they would
 |---|---|---|
 | from every tagged typed world, the program, closed by values of the semantic relation, has a fresh run to a value (`FreshRunsExistSyn`, `FreshRunsExistSem`) | does not hold, `not_freshRunsExistSyn` | does not hold, `not_freshRunsExistSem` at `peek 0` |
 | the same for a closed program (`FreshRunsExistClosed`) | proved, `freshRunsExistClosed` (below) | — |
-| the same for a program of the pure fragment (`FreshRunsExistPure`) | proved at argument types where no `⊸`/`∀` is read at the program's view (`freshRunsExistPureInd`); for all argument types with the arguments in the relation at the fresh runs (`freshRunsExistPureF`); otherwise not derived | — |
+| the same for a program of the pure fragment (`FreshRunsExistPure`) | proved at argument types where no `⊸`/`∀` is read at the program's view (`freshRunsExistPureInd`); for arguments that arise from well-typed code, at every argument type (`arising_pure_every_run`); for all argument types with the arguments in the relation at the fresh runs (`freshRunsExistPureF`); otherwise not derived | — |
 
 From the empty world, every run of `peek 0` to a value allocates `0` so that its `load 0`
 succeeds; `0` is named by the term, so no fresh run reaches a value.  `FreshRunsExistSyn` fails
@@ -382,6 +382,43 @@ program cannot call such a function (it reaches the program at `Unk`), but no ar
 uses that.  Arguments that arise from a well-typed program run at the fresh runs are in the
 relation at the fresh runs, where `pure_result_every_run_fresh` applies to every argument type.
 
+### Arguments that arise from well-typed code (branch `fresh-arises`)
+
+§6 quantifies over the resources that arise from the calculus.  `Arises` (`Arises.lean`) names
+the arguments a pure-fragment function receives from well-typed code: a tuple `γ` at types `Ts`,
+with its world and heap, is a post-state of a well-typed *producer* `p : Δ; ∅ ⊢ p : Ts₁ ⊗ … ⊗ 1`
+run from a tagged typed world completing `∅`.  The producer's run is fresh, the post-world
+completes the tuple's resource, and the tuple is in the relation there, as the Fundamental
+Property at the fresh runs states of what `p` returns.  A producer at a lifetime context `Δ` may
+return borrows, so a call inside a borrow's scope is covered: the code up to the call is the
+producer.
+
+| result | statement |
+|---|---|
+| `arises_of_producer` | every well-typed producer, from every tagged typed world completing `∅`, has an arising post-state (`Typed.fundamentalR` at `freshRel`) |
+| `Arises.gDenX` | an arising tuple is in the context relation at the fresh runs, at every argument type |
+| `arising_pure_every_run` | a program of the pure fragment applied to arising arguments: a fresh run gives the heap back and returns `v`; every run from that heap, and every run from any heap agreeing on what the arguments reach, returns `v` — at every argument type, `Imm @a (Mut @b (1 ⊸ 1))` included |
+| `arising_producer_pure` | producer then consumer, from every world |
+| `Arises.mut_pred` | in an arising argument at `Imm @a (Mut @b S)`, the `Mut` cell under the borrow stores `vX (wpTSR freshRel) true S`: the difference `vX_lolli_depends` records is never met by an arising argument |
+
+### Arising under every run: what it would take
+
+The arising results above are about producers run at the fresh runs.  The same question for
+producers run under an arbitrary allocator — does a well-typed program ever leave a cell, or a
+closure in a cell, naming a location it has freed and may reallocate? — is not derived.
+
+* **What it needs.**  An invariant of the states along a run: run-time values typed against a
+  store typing that records, per location, owned, lent immutably at a lifetime, lent mutably
+  at a lifetime, or moved out, with one rule per intermediate state of the axiom terms
+  (`Invariant.lean`'s design).  BoLo's semantic proof constrains a run only through its final
+  world and has no such invariant.
+* **What outlives gives.**  `[a]I`'s premise `Δ ⊢ Γ ⊐ @a` keeps a borrow at `'a` out of what a
+  borrower returns, so a borrow cannot escape its scope *in a type*.  Whether a dead borrow's
+  location can still occur in a run-time term or cell is a property of reducts, which
+  `DerivesWf` does not type (`derivesWf_locFree`; `withbor`'s reduct `(ℓ, f () ℓ)`), and during
+  a `withswap` callback the lent cell still holds a payload the callback may free
+  (`withswapWindow`, recorded, not machine-checked).  Not derived.
+
 ## Files
 
 | file | contents |
@@ -402,4 +439,5 @@ relation at the fresh runs, where `pure_result_every_run_fresh` applies to every
 | `PolicyRuns.lean` | `polStep_det`, `polRun_det`; `closed_policy_adequacy`, `closed_policy_pure`, `pure_policy_heap` |
 | `Policy.lean` | `wpTS_alloc_any` (6.141 at every heap-fresh location), `PostAt`; `PolRun`, `leastFree`; `not_semPolicyRuns` at `peek 1` |
 | `Independence.lean` | `Ind`, `vX_indep`, `gDenXR_indep`; `freshRunsExistPureInd`, `pure_result_every_run_ind`; `vX_lolli_depends` |
+| `Arises.lean` | `tupTy`, `tupVal`, `Arises`; `arises_of_producer`, `Arises.gDenX`, `arising_pure_every_run`, `arising_producer_pure`, `Arises.mut_pred` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |
