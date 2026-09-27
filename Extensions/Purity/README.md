@@ -183,7 +183,7 @@ and its adequacy for *every* run, both rest on step 1, and without it they would
 |---|---|---|
 | from every tagged typed world, the program, closed by values of the semantic relation, has a fresh run to a value (`FreshRunsExistSyn`, `FreshRunsExistSem`) | does not hold, `not_freshRunsExistSyn` | does not hold, `not_freshRunsExistSem` at `peek 0` |
 | the same for a closed program (`FreshRunsExistClosed`) | proved, `freshRunsExistClosed` (below) | — |
-| the same for a program of the pure fragment (`FreshRunsExistPure`) | not derived; proved with the arguments in the relation at the fresh runs (`freshRunsExistPureF`) | — |
+| the same for a program of the pure fragment (`FreshRunsExistPure`) | proved at argument types where no `⊸`/`∀` is read at the program's view (`freshRunsExistPureInd`); for all argument types with the arguments in the relation at the fresh runs (`freshRunsExistPureF`); otherwise not derived | — |
 
 From the empty world, every run of `peek 0` to a value allocates `0` so that its `load 0`
 succeeds; `0` is named by the term, so no fresh run reaches a value.  `FreshRunsExistSyn` fails
@@ -360,6 +360,28 @@ relation at every run.  At plain data the relation mentions no `wp`; but a `Mut`
 borrowed payload stores a predicate that mentions `wp` (`vX`'s `Mut` clause), where the two
 relations need not agree.  The transfer is not derived, and no obstruction is verified.
 
+### The pure fragment with arguments in the relation at every run (branch `fresh-pure`)
+
+The relation mentions `wp` only at `⊸` and `∀` read at the program's view.  An `Imm` payload is
+read at the observable view, where `⊸` and `∀` are `True`, but a `Mut` cell's stored predicate
+is read at the program's view wherever the cell sits.  `Ind b T` (`Independence.lean`) says no
+`⊸`/`∀` of `T` is read at the program's view; there the relation does not depend on `wp`
+(`vX_indep`), so neither does the context relation (`gDenXR_indep`).
+
+| result | statement |
+|---|---|
+| `freshRunsExistPureInd` | `FreshRunsExistPure` at argument types satisfying `Ind` (`PureTypingInd`): plain data, `Imm` borrows of data, of references, of borrows, of functions, of `Mut` borrows of data |
+| `pure_result_every_run_ind` | at those types, with the arguments in the relation at every run: a fresh run gives the heap back and returns `v`, every run from the world's heap returns `v`, and every run from any heap agreeing on what the arguments reach returns `v` |
+| `vX_lolli_depends` | at the program's view the relation at `1 ⊸ 1` differs between every run and the fresh runs: `λ_. staleL` is in the first and not in the second (`staleClosure_outside_fresh`) |
+
+Open: `FreshRunsExistPure` at argument types outside `Ind`, such as `Imm @a (Mut @b (1 ⊸ 1))`,
+with the arguments in the relation at every run.  The step that does not go through is
+`gDenXR_indep`'s at the `Mut` cell's stored predicate (`ptoMutS`'s `ofS Q = P ls₀`), where the
+two predicates differ (`vX_lolli_depends`).  Not derived, and no obstruction is verified: the
+program cannot call such a function (it reaches the program at `Unk`), but no argument here
+uses that.  Arguments that arise from a well-typed program run at the fresh runs are in the
+relation at the fresh runs, where `pure_result_every_run_fresh` applies to every argument type.
+
 ## Files
 
 | file | contents |
@@ -379,4 +401,5 @@ relations need not agree.  The transfer is not derived, and no obstruction is ve
 | `Stale.lean` | `staleL`: location-free, in the relation, no fresh run; `not_freshRunsExistSemLocFree` |
 | `PolicyRuns.lean` | `polStep_det`, `polRun_det`; `closed_policy_adequacy`, `closed_policy_pure`, `pure_policy_heap` |
 | `Policy.lean` | `wpTS_alloc_any` (6.141 at every heap-fresh location), `PostAt`; `PolRun`, `leastFree`; `not_semPolicyRuns` at `peek 1` |
+| `Independence.lean` | `Ind`, `vX_indep`, `gDenXR_indep`; `freshRunsExistPureInd`, `pure_result_every_run_ind`; `vX_lolli_depends` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |

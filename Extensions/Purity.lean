@@ -17,3 +17,4 @@ import Purity.Closures
 import Purity.Policy
 import Purity.PolicyRuns
 import Purity.FreshRuns
+import Purity.Independence
