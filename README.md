@@ -170,6 +170,8 @@ docs/adjudications.md         every departure from the printed text, argued
 comparator/                   the adequacy statement over a verbatim copy of its trust base
 tools/challenge/              the generator of comparator/Challenge/**
 scripts/                      the hygiene and axiom checks
+Extensions/Purity/            an extension, not a transcription: the pure fragment of BoCa
+                              (its own README; `lake build Purity`, not a default target)
 ```
 
 A **record** for a numbered result gives its number, page and status, the printed

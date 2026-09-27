@@ -18,3 +18,10 @@ name = "Paper"
 [[lean_lib]]
 name = "Challenge"
 srcDir = "comparator"
+
+# The pure fragment of BoCa: renaming, frame and read footprints, heap
+# preservation and result determinacy (Extensions/Purity/README.md).  Not a
+# default target; it imports `Paper` and `Support` and nothing imports it.
+[[lean_lib]]
+name = "Purity"
+srcDir = "Extensions"

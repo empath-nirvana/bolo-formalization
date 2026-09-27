@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # No `sorry`, `axiom`, `native_decide`, `implemented_by`, `opaque`, `partial`,
-# `unsafe` in the library, outside comments; then every declaration's axioms.
+# `unsafe` in the library or in `Extensions/`, outside comments; then every
+# declaration's axioms (for `Extensions/Purity`, `scripts/check-purity.sh`).
 # `comparator/` is scanned too, with one permitted exception: the single `sorry`
 # that is the body of the challenge statement in `comparator/Challenge.lean`
 # (comparator's convention; comparator/README.md).  Needs nothing outside this
@@ -15,6 +16,7 @@ CHALLENGE = pathlib.Path("comparator/Challenge.lean")
 challenge_sorries = 0
 files = sorted(pathlib.Path(".").glob("[PS]*/**/*.lean")) + [pathlib.Path("Paper.lean"), pathlib.Path("Support.lean")]
 files += sorted(pathlib.Path("comparator").glob("**/*.lean"))
+files += sorted(pathlib.Path("Extensions").glob("**/*.lean"))
 for p in files:
     src = p.read_text(encoding="utf-8")
     # strip comments: nested block comments and line comments
