@@ -282,6 +282,33 @@ borrow's lifetime at run time), `withswap` (the moved-out state), `∀E` (lifeti
 substitution) and `free` (an owned cell leaving `Σ`).  The estimate is several thousand
 lines, on the scale of the typed world itself.
 
+### Where the freedom in allocation comes from (`Policy.lean`)
+
+* **The allocation rule is demonic.**  `Typed.wpTS_alloc` (`Support/TypedWorld/Wp.lean:573`,
+  `[TR]` 6.141) chooses its location by `PMap.exists_fresh` from the flattening `⦇ρf ● ρ⦈`
+  (line 579).  A location is missing from the flattening exactly when it is missing from the
+  heap (`lower_eq_none_iff`, line 580), and nothing after the choice depends on it.
+  `wpTS_alloc_any` proves the rule at *every* heap-fresh location: the step to it satisfies
+  row 5.33's post-conditions (`PostAt`) from every tagged typed world.
+* **The freedom is in `wpTS`'s definition** (`Support/TypedWorld/World.lean:137`, the
+  existential run at line 146).  The run the Fundamental Property exhibits is assembled only
+  by `wpTS_val` (`Wp.lean:529`), `wpTS_head` (541), `wpTS_alloc` (594), `wpTS_free` (628), the
+  two load rules (649, 677), `wpTS_store` (717) and `wpTS_bind` (`Steps.plug`, `Steps.trans`,
+  754); every other rule passes the run through.  Each of these constructions is a run under
+  any allocation policy that picks a heap-fresh location, given `wpTS_alloc_any`.  So a
+  `wpTS` whose run were a `PolRun pol` would satisfy the same rules.  In this repository that
+  means re-running the typed world (`Wp`, `FrameRules`, `Reborrow`, `Relation`,
+  `Compatibility`, and the Fundamental Property's induction) at a second `wpTS`, several
+  thousand lines in which only the eight constructions above change; it is not done here.
+  In a development where `wpTS` can be edited, the change is to its run conjunct: replace
+  `Steps μ e μ' (.val v)` by `PolRun pol μ e μ' (.val v)` for a policy `pol` returning a
+  heap-fresh location on finite heaps, and re-prove the eight constructions.
+* **A term of the semantic relation can need the freedom** (`not_semPolicyRuns`).  `peek 1`
+  is in the relation at `∅; ∅ ⊨ peek 1 : 1`; from the empty world the least-free policy
+  (`leastFree`) allocates `0`, and `load 1` is stuck.  Its semantic proof allocates `1` when
+  the heap misses it.  A policy-indexed `wpTS` would exclude such terms from the relation, as
+  it should: `peek` is not well typed.
+
 ## Files
 
 | file | contents |
@@ -298,4 +325,5 @@ lines, on the scale of the typed world itself.
 | `Closures.lean` | `not_freshRunsExistSyn` at `(λ_. staleL) ()`; `FreshRunsExistClosed`, `FreshRunsExistPure` (not derived); `pure_result_every_run` |
 | `Invariant.lean` | `TermLive`, `LiveSteps`; `staleH`; `not_termLiveSuffices`; `withswapWindow` (recorded) |
 | `Stale.lean` | `staleL`: location-free, in the relation, no fresh run; `not_freshRunsExistSemLocFree` |
+| `Policy.lean` | `wpTS_alloc_any` (6.141 at every heap-fresh location), `PostAt`; `PolRun`, `leastFree`; `not_semPolicyRuns` at `peek 1` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |
