@@ -181,36 +181,30 @@ and its adequacy for *every* run, both rest on step 1, and without it they would
 
 | statement | at `DerivesWf` | at `SemX` |
 |---|---|---|
-| from every tagged typed world, the program has a fresh run to a value (`FreshRunsExistSyn`, `FreshRunsExistSem`) | not derived | does not hold, `not_freshRunsExistSem` at `peek 0` |
+| from every tagged typed world, the program, closed by values of the semantic relation, has a fresh run to a value (`FreshRunsExistSyn`, `FreshRunsExistSem`) | does not hold, `not_freshRunsExistSyn` | does not hold, `not_freshRunsExistSem` at `peek 0` |
+| the same for a closed program (`FreshRunsExistClosed`) or a program of the pure fragment (`FreshRunsExistPure`) | not derived | — |
 
 From the empty world, every run of `peek 0` to a value allocates `0` so that its `load 0`
-succeeds; `0` is named by the term, so no fresh run reaches a value.  `pure_result_every_run`
-records what `FreshRunsExistSyn` would give: every run of a program of the pure fragment,
-from the world's heap or from any heap agreeing on what the arguments reach, returns the
-exhibited value.
+succeeds; `0` is named by the term, so no fresh run reaches a value.  `FreshRunsExistSyn` fails
+for a different reason (`Closures.lean`): its closing values come from the semantic relation,
+which admits at `1 ⊸ 1` the closure `λ_. staleL` of `Stale.lean`, and the well-typed `f ()`
+then runs it.  The forms that remain open keep what the program can reach syntactically
+typed: a closed program cannot reach the frame's closures, and in the pure fragment a closure
+behind an `Imm` borrow reaches the program only at `Unk` and cannot be called.
+`pure_result_every_run` records what `FreshRunsExistPure` would give: every run of a program of
+the pure fragment, from the world's heap or from any heap agreeing on what the arguments
+reach, returns the exhibited value.
 
-What a proof of `FreshRunsExistSyn` needs, and why it is not in reach here: a run can be
-renamed into a fresh one exactly as long as it never reads through a name whose location it
-freed and then reallocated.  That is a property of the states *along* a run.  The semantic
+A run can be renamed into a fresh one as long as it never reads through a name whose location
+it freed and then reallocated.  That is a property of the states along a run.  The semantic
 relation constrains a run only through its final world, and `DerivesWf` does not type a run's
 intermediate terms: they mention locations, which no typing rule types
 (`derivesWf_locFree`), and the axiom terms' reducts duplicate a lent location
-(`withbor ≜ λx.λf.(x, f () x)` reduces to `(ℓ, f () ℓ)`).  An invariant of intermediate states
-would need a run-time typing of borrow states, which neither document prints and this
-development does not have.  No obstruction to `FreshRunsExistSyn` itself is verified.
-
-**Related work, for the later steps.**  The intended correspondence is the one the linear
-state monad gives: a program threading an owned state is a function of that state.  The
-converse direction, realising every such function by a BoCa program, is a separate question
-and is not attempted.  For `Mut` borrows, the forward-and-backward reading of Aeneas (Ho and
-Protzenko, ICFP 2022), where a function taking a mutable borrow is translated into a forward
-function and a backward function returning the borrow's final value, and the prophecy
-reading of RustHorn (Matsushita, Tsukada and Kobayashi, ESOP 2020), where a mutable borrow
-is a pair of its current and final values, are the natural points of comparison for step 4.
+(`withbor ≜ λx.λf.(x, f () x)` reduces to `(ℓ, f () ℓ)`).
 
 ### The nominal route, and where it stops
 
-A nominal argument for `FreshRunsExistSyn` would go as follows.  The model compares locations
+A nominal argument for fresh-run existence would go as follows.  The model compares locations
 only by equality, so the relation should be invariant under permutations of locations.  A
 `DerivesWf` term names no location (`derivesWf_locFree`), so it is fixed by every permutation.
 At each allocation of the exhibited run, the chosen location would be renamed to one nothing
@@ -236,11 +230,57 @@ The renaming step above is where the argument meets `staleL`: renaming only the 
 through `x`.  Renaming the whole run by a permutation keeps every allocation as stale as it
 was.  Whatever the model's invariance under permutations, it is a fact about the model and
 holds for `staleL` as well; with membership in the relation and location-freeness, it cannot
-yield fresh runs.  A proof of `FreshRunsExistSyn` has to use more of the typing than that the
+yield fresh runs.  A proof of fresh-run existence has to use more of the typing than that the
 term names no location — here, that `staleL` uses `x` after `free x` consumes it.  The
 equivariance of the model's definitions (step 1 of the route) is therefore not mechanised:
 it would not close step 2.  No definition read for this work inspects a location other than
 by equality, but that is not verified.
+
+### An invariant along runs: design
+
+What follows is the design for proving `FreshRunsExistClosed` and `FreshRunsExistPure`; the
+proof is not started.
+
+**Invariants on names alone** (`Invariant.lean`).
+* *Term liveness* (`TermLive`): every location the term mentions is allocated.  `staleL`
+  breaks it: after `free x` the term still mentions `x`'s location.  It is not enough on its
+  own (`not_termLiveSuffices`): `staleH` has a run from the empty heap all of whose states are
+  term-live and no fresh run.  A value stored in a cell goes stale without the term
+  mentioning it, and is read back once its location is reallocated.
+* *Reach liveness*: every location reachable from the term through the heap is allocated.
+  That excludes `staleH`, and a run satisfying it at every allocation could be renamed into a
+  fresh one by `Local.lean`'s simulation (not proved here).  But well-typed programs break it
+  in `withswap`'s window: during the callback, the lent cell still holds the payload the
+  callback owns and may free (`withswapWindow`; its typing and run are not built, so this is
+  not machine-checked).
+
+So an invariant that suffices has to say which cells' contents are *moved out*, as
+`withswap`'s is during its callback, and has to know that nothing but the pending `store`
+reaches such a cell.  That is a fact about ownership, which is carried by types.
+
+**The invariant proposed: a run-time typing of configurations.**  A store typing
+`Σ : Loc ⇀ Ty × state`, `state ∈ {owned, lent-imm 'a, lent-mut 'a, moved-out}`, and a
+judgment `Σ; Δ; Γ ⊢ e : T` extending `DerivesWf` with
+* locations: `ℓ : Ref T` for an owned cell, used once across the term and the heap;
+  `ℓ : Imm 'a T` and `ℓ : Mut 'a T` for a lent cell, the lender's own occurrence frozen;
+* one rule for each intermediate state of the axiom terms' reducts: `withbor`'s
+  `(ℓ, f () ℓ)`, `withload`'s `f () (load ℓ)` and its loaded value, `withswap`'s
+  `let (y, z) = f v; store ℓ y; (ℓ, z)` with `ℓ` moved out, and `swap`'s two states;
+* a heap typing: every cell's content typed by `Σ`, a moved-out cell's content unconstrained.
+
+Its consequences would be reach liveness outside moved-out cells, and that a moved-out cell is
+touched only by its pending `store` — enough for the renaming argument.
+
+**Cost.**  The preservation proof ranges over the 9 head redexes and the 10 evaluation frames,
+against the 27 rules of `DerivesWf` (by inversion) and about ten run-time rules.  It needs
+weakening and splitting lemmas for the linear contexts, substitution of a value for a linear
+variable (de Bruijn, through `Ctx.Split`), substitution of a lifetime into a derivation (for
+`∀E`, which the semantic proof never needs), decomposition of a typing of `K[e]`, and, for
+`FreshRunsExistPure`, a bridge from a tagged typed world and `gDenX` to a store typing.  The
+hard cases are `withbor` (the lender's frozen occurrence beside the borrower's, and the
+borrow's lifetime at run time), `withswap` (the moved-out state), `∀E` (lifetime
+substitution) and `free` (an owned cell leaving `Σ`).  The estimate is several thousand
+lines, on the scale of the typed world itself.
 
 ## Files
 
@@ -254,6 +294,8 @@ by equality, but that is not verified.
 | `Read.lean` | the read footprint of every run, and of well-typed programs |
 | `Pure.lean` | the fragment; `pure_heap`, `pure_result`, `closed_pure` |
 | `Boundary.lean` | `peek`; `readFootprintSyn`, `not_readFootprintSem` |
-| `FreshExistence.lean` | `FreshRunsExistSyn` (not derived), `not_freshRunsExistSem` at `peek 0`, `pure_result_every_run` |
+| `FreshExistence.lean` | `FreshRunsExistSyn`, `FreshRunsExistSem`; `not_freshRunsExistSem` at `peek 0` |
+| `Closures.lean` | `not_freshRunsExistSyn` at `(λ_. staleL) ()`; `FreshRunsExistClosed`, `FreshRunsExistPure` (not derived); `pure_result_every_run` |
+| `Invariant.lean` | `TermLive`, `LiveSteps`; `staleH`; `not_termLiveSuffices`; `withswapWindow` (recorded) |
 | `Stale.lean` | `staleL`: location-free, in the relation, no fresh run; `not_freshRunsExistSemLocFree` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |

@@ -12,3 +12,5 @@ import Purity.Boundary
 import Purity.Examples
 import Purity.FreshExistence
 import Purity.Stale
+import Purity.Invariant
+import Purity.Closures

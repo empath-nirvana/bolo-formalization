@@ -24,7 +24,8 @@ reallocate that location, since the term still names it, and then `load x` is st
 Consequence for the nominal route.  Every fact such a proof uses about the program — its
 membership in the relation, and that it names no location — holds of `staleL`, and so does
 every fact about the model, which does not depend on the program.  An argument from those
-facts alone would prove `FreshRunsExistSemLocFree`.  A proof of `FreshRunsExistSyn` has to use
+facts alone would prove `FreshRunsExistSemLocFree`.  A proof of fresh-run existence for well-typed programs (`FreshRunsExistClosed`,
+`FreshRunsExistPure`, `Closures.lean`) has to use
 more of `DerivesWf` than `derivesWf_locFree`: here, that `staleL` uses `x` twice.
 
 `[about ours]`: an extension, not a transcription.

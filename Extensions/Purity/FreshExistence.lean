@@ -9,14 +9,13 @@ The run the Fundamental Property exhibits need not be fresh.  This file states t
 fact and settles how far the semantic relation goes toward it.
 
 * `FreshRunsExistSyn`: from every tagged typed world, a program `DerivesWf` types, closed by
-  values in the relation, has a fresh run to a value.  **Not derived**; no obstruction to it
-  is verified.
+  values in the relation, has a fresh run to a value.  **It does not hold as stated**
+  (`not_freshRunsExistSyn`, `Closures.lean`): the closing values come from the semantic
+  relation, and a closure there may run `staleL`.  The forms that remain open are
+  `FreshRunsExistClosed` and `FreshRunsExistPure` (`Closures.lean`).
 * `FreshRunsExistSem`: the same with `SemX` in place of `DerivesWf`.  **It does not hold**
   (`not_freshRunsExistSem`), at `peek 0`: from the empty world every run of `peek 0` to a
   value allocates the location `0` that the term itself names.
-* `pure_result_every_run`: under `FreshRunsExistSyn`, every run of a program of the pure
-  fragment from the world's heap, and every run from any heap agreeing on what the arguments
-  reach, returns the exhibited value.  This is what the missing fact would buy.
 
 The two columns differ, as for the read footprint, by the locations a term names.  What a
 proof of `FreshRunsExistSyn` would need is that a well-typed program never reads through a
@@ -39,7 +38,8 @@ open BoCa.BoLo (Heap Steps Step1 Head Kont)
 open BoCa.Fig16.LogRel.Typed
 open BoCa.Lifetime (LifeCtx LSub)
 
-/-- **Fresh runs exist, at the syntactic judgment.**  Not derived. -/
+/-- **Fresh runs exist, at the syntactic judgment, for closing values of the semantic relation.**
+Refuted by `not_freshRunsExistSyn` (`Closures.lean`). -/
 def FreshRunsExistSyn : Prop :=
   ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty), DerivesWf Δ Γ e T → Δ.Ok →
     Ctx.ScopedB Δ Γ → ∀ (δ : LSub) (γ : List Val) (ls : List SRec) (ρ ρf fρ : WRes)
@@ -114,23 +114,6 @@ theorem not_freshRunsExistSem : ¬ FreshRunsExistSem := by
       subst hl
       exact hs.2 0 (by simp) rfl
         (.inr (.inl (by simp [peek, elet, peekBody, loadE, Expr.Occ, Expr.val, Val.loc])))
-
-/-- **What fresh-run existence would buy.**  Under `FreshRunsExistSyn`, every run of a program
-of the pure fragment from the world's heap `μ`, and every run from any heap agreeing with `μ`
-on what the arguments reach, returns the exhibited value. -/
-theorem pure_result_every_run (hex : FreshRunsExistSyn) {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr}
-    {T : Ty} (hP : PureTyping Δ Γ e T) {δ : LSub} {γ : List Val} {ls : List SRec} {ρ : WRes}
-    (hδ : Δ.Models δ) (hγ : gDenX ls δ Γ γ ρ) {ρf fρ : WRes} {ps : List FrameRec}
-    (hf : ResU.Hash ρf ρ) (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls))
-    (htg : Tagged fρ ps ls) {μ : Heap} (hμ : ResU.Lower fρ μ) :
-    ∃ v : Val, LocFree v.1 ∧ Steps μ (LogRel.substAll γ e) μ (.val v) ∧
-      ∀ (μ₂ μ₂' : Heap) (w : Val),
-        (∀ x, Reach μ (ArgLocs γ) x → μ x ≠ none → μ₂ x = μ x) →
-        Steps μ₂ (LogRel.substAll γ e) μ₂' w.1 → w = v := by
-  obtain ⟨v, hlf, -, hrun, hall⟩ := pure_result hP hδ hγ hf hc hT htg hμ
-  obtain ⟨μ₁, w₁, hR⟩ := hex Δ Γ e T hP.derives hP.ok hP.wfCtx δ γ ls ρ ρf fρ ps μ hδ hγ
-    hf hc hT htg hμ
-  exact ⟨v, hlf, hrun, fun μ₂ μ₂' w hag h₂ => (hall μ₁ μ₂ μ₂' w₁ w hR hag h₂).2⟩
 
 end BoCa.Purity
 
