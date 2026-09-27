@@ -208,6 +208,40 @@ function and a backward function returning the borrow's final value, and the pro
 reading of RustHorn (Matsushita, Tsukada and Kobayashi, ESOP 2020), where a mutable borrow
 is a pair of its current and final values, are the natural points of comparison for step 4.
 
+### The nominal route, and where it stops
+
+A nominal argument for `FreshRunsExistSyn` would go as follows.  The model compares locations
+only by equality, so the relation should be invariant under permutations of locations.  A
+`DerivesWf` term names no location (`derivesWf_locFree`), so it is fixed by every permutation.
+At each allocation of the exhibited run, the chosen location would be renamed to one nothing
+names, and invariance would keep the run valid.
+
+`Stale.lean` shows that the program-side facts this argument uses are not enough:
+
+| statement | at `SemX` and location-free |
+|---|---|
+| every location-free term of the semantic relation has a fresh run from every tagged typed world (`FreshRunsExistSemLocFree`) | does not hold, `not_freshRunsExistSemLocFree` at `staleL` |
+
+    staleL = let x = alloc () in free x;
+             let y = alloc (inj₁ ()) in (λ_. ()) (load x); case (free y) {_ ⇒ () | _ ⇒ ()}
+
+`staleL` names no location (`staleL_locFree`) and is in the relation at `∅; ∅ ⊨ staleL : 1`
+(`staleL_sem`): from every world its run reallocates `x`'s location for `y`, reads `inj₁ ()`
+through `x`, and gives the heap back.  From the empty world it has no fresh run
+(`staleL_no_fresh`): a fresh run may not reallocate a location the term still names, and then
+`load x` is stuck.
+
+The renaming step above is where the argument meets `staleL`: renaming only the allocation of
+`y` is not a permutation of the configuration, because the term still names the old location
+through `x`.  Renaming the whole run by a permutation keeps every allocation as stale as it
+was.  Whatever the model's invariance under permutations, it is a fact about the model and
+holds for `staleL` as well; with membership in the relation and location-freeness, it cannot
+yield fresh runs.  A proof of `FreshRunsExistSyn` has to use more of the typing than that the
+term names no location — here, that `staleL` uses `x` after `free x` consumes it.  The
+equivariance of the model's definitions (step 1 of the route) is therefore not mechanised:
+it would not close step 2.  No definition read for this work inspects a location other than
+by equality, but that is not verified.
+
 ## Files
 
 | file | contents |
@@ -221,4 +255,5 @@ is a pair of its current and final values, are the natural points of comparison 
 | `Pure.lean` | the fragment; `pure_heap`, `pure_result`, `closed_pure` |
 | `Boundary.lean` | `peek`; `readFootprintSyn`, `not_readFootprintSem` |
 | `FreshExistence.lean` | `FreshRunsExistSyn` (not derived), `not_freshRunsExistSem` at `peek 0`, `pure_result_every_run` |
+| `Stale.lean` | `staleL`: location-free, in the relation, no fresh run; `not_freshRunsExistSemLocFree` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |
