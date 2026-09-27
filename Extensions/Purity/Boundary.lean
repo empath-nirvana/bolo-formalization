@@ -89,7 +89,7 @@ theorem readFootprintSyn : ReadFootprintSyn := by
   have hP : PureTyping LifeCtx.empty [] e T :=
     ⟨hD, ok_empty, fun s hs => absurd hs (by simp), fun s hs => absurd hs (by simp), hT⟩
   obtain ⟨v, hrun, -, -⟩ := pure_exhibited (RR := stepsRel) hP Adequacy.models_empty (gDenX_nil [] LSub.empty)
-    hf hc hTW htg hμ
+    hf hc hTW htg hμ ()
   have hsub : LogRel.substAll [] e = e := by rw [LogRel.substAll, Adequacy.psub_nil]
   refine ⟨μ, v, ?_⟩
   have := derivesWf_runIn hD [] hrun
@@ -165,7 +165,7 @@ theorem wpTS_restore {ls : List SRec} {e : Expr} {Q : List SRec → Val → WPro
     (hrun : ∀ ρf fρ μ, ResU.Hash ρf ρ → ResU.CompS ρf ρ fρ → ResU.Lower fρ μ →
       Steps μ e μ (.val v))
     (hQ : Q ls v ρ) : wpTS ls e Q ρ := by
-  intro ρf fρ ps hf hc hT htg
+  intro ρf fρ ps hf hc hT htg _
   obtain ⟨μ, hμ⟩ := lower_of_hash hf hc
   exact ⟨ρ, PMap.empty, fρ, fρ, ρ, v, μ, μ, ps, ls, ResU.hash_symm hf, hc,
     ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hf hc)), hμ,

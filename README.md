@@ -70,7 +70,9 @@ every finite memory misses.  The typed world and 6.151 are proved for `wp` with 
 from any class of runs closed under the operations `wp`'s rules build runs with
 (`Fig16.LogRel.Typed.wpTSR`, `Fig16.LogRel.Typed.fundamentalR`); `wpTS`, `SemX` and every
 statement above are the instance at every run, and `adequacy` is `adequacyPol` at the
-least-free policy with the policy forgotten (`docs/adjudications.md` §12.74).
+least-free policy with the policy forgotten (`docs/adjudications.md` §12.74).  The classes are indexed:
+`Fig16.LogRel.Typed.freshRel` is the runs whose allocations avoid a given finite list and every
+location in reach, and `Fig16.LogRel.Typed.adequacyFresh` is adequacy for them.
 
 **The trust base of `adequacy` is `[TR]` §§1–3.**  The statement mentions the
 syntax (§1), the typing judgment `DerivesWf` (§2) and the machine `BoLo.Steps`

@@ -22,8 +22,9 @@ What is not derived here: that runs under *different* policies, or from heaps th
 what the arguments reach, return the same value.  That comparison is `Local.lean`'s, and needs
 one of the runs fresh.  A policy sees only the memory; a fresh choice must also avoid the
 locations the term names, and a choice that looks at the term is not preserved by plugging
-into an evaluation context (`RunRel.plug`).  So `FreshRunsExistClosed` does not follow from
-the policy results, and remains open.
+into an evaluation context (`RunRel.plug` at a single class).  The fresh runs are therefore a
+class indexed by a list of locations to avoid, enlarged when a run is plugged
+(`Typed.freshRel`); `FreshRuns.lean` draws the consequences.
 
 `[about ours]`: an extension, not a transcription.
 -/
@@ -99,7 +100,7 @@ theorem closed_policy_pure {e : Expr} {T : Ty} (hD : DerivesWf LifeCtx.empty [] 
     ⟨hD, ok_empty, fun s hs => absurd hs (by simp), fun s hs => absurd hs (by simp), hT⟩
   have hsub : LogRel.substAll [] e = e := by rw [LogRel.substAll, Adequacy.psub_nil]
   obtain ⟨v, hrun, hlf, -⟩ := pure_exhibited (RR := polRel pol) hP Adequacy.models_empty
-    (gDenX_nil ls LSub.empty) hf hc hTW htg hμ
+    (gDenX_nil ls LSub.empty) hf hc hTW htg hμ ()
   rw [hsub] at hrun
   exact ⟨v, hlf, hrun, fun _ _ h => polRun_det hrun rfl h⟩
 
@@ -114,7 +115,7 @@ theorem pure_policy_heap {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty}
     (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap} (hμ : ResU.Lower fρ μ) :
     ∃ v : Val, LocFree v.1 ∧ PolRun pol μ (LogRel.substAll γ e) μ (.val v) ∧
       ∀ (μ' : Heap) (w : Val), PolRun pol μ (LogRel.substAll γ e) μ' w.1 → μ' = μ ∧ w = v := by
-  obtain ⟨v, hrun, hlf, -⟩ := pure_exhibited (RR := polRel pol) hP hδ hγ hf hc hT htg hμ
+  obtain ⟨v, hrun, hlf, -⟩ := pure_exhibited (RR := polRel pol) hP hδ hγ hf hc hT htg hμ ()
   exact ⟨v, hlf, hrun, fun _ _ h => polRun_det hrun rfl h⟩
 
 end BoCa.Purity

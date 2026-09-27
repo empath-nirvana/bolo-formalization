@@ -19,8 +19,10 @@ code.  Two forms of it are stated:
   `Imm` borrows; a closure behind an `Imm` borrow is reachable but reaches the program only at
   `Unk` (`[TR]` p. 3's `Imm̲`), and cannot be called.
 
-Neither is derived; no obstruction to either is verified.  `pure_result_every_run` records what
-the second would give.
+`FreshRunsExistClosed` is proved in `FreshRuns.lean`, from the Fundamental Property at the
+fresh runs; `FreshRunsExistPure` is not derived, and no obstruction to it is verified
+(`FreshRuns.lean` proves it with the arguments in the relation at the fresh runs).
+`pure_result_every_run` records what `FreshRunsExistPure` would give.
 
 `[about ours]`: an extension, not a transcription.
 -/
@@ -67,7 +69,7 @@ theorem not_freshRunsExistSyn : ¬ FreshRunsExistSyn := by
   have htg : Tagged (PMap.empty : WRes) [] [] := fun x hx => absurd hx (by simp)
   have hγ : gDenX [] LSub.empty [⟨.lolli .unit .unit, true⟩] [staleClosure] PMap.empty := by
     refine gDenX_mk (by simp [Ctx.LiveWithin]) ?_
-    simp only [gSepX, gSepXR, if_pos]
+    simp only [gSepXR, if_pos]
     exact ⟨PMap.empty, PMap.empty, ResU.comp_empty_right _, staleClosure_vP [] LSub.empty,
       ⟨rfl, trivial⟩⟩
   obtain ⟨μ', v, hR⟩ := h LifeCtx.empty _ callF .unit d_callF ok_empty
@@ -87,7 +89,8 @@ theorem not_freshRunsExistSyn : ¬ FreshRunsExistSyn := by
 
 /-! ### The forms that remain open -/
 
-/-- **Fresh runs exist for closed well-typed programs.**  Not derived. -/
+/-- **Fresh runs exist for closed well-typed programs.**  Proved: `freshRunsExistClosed`
+(`FreshRuns.lean`). -/
 def FreshRunsExistClosed : Prop :=
   ∀ (e : Expr) (T : Ty), DerivesWf LifeCtx.empty ([] : Ctx Ty) e T →
     ∀ (ls : List SRec) (ρf fρ : WRes) (ps : List FrameRec) (μ : Heap),

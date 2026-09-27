@@ -225,13 +225,13 @@ open BoCa.Lifetime (LSub LifeCtx LifeVar)
 class `RR`.  `[about ours: [CONF] 3.2 at `wpTSR`; the proof is `Adequacy.theorem32`'s;
 docs/adjudications.md §12.74]` -/
 theorem theorem32R (RR : RunRel) (e : Expr) (P : Val → Prop)
-    (hwp : wpTSR RR [] e (fun _ v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes)) :
-    ∃ v : Val, RR.R Adequacy.emptyMem e Adequacy.emptyMem (.val v) ∧ P v := by
+    (hwp : wpTSR RR [] e (fun _ v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes)) (i : RR.I) :
+    ∃ v : Val, RR.R i Adequacy.emptyMem e Adequacy.emptyMem (.val v) ∧ P v := by
   have htg : Tagged (PMap.empty : WRes) [] [] := fun x hx => absurd hx (by simp)
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', -, -,
     h1, h2, h3, h5, h6, h7, h8, h9, h10, h11, -, -, -, -, h12⟩ :=
     hwp PMap.empty PMap.empty [] Fig16.LogRel.hash_empty (ResU.comp_empty_right _)
-      TW.empty htg
+      TW.empty htg i
   obtain ⟨hρ'e, hPv⟩ := h12
   subst hρ'e
   obtain rfl : (PMap.empty : WRes) = fρ' := ResU.eq_of_comp_empty_left h2
@@ -247,7 +247,7 @@ theorem theorem32R (RR : RunRel) (e : Expr) (P : Val → Prop)
 theorem theorem32 (e : Expr) (P : Val → Prop)
     (hwp : wpTS [] e (fun _ v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes)) :
     ∃ v : Val, BoCa.BoLo.Steps Adequacy.emptyMem e Adequacy.emptyMem (.val v) ∧ P v :=
-  theorem32R stepsRel e P hwp
+  theorem32R stepsRel e P hwp ()
 
 end BoCa.Fig16.LogRel.Typed
 
@@ -350,12 +350,12 @@ theorem corollary33 (e : Expr) (hsem : SemX LifeCtx.empty ([] : Ctx Ty) e Ty.uni
 /-- `[CONF]` Corollary 3.3 at `SemXR RR`: the run is of the class `RR`.
 `[about ours: [CONF] 3.3 at `SemXR`; the proof is `Adequacy.corollary33`'s; §12.74]` -/
 theorem corollary33R (RR : RunRel) (e : Expr)
-    (hsem : SemXR RR LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
-    RR.R Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) := by
+    (hsem : SemXR RR LifeCtx.empty ([] : Ctx Ty) e Ty.unit) (i : RR.I) :
+    RR.R i Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) := by
   have hwp := hsem LSub.empty [] [] PMap.empty Adequacy.models_empty
     (by simpa using gDenX_nil (RR := RR) [] LSub.empty)
   rw [substAll, Adequacy.psub_nil] at hwp
-  obtain ⟨v, hsteps, hv⟩ := theorem32R RR e (· = Val.unit) hwp
+  obtain ⟨v, hsteps, hv⟩ := theorem32R RR e (· = Val.unit) hwp i
   subst hv
   exact hsteps
 
@@ -363,9 +363,9 @@ theorem corollary33R (RR : RunRel) (e : Expr)
 run of the class `RR` from the empty memory to `()` and the empty memory.
 `[about ours: [CONF] Lemma 3.1 composed with Corollary 3.3, at `SemXR RR`; §12.74]` -/
 theorem adequacyR (RR : RunRel) (e : Expr)
-    (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
-    RR.R Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
-  corollary33R RR e (fundamentalR RR _ _ _ _ hD ok_empty (fun s hs => absurd hs (by simp)))
+    (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) (i : RR.I) :
+    RR.R i Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
+  corollary33R RR e (fundamentalR RR _ _ _ _ hD ok_empty (fun s hs => absurd hs (by simp))) i
 
 /-- **Adequacy under every allocation policy**: a closed program `[TR]` p. 2 types at `1`
 runs, allocating wherever `pol` says, from the empty memory to `()` and the empty memory.
@@ -373,7 +373,16 @@ runs, allocating wherever `pol` says, from the empty memory to `()` and the empt
 theorem adequacyPol (pol : BoCa.BoLo.Policy) (e : Expr)
     (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
     BoCa.BoLo.PolRun pol Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
-  adequacyR (polRel pol) e hD
+  adequacyR (polRel pol) e hD ()
+
+/-- **Adequacy with fresh allocation**: for every finite list `N`, a closed program `[TR]` p. 2
+types at `1` has a run from the empty memory to `()` and the empty memory each of whose
+allocations avoids `N` and every location its configuration names.
+`[about ours: `adequacyR` at `freshRel`; §12.74]` -/
+theorem adequacyFresh (N : List BoCa.Loc) (e : Expr)
+    (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
+    BoCa.BoLo.FreshRunN N Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
+  adequacyR freshRel e hD N
 
 /-- Adequacy from a typing derivation: a closed program `[TR]` p. 2 types at `1`
 (`DerivesWf`) runs from the empty memory to `()` and the empty memory.  It is the run

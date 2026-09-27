@@ -182,12 +182,12 @@ theorem pure_exhibited {RR : RunRel} {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T 
     {δ : LSub} {γ : List Val} {ls : List SRec} {ρ : WRes} (hδ : Δ.Models δ)
     (hγ : gDenXR RR ls δ Γ γ ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
-    (hμ : ResU.Lower fρ μ) :
-    ∃ v : Val, RR.R μ (LogRel.substAll γ e) μ (.val v) ∧ LocFree v.1 ∧
+    (hμ : ResU.Lower fρ μ) (i : RR.I) :
+    ∃ v : Val, RR.R i μ (LogRel.substAll γ e) μ (.val v) ∧ LocFree v.1 ∧
       ∃ ls', vPR RR T ls' δ v PMap.empty := by
   have hw := fundamentalR RR Δ Γ e T hP.derives hP.ok hP.wfCtx δ γ ls ρ hδ hγ
   obtain ⟨ρ', ρp, π, fπ, μ', v, ls', hrun, hQ, h9, hA, hno, hfπ, hμ'⟩ :=
-    wpTS_exhibited hw hf hc hT htg hμ
+    wpTS_exhibited hw hf hc hT htg hμ i
   obtain ⟨rfl, hlf⟩ := vP_plain hP.result hQ
   obtain rfl : ρp = π := ResU.eq_of_comp_empty_left h9
   obtain rfl := heap_restored hc hμ hfπ hμ' hA (gDenX_pure hP.args hγ) hno
@@ -206,7 +206,7 @@ theorem pure_heap {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty} (hP : PureTyp
       (∃ ls', vP T ls' δ v PMap.empty) ∧
       ∀ (μR : Heap) (w : Val), FreshRun μ (LogRel.substAll γ e) μR w.1 →
         w = v ∧ ∃ g : Loc → Loc, Set.InjOn g {x | μR x ≠ none} ∧ μ = Heap.push g μR := by
-  obtain ⟨v, hrun, hlf, hQ⟩ := pure_exhibited hP hδ hγ hf hc hT htg hμ
+  obtain ⟨v, hrun, hlf, hQ⟩ := pure_exhibited (RR := stepsRel) hP hδ hγ hf hc hT htg hμ ()
   refine ⟨v, hrun, hlf, hQ, fun μR w hR => ?_⟩
   obtain ⟨g, hinj, hpush, hv⟩ := fresh_run_image hR hrun
   have hw : LocFree w.1 := locFree_of_rename (e := w.1) (g := g) (by rw [← Val.rename_val, ← hv]; exact hlf)
@@ -254,7 +254,7 @@ theorem closed_pure {e : Expr} {T : Ty} (hD : DerivesWf LifeCtx.empty [] e T) (h
   have hworld := fun (ρf fρ : WRes) (ps : List FrameRec) (ls : List SRec) (μ : Heap)
       (hf : ResU.Hash ρf PMap.empty) (hc : ResU.CompS ρf PMap.empty fρ)
       (hTW : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) (hμ : ResU.Lower fρ μ) =>
-    pure_exhibited (RR := stepsRel) hP Adequacy.models_empty (gDenX_nil ls LSub.empty) hf hc hTW htg hμ
+    pure_exhibited (RR := stepsRel) hP Adequacy.models_empty (gDenX_nil ls LSub.empty) hf hc hTW htg hμ ()
   -- the empty world
   have htg0 : Tagged (PMap.empty : WRes) [] [] := fun x hx => absurd hx (by simp)
   obtain ⟨v, hrun, hlf, -⟩ := hworld PMap.empty PMap.empty [] [] Adequacy.emptyMem

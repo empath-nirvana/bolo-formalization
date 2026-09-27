@@ -59,10 +59,10 @@ theorem wpTS_iff_postAt {ls : List SRec} {e : Expr} {Q : List SRec → Val → W
   constructor
   · intro h ρf fρ ps hf hc hT htg
     obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉, hA, hB,
-      hT', htg', hps, hls, hC⟩ := h ρf fρ ps hf hc hT htg
+      hT', htg', hps, hls, hC⟩ := h ρf fρ ps hf hc hT htg ()
     exact ⟨μ, μ', v, h₈, ρ', ρp, fρ', fρ'p, π, ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₉, hA, hB,
       hT', htg', hps, hls, hC⟩
-  · intro h ρf fρ ps hf hc hT htg
+  · intro h ρf fρ ps hf hc hT htg _
     obtain ⟨μ, μ', v, h₈, ρ', ρp, fρ', fρ'p, π, ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₉, hA, hB,
       hT', htg', hps, hls, hC⟩ := h ρf fρ ps hf hc hT htg
     exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉, hA, hB,

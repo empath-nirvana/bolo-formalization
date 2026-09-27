@@ -1189,11 +1189,22 @@ particular a run (`RunRel.toSteps`), and the printed existential is the instance
 policy: `Fig16.LogRel.Typed.adequacy` is now `Fig16.LogRel.Typed.adequacyPol` at the
 least-free policy, forgetting the policy.  Its statement is unchanged.
 
+The class is indexed (`RunRel.I`) and `wp` holds at every index; plugging a run into an
+evaluation context `K` may change the index (`RunRel.shift K`).  `stepsRel` and `polRel pol`
+have one index.  `Fig16.LogRel.Typed.freshRel` is indexed by a finite list `N`: its runs
+allocate only locations that neither `N` nor the configuration names (the memory's domain, the
+term, the values the memory holds; `BoLo.FreshRunN`), and a run plugged into `K` avoids the
+locations of `K` too.  6.141's choice of `ℓ` is again a location missing from `ρf ● ρ`, now also
+avoiding a finite list, which exists because every set involved is finite.
+
 What it buys.  `Fig16.LogRel.Typed.adequacyPol`: for every policy, a closed program of type
 `1` runs *under that policy* from the empty memory to `()` and the empty memory.  A policy run
 is the only step from each configuration, so this run is the only policy run that reaches a
 value (`Extensions/Purity`, `closed_policy_adequacy`): for every deterministic allocator of
-this kind, the one execution is safe, terminates and reclaims its memory.  Terms that the
+this kind, the one execution is safe, terminates and reclaims its memory.  `Fig16.LogRel.Typed.adequacyFresh`: a closed program of
+type `1` has, for every finite `N`, a run whose allocations avoid `N` and every name in reach;
+with renaming invariance of runs, every run of a closed program of plain-data type returns one
+value (`Extensions/Purity`, `closed_pure_every_run`).  Terms that the
 semantic judgment `SemX` admits but no rule types can need the existential's freedom:
 `peek 1` (`Extensions/Purity`, `not_semPolicyRuns`) runs only by allocating the location it
 reads.

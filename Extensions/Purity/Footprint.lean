@@ -210,12 +210,12 @@ four composites of the final world regrouped as `ρf ● π`. -/
 theorem wpTS_exhibited {RR : RunRel} {ls : List SRec} {e : Expr}
     {Q : List SRec → Val → WProp} {ρ : WRes} (hw : wpTSR RR ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
-    (hμ : ResU.Lower fρ μ) :
+    (hμ : ResU.Lower fρ μ) (i : RR.I) :
     ∃ (ρ' ρp π fπ : WRes) (μ' : Heap) (v : Val) (ls' : List SRec),
-      RR.R μ e μ' (.val v) ∧ Q ls' v ρ' ∧ ResU.CompS ρ' ρp π ∧ ResU.UpdV ρ π ∧
+      RR.R i μ e μ' (.val v) ∧ Q ls' v ρ' ∧ ResU.CompS ρ' ρp π ∧ ResU.UpdV ρ π ∧
       NoOwn ρp ∧ ResU.CompS ρf π fπ ∧ ResU.Lower fπ μ' := by
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ₀, μ', ps', ls', -, h₂, -, h₅, h₆, h₇, h₈, h₉, hA, hno,
-    -, -, -, -, hC⟩ := hw ρf fρ ps hf hc hT htg
+    -, -, -, -, hC⟩ := hw ρf fρ ps hf hc hT htg i
   cases ResU.Lower.functional h₅ hμ
   -- `π = ρ′ ● ρ⁺` is a factor of the final world
   obtain ⟨bc, hbc, hfbc⟩ := compS_reassoc h₂ h₆
@@ -230,11 +230,11 @@ theorem wpTS_exhibited {RR : RunRel} {ls : List SRec} {e : Expr}
 theorem wpTS_footprint {RR : RunRel} {ls : List SRec} {e : Expr}
     {Q : List SRec → Val → WProp} {ρ : WRes} (hw : wpTSR RR ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
-    (hμ : ResU.Lower fρ μ) :
-    ∃ (μ' : Heap) (v : Val), RR.R μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
+    (hμ : ResU.Lower fρ μ) (i : RR.I) :
+    ∃ (μ' : Heap) (v : Val), RR.R i μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
       Footprint ρf ρ μ μ' := by
   obtain ⟨ρ', -, π, fπ, μ', v, ls', hrun, hQ, -, hA, -, hfπ, hμ'⟩ :=
-    wpTS_exhibited hw hf hc hT htg hμ
+    wpTS_exhibited hw hf hc hT htg hμ i
   exact ⟨μ', v, hrun, ⟨ls', ρ', hQ⟩, footprint_of_upd hc hμ hfπ hμ' hA⟩
 
 /-! ### Every run that does not allocate, and every fresh run -/
@@ -248,7 +248,7 @@ theorem wpTS_footprint_every {ls : List SRec} {e : Expr} {Q : List SRec → Val 
     (htg : Tagged fρ ps ls) {μ μR : Heap} {w : Val} (hμ : ResU.Lower fρ μ)
     (hR : StepsNA μ e μR (.val w)) :
     (∃ ls' ρ', Q ls' w ρ') ∧ Footprint ρf ρ μ μR := by
-  obtain ⟨μ', v, hrun, hQ, hfp⟩ := wpTS_footprint hw hf hc hT htg hμ
+  obtain ⟨μ', v, hrun, hQ, hfp⟩ := wpTS_footprint hw hf hc hT htg hμ ()
   obtain ⟨rfl, rfl⟩ := stepsNA_det hR rfl hrun
   exact ⟨hQ, hfp⟩
 
@@ -263,7 +263,7 @@ theorem wpTS_footprint_fresh {ls : List SRec} {e : Expr} {Q : List SRec → Val 
     (hR : FreshRun μ e μR w.1) :
     ∃ g : Loc → Loc, Set.InjOn g {x | μR x ≠ none} ∧
       (∃ ls' ρ', Q ls' (w.rename g) ρ') ∧ Footprint ρf ρ μ (Heap.push g μR) := by
-  obtain ⟨μ', v, hrun, hQ, hfp⟩ := wpTS_footprint hw hf hc hT htg hμ
+  obtain ⟨μ', v, hrun, hQ, hfp⟩ := wpTS_footprint hw hf hc hT htg hμ ()
   obtain ⟨g, hinj, rfl, rfl⟩ := fresh_run_image hR hrun
   exact ⟨g, hinj, hQ, hfp⟩
 

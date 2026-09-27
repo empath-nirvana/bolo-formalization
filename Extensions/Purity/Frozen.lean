@@ -92,11 +92,11 @@ every location beneath an `imm` cell of `⦇ρ⦈` keeps its value; with `Footpr
 theorem wpTS_frozen {RR : RunRel} {ls : List SRec} {e : Expr}
     {Q : List SRec → Val → WProp} {ρ : WRes} (hw : wpTSR RR ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
-    (hμ : ResU.Lower fρ μ) :
-    ∃ (μ' : Heap) (v : Val), RR.R μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
+    (hμ : ResU.Lower fρ μ) (i : RR.I) :
+    ∃ (μ' : Heap) (v : Val), RR.R i μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
       Footprint ρf ρ μ μ' ∧ ∀ ℓ, Frozen ρ ℓ → μ' ℓ = μ ℓ := by
   obtain ⟨ρ', -, π, fπ, μ', v, ls', hrun, hQ, -, hA, -, hfπ, hμ'⟩ :=
-    wpTS_exhibited hw hf hc hT htg hμ
+    wpTS_exhibited hw hf hc hT htg hμ i
   exact ⟨μ', v, hrun, ⟨ls', ρ', hQ⟩, footprint_of_upd hc hμ hfπ hμ' hA,
     fun ℓ h => (frozen_keeps hc hμ hfπ hμ' hA h).1⟩
 

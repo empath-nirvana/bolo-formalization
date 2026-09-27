@@ -522,9 +522,9 @@ theorem addAt_frameList (p : FrameRec) (ds : List FrameRec) (α : Life) (ls : Li
 
 /-! ### Lemma 6.136 (wp-val) at the typed world; record in `Paper/S6_7_WeakestPreconditionRules/Lemmas.lean` -/
 /-- A head step that allocates nothing, as a run of the class. -/
-theorem RunRel.head₁ (R : RunRel) {μ μ' : Heap} {a a' : Expr} (h : Head μ a μ' a')
-    (hdom : ∀ ℓ, μ' ℓ ≠ none → μ ℓ ≠ none) : R.R μ a μ' a' :=
-  R.cons (Step1.head h) hdom (R.refl _ _)
+theorem RunRel.head₁ (R : RunRel) {i : R.I} {μ μ' : Heap} {a a' : Expr} (h : Head μ a μ' a')
+    (hdom : ∀ ℓ, μ' ℓ ≠ none → μ ℓ ≠ none) : R.R i μ a μ' a' :=
+  R.cons (Step1.head h) hdom (R.refl _ _ _)
 
 /-- The memory of a world is finite. -/
 theorem finDom_of_lower {W : WRes} {μ : Heap} (hμ : ResU.Lower W μ) : Fig16.FinDom μ := by
@@ -535,11 +535,11 @@ theorem finDom_of_lower {W : WRes} {μ : Heap} (hμ : ResU.Lower W μ) : Fig16.F
 /-- `[TR]` 6.136 (`wp-val`) at `wpTS`. -/
 theorem wpTS_val (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (Q ls v) ((wpTSR RR) ls (.val v) Q) := by
-  intro ρ hQ ρf fρ ps hf hc hT htg
+  intro ρ hQ ρf fρ ps hf hc hT htg i
   obtain ⟨μ, hμ⟩ := lower_of_hash hf hc
   exact ⟨ρ, PMap.empty, fρ, fρ, ρ, v, μ, μ, ps, ls, ResU.hash_symm hf, hc,
     ResU.hash_symm (ResU.hash_empty_right (hash_valid_comp hf hc)), hμ,
-    ResU.comp_empty_right fρ, hμ, RR.refl _ _, ResU.comp_empty_right ρ,
+    ResU.comp_empty_right fρ, hμ, RR.refl i _ _, ResU.comp_empty_right ρ,
     (ResU.updV_self_iff ρ).mpr (hash_valid hf).2, noOwn_empty, hT, htg,
     fun _ => Iff.rfl, fun _ => Iff.rfl, hQ⟩
 
@@ -547,9 +547,9 @@ theorem wpTS_val (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
 /-- One deterministic head step in front of a `wpTS` (6.137–6.140). -/
 theorem wpTS_head {e e' : Expr} (h : ∀ μ : Heap, Head μ e μ e') (ls : List SRec)
     (Q : List SRec → Val → WProp) : Entails ((wpTSR RR) ls e' Q) ((wpTSR RR) ls e Q) := by
-  intro ρ hw ρf fρ ps hf hc hT htg
+  intro ρ hw ρf fρ ps hf hc hT htg i
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉, hA, hB,
-    hT', htg', hps, hls, hC⟩ := hw ρf fρ ps hf hc hT htg
+    hT', htg', hps, hls, hC⟩ := hw ρf fρ ps hf hc hT htg i
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇,
     RR.cons (Step1.head (h μ)) (fun _ h => h) h₈, h₉, hA, hB, hT', htg', hps, hls, hC⟩
 
@@ -586,10 +586,10 @@ theorem wpTS_lolli (ls : List SRec) (b : Expr) (v : Val) (Q : List SRec → Val 
 theorem wpTS_alloc (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (all fun l : BoCa.Loc => wand (ptoOwn l v) (Q ls (.loc l)))
       ((wpTSR RR) ls (.app (.val (.prim .alloc)) (.val v)) Q) := by
-  intro ρ h ρf σ ps hf hσ hT htg
+  intro ρ h ρf σ ps hf hσ hT htg i
   obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
   obtain ⟨τ, hτ, hval⟩ := id hμ
-  obtain ⟨l, hμl, hrun⟩ := RR.alloc μ v (finDom_of_lower hμ)
+  obtain ⟨l, hμl, hrun⟩ := RR.alloc i μ v (finDom_of_lower hμ)
   have hl : τ.get l = none := (lower_eq_none_iff hval).mp hμl
   have hρl : ρ.get l = none :=
     ((ResU.Comp.eq_none_iff hσ l).mp (get_eq_none_of_flat hτ hl)).2
@@ -614,7 +614,7 @@ theorem wpTS_alloc (ls : List SRec) (v : Val) (Q : List SRec → Val → WProp) 
 theorem wpTS_free (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoOwn l v) (Q ls v))
       ((wpTSR RR) ls (.app (.val (.prim .free)) (.val (.loc l))) Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hQ⟩ ρf σ ps hf hσ hT htg
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hQ⟩ ρf σ ps hf hσ hT htg i
   obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
   have h₂ : ResU.Hash ρf ρ₂ :=
     ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
@@ -648,7 +648,7 @@ theorem wpTS_free (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → V
 theorem wpTS_load (ls : List SRec) (l : BoCa.Loc) (v : Val) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoOwn l v) (wand (ptoOwn l v) (Q ls v)))
       ((wpTSR RR) ls (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf σ ps hf hσ hT htg
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf σ ps hf hσ hT htg i
   obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
   have hρ : ρ.get l = some (CellU.ownOf v) := by
     rw [ResU.Comp.get_of_right_none hcρ (ResU.compatS_single_own hcρ.1),
@@ -675,7 +675,7 @@ theorem wpTS_load_I (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WPr
         (all fun v =>
           wand (ptoImm l α (fun v' => sep (pure (v = v')) (P v))) (Q ls v)))
       ((wpTSR RR) ls (.app (.val (.prim .load)) (.val (.loc l))) Q) := by
-  rintro ρ ⟨ρ₁, ρR, hcρ, ⟨s, v, σ, hs, rfl, hP, hα⟩, hR⟩ ρf τ ps hf hτ hT htg
+  rintro ρ ⟨ρ₁, ρR, hcρ, ⟨s, v, σ, hs, rfl, hP, hα⟩, hR⟩ ρf τ ps hf hτ hT htg i
   have hcell : ptoImm l α (fun v' => sep (pure (v = v')) (P v))
       (ResU.single l (CellU.immOf s v σ hs)) :=
     ⟨s, v, σ, hs, rfl, (pure_sep_biEntails rfl (P v)).2 σ hP, hα⟩
@@ -699,7 +699,7 @@ theorem wpTS_load_I (ls : List SRec) (l : BoCa.Loc) (α : Life) (P : Val → WPr
 theorem wpTS_store (ls : List SRec) (l : BoCa.Loc) (v₁ v₂ : Val) (Q : List SRec → Val → WProp) :
     Entails (sep (ptoOwn l v₁) (wand (ptoOwn l v₂) (Q ls .unit)))
       ((wpTSR RR) ls (.app (.val (.storeV (.loc l))) (.val v₂)) Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf σ ps hf hσ hT htg
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, rfl, hwand⟩ ρf σ ps hf hσ hT htg i
   obtain ⟨μ, hμ⟩ := lower_of_hash hf hσ
   have h₂ : ResU.Hash ρf ρ₂ :=
     ResU.hash_symm (ResU.Hash.split hcρ (ResU.hash_symm hf)).2
@@ -743,15 +743,15 @@ theorem wpTS_store (ls : List SRec) (l : BoCa.Loc) (v₁ v₂ : Val) (Q : List S
 typed world with the list the first run returned. -/
 theorem wpTS_bind (K : Kont) (e : Expr) (ls : List SRec) (Q : List SRec → Val → WProp) :
     Entails ((wpTSR RR) ls e fun ls' v => (wpTSR RR) ls' (K.plug (.val v)) Q) ((wpTSR RR) ls (K.plug e) Q) := by
-  intro ρ hw ρf fρ ps hf h₄ hT htg
+  intro ρ hw ρf fρ ps hf h₄ hT htg i
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
-    hA, hB, hT', htg', hps', hls', hC⟩ := hw ρf fρ ps hf h₄ hT htg
+    hA, hB, hT', htg', hps', hls', hC⟩ := hw ρf fρ ps hf h₄ hT htg (RR.shift K i)
   obtain ⟨z, hzp, hz⟩ := (hash_shift ρp ρf ρ').mp ⟨fρ', h₂, h₃⟩
   have hfz : ResU.CompS ρf ρp z := ResU.CompS.comm hzp
   obtain ⟨z₀, hz₀, hY⟩ := compS_exch h₂ h₆
   have hzY : ResU.CompS z ρ' fρ'p := by rwa [ResU.CompS.functional hz₀ hfz] at hY
   obtain ⟨ρ'', ρpp, Y'', Y''p, π'', v', ν, ν', ps'', ls'', k₁, k₂, k₃, k₅, k₆, k₇, k₈,
-    k₉, kA, kB, kT, ktg, kps, kls, kC⟩ := hC z fρ'p ps' hz hzY hT' htg'
+    k₉, kA, kB, kT, ktg, kps, kls, kC⟩ := hC z fρ'p ps' hz hzY hT' htg' i
   obtain ⟨hfρ'', -⟩ := ResU.Hash.split hfz (ResU.hash_symm k₁)
   obtain ⟨F, hF, hFp⟩ := compS_exch hfz k₂
   obtain ⟨ZZ, hZZ, hZF⟩ := (hash_shift ρpp ρp F).mp ⟨Y'', ResU.CompS.comm hFp, k₃⟩
@@ -780,12 +780,12 @@ theorem wpTS_bind (K : Kont) (e : Expr) (ls : List SRec) (Q : List SRec → Val 
 /-- `[TR]` 6.146 (`wp-ramify`) at `wpTS`. -/
 theorem wpTS_ramify (ls : List SRec) (e : Expr) (P Q : List SRec → Val → WProp) :
     Entails (sep ((wpTSR RR) ls e P) (wandAllTS ls P Q)) ((wpTSR RR) ls e Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, hwp, hwand⟩ ρf fρ ps hf hc hT htg
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, hwp, hwand⟩ ρf fρ ps hf hc hT htg i
   obtain ⟨y, hy, hy₁⟩ := (hash_shift ρf ρ₂ ρ₁).mp ⟨ρ, ResU.CompS.comm hcρ, hf⟩
   obtain ⟨y', hy', hyfρ⟩ := compS_reassoc' (ResU.CompS.comm hcρ) hc
   cases ResU.CompS.functional hy' hy
   obtain ⟨ρ', ρp, Y', Y'p, π', v, μ, μ', ps', ls', g₁, g₂, g₃, g₅, g₆, g₇, g₈, g₉,
-    gA, gB, gT, gtg, gps, gls, gC⟩ := hwp y fρ ps hy₁ hyfρ hT htg
+    gA, gB, gT, gtg, gps, gls, gC⟩ := hwp y fρ ps hy₁ hyfρ hT htg i
   obtain ⟨W, hW, hfW⟩ := compS_reassoc hy g₂
   obtain ⟨W₀, hW₀, hWf₀⟩ := (hash_shift ρ' ρ₂ ρf).mp ⟨y, ResU.CompS.comm hy, g₁⟩
   have hWf : ResU.Hash W ρf := by
@@ -806,9 +806,9 @@ theorem wpTS_ramify (ls : List SRec) (e : Expr) (P Q : List SRec → Val → WPr
 /-- `[TR]` 6.147 (`wp-box`) at `wpTS`. -/
 theorem wpTS_box (ls : List SRec) (α : Life) (e : Expr) (Q : List SRec → Val → WProp) :
     Entails (box α ((wpTSR RR) ls e Q)) ((wpTSR RR) ls e fun ls' v => box α (Q ls' v)) := by
-  rintro ρ ⟨hw, hout⟩ ρf fρ ps hf hc hT htg
+  rintro ρ ⟨hw, hout⟩ ρf fρ ps hf hc hT htg i
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
-    hA, hB, hT', htg', hps, hls, hC⟩ := hw ρf fρ ps hf hc hT htg
+    hA, hB, hT', htg', hps, hls, hC⟩ := hw ρf fρ ps hf hc hT htg i
   exact ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', h₁, h₂, h₃, h₅, h₆, h₇, h₈, h₉,
     hA, hB, hT', htg', hps, hls, hC, ((outlives_comp h₉ α).mp (updV_outlives hout hA)).1⟩
 
@@ -816,12 +816,12 @@ theorem wpTS_box (ls : List SRec) (α : Life) (e : Expr) (Q : List SRec → Val 
 /-- A frame with no owned cell passes through a `wpTS` run (6.148/6.149's shared argument). -/
 theorem wpTS_frame_noOwn {R : WProp} (hR : ∀ ρ, R ρ → NoOwn ρ) (ls : List SRec) (e : Expr)
     (Q : List SRec → Val → WProp) : Entails (sep R ((wpTSR RR) ls e Q)) ((wpTSR RR) ls e Q) := by
-  rintro ρ ⟨ρ₁, ρ₂, hcρ, hR₁, hwp⟩ ρf fρ ps hf hc hT htg
+  rintro ρ ⟨ρ₁, ρ₂, hcρ, hR₁, hwp⟩ ρf fρ ps hf hc hT htg i
   obtain ⟨y, hy, hy₂⟩ := (hash_shift ρf ρ₁ ρ₂).mp ⟨ρ, hcρ, hf⟩
   obtain ⟨y', hy', hyfρ⟩ := compS_reassoc' hcρ hc
   cases ResU.CompS.functional hy' hy
   obtain ⟨ρ'', ρp, Y'', Y''p, π', v', μ, μ', ps', ls', g₁, g₂, g₃, g₅, g₆, g₇, g₈, g₉,
-    gA, gB, gT, gtg, gps, gls, gC⟩ := hwp y fρ ps hy₂ hyfρ hT htg
+    gA, gB, gT, gtg, gps, gls, gC⟩ := hwp y fρ ps hy₂ hyfρ hT htg i
   obtain ⟨hfρ'', -⟩ := ResU.Hash.split hy (ResU.hash_symm g₁)
   obtain ⟨F, hF, hFv⟩ := hfρ''.2
   obtain ⟨F', hF', hFρ₁⟩ := compS_exch hy g₂

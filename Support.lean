@@ -1,5 +1,6 @@
 import Support.Dynamics.Interpreter
 import Support.Dynamics.Machine
+import Support.Dynamics.Fresh
 import Support.Dynamics.Policy
 import Support.Dynamics.PrintedWp
 import Support.Lifetimes.Interpretation

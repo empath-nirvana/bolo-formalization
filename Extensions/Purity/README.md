@@ -182,7 +182,8 @@ and its adequacy for *every* run, both rest on step 1, and without it they would
 | statement | at `DerivesWf` | at `SemX` |
 |---|---|---|
 | from every tagged typed world, the program, closed by values of the semantic relation, has a fresh run to a value (`FreshRunsExistSyn`, `FreshRunsExistSem`) | does not hold, `not_freshRunsExistSyn` | does not hold, `not_freshRunsExistSem` at `peek 0` |
-| the same for a closed program (`FreshRunsExistClosed`) or a program of the pure fragment (`FreshRunsExistPure`) | not derived | — |
+| the same for a closed program (`FreshRunsExistClosed`) | proved, `freshRunsExistClosed` (below) | — |
+| the same for a program of the pure fragment (`FreshRunsExistPure`) | not derived; proved with the arguments in the relation at the fresh runs (`freshRunsExistPureF`) | — |
 
 From the empty world, every run of `peek 0` to a value allocates `0` so that its `load 0`
 succeeds; `0` is named by the term, so no fresh run reaches a value.  `FreshRunsExistSyn` fails
@@ -238,8 +239,9 @@ by equality, but that is not verified.
 
 ### An invariant along runs: design
 
-What follows is the design for proving `FreshRunsExistClosed` and `FreshRunsExistPure`; the
-proof is not started.
+What follows is a design for proving fresh-run existence from an invariant along runs; it was
+not started.  Fresh runs came instead from the Fundamental Property at a class of fresh runs
+(below).
 
 **Invariants on names alone** (`Invariant.lean`).
 * *Term liveness* (`TermLive`): every location the term mentions is allocated.  `staleL`
@@ -327,14 +329,36 @@ run is the only one from its start (`polStep_det`, `polRun_det`, `PolicyRuns.lea
 What remains open.  These results fix the allocator; they do not compare two allocators, or
 runs from heaps that agree only on what the arguments reach — `Local.lean`'s comparison, which
 needs one of the runs fresh.  A policy sees only the memory, while a fresh choice must avoid the
-locations the term names, and a choice that looks at the term is not preserved by
-`RunRel.plug`: the run of a redex cannot see the context it is plugged into.  So
-`FreshRunsExistClosed` does not follow, and is still not derived.  The least-free policy is not
+locations the term names, and a choice that looks at the term is not preserved by plugging at a
+single class: the run of a redex cannot see the context it is plugged into.  The next section
+indexes the class instead.  The least-free policy is not
 fresh in general: during a `withswap` callback the lent cell still names the payload, which
 the callback may free and the policy then reallocate (`withswapWindow`; not machine-checked).
 For open programs the arguments must be in the relation at the policy's runs
 (`gDenXR (polRel pol)`); a closure the relation at every run admits need not be
 (`staleClosure`, `not_semPolicyRuns`).
+
+## Fresh runs of well-typed programs (branch `fresh-avoid`)
+
+The class of runs is indexed (`Typed.RunRel.I`); plugging a run into a context `K` may change the
+index (`RunRel.shift`), and `wp` holds at every index.  `Typed.freshRel` is indexed by a finite list
+`N`: its runs allocate only locations that neither `N` nor the configuration names
+(`BoLo.FreshRunN`, `Support/Dynamics/Fresh.lean`); a run plugged into `K` must avoid the locations
+of `K` too (`FreshRunN.plug`).  The Fundamental Property holds at it (`Typed.fundamentalR`), and
+`Typed.adequacyFresh` is adequacy with fresh allocation.
+
+| result | statement |
+|---|---|
+| `freshRunsExistClosed` | a closed well-typed program has a fresh run from the heap of every tagged typed world: `FreshRunsExistClosed` |
+| `closed_pure_every_run` | a closed program of plain-data type returns one plain-data value on **every** run from **every** heap |
+| `freshRunsExistPureF` | a program of the pure fragment has a fresh run, its arguments in the relation at the fresh runs |
+| `pure_result_every_run_fresh` | with the arguments in that relation, from every tagged typed world's heap `μ`: a fresh run gives `μ` back and returns `v`; every run from `μ`, and every run from any heap agreeing with `μ` on what the arguments reach, returns `v` |
+
+`staleL` and `λ_. staleL` are not in the relation at the fresh runs: from the empty world
+`staleL` has no fresh run.  What remains open: `FreshRunsExistPure` with the arguments in the
+relation at every run.  At plain data the relation mentions no `wp`; but a `Mut` cell inside a
+borrowed payload stores a predicate that mentions `wp` (`vX`'s `Mut` clause), where the two
+relations need not agree.  The transfer is not derived, and no obstruction is verified.
 
 ## Files
 
@@ -349,7 +373,8 @@ For open programs the arguments must be in the relation at the policy's runs
 | `Pure.lean` | the fragment; `pure_heap`, `pure_result`, `closed_pure` |
 | `Boundary.lean` | `peek`; `readFootprintSyn`, `not_readFootprintSem` |
 | `FreshExistence.lean` | `FreshRunsExistSyn`, `FreshRunsExistSem`; `not_freshRunsExistSem` at `peek 0` |
-| `Closures.lean` | `not_freshRunsExistSyn` at `(λ_. staleL) ()`; `FreshRunsExistClosed`, `FreshRunsExistPure` (not derived); `pure_result_every_run` |
+| `Closures.lean` | `not_freshRunsExistSyn` at `(λ_. staleL) ()`; `FreshRunsExistClosed`, `FreshRunsExistPure`; `pure_result_every_run` |
+| `FreshRuns.lean` | `freshRunsExistClosed`, `closed_pure_every_run`, `freshRunsExistPureF`, `pure_result_every_run_fresh` |
 | `Invariant.lean` | `TermLive`, `LiveSteps`; `staleH`; `not_termLiveSuffices`; `withswapWindow` (recorded) |
 | `Stale.lean` | `staleL`: location-free, in the relation, no fresh run; `not_freshRunsExistSemLocFree` |
 | `PolicyRuns.lean` | `polStep_det`, `polRun_det`; `closed_policy_adequacy`, `closed_policy_pure`, `pure_policy_heap` |

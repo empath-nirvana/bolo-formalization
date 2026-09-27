@@ -1,6 +1,7 @@
 import Paper.S1_Syntax.Definitions
 import Paper.S3_Dynamics.Definitions
 import Support.Dynamics.Machine
+import Support.Dynamics.Fresh
 import Support.Syntax.Terms
 
 /-!
@@ -95,14 +96,6 @@ theorem Val.rename_comp (σ τ : Loc → Loc) (v : Val) :
     (v.rename σ).rename τ = v.rename (τ ∘ σ) := Subtype.ext (Expr.rename_comp σ τ v.1)
 
 theorem Val.rename_id (v : Val) : v.rename id = v := Subtype.ext (Expr.rename_id v.1)
-
-/-- `ℓ` occurs in `e`. -/
-def Expr.Occ (ℓ : Loc) : Expr → Prop
-  | .var _ | .unit | .prim _ => False
-  | .loc k         => k = ℓ
-  | .pair a b | .seq a b | .letpair a b | .app a b => a.Occ ℓ ∨ b.Occ ℓ
-  | .inj₁ a | .inj₂ a | .lam a => a.Occ ℓ
-  | .case a b c    => a.Occ ℓ ∨ b.Occ ℓ ∨ c.Occ ℓ
 
 /-- Renamings that agree on the locations of `e` rename it alike. -/
 theorem Expr.rename_congr {σ τ : Loc → Loc} :
