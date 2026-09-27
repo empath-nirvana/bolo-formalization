@@ -108,8 +108,8 @@ theorem compS_empty_empty {ρ₁ ρ₂ ρ : WRes} (hc : ResU.CompS ρ₁ ρ₂ �
   exact (ResU.eq_of_comp_empty_left hc).symm
 
 /-- **A plain-data value holds no resource and mentions no location.** -/
-theorem vP_plain {T : Ty} (hT : PlainTy T) :
-    ∀ {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes}, vP T ls δ v ρ →
+theorem vP_plain {RR : RunRel} {T : Ty} (hT : PlainTy T) :
+    ∀ {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes}, vPR RR T ls δ v ρ →
       ρ = PMap.empty ∧ LocFree v.1 := by
   induction hT with
   | unit =>
@@ -134,8 +134,8 @@ theorem vP_plain {T : Ty} (hT : PlainTy T) :
         exact ⟨compS_empty_empty hc hρa e₂, fun ℓ o => f₂ ℓ o⟩
 
 /-- **A value at an argument type of the fragment holds only `imm` cells.** -/
-theorem vP_pureArg {T : Ty} (hT : PureArgTy T) :
-    ∀ {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes}, vP T ls δ v ρ → ImmTop ρ := by
+theorem vP_pureArg {RR : RunRel} {T : Ty} (hT : PureArgTy T) :
+    ∀ {ls : List SRec} {δ : LSub} {v : Val} {ρ : WRes}, vPR RR T ls δ v ρ → ImmTop ρ := by
   induction hT with
   | unit =>
       intro ls δ v ρ h
@@ -155,13 +155,13 @@ theorem vP_pureArg {T : Ty} (hT : PureArgTy T) :
       obtain ⟨α, -, ℓ, ρa, ρb, hc, ⟨rfl, -⟩, s, u, σ, hσ, ls₀, rfl, -⟩ := h
       exact immTop_compS hc immTop_empty (immTop_single_imm ℓ hσ)
 
-theorem gSepX_pure {ls : List SRec} {δ : LSub} :
-    ∀ {Γ : Ctx Ty} {γ : List Val} {ρ : WRes}, PureCtx Γ → gSepX ls δ Γ γ ρ → ImmTop ρ
+theorem gSepX_pure {RR : RunRel} {ls : List SRec} {δ : LSub} :
+    ∀ {Γ : Ctx Ty} {γ : List Val} {ρ : WRes}, PureCtx Γ → gSepXR RR ls δ Γ γ ρ → ImmTop ρ
   | [], _, ρ, _, h => by obtain ⟨rfl, -⟩ := h; exact immTop_empty
   | _ :: _, [], ρ, _, h => by obtain ⟨rfl, -⟩ := h; exact immTop_empty
   | s :: Γ, v :: γ, ρ, hΓ, h => by
       have hΓ' : PureCtx Γ := fun s' hs' => hΓ s' (List.mem_cons_of_mem _ hs')
-      simp only [gSepX] at h
+      simp only [gSepXR] at h
       split at h
       · rename_i hl
         obtain ⟨ρ₁, ρ₂, hc, h₁, h₂⟩ := h
@@ -170,22 +170,22 @@ theorem gSepX_pure {ls : List SRec} {δ : LSub} :
       · exact gSepX_pure hΓ' h
 
 /-- **A context of the fragment holds only `imm` cells.** -/
-theorem gDenX_pure {ls : List SRec} {δ : LSub} {Γ : Ctx Ty} {γ : List Val} {ρ : WRes}
-    (hΓ : PureCtx Γ) (h : gDenX ls δ Γ γ ρ) : ImmTop ρ := by
+theorem gDenX_pure {RR : RunRel} {ls : List SRec} {δ : LSub} {Γ : Ctx Ty} {γ : List Val}
+    {ρ : WRes} (hΓ : PureCtx Γ) (h : gDenXR RR ls δ Γ γ ρ) : ImmTop ρ := by
   obtain ⟨ρ₁, ρ₂, hc, ⟨rfl, -⟩, h₂⟩ := h
   exact immTop_compS hc immTop_empty (gSepX_pure hΓ h₂)
 
 /-! ### Level 1: pure relative to the borrowed data -/
 
 /-- The run the Fundamental Property exhibits for a program of the fragment. -/
-theorem pure_exhibited {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty} (hP : PureTyping Δ Γ e T)
+theorem pure_exhibited {RR : RunRel} {Δ : LifeCtx} {Γ : Ctx Ty} {e : Expr} {T : Ty} (hP : PureTyping Δ Γ e T)
     {δ : LSub} {γ : List Val} {ls : List SRec} {ρ : WRes} (hδ : Δ.Models δ)
-    (hγ : gDenX ls δ Γ γ ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
+    (hγ : gDenXR RR ls δ Γ γ ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
     (hμ : ResU.Lower fρ μ) :
-    ∃ v : Val, Steps μ (LogRel.substAll γ e) μ (.val v) ∧ LocFree v.1 ∧
-      ∃ ls', vP T ls' δ v PMap.empty := by
-  have hw := fundamental Δ Γ e T hP.derives hP.ok hP.wfCtx δ γ ls ρ hδ hγ
+    ∃ v : Val, RR.R μ (LogRel.substAll γ e) μ (.val v) ∧ LocFree v.1 ∧
+      ∃ ls', vPR RR T ls' δ v PMap.empty := by
+  have hw := fundamentalR RR Δ Γ e T hP.derives hP.ok hP.wfCtx δ γ ls ρ hδ hγ
   obtain ⟨ρ', ρp, π, fπ, μ', v, ls', hrun, hQ, h9, hA, hno, hfπ, hμ'⟩ :=
     wpTS_exhibited hw hf hc hT htg hμ
   obtain ⟨rfl, hlf⟩ := vP_plain hP.result hQ
@@ -254,7 +254,7 @@ theorem closed_pure {e : Expr} {T : Ty} (hD : DerivesWf LifeCtx.empty [] e T) (h
   have hworld := fun (ρf fρ : WRes) (ps : List FrameRec) (ls : List SRec) (μ : Heap)
       (hf : ResU.Hash ρf PMap.empty) (hc : ResU.CompS ρf PMap.empty fρ)
       (hTW : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) (hμ : ResU.Lower fρ μ) =>
-    pure_exhibited hP Adequacy.models_empty (gDenX_nil ls LSub.empty) hf hc hTW htg hμ
+    pure_exhibited (RR := stepsRel) hP Adequacy.models_empty (gDenX_nil ls LSub.empty) hf hc hTW htg hμ
   -- the empty world
   have htg0 : Tagged (PMap.empty : WRes) [] [] := fun x hx => absurd hx (by simp)
   obtain ⟨v, hrun, hlf, -⟩ := hworld PMap.empty PMap.empty [] [] Adequacy.emptyMem

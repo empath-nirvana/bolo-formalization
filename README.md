@@ -56,6 +56,22 @@ empty contexts `Δ.Ok` and `Ctx.ScopedB` hold, so this is `[CONF]` Corollary 3.3
 document prints a proof of Theorem 3.2 or Corollary 3.3; the proofs here are ours
 (`docs/adjudications.md` §A.1).
 
+**Adequacy under every allocation policy** — `Fig16.LogRel.Typed.adequacyPol`, in the same
+file:
+
+```lean
+theorem adequacyPol (pol : BoCa.BoLo.Policy) (e : Expr)
+    (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
+    BoCa.BoLo.PolRun pol Adequacy.emptyMem e Adequacy.emptyMem (.val .unit)
+```
+
+A policy fixes where `alloc` allocates, as any function of the memory that picks a location
+every finite memory misses.  The typed world and 6.151 are proved for `wp` with its run drawn
+from any class of runs closed under the operations `wp`'s rules build runs with
+(`Fig16.LogRel.Typed.wpTSR`, `Fig16.LogRel.Typed.fundamentalR`); `wpTS`, `SemX` and every
+statement above are the instance at every run, and `adequacy` is `adequacyPol` at the
+least-free policy with the policy forgotten (`docs/adjudications.md` §12.74).
+
 **The trust base of `adequacy` is `[TR]` §§1–3.**  The statement mentions the
 syntax (§1), the typing judgment `DerivesWf` (§2) and the machine `BoLo.Steps`
 (§3), and nothing else.  The model — resources, the logic, `wp`, the logical

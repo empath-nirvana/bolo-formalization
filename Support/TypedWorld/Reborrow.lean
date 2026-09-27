@@ -45,6 +45,8 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
+variable {RR : RunRel}
+
 /-- A reborrow keeps `Tagged` — `TW.linLife`'s `reb` case at the tag's lifetime. -/
 theorem tagged_reb {W W' c : WRes} {ps rs : List FrameRec} {ls : List SRec} {r : FrameRec}
     {le : Loc} {s : LSet} {β : Life} {hs : r.R.InStratum s.join}
@@ -131,9 +133,9 @@ entry is `TW.reb`, exit `TW.rebEnd`.  The payload input `R` is the program's own
 observable at the record's type.  `[about ours: our chooser, at the program's relation]` -/
 theorem rebChooseTW_top {ls : List SRec} {r : FrameRec} {x : LifeVar} {δ' : LSub}
     (hr : r ∈ rsOf ls) (hag : AgreeOn r.T δ' r.δ) (hx : ¬ LFree x r.T) :
-    RebChooseTW ls r.le (fun w σ => vX wpTS false r.T ls δ' w σ)
+    RebChooseTW ls r.le (fun w σ => vX (wpTSR RR) false r.T ls δ' w σ)
       (fun β w χ => vShape (r.T.immReborrow (.var x)) (δ'.extend x β) w χ)
-      (fun β w χ => vX wpTS true (r.T.immReborrow (.var x)) ls (δ'.extend x β) w χ) := by
+      (fun β w χ => vX (wpTSR RR) true (r.T.immReborrow (.var x)) ls (δ'.extend x β) w χ) := by
   intro W F χ₀ σ ps β w s hs hT htag hβ hW hR hreb₀ hP₀
   -- the cell's value and escrow are the record's
   obtain ⟨s', hs', hle⟩ := cell_of_compS_single hW
@@ -154,7 +156,7 @@ theorem rebChooseTW_top {ls : List SRec} {r : FrameRec} {x : LifeVar} {δ' : LSu
     · subst hxy; rw [find?_extend_self, find?_extend_self]
     · rw [find?_extend_ne _ _ hxy, find?_extend_ne _ _ hxy]
       exact (hag y (hfree y hy)).symm
-  have hP₀' : vX wpTS true (r.T.immReborrow (.var x)) ls (δ'.extend x β) r.v χ₀ :=
+  have hP₀' : vX (wpTSR RR) true (r.T.immReborrow (.var x)) ls (δ'.extend x β) r.v χ₀ :=
     image_vX_of_shape (witLB_of hT.valid htag hle) (tags_above hT htag hβ) r.T hx hreb₀ hP₀ hR
       (fun m S u hpos hown => agreeCoh (fun y => hpos.free) m (coh_root hr hx hpos hown))
       (fun m S hpos => agreeCoh (fun y => hpos.free) m (coh_mut hT hr hx hpos))
@@ -180,9 +182,9 @@ theorem rebChooseTW_deep {ls : List SRec} {r : FrameRec} {p₀ : Option Loc} {l�
     {S₀ : Ty} {u₀ : Val} {x : LifeVar} {δ' : LSub}
     (hr : r ∈ rsOf ls) (hch : Chain r.R r.T r.v p₀ l₀ S₀ u₀) (hag : AgreeOn S₀ δ' r.δ)
     (hx : ¬ LFree x S₀) :
-    RebChooseTW ls l₀ (fun w σ => vX wpTS false S₀ ls δ' w σ)
+    RebChooseTW ls l₀ (fun w σ => vX (wpTSR RR) false S₀ ls δ' w σ)
       (fun β w χ => vShape (S₀.immReborrow (.var x)) (δ'.extend x β) w χ)
-      (fun β w χ => vX wpTS true (S₀.immReborrow (.var x)) ls (δ'.extend x β) w χ) := by
+      (fun β w χ => vX (wpTSR RR) true (S₀.immReborrow (.var x)) ls (δ'.extend x β) w χ) := by
   intro W F χ₀ σ ps β w s hs hT htag hβ hW hR hreb₀ hP₀
   obtain ⟨s', hs', hle⟩ := cell_of_compS_single hW
   obtain ⟨aW, haW⟩ := agW_of_valid hT.valid
@@ -199,7 +201,7 @@ theorem rebChooseTW_deep {ls : List SRec} {r : FrameRec} {p₀ : Option Loc} {l�
   obtain ⟨-, -, hw₀own, -, -⟩ :=
     hT.inv.1.1 r hr p₀ l₀ S₀ w hch aW haW φ₁ eφ₁ (by rw [kφ₁]; simp)
   rw [wφ₁] at hw₀own
-  have hP₀' : vX wpTS true (S₀.immReborrow (.var x)) ls (δ'.extend x β) w χ₀ :=
+  have hP₀' : vX (wpTSR RR) true (S₀.immReborrow (.var x)) ls (δ'.extend x β) w χ₀ :=
     image_vX_of_shape (witLB_of hT.valid htag hle) (tags_above hT htag hβ) S₀ hx hreb₀ hP₀ hR
       (fun m S u hpos hown => coh_child hr hch hag hx hpos (hw₀own m u hown))
       (fun m S hpos => coh_mut_child hT hr hch hag hx hpos)
@@ -230,8 +232,8 @@ theorem wpTS_reborrow (ls : List SRec) (l : BoCa.Loc) (α : Life) (R : Val → W
     (hesc : RebChooseTW ls l R P₀ P) :
     Entails
       (ptoImm l α (fun v σ => R v σ ∧ fresh (fun b => reborrow b (P₀ b v)) σ) ⋆
-        (fresh fun b => all fun v => P b v ─⋆ wpTS ls e (fun ls' v' => box b (Q ls' v'))))
-      (wpTS ls e Q) := by
+        (fresh fun b => all fun v => P b v ─⋆ (wpTSR RR) ls e (fun ls' v' => box b (Q ls' v'))))
+      ((wpTSR RR) ls e Q) := by
   rintro ρ ⟨ρi, ρb, hc, hpi, hpb⟩ ρf fρ ps hf hcf hT htg
   -- H4 unfolded: `ρᵢ = ℓ ↦ imm(ᾱ, v′, ρ′)`, H7 and H8.
   obtain ⟨s, v', σ, hs, hρi, ⟨hRv, hP7⟩, hα⟩ := hpi
@@ -285,7 +287,7 @@ theorem wpTS_reborrow (ls : List SRec) (l : BoCa.Loc) (α : Life) (R : Val → W
     rwa [ResU.CompS.functional hab hFb] at hab'
   obtain ⟨hTin, htgin⟩ := hentry Win hfχ hvWin
   -- H21: by the definition of `─⋆`.
-  have h21 : wpTS ls e (fun ls' v'' => box β (Q ls' v'')) ρbχ := hwand χ ρbχ hPχ hbχ
+  have h21 : (wpTSR RR) ls e (fun ls' v'' => box β (Q ls' v'')) ρbχ := hwand χ ρbχ hPχ hbχ
   obtain ⟨ρQ, ρp, fρ', fρ'p, π, v, μ, μ', ps', ls', g1, g2, g3, g5, g6, g7, g8, g9, gA, gB,
     gT, gtg, gps, gls, gC⟩ := h21 ρF Win ps hFbχ hWin hTin htgin
   have g4 : ResU.CompS ρF ρbχ Win := hWin

@@ -53,12 +53,13 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- `[TR]` Lemma 6.151's printed proof at `SemX`: induction on the derivation, each
-node closed by its `_compatX` compatibility lemma.  `[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs
-of docs/adjudications.md §12.69–§12.72]` -/
-theorem fundamental :
+/-- `[TR]` Lemma 6.151's printed proof at `SemXR RR`, for every class of runs `RR`:
+induction on the derivation, each node closed by its `_compatX` compatibility lemma.
+`[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs of docs/adjudications.md
+§12.69–§12.72; at every run class, §12.74]` -/
+theorem fundamentalR (RR : RunRel) :
     ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty),
-      DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemX Δ Γ e T := by
+      DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemXR RR Δ Γ e T := by
   intro Δ Γ e T hD
   induction hD with
   | var h => intro _ _; exact id_compatX h
@@ -128,6 +129,14 @@ theorem fundamental :
       obtain ⟨h₁, h₂⟩ := BoCa.scopedB_axWithloadTy hwf
       exact withload_compatX x hΓd hx (not_lfree_of_scopedB hx h₁) (not_lfree_of_scopedB hx h₂)
   | withswapAx hΓd => intro _ _; exact withswap_compatX hΓd
+
+/-- `[TR]` Lemma 6.151's printed proof at `SemX`: `fundamentalR` at every run.
+`[restricted: `⊧ Δ` carried as `Δ.Ok`; at the definition repairs of docs/adjudications.md
+§12.69–§12.72]` -/
+theorem fundamental :
+    ∀ (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty),
+      DerivesWf Δ Γ e T → Δ.Ok → Ctx.ScopedB Δ Γ → SemX Δ Γ e T :=
+  fundamentalR stepsRel
 
 /-- The statement of `[TR]` Lemma 6.151 (Fundamental Property, p. 40) at `SemX`.
 `[variant: at `SemX`, p. 4's judgment at the definition repairs of docs/adjudications.md §12.69–§12.72; `⊧ Δ` carried as `Δ.Ok`]` -/

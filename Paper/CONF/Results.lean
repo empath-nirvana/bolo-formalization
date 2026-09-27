@@ -221,11 +221,12 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
-/-- `[CONF]` Theorem 3.2 at the tagged `wpTS`, at the empty list.
-`[about ours: [CONF] 3.2 at `wpTS`; the proof is `Adequacy.theorem32`'s]` -/
-theorem theorem32 (e : Expr) (P : Val → Prop)
-    (hwp : wpTS [] e (fun _ v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes)) :
-    ∃ v : Val, BoCa.BoLo.Steps Adequacy.emptyMem e Adequacy.emptyMem (.val v) ∧ P v := by
+/-- `[CONF]` Theorem 3.2 at the tagged `wpTSR RR`, at the empty list: the run is of the
+class `RR`.  `[about ours: [CONF] 3.2 at `wpTSR`; the proof is `Adequacy.theorem32`'s;
+docs/adjudications.md §12.74]` -/
+theorem theorem32R (RR : RunRel) (e : Expr) (P : Val → Prop)
+    (hwp : wpTSR RR [] e (fun _ v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes)) :
+    ∃ v : Val, RR.R Adequacy.emptyMem e Adequacy.emptyMem (.val v) ∧ P v := by
   have htg : Tagged (PMap.empty : WRes) [] [] := fun x hx => absurd hx (by simp)
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ, μ', -, -,
     h1, h2, h3, h5, h6, h7, h8, h9, h10, h11, -, -, -, -, h12⟩ :=
@@ -240,6 +241,13 @@ theorem theorem32 (e : Expr) (P : Val → Prop)
   obtain rfl : μ = (fun _ => none) := ResU.Lower.functional h5 Fig16.BoLo.lower_empty
   obtain rfl : μ' = (fun _ => none) := ResU.Lower.functional h7 Fig16.BoLo.lower_empty
   exact ⟨v, h8, hPv⟩
+
+/-- `[CONF]` Theorem 3.2 at the tagged `wpTS`, at the empty list: `theorem32R` at every run.
+`[about ours: [CONF] 3.2 at `wpTS`; the proof is `Adequacy.theorem32`'s]` -/
+theorem theorem32 (e : Expr) (P : Val → Prop)
+    (hwp : wpTS [] e (fun _ v => Fig16.BoLo.pure (P v)) (PMap.empty : WRes)) :
+    ∃ v : Val, BoCa.BoLo.Steps Adequacy.emptyMem e Adequacy.emptyMem (.val v) ∧ P v :=
+  theorem32R stepsRel e P hwp
 
 end BoCa.Fig16.LogRel.Typed
 
@@ -339,14 +347,43 @@ theorem corollary33 (e : Expr) (hsem : SemX LifeCtx.empty ([] : Ctx Ty) e Ty.uni
   subst hv
   exact hsteps
 
+/-- `[CONF]` Corollary 3.3 at `SemXR RR`: the run is of the class `RR`.
+`[about ours: [CONF] 3.3 at `SemXR`; the proof is `Adequacy.corollary33`'s; §12.74]` -/
+theorem corollary33R (RR : RunRel) (e : Expr)
+    (hsem : SemXR RR LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
+    RR.R Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) := by
+  have hwp := hsem LSub.empty [] [] PMap.empty Adequacy.models_empty
+    (by simpa using gDenX_nil (RR := RR) [] LSub.empty)
+  rw [substAll, Adequacy.psub_nil] at hwp
+  obtain ⟨v, hsteps, hv⟩ := theorem32R RR e (· = Val.unit) hwp
+  subst hv
+  exact hsteps
+
+/-- **Adequacy at every class of runs**: a closed program `[TR]` p. 2 types at `1` has a
+run of the class `RR` from the empty memory to `()` and the empty memory.
+`[about ours: [CONF] Lemma 3.1 composed with Corollary 3.3, at `SemXR RR`; §12.74]` -/
+theorem adequacyR (RR : RunRel) (e : Expr)
+    (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
+    RR.R Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
+  corollary33R RR e (fundamentalR RR _ _ _ _ hD ok_empty (fun s hs => absurd hs (by simp)))
+
+/-- **Adequacy under every allocation policy**: a closed program `[TR]` p. 2 types at `1`
+runs, allocating wherever `pol` says, from the empty memory to `()` and the empty memory.
+`[about ours: `adequacyR` at `polRel pol`; §12.74]` -/
+theorem adequacyPol (pol : BoCa.BoLo.Policy) (e : Expr)
+    (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
+    BoCa.BoLo.PolRun pol Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
+  adequacyR (polRel pol) e hD
+
 /-- Adequacy from a typing derivation: a closed program `[TR]` p. 2 types at `1`
-(`DerivesWf`) runs from the empty memory to `()` and the empty memory.  It is
-`fundamental` (6.151 at `SemX`) composed with `corollary33`; at `Δ = Γ = ∅` the
-hypotheses `⊧ Δ` and `Δ ⊢ Γ` hold outright.
-`[about ours: [CONF] Lemma 3.1 composed with Corollary 3.3, at `SemX`]` -/
+(`DerivesWf`) runs from the empty memory to `()` and the empty memory.  It is the run
+`adequacyPol` gives under any allocation policy, here the least free location; that is
+`fundamentalR` (6.151) composed with `corollary33R` at the policy's runs.  At `Δ = Γ = ∅`
+the hypotheses `⊧ Δ` and `Δ ⊢ Γ` hold outright.
+`[about ours: [CONF] Lemma 3.1 composed with Corollary 3.3, at `SemXR`; §12.74]` -/
 theorem adequacy (e : Expr) (hD : DerivesWf LifeCtx.empty ([] : Ctx Ty) e Ty.unit) :
     BoCa.BoLo.Steps Adequacy.emptyMem e Adequacy.emptyMem (.val .unit) :=
-  corollary33 e (fundamental _ _ _ _ hD ok_empty (fun s hs => absurd hs (by simp)))
+  (adequacyPol BoCa.BoLo.leastFree e hD).toSteps
 
 end BoCa.Fig16.LogRel.Typed
 

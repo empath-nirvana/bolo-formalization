@@ -15,15 +15,14 @@ location is missing from the flattening exactly when it is missing from the heap
 `wpTS_alloc_any` restates the rule for every heap-fresh location: from every tagged typed
 world, the step to *any* location the heap misses satisfies all of row 5.33's post-conditions.
 
-**The freedom is in `wpTS` itself** (`Support/TypedWorld/World.lean`, row 5.33): it asks for
-*some* run (`Steps`, existentially).  Every run the Fundamental Property builds is assembled by
-`wpTS_val`, `wpTS_head`, `wpTS_alloc`, `wpTS_free`, the two load rules, `wpTS_store` (one head
-step each) and `wpTS_bind` (`Steps.plug`, `Steps.trans`); the other rules pass the run through
-(by inspection of the run constructors in `Support/TypedWorld/`).  So a `wpTS` whose run is
-restricted to a policy (`PolRun`) would satisfy the same rules — but in this repository that
-means re-running the typed world at a different `wpTS`, since its definition fixes `Steps`.
+**The freedom is in `wp`'s run conjunct** (row 5.33): `wpTS` asks for *some* run.  Every run
+the Fundamental Property builds is assembled by `wpTS_val`, `wpTS_head`, `wpTS_alloc`,
+`wpTS_free`, the two load rules, `wpTS_store` and `wpTS_bind`; the other rules pass the run
+through.  The typed world is therefore stated at every class of runs closed under those
+constructions (`Typed.RunRel`, `Typed.wpTSR`), and `wpTS` is its instance at every run
+(docs/adjudications.md §12.74); `PolicyRuns.lean` draws the consequences for policy runs.
 
-**A term of the semantic relation can need the freedom.**  `peek 1` is in the relation at
+**A term of the semantic relation at every run can need the freedom.**  `peek 1` is in the relation at
 `∅; ∅ ⊨ peek 1 : 1`, and from the empty world it has no run under the least-free policy
 (`not_semPolicyRuns`): the policy allocates `0`, and `load 1` is stuck.  Its semantic proof
 allocates `1` when the heap misses it, a choice the policy does not make.
@@ -99,42 +98,19 @@ theorem wpTS_alloc_any (ls : List SRec) (v : Val) (Q : List SRec → Val → WPr
 
 /-! ### Runs under an allocation policy -/
 
-/-- A step whose allocation, if any, is at `pol μ`. -/
-def PolStep (pol : Heap → Loc) (μ : Heap) (e : Expr) (μ' : Heap) (e' : Expr) : Prop :=
-  Step1 μ e μ' e' ∧ ∀ ℓ, μ' ℓ ≠ none → μ ℓ = none → ℓ = pol μ
+open BoCa.BoLo (Policy PolRun leastFree)
 
-/-- A run under the allocation policy `pol`. -/
-inductive PolRun (pol : Heap → Loc) : Heap → Expr → Heap → Expr → Prop where
-  | refl (μ : Heap) (e : Expr) : PolRun pol μ e μ e
-  | more {μ μ₁ μ' : Heap} {e e₁ e' : Expr}
-      (h : PolStep pol μ e μ₁ e₁) (t : PolRun pol μ₁ e₁ μ' e') : PolRun pol μ e μ' e'
-
-theorem PolRun.toSteps {pol : Heap → Loc} {μ μ' : Heap} {e e' : Expr}
-    (h : PolRun pol μ e μ' e') : Steps μ e μ' e' := by
-  induction h with
-  | refl => exact .refl _ _
-  | more h _ ih => exact .more h.1 ih
-
-open Classical in
-/-- The least location the heap misses (`0` if it misses none). -/
-def leastFree (μ : Heap) : Loc := if h : ∃ l, μ l = none then Nat.find h else 0
-
-theorem leastFree_fresh {μ : Heap} (h : ∃ l, μ l = none) : μ (leastFree μ) = none := by
-  classical
-  simp only [leastFree, dif_pos h]
-  exact Nat.find_spec h
-
-theorem leastFree_empty : leastFree (fun _ => none) = 0 := by
+theorem leastFree_empty : leastFree.pick (fun _ => none) = 0 := by
   classical
   have h : ∃ l : Loc, (fun _ => none : Heap) l = none := ⟨0, rfl⟩
-  unfold leastFree
+  show (if h : ∃ l, (fun _ => none : Heap) l = none then Nat.find h else 0) = 0
   rw [dif_pos h]
   exact (Nat.find_eq_zero h).mpr rfl
 
 /-- **Runs under a policy, at the semantic judgment**: every closed plain program of the
 semantic relation has, from every tagged typed world completing `∅`, a run under `pol` to a
 value. -/
-def SemPolicyRuns (pol : Heap → Loc) : Prop :=
+def SemPolicyRuns (pol : Policy) : Prop :=
   ∀ (e : Expr) (T : Ty), SemX LifeCtx.empty ([] : Ctx Ty) e T →
     ∀ (ρf fρ : WRes) (ps : List FrameRec) (μ : Heap),
       ResU.Hash ρf PMap.empty → ResU.CompS ρf PMap.empty fρ → TW fρ ps (rsOf []) →

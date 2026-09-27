@@ -207,12 +207,12 @@ theorem footprint_of_upd {ρf ρ π fρ fπ : WRes} {μ μ' : Heap} (hc : ResU.C
 with heap `μ`, a run to `v` whose final heap lowers `ρf ● π`, where `π = ρ′ ● ρ⁺`, `ρ ↭ π`,
 `ρ⁺` owns no cell, and the post-condition holds of `v` at `ρ′`: row 5.33's conjuncts, with the
 four composites of the final world regrouped as `ρf ● π`. -/
-theorem wpTS_exhibited {ls : List SRec} {e : Expr} {Q : List SRec → Val → WProp} {ρ : WRes}
-    (hw : wpTS ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
+theorem wpTS_exhibited {RR : RunRel} {ls : List SRec} {e : Expr}
+    {Q : List SRec → Val → WProp} {ρ : WRes} (hw : wpTSR RR ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
     (hμ : ResU.Lower fρ μ) :
     ∃ (ρ' ρp π fπ : WRes) (μ' : Heap) (v : Val) (ls' : List SRec),
-      Steps μ e μ' (.val v) ∧ Q ls' v ρ' ∧ ResU.CompS ρ' ρp π ∧ ResU.UpdV ρ π ∧
+      RR.R μ e μ' (.val v) ∧ Q ls' v ρ' ∧ ResU.CompS ρ' ρp π ∧ ResU.UpdV ρ π ∧
       NoOwn ρp ∧ ResU.CompS ρf π fπ ∧ ResU.Lower fπ μ' := by
   obtain ⟨ρ', ρp, fρ', fρ'p, π, v, μ₀, μ', ps', ls', -, h₂, -, h₅, h₆, h₇, h₈, h₉, hA, hno,
     -, -, -, -, hC⟩ := hw ρf fρ ps hf hc hT htg
@@ -227,11 +227,11 @@ theorem wpTS_exhibited {ls : List SRec} {e : Expr} {Q : List SRec → Val → WP
 `⦇ρ⦈` holds only immutably or not at all keeps its value, and every location where `⦇ρ⦈` has a
 `mut` cell stays allocated.  An existing location changes only where `⦇ρ⦈` has an `own` or
 `mut` cell.  The post-condition holds of the result. -/
-theorem wpTS_footprint {ls : List SRec} {e : Expr} {Q : List SRec → Val → WProp} {ρ : WRes}
-    (hw : wpTS ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
+theorem wpTS_footprint {RR : RunRel} {ls : List SRec} {e : Expr}
+    {Q : List SRec → Val → WProp} {ρ : WRes} (hw : wpTSR RR ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
     (hμ : ResU.Lower fρ μ) :
-    ∃ (μ' : Heap) (v : Val), Steps μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
+    ∃ (μ' : Heap) (v : Val), RR.R μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
       Footprint ρf ρ μ μ' := by
   obtain ⟨ρ', -, π, fπ, μ', v, ls', hrun, hQ, -, hA, -, hfπ, hμ'⟩ :=
     wpTS_exhibited hw hf hc hT htg hμ

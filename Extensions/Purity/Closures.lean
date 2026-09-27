@@ -67,7 +67,7 @@ theorem not_freshRunsExistSyn : ¬ FreshRunsExistSyn := by
   have htg : Tagged (PMap.empty : WRes) [] [] := fun x hx => absurd hx (by simp)
   have hγ : gDenX [] LSub.empty [⟨.lolli .unit .unit, true⟩] [staleClosure] PMap.empty := by
     refine gDenX_mk (by simp [Ctx.LiveWithin]) ?_
-    simp only [gSepX, if_pos]
+    simp only [gSepX, gSepXR, if_pos]
     exact ⟨PMap.empty, PMap.empty, ResU.comp_empty_right _, staleClosure_vP [] LSub.empty,
       ⟨rfl, trivial⟩⟩
   obtain ⟨μ', v, hR⟩ := h LifeCtx.empty _ callF .unit d_callF ok_empty

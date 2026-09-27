@@ -309,6 +309,33 @@ lines, on the scale of the typed world itself.
   the heap misses it.  A policy-indexed `wpTS` would exclude such terms from the relation, as
   it should: `peek` is not well typed.
 
+## Every run under an allocation policy (branch `policy-wp`)
+
+`Support/`'s `wp` is stated at every class of runs closed under the operations its rules build
+runs with (`Typed.RunRel`, `Typed.wpTSR`), with the printed `wp` the instance at every run
+(`docs/adjudications.md` §12.74).  The Fundamental Property holds at every class
+(`Typed.fundamentalR`), in particular at the runs of any allocation policy
+(`BoLo.PolRun`, `Typed.polRel`); `Typed.adequacyPol` is adequacy under every policy.  A policy
+run is the only one from its start (`polStep_det`, `polRun_det`, `PolicyRuns.lean`), so:
+
+| result | statement |
+|---|---|
+| `closed_policy_adequacy` | for every policy, the run of a closed program of type `1` from the empty memory ends at `()` and the empty memory, and every run under the policy that reaches a value is this one |
+| `closed_policy_pure` | for a closed program of plain-data type and every policy, from the heap of every tagged typed world the policy's run gives the heap back with a plain-data value, and it is the only policy run to a value |
+| `pure_policy_heap` | the same for the pure fragment, its arguments in the relation at the policy's runs |
+
+What remains open.  These results fix the allocator; they do not compare two allocators, or
+runs from heaps that agree only on what the arguments reach — `Local.lean`'s comparison, which
+needs one of the runs fresh.  A policy sees only the memory, while a fresh choice must avoid the
+locations the term names, and a choice that looks at the term is not preserved by
+`RunRel.plug`: the run of a redex cannot see the context it is plugged into.  So
+`FreshRunsExistClosed` does not follow, and is still not derived.  The least-free policy is not
+fresh in general: during a `withswap` callback the lent cell still names the payload, which
+the callback may free and the policy then reallocate (`withswapWindow`; not machine-checked).
+For open programs the arguments must be in the relation at the policy's runs
+(`gDenXR (polRel pol)`); a closure the relation at every run admits need not be
+(`staleClosure`, `not_semPolicyRuns`).
+
 ## Files
 
 | file | contents |
@@ -325,5 +352,6 @@ lines, on the scale of the typed world itself.
 | `Closures.lean` | `not_freshRunsExistSyn` at `(λ_. staleL) ()`; `FreshRunsExistClosed`, `FreshRunsExistPure` (not derived); `pure_result_every_run` |
 | `Invariant.lean` | `TermLive`, `LiveSteps`; `staleH`; `not_termLiveSuffices`; `withswapWindow` (recorded) |
 | `Stale.lean` | `staleL`: location-free, in the relation, no fresh run; `not_freshRunsExistSemLocFree` |
+| `PolicyRuns.lean` | `polStep_det`, `polRun_det`; `closed_policy_adequacy`, `closed_policy_pure`, `pure_policy_heap` |
 | `Policy.lean` | `wpTS_alloc_any` (6.141 at every heap-fresh location), `PostAt`; `PolRun`, `leastFree`; `not_semPolicyRuns` at `peek 1` |
 | `Examples.lean` | `negB` (open, `b : Imm 'a (1 ⊕ 1)`) and `negClosed` (closed): negation through a temporary cell, with their instances |

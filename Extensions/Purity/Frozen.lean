@@ -89,11 +89,11 @@ theorem frozen_keeps {ρf ρ π fρ fπ : WRes} {μ μ' : Heap} (hc : ResU.CompS
 
 /-- **Deep immutability, on the run a `wpTS` exhibits.**  From the tagged typed world `ρf ● ρ`,
 every location beneath an `imm` cell of `⦇ρ⦈` keeps its value; with `Footprint`. -/
-theorem wpTS_frozen {ls : List SRec} {e : Expr} {Q : List SRec → Val → WProp} {ρ : WRes}
-    (hw : wpTS ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
+theorem wpTS_frozen {RR : RunRel} {ls : List SRec} {e : Expr}
+    {Q : List SRec → Val → WProp} {ρ : WRes} (hw : wpTSR RR ls e Q ρ) {ρf fρ : WRes} {ps : List FrameRec} (hf : ResU.Hash ρf ρ)
     (hc : ResU.CompS ρf ρ fρ) (hT : TW fρ ps (rsOf ls)) (htg : Tagged fρ ps ls) {μ : Heap}
     (hμ : ResU.Lower fρ μ) :
-    ∃ (μ' : Heap) (v : Val), Steps μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
+    ∃ (μ' : Heap) (v : Val), RR.R μ e μ' (.val v) ∧ (∃ ls' ρ', Q ls' v ρ') ∧
       Footprint ρf ρ μ μ' ∧ ∀ ℓ, Frozen ρ ℓ → μ' ℓ = μ ℓ := by
   obtain ⟨ρ', -, π, fπ, μ', v, ls', hrun, hQ, -, hA, -, hfπ, hμ'⟩ :=
     wpTS_exhibited hw hf hc hT htg hμ

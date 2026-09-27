@@ -94,31 +94,46 @@ def vX (wpX : WpOp) : Bool → Ty → List SRec → LSub → Val → WProp
         ptoMutS ℓ α ls (fun ls₀ => vX wpX true T ls₀ δ)
   | _, .unk, _, _, _ => emp
 
+/-- The program's relation at the tagged `wp` whose runs are drawn from `R`. -/
+abbrev vPR (R : RunRel) : Ty → List SRec → LSub → Val → WProp := vX (wpTSR R) true
+
 /-- The program's relation at the tagged `wp`. -/
-abbrev vP : Ty → List SRec → LSub → Val → WProp := vX wpTS true
+abbrev vP : Ty → List SRec → LSub → Val → WProp := vPR stepsRel
 
 /-!
 Row 4.13 · `𝒢⟦Γ⟧(γ) ≜ ⌜dom(Γ) ⊆ dom(δ)⌝ ⋆ ⊛_{x∈dom(Γ)} 𝒱⟦Γ(x)⟧δ(γ(x))` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 -/
-/-- `⊛_{x ∈ dom(Γ)} 𝒱X⟦Γ(x)⟧(ls)δ(γ(x))`.  `[about ours]` -/
-def gSepX (ls : List SRec) (δ : LSub) : Ctx Ty → List Val → WProp
+/-- `⊛_{x ∈ dom(Γ)} 𝒱X⟦Γ(x)⟧(ls)δ(γ(x))`, at the runs `R`.  `[about ours]` -/
+def gSepXR (R : RunRel) (ls : List SRec) (δ : LSub) : Ctx Ty → List Val → WProp
   | [],     _      => emp
   | _ :: _, []     => emp
-  | s :: Γ, v :: γ => if s.live then vP s.ty ls δ v ⋆ gSepX ls δ Γ γ else gSepX ls δ Γ γ
+  | s :: Γ, v :: γ =>
+      if s.live then vPR R s.ty ls δ v ⋆ gSepXR R ls δ Γ γ else gSepXR R ls δ Γ γ
+
+/-- `⊛_{x ∈ dom(Γ)} 𝒱X⟦Γ(x)⟧(ls)δ(γ(x))`.  `[about ours]` -/
+abbrev gSepX : List SRec → LSub → Ctx Ty → List Val → WProp := gSepXR stepsRel
+
+/-- `𝒢X⟦Γ⟧(ls)δ(γ)`, at the runs `R`.  `[about ours]` -/
+def gDenXR (R : RunRel) (ls : List SRec) (δ : LSub) (Γ : Ctx Ty) (γ : List Val) : WProp :=
+  ⌜Ctx.LiveWithin Γ γ⌝ ⋆ gSepXR R ls δ Γ γ
 
 /-- `𝒢X⟦Γ⟧(ls)δ(γ)`.  `[about ours]` -/
-def gDenX (ls : List SRec) (δ : LSub) (Γ : Ctx Ty) (γ : List Val) : WProp :=
-  ⌜Ctx.LiveWithin Γ γ⌝ ⋆ gSepX ls δ Γ γ
+abbrev gDenX : List SRec → LSub → Ctx Ty → List Val → WProp := gDenXR stepsRel
 
 /-!
 Row 4.14 · `Δ; Γ ⊨ e : T ≜ !∀ δ,γ. 𝒟⟦Δ⟧(δ) ─⋆ 𝒢⟦Γ⟧δ(γ) ─⋆ ℰ⟦T⟧δ(γ(e))` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 -/
+/-- `Δ; Γ ⊨ e : T` at the typed world, with the runs of `wp` drawn from `R`.
+`[about ours: [TR] p. 4's judgment at the definitions docs/adjudications.md §12.69–§12.72
+repair; §12.74]` -/
+def SemXR (R : RunRel) (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=
+  ∀ δ γ (ls : List SRec) ρ, Δ.Models δ → gDenXR R ls δ Γ γ ρ →
+    wpTSR R ls (substAll γ e) (fun ls' => vPR R T ls' δ) ρ
+
 /-- `Δ; Γ ⊨ e : T` at the typed world: `[TR]` p. 4's judgment, `∀δ ∈ 𝒟⟦Δ⟧, γ.
 𝒢⟦Γ⟧δ(γ) ⊨ ℰ⟦T⟧δ(γ(e))`, read at `𝒱X` and the tagged `wpTS`, at every record list.
 `[about ours: [TR] p. 4's judgment at the definitions docs/adjudications.md §12.69–§12.72 repair]` -/
-def SemX (Δ : LifeCtx) (Γ : Ctx Ty) (e : Expr) (T : Ty) : Prop :=
-  ∀ δ γ (ls : List SRec) ρ, Δ.Models δ → gDenX ls δ Γ γ ρ →
-    wpTS ls (substAll γ e) (fun ls' => vP T ls' δ) ρ
+abbrev SemX : LifeCtx → Ctx Ty → Expr → Ty → Prop := SemXR stepsRel
 
 end BoCa.Fig16.LogRel.Typed
 

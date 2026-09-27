@@ -1161,6 +1161,43 @@ a witness's typing only at the observable view, which the world's first-order da
 (`Fig16.LogRel.Typed.obs_transfer`), so `TW` records no relation fact and mentions only
 `Fig16.LogRel.Typed.vShape`.
 
+### §12.74 `wp`'s run drawn from a class of runs, and allocation policies
+
+Definition rows 4.11, 4.14, 5.33.
+
+Printed ([TR] p. 6, row 5.33): `wp (e) {Q̂} (ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v.
+(⟦ρ_f ● ρ⟧, e) →* (⟦ρ_f ● ρ′ ● ρ⁺⟧, v) ∧ …`.  The run is existential, and `alloc↦` ([TR] p. 4)
+allocates any location the memory misses.
+
+Reading adopted.  `Fig16.LogRel.Typed.wpTSR RR` is §12.72's `wpTS` with the run drawn from a
+class `RR : Fig16.LogRel.Typed.RunRel` of runs closed under the empty run, a step that
+allocates nothing, an allocation at some location the memory misses, plugging into an
+evaluation context, and concatenation.  `wpTS`, `vP`, `gDenX` and `SemX` are the instances at
+`Fig16.LogRel.Typed.stepsRel`, every run, which is row 5.33's `→*`; every statement stated at
+them is unchanged.  The typed world (`Support/TypedWorld/`) and 6.151
+(`Fig16.LogRel.Typed.fundamentalR`) are proved at every class.  The runs are built in eight
+places only — `wpTS_val`, `wpTS_head`, `wpTS_alloc`, `wpTS_free`, `wpTS_load`, `wpTS_load_I`,
+`wpTS_store`, `wpTS_bind` — and each is one of the closure operations; every other rule
+passes the run through.  `Fig16.LogRel.Typed.polRel pol` is the class of runs under an
+allocation policy `pol : BoLo.Policy`, which picks, for each memory, a location every finite
+memory misses (`BoLo.PolRun`, `Support/Dynamics/Policy.lean`).
+
+Why this is a strengthening, not a change.  The printed row asks for some run.  6.141's proof
+([TR] p. 37, *"Choose an ℓ such that ℓ ∉ ρf ● ρ"*) uses of `ℓ` only that it is missing from
+`ρf ● ρ`, so the rule holds for whichever such location a policy names.  At every class the run is in
+particular a run (`RunRel.toSteps`), and the printed existential is the instance at any
+policy: `Fig16.LogRel.Typed.adequacy` is now `Fig16.LogRel.Typed.adequacyPol` at the
+least-free policy, forgetting the policy.  Its statement is unchanged.
+
+What it buys.  `Fig16.LogRel.Typed.adequacyPol`: for every policy, a closed program of type
+`1` runs *under that policy* from the empty memory to `()` and the empty memory.  A policy run
+is the only step from each configuration, so this run is the only policy run that reaches a
+value (`Extensions/Purity`, `closed_policy_adequacy`): for every deterministic allocator of
+this kind, the one execution is safe, terminates and reclaims its memory.  Terms that the
+semantic judgment `SemX` admits but no rule types can need the existential's freedom:
+`peek 1` (`Extensions/Purity`, `not_semPolicyRuns`) runs only by allocating the location it
+reads.
+
 ## Part II — The judgment boxes of [TR] p. 2
 
 ### §C.25 `@ρ ⊐ α` is universal over the borrow cells, and `[⊤]P` is the borrow-free restriction

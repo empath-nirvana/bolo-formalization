@@ -44,6 +44,8 @@ open BoCa.Fig16.BoLo
 open BoCa.BoLo (Heap Steps Step1 Head Kont eLoad eStore)
 open BoCa.Lifetime (LSub LifeCtx LifeVar)
 
+variable {RR : RunRel}
+
 /-! ### Theorem 6.64 (Imm Frame) at the typed world; record in `Paper/S6_3_FrameAndAntiFrame/Lemmas.lean` -/
 /-- `[TR]` Theorem 6.64 (`Imm Frame`) at the tagged `wpTS`:
 
@@ -57,18 +59,18 @@ theorem wpTS_I_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (hadm : AdmWf T δ) (v
     (e : Expr) (ls : List SRec) (Q : List SRec → Val → WProp)
     (hQ : ∀ ls₁ ls₂ w ρ, Ext ls₁ ls₂ ρ → Q ls₁ w ρ → Q ls₂ w ρ) :
     Entails
-      (ptoOwn l v ⋆ vX wpTS true T ls δ v ⋆
+      (ptoOwn l v ⋆ vX (wpTSR RR) true T ls δ v ⋆
         fresh (fun α ρ => ∀ ls', AddAt ls ls' α →
           (∃ r ∈ rsOf ls', r.le = l ∧ r.T = T ∧ r.δ = δ) →
-          (ptoImmS l α ls' (fun ls₀ => vX wpTS true T ls₀ δ) ─⋆
-            wpTS ls' e (fun ls'' v' => box α (ptoOwn l v ─⋆ (vX wpTS true T ls'' δ v ─⋆ Q ls'' v')))) ρ))
-      (wpTS ls e Q) := by
+          (ptoImmS l α ls' (fun ls₀ => vX (wpTSR RR) true T ls₀ δ) ─⋆
+            (wpTSR RR) ls' e (fun ls'' v' => box α (ptoOwn l v ─⋆ (vX (wpTSR RR) true T ls'' δ v ─⋆ Q ls'' v')))) ρ))
+      ((wpTSR RR) ls e Q) := by
   classical
   intro ρ hH2 ρf sρ ps hH3 hsρ hT htg
   have hTI := hT.inv
   have hvsρ : ResU.Valid sρ := hash_valid_comp hH3 hsρ
   -- 6.112 pulls `ℓ ↦ v ⋆ P̂(v)` inside the `⋔`
-  obtain ⟨γ, hγ⟩ := fresh_frame (ptoOwn l v ⋆ vX wpTS true T ls δ v) _ ρ
+  obtain ⟨γ, hγ⟩ := fresh_frame (ptoOwn l v ⋆ vX (wpTSR RR) true T ls δ v) _ ρ
     (BoLo.sep_assoc' _ _ _ ρ hH2)
   -- H4, taken also below every tag of the list
   obtain ⟨b₀, hb₀⟩ := exists_fresh ls
@@ -132,7 +134,7 @@ theorem wpTS_I_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (hadm : AdmWf T δ) (v
     · obtain ⟨q, hq, hqd, hfq⟩ := htg x hx
       exact ⟨q, List.mem_cons_of_mem _ hq, hqd, hFLold q hq x.2 hfq⟩
   -- the borrow handed to the body is at the caller's list (`⊐ α`)
-  have hcell : ptoImmS l A ls' (fun ls₀ => vX wpTS true T ls₀ δ) ρi := by
+  have hcell : ptoImmS l A ls' (fun ls₀ => vX (wpTSR RR) true T ls₀ δ) ρi := by
     refine ⟨LSet.singleton A, v, ρP, houtP, ls, rfl, hPv, le_refl _, fun x => ?_⟩
     refine ⟨fun hx => ⟨hadd.1 x hx, hAtag x hx⟩, fun ⟨hx, hxA⟩ => ?_⟩
     by_contra hn
@@ -257,7 +259,7 @@ theorem wpTS_I_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (hadm : AdmWf T δ) (v
   have hαA : A = α' := frameLife_eq hα' haF eζl htl hAl
   subst hαA
   -- H36: the callback's wand, at the cell and the payload it gets back (`ext_add`)
-  have hPv'' : vX wpTS true T ls'' δ v ρP := vX_local true T (ext_add hls''add houtP) hPv
+  have hPv'' : vX (wpTSR RR) true T ls'' δ v ρP := vX_local true T (ext_add hls''add houtP) hPv
   obtain ⟨X, hX, hXR⟩ :=
     (ResU.CompS.assoc ρ' (ResU.single l (CellU.ownOf v)) ρP R).mp ⟨ρlP, hclP, hR⟩
   have hQ'' : Q ls'' v' R := (hwand' _ X rfl hX) ρP R hPv'' hXR
@@ -342,19 +344,19 @@ list, then
 
 `[variant: P̂ ≔ 𝒱X⟦T⟧δ; the premise `P̂ ⊨ [β]P̂` at every list, the family's reading]` -/
 theorem wpTS_M_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (β : Life)
-    (hP : ∀ ls w σ, vX wpTS true T ls δ w σ → σ.InStratum β) (v : Val) (e : Expr) (ls : List SRec)
+    (hP : ∀ ls w σ, vX (wpTSR RR) true T ls δ w σ → σ.InStratum β) (v : Val) (e : Expr) (ls : List SRec)
     (Q : List SRec → Val → WProp) :
     Entails
-      (ptoOwn l v ⋆ vX wpTS true T ls δ v ⋆
-        fresh (fun α => ptoMutS l α ls (fun ls₀ => vX wpTS true T ls₀ δ) ─⋆
-          wpTS ls e (fun ls'' v' =>
-            box α (all fun w => ptoOwn l w ─⋆ (vX wpTS true T ls'' δ w ─⋆ Q ls'' v')))))
-      (wpTS ls e Q) := by
+      (ptoOwn l v ⋆ vX (wpTSR RR) true T ls δ v ⋆
+        fresh (fun α => ptoMutS l α ls (fun ls₀ => vX (wpTSR RR) true T ls₀ δ) ─⋆
+          (wpTSR RR) ls e (fun ls'' v' =>
+            box α (all fun w => ptoOwn l w ─⋆ (vX (wpTSR RR) true T ls'' δ w ─⋆ Q ls'' v')))))
+      ((wpTSR RR) ls e Q) := by
   classical
   intro ρ hH2 ρf sρ ps hH3 hsρ hT htg
   have hvsρ : ResU.Valid sρ := hash_valid_comp hH3 hsρ
   -- 6.112 pulls `ℓ ↦ v ⋆ P̂(v)` inside the `⋔`
-  obtain ⟨γ, hγ⟩ := fresh_frame (ptoOwn l v ⋆ vX wpTS true T ls δ v) _ ρ
+  obtain ⟨γ, hγ⟩ := fresh_frame (ptoOwn l v ⋆ vX (wpTSR RR) true T ls δ v) _ ρ
     (BoLo.sep_assoc' _ _ _ ρ hH2)
   -- H4: a lifetime shorter than `γ`, `β` and every tag
   obtain ⟨b₀, hb₀⟩ := exists_fresh ls
@@ -374,11 +376,11 @@ theorem wpTS_M_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (β : Life)
   have houtP : ResU.InStratum A ρP := ResU.CompS.inStratum_right hclP houtlP
   have houtb : ResU.InStratum A ρb := ResU.CompS.inStratum_right hcρ houtρ
   -- `P̂ ⊧ [β] P̂` is what puts `P̂`'s resources in `Res_A`
-  have hunif : ∀ ls' w σ, vX wpTS true T ls' δ w σ → ResU.InStratum A σ := fun ls' w σ h m ψ hm =>
+  have hunif : ∀ ls' w σ, vX (wpTSR RR) true T ls' δ w σ → ResU.InStratum A σ := fun ls' w σ h m ψ hm =>
     CellU.InStratum.mono (le_of_lt hAβ) (hP ls' w σ h m ψ hm)
   set Qs : Val → SPropS BoCa.Loc BoCa.Val A :=
-    (fun (w : Val) (r : ResS BoCa.Loc BoCa.Val A) => vX wpTS true T ls δ w r.1) with hQs
-  have hofS : BoLo.ofS Qs = fun w => vX wpTS true T ls δ w := by
+    (fun (w : Val) (r : ResS BoCa.Loc BoCa.Val A) => vX (wpTSR RR) true T ls δ w r.1) with hQs
+  have hofS : BoLo.ofS Qs = fun w => vX (wpTSR RR) true T ls δ w := by
     funext w σ
     exact propext ⟨fun h => h.2, fun h => ⟨hunif ls w σ h, h⟩⟩
   -- the "fictional" `ρ_m = ℓ ↦ mut(α, v, ρ_P̂(v), P̂)`, well formed by H4
@@ -528,8 +530,8 @@ theorem wpTS_M_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (β : Life)
       ha) htg''
   -- H35: the callback's wand, at the value the run leaves in the cell, read at the list the
   -- run returns
-  have hχv : vX wpTS true T ls'' δ v'' χ :=
-    vX_local true T (ext_of_same hls'' χ) (show vX wpTS true T ls δ v'' χ from hwit'')
+  have hχv : vX (wpTSR RR) true T ls'' δ v'' χ :=
+    vX_local true T (ext_of_same hls'' χ) (show vX (wpTSR RR) true T ls δ v'' χ from hwit'')
   obtain ⟨y, hy₁, hy₂⟩ :=
     (ResU.CompS.assoc ρ' (ResU.single l (CellU.ownOf v'')) χ R).mp
       ⟨W'', ResU.CompS.comm hW'', hR⟩
@@ -548,12 +550,12 @@ theorem wpTS_M_frameX (l : BoCa.Loc) (T : Ty) (δ : LSub) (β : Life)
 theorem wpTS_M_antiFrameX (l : BoCa.Loc) (α : Life) (T : Ty) (δ : LSub) (e : Expr)
     (ls : List SRec) (Q : List SRec → Val → WProp) :
     Entails
-      (ptoMutS l α ls (fun ls₀ => vX wpTS true T ls₀ δ) ⋆
-        (all fun v => ptoOwn l v ─⋆ (vX wpTS true T ls δ v ─⋆
-          wpTS ls e (fun ls'' v' => ex fun w =>
-            ptoOwn l w ⋆ vX wpTS true T ls'' δ w ⋆
-              (ptoMutS l α ls'' (fun ls₀ => vX wpTS true T ls₀ δ) ─⋆ Q ls'' v')))))
-      (wpTS ls e Q) := by
+      (ptoMutS l α ls (fun ls₀ => vX (wpTSR RR) true T ls₀ δ) ⋆
+        (all fun v => ptoOwn l v ─⋆ (vX (wpTSR RR) true T ls δ v ─⋆
+          (wpTSR RR) ls e (fun ls'' v' => ex fun w =>
+            ptoOwn l w ⋆ vX (wpTSR RR) true T ls'' δ w ⋆
+              (ptoMutS l α ls'' (fun ls₀ => vX (wpTSR RR) true T ls₀ δ) ─⋆ Q ls'' v')))))
+      ((wpTSR RR) ls e Q) := by
   classical
   intro ρ hH1 ρf sρ ps hH2 hsρ hT htg
   have hvsρ : ResU.Valid sρ := hash_valid_comp hH2 hsρ
@@ -573,8 +575,8 @@ theorem wpTS_M_antiFrameX (l : BoCa.Loc) (α : Life) (T : Ty) (δ : LSub) (e : E
   obtain ⟨X, hX⟩ := (ResU.compS_defined_iff ρa W).mpr haW.1
   have hfX : ResU.Hash ρf X := ResU.hash_of_pairwise (ResU.hash_symm haf) haW hfW hX
   -- the content handed out, read at the current list
-  have hPv : vX wpTS true T ls δ v σP := by
-    have h₀ : vX wpTS true T ls₀ δ v σP := by
+  have hPv : vX (wpTSR RR) true T ls δ v σP := by
+    have h₀ : vX (wpTSR RR) true T ls₀ δ v σP := by
       have : BoLo.ofS Qs v σP := ⟨hstr, hwit⟩
       rw [hofS] at this; exact this
     exact vX_local true T (ext_stored_current hstr le_rfl hls₀) h₀

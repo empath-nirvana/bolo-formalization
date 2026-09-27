@@ -4,6 +4,7 @@ import Paper.S3_Dynamics.Definitions
 import Paper.S4_LogicalRelation.Definitions
 import Paper.S5_Model.Definitions
 import Support.Dynamics.Machine
+import Support.Dynamics.Policy
 import Support.Lifetimes.Interpretation
 import Support.LogicalRelation.ClosingSubstitutions
 import Support.Model.Notation
@@ -123,18 +124,62 @@ record proper whose lineage holds it.  `[about ours: our tag discipline]` -/
 def Tagged (W : WRes) (ps : List FrameRec) (ls : List SRec) : Prop :=
   ∀ x ∈ ls, ∃ p ∈ ps, DescR p x.1 ∧ FrameLife W p x.2
 
+/-- A class of runs `wp` may exhibit: closed under the operations `wp`'s rules build runs with.
+`stepsRel` is every run, `[TR]` p. 6's `(⟦ρ_f ● ρ⟧, e) →* (…, v)`; `polRel pol` is the runs
+under an allocation policy.  `[about ours: docs/adjudications.md §12.74]` -/
+structure RunRel where
+  R : Heap → Expr → Heap → Expr → Prop
+  refl : ∀ (μ : Heap) (e : Expr), R μ e μ e
+  cons : ∀ {μ μ₁ μ' : Heap} {e e₁ e' : Expr}, Step1 μ e μ₁ e₁ →
+    (∀ ℓ, μ₁ ℓ ≠ none → μ ℓ ≠ none) → R μ₁ e₁ μ' e' → R μ e μ' e'
+  alloc : ∀ (μ : Heap) (v : Val), Fig16.FinDom μ →
+    ∃ l, μ l = none ∧ R μ (.app (.val (.prim .alloc)) (.val v)) (μ.upd l v) (.val (.loc l))
+  plug : ∀ (K : Kont) {μ μ' : Heap} {e e' : Expr}, R μ e μ' e' → R μ (K.plug e) μ' (K.plug e')
+  trans : ∀ {μ μ₁ μ' : Heap} {e e₁ e' : Expr}, R μ e μ₁ e₁ → R μ₁ e₁ μ' e' → R μ e μ' e'
+  toSteps : ∀ {μ μ' : Heap} {e e' : Expr}, R μ e μ' e' → Steps μ e μ' e'
+
+/-- A finite memory misses a location. -/
+theorem exists_fresh_loc {μ : Heap} (h : Fig16.FinDom μ) : ∃ l, μ l = none := by
+  obtain ⟨d, hd⟩ := h
+  refine ⟨d.sum + 1, ?_⟩
+  by_contra hne
+  exact Nat.not_succ_le_self _ (List.le_sum_of_mem (hd _ hne))
+
+/-- Every run: `[TR]` p. 6's `→*`. -/
+def stepsRel : RunRel where
+  R := Steps
+  refl := fun μ e => .refl μ e
+  cons := fun h _ t => .more h t
+  alloc := fun μ v hfin => by
+    obtain ⟨l, hl⟩ := exists_fresh_loc hfin
+    exact ⟨l, hl, .one (Step1.head (Head.alloc μ v l hl))⟩
+  plug := fun K _ _ _ _ h => h.plug K
+  trans := fun h₁ h₂ => h₁.trans h₂
+  toSteps := fun h => h
+
+/-- The runs under the allocation policy `pol`. -/
+def polRel (pol : BoLo.Policy) : RunRel where
+  R := BoLo.PolRun pol
+  refl := fun μ e => .refl μ e
+  cons := fun h hdom t => BoLo.PolRun.cons h hdom t
+  alloc := fun μ v hfin => ⟨pol.pick μ, pol.fresh μ hfin, BoLo.PolRun.alloc pol μ v hfin⟩
+  plug := fun K _ _ _ _ h => BoLo.PolRun.plug K h
+  trans := fun h₁ h₂ => BoLo.PolRun.trans h₁ h₂
+  toSteps := fun h => h.toSteps
+
 /-!
 Row 4.11 · `ℰ⟦T⟧δ(v) ≜ wp (e) {𝒱⟦T⟧δ}` · `[repair]`; the printed row is in `Paper/S4_LogicalRelation/Definitions.lean`.
 
 Row 5.33, continued.
 -/
-/-- `[TR]` p. 6's `wp` at a tagged typed world.  The frame quantifier ranges over the
-completions `ρ_f ● ρ` that are `TW` worlds at the list's records, tagged, and the
-post-configuration is one too, with the same records proper and the same list members: a
-record 6.64 creates inside a run is ended before the run returns.  Every other conjunct is
-`Fig16.BoLo.wp`'s, verbatim.  `[about ours: [TR] p. 6's wp relativised to tagged typed worlds;
-docs/adjudications.md §12.72]` -/
-def wpTS (ls : List SRec) (e : Expr) (Q : List SRec → Val → WProp) : WProp := fun ρ =>
+/-- `[TR]` p. 6's `wp` at a tagged typed world, with its run drawn from the class `R`.  The
+frame quantifier ranges over the completions `ρ_f ● ρ` that are `TW` worlds at the list's
+records, tagged, and the post-configuration is one too, with the same records proper and the
+same list members: a record 6.64 creates inside a run is ended before the run returns.  Every
+other conjunct is `Fig16.BoLo.wp`'s, verbatim.  `[about ours: [TR] p. 6's wp relativised to
+tagged typed worlds; docs/adjudications.md §12.72, §12.74]` -/
+def wpTSR (RR : RunRel) (ls : List SRec) (e : Expr) (Q : List SRec → Val → WProp) : WProp :=
+  fun ρ =>
   ∀ (ρf fρ : WRes) (ps : List FrameRec), ResU.Hash ρf ρ → ResU.CompS ρf ρ fρ →
     TW fρ ps (rsOf ls) → Tagged fρ ps ls →
     ∃ (ρ' ρp fρ' fρ'p π : WRes) (v : Val) (μ μ' : Heap) (ps' : List FrameRec)
@@ -143,11 +188,15 @@ def wpTS (ls : List SRec) (e : Expr) (Q : List SRec → Val → WProp) : WProp :
       ResU.CompS ρf ρ' fρ' ∧ ResU.Hash ρp fρ' ∧
       ResU.Lower fρ μ ∧
       ResU.CompS fρ' ρp fρ'p ∧ ResU.Lower fρ'p μ' ∧
-      Steps μ e μ' (.val v) ∧
+      RR.R μ e μ' (.val v) ∧
       ResU.CompS ρ' ρp π ∧ ResU.UpdV ρ π ∧
       NoOwn ρp ∧
       TW fρ'p ps' (rsOf ls') ∧ Tagged fρ'p ps' ls' ∧
       (∀ p, p ∈ ps' ↔ p ∈ ps) ∧ (∀ x, x ∈ ls' ↔ x ∈ ls) ∧ Q ls' v ρ'
+
+/-- `[TR]` p. 6's `wp` at a tagged typed world: `wpTSR` at every run.
+`[about ours: [TR] p. 6's wp relativised to tagged typed worlds; docs/adjudications.md §12.72]` -/
+abbrev wpTS : List SRec → Expr → (List SRec → Val → WProp) → WProp := wpTSR stepsRel
 
 end BoCa.Fig16.LogRel.Typed
 

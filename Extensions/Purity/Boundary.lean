@@ -88,7 +88,7 @@ theorem readFootprintSyn : ReadFootprintSyn := by
   intro e T hT hD ρf fρ ps μ hf hc hTW htg hμ
   have hP : PureTyping LifeCtx.empty [] e T :=
     ⟨hD, ok_empty, fun s hs => absurd hs (by simp), fun s hs => absurd hs (by simp), hT⟩
-  obtain ⟨v, hrun, -, -⟩ := pure_exhibited hP Adequacy.models_empty (gDenX_nil [] LSub.empty)
+  obtain ⟨v, hrun, -, -⟩ := pure_exhibited (RR := stepsRel) hP Adequacy.models_empty (gDenX_nil [] LSub.empty)
     hf hc hTW htg hμ
   have hsub : LogRel.substAll [] e = e := by rw [LogRel.substAll, Adequacy.psub_nil]
   refine ⟨μ, v, ?_⟩
