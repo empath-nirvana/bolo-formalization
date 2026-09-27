@@ -1,0 +1,113 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\hypersetup{colorlinks,urlcolor=blue!50!black,linkcolor=blue!50!black}
+\newcommand{\lean}[1]{\texttt{#1}}
+\renewcommand{\wp}{\mathsf{wp}}
+
+\title{Purity and allocation in the BoCa mechanisation\\[2pt]
+\large A short note on the \lean{Extensions/Purity} branch}
+\author{}\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2em}
+
+\noindent
+This note summarises an extension of the Lean mechanisation of \emph{From Linearity to
+Borrowing} (Wagner et al., OOPSLA 2025), prompted by Matsushita and Ishii's \emph{Pure Borrow}
+(PLDI 2026), whose \S7 observes that the BoLo metatheory does not address the functional
+behaviour of borrowing programs (issue \#1). All results below are machine-checked, use only
+\lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}, and leave every printed statement
+unchanged. Lean names refer to \lean{Extensions/Purity/} and \lean{Support/} on branch
+\lean{purity}; \lean{Extensions/Purity/README.md} has the full account.
+
+\section{Runs as a parameter of \texorpdfstring{$\wp$}{wp}}
+
+The printed $\wp$ (row 5.33) asks for \emph{some} run to a value, so adequacy says that some run
+of a well-typed program is safe and frees what it allocates. The proof of \textsc{[TR]}~6.141
+uses only that the chosen location is fresh: \lean{wpTS\_alloc\_any} proves the allocation rule
+at every location missing from the heap.
+
+We state $\wp$ at a \emph{class of runs} \lean{RunRel}, closed under the operations its rules
+build runs with, and indexed so that a run plugged into a context $K$ may be required to do
+more (\lean{shift}). Only eight constructions build runs (value, head step, allocation, free,
+the two loads, store, bind); every other rule of the typed world passes the run through
+unchanged. The Fundamental Property holds at every class (\lean{fundamentalR}). The printed
+$\wp$, \lean{fundamental} and \lean{adequacy} are the instance at every run, and are now
+corollaries (\S12.74 of \lean{docs/adjudications.md}). Two further instances:
+
+\begin{itemize}
+\item \textbf{Allocation policies.} A policy picks a heap-fresh location as a function of the
+  heap. \lean{adequacyPol}: for \emph{every} policy, the unique run of a closed well-typed
+  program is safe, terminates and frees everything. Least-free allocation, which reuses
+  locations, is an instance; the printed \lean{adequacy} is derived from it.
+\item \textbf{Fresh runs.} Each allocation avoids every location the configuration names (heap,
+  term and stored values) and a finite set $N$; plugging into $K$ adds the locations of $K$
+  to $N$. \lean{adequacyFresh} is adequacy with fresh allocation.
+\end{itemize}
+
+\section{Purity}
+
+Allocation is the machine's only nondeterminism, and on fresh runs it is invisible up to a
+renaming of locations (\lean{freshRun\_det}, \lean{fresh\_run\_local}).
+
+\paragraph{Closed programs.} \lean{freshRunsExistClosed}: a closed well-typed program has a fresh
+run from the heap of every tagged typed world. Hence \lean{closed\_pure\_every\_run}: a closed
+program of plain-data type ($1$, $\oplus$, $\otimes$) returns one location-free value on
+\emph{every} run from \emph{every} heap.
+
+\paragraph{The pure fragment.} A program whose arguments are plain data and $\mathsf{Imm}$
+borrows and whose result is plain data (\lean{PureTyping}) may allocate, mutate and free
+internally. From the heap $\mu$ of a tagged typed world, a fresh run gives $\mu$ back and
+returns a location-free $v$; every run from $\mu$, and every run from any heap agreeing with
+$\mu$ on what the arguments reach, returns $v$. This holds
+\begin{itemize}
+\item with the arguments in the printed relation, at argument types where no function type is
+  read at the program's view (\lean{pure\_result\_every\_run\_ind}); there the relation does not
+  depend on the run class at all (\lean{vX\_indep});
+\item at \emph{every} argument type, for arguments produced by a well-typed program
+  (\lean{arising\_producer\_pure}), following the reading that \S6 quantifies over resources
+  that arise from the calculus.
+\end{itemize}
+Within a borrow's lifetime, nothing beneath an $\mathsf{imm}$ cell changes on the exhibited run
+(\lean{wpTS\_frozen}): the model's deep immutability (\textsc{[CONF]} \S5), at the level of
+the machine.
+
+\section{Where the boundary lies}
+
+Four small terms, each built in Lean, mark the edge of these statements. None is well typed;
+the first three are admitted by the semantic relation, and the typing is what excludes them.
+\begin{itemize}
+\item \lean{peek}: in the relation at $1$, but its run reads a location of the frame, so its
+  behaviour depends on the allocator (\lean{not\_readFootprintSem},
+  \lean{not\_semPolicyRuns}). Well-typed programs read only what their arguments reach or they
+  allocate (\lean{readFootprintSyn}).
+\item \lean{staleL}: location-free and in the relation, but it reads through a freed and
+  reallocated name, so it has no fresh run (\lean{staleL\_no\_fresh}).
+\item \lean{staleClosure} ($\lambda\_.\,\mathit{staleL}$): admitted at $1 \multimap 1$ by the
+  relation at every run but not at the fresh runs (\lean{vX\_lolli\_depends}).
+\item \lean{staleH}: a stale name kept in a cell rather than the term
+  (\lean{not\_termLiveSuffices}).
+\end{itemize}
+
+\section{Open}
+
+Each item is not derived; no obstruction to it is verified.
+\begin{itemize}
+\item The pure fragment with arguments in the printed relation at types such as
+  $\mathsf{Imm}\,@a\,(\mathsf{Mut}\,@b\,(1 \multimap 1))$, where a $\mathsf{Mut}$ cell's stored
+  predicate mentions $\wp$. Such arguments are covered when they arise from well-typed code
+  (\lean{Arises.mut\_pred}).
+\item Arguments produced under an arbitrary (non-fresh) allocator. This needs an invariant along
+  runs, a run-time store typing with owned, lent and moved-out cells; the README sketches it.
+  The \lean{withswap} window, where a lent cell names a payload the callback may free, is
+  recorded but not machine-checked.
+\item A state-monad denotation for programs with $\mathsf{Mut}$ borrows or owned references in
+  their interface, of which the pure fragment would be the empty-state case.
+\end{itemize}
+
+\end{document}

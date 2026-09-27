@@ -16,6 +16,8 @@ Fundamental Property (`[TR]` Lemma 6.151) and typed world unchanged.
 
 `[CONF]` is the conference paper and `[TR]` its supplement, as elsewhere in this repository.
 
+A short summary is in [`note/purity-note.pdf`](note/purity-note.pdf).
+
 ## Building and checking
 
 ```sh
@@ -131,11 +133,13 @@ a `DerivesWf` term mentions none (`derivesWf_locFree`), so every location of `γ
 `γ` (`occ_substAll_of_locFree`).  With `Read.lean`'s machine fact, that is the read footprint
 of well-typed programs.
 
-## What remains open
+## What remained open after the first pass
 
-Each item below is not derived; no obstruction to it has been verified.
+This section records the state before the run-class sections below; items marked there as proved
+are proved.  Each item not marked is not derived; no obstruction to it has been verified.
 
-* **Existence of fresh runs.**  `pure_result`, `closed_pure` and the fresh-run half of
+* **Existence of fresh runs** (proved for closed programs and for arising arguments below:
+  `freshRunsExistClosed`, `arising_pure_every_run`).  `pure_result`, `closed_pure` and the fresh-run half of
   `pure_heap` speak about fresh runs, the runs of any allocator that never reuses a location
   its configuration names (a bump allocator, for instance).  The exhibited run of `wpTS` need
   not be fresh, and that a well-typed program always has a fresh run is not derived.  The
@@ -301,7 +305,7 @@ lines, on the scale of the typed world itself.
   `wpTS` whose run were a `PolRun pol` would satisfy the same rules.  In this repository that
   means re-running the typed world (`Wp`, `FrameRules`, `Reborrow`, `Relation`,
   `Compatibility`, and the Fundamental Property's induction) at a second `wpTS`, several
-  thousand lines in which only the eight constructions above change; it is not done here.
+  thousand lines in which only the eight constructions above change; the next section does it.
   In a development where `wpTS` can be edited, the change is to its run conjunct: replace
   `Steps μ e μ' (.val v)` by `PolRun pol μ e μ' (.val v)` for a policy `pol` returning a
   heap-fresh location on finite heaps, and re-prove the eight constructions.
@@ -311,7 +315,7 @@ lines, on the scale of the typed world itself.
   the heap misses it.  A policy-indexed `wpTS` would exclude such terms from the relation, as
   it should: `peek` is not well typed.
 
-## Every run under an allocation policy (branch `policy-wp`)
+## Every run under an allocation policy
 
 `Support/`'s `wp` is stated at every class of runs closed under the operations its rules build
 runs with (`Typed.RunRel`, `Typed.wpTSR`), with the printed `wp` the instance at every run
@@ -338,7 +342,7 @@ For open programs the arguments must be in the relation at the policy's runs
 (`gDenXR (polRel pol)`); a closure the relation at every run admits need not be
 (`staleClosure`, `not_semPolicyRuns`).
 
-## Fresh runs of well-typed programs (branch `fresh-avoid`)
+## Fresh runs of well-typed programs
 
 The class of runs is indexed (`Typed.RunRel.I`); plugging a run into a context `K` may change the
 index (`RunRel.shift`), and `wp` holds at every index.  `Typed.freshRel` is indexed by a finite list
@@ -360,7 +364,7 @@ relation at every run.  At plain data the relation mentions no `wp`; but a `Mut`
 borrowed payload stores a predicate that mentions `wp` (`vX`'s `Mut` clause), where the two
 relations need not agree.  The transfer is not derived, and no obstruction is verified.
 
-### The pure fragment with arguments in the relation at every run (branch `fresh-pure`)
+### The pure fragment with arguments in the relation at every run
 
 The relation mentions `wp` only at `⊸` and `∀` read at the program's view.  An `Imm` payload is
 read at the observable view, where `⊸` and `∀` are `True`, but a `Mut` cell's stored predicate
@@ -382,7 +386,7 @@ program cannot call such a function (it reaches the program at `Unk`), but no ar
 uses that.  Arguments that arise from a well-typed program run at the fresh runs are in the
 relation at the fresh runs, where `pure_result_every_run_fresh` applies to every argument type.
 
-### Arguments that arise from well-typed code (branch `fresh-arises`)
+### Arguments that arise from well-typed code
 
 §6 quantifies over the resources that arise from the calculus.  `Arises` (`Arises.lean`) names
 the arguments a pure-fragment function receives from well-typed code: a tuple `γ` at types `Ts`,
