@@ -214,24 +214,35 @@ theorem mint_views {α : Life} {O : WRes} (hvO : ResU.Valid O) (δ : LSub) :
       exact ⟨PMap.empty, Y₀, ResU.comp_empty_right Y₀, hM, ⟨rfl, trivial⟩,
         fun m ψ e => by simp at e⟩
 
+/-- **An owned value shares at `α`**, at a named decomposition `ρₒ = ℓ ↦ own(v) ● ρ_P`: the
+minted resource is 6.64's cell `ℓ ↦ imm({α}, v, ρ_P)` and own-free views `V` on `ρ_P`'s `own`
+cells. -/
+theorem mint_shr_of {α : Life} {l : Loc} {v : Val} {T : Ty} {δ : LSub} {ρP ρo : WRes}
+    (hc : ResU.CompS (ResU.single l (CellU.ownOf v)) ρP ρo) (hρP : vDen T δ v ρP)
+    (hPα : ρP.InStratum (LSet.singleton α).join) (hvo : ResU.Valid ρo) :
+    ∃ V Y, ResU.CompS (ResU.single l (CellU.immOf (LSet.singleton α) v ρP hPα)) V Y ∧
+      Mint α ρo Y ∧ shrDen α T δ (Val.loc l) Y ∧ shrV α T δ v V ∧
+      (∀ m ψ, V.get m = some ψ → ∃ u, ρP.get m = some (CellU.ownOf u)) := by
+  have hLself : (ResU.single l (CellU.ownOf v)).get l = some (CellU.ownOf v) :=
+    ResU.single_get_self _ _
+  have hPl : ρP.get l = none := own_disjoint hc hLself
+  have hM₀ : Mint α ρo (ResU.single l (CellU.immOf (LSet.singleton α) v ρP hPα)) :=
+    mint_single (ResU.CompS.comm hc) hvo
+  obtain ⟨V, Y, hY, hM, hV, hdom⟩ := mint_views hvo δ T v ρP _ hρP (le_of_compS_right hc) hPα
+    hM₀ (fun m u e => by
+      have hm : m ≠ l := by rintro rfl; rw [hPl] at e; cases e
+      exact ResU.single_get_ne _ hm)
+  exact ⟨V, Y, hY, hM, ⟨l, v, PMap.empty, Y, ResU.comp_empty_left Y, ⟨rfl, rfl⟩, _, V, hY,
+    ⟨LSet.singleton α, v, ρP, hPα, rfl, ⟨rfl, hρP⟩, le_refl α⟩, hV⟩, hV, hdom⟩
+
 /-- **An owned value shares at `α`.**  `ℓ ↦ v ⋆ 𝒱⟦T⟧δ(v)`, valid and in `Res_α`, mints
 `shrDen α T δ (ℓ)` over itself: 6.64's cell `ℓ ↦ imm({α}, v, ρ_P̂(v))` and the views. -/
 theorem mint_shr {α : Life} {l : Loc} {v : Val} {T : Ty} {δ : LSub} {ρo : WRes}
     (hP : (ptoOwn l v ⋆ vDen T δ v) ρo) (hα : ρo.InStratum α) (hvo : ResU.Valid ρo) :
     ∃ Y, Mint α ρo Y ∧ shrDen α T δ (Val.loc l) Y := by
   obtain ⟨L, ρP, hc, rfl, hρP⟩ := hP
-  have hPα : ρP.InStratum α := ResU.CompS.inStratum_right hc hα
-  have hLself : (ResU.single l (CellU.ownOf v)).get l = some (CellU.ownOf v) :=
-    ResU.single_get_self _ _
-  have hPl : ρP.get l = none := own_disjoint hc hLself
-  have hM₀ : Mint α ρo (ResU.single l (CellU.immOf (LSet.singleton α) v ρP hPα)) :=
-    mint_single (ResU.CompS.comm hc) hvo
-  obtain ⟨V, Y, hY, hM, hV, -⟩ := mint_views hvo δ T v ρP _ hρP (le_of_compS_right hc) hPα
-    hM₀ (fun m u e => by
-      have hm : m ≠ l := by rintro rfl; rw [hPl] at e; cases e
-      exact ResU.single_get_ne _ hm)
-  exact ⟨Y, hM, l, v, PMap.empty, Y, ResU.comp_empty_left Y, ⟨rfl, rfl⟩, _, V, hY,
-    ⟨LSet.singleton α, v, ρP, hPα, rfl, ⟨rfl, hρP⟩, le_refl α⟩, hV⟩
+  obtain ⟨-, Y, -, hM, hY, -⟩ := mint_shr_of hc hρP (ResU.CompS.inStratum_right hc hα) hvo
+  exact ⟨Y, hM, hY⟩
 
 /-! ### The share frame -/
 
