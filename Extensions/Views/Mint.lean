@@ -372,7 +372,8 @@ theorem Mint.post_hash (hM : Mint α O Y) {Z ZO ZY ρ' ρp π : WRes} (hZα : Z.
     (hOα : O.InStratum α) (hZO : ResU.CompS Z O ZO) (hvZO : ResU.Valid ZO)
     (hZY : ResU.CompS Z Y ZY) (hpp : ResU.CompS ρ' ρp π) (hρ'α : ρ'.InStratum α)
     (hupd : ResU.UpdV ZY π) :
-    ∃ G, ResU.CompS ρ' (ρp.delDom Y) G ∧ ResU.CompS G Y π ∧ ResU.Hash G O := by
+    ∃ G, ResU.CompS (ρp.delDom Y) Y ρp ∧ ResU.CompS ρ' (ρp.delDom Y) G ∧
+      ResU.CompS G Y π ∧ ResU.Hash G O := by
   classical
   have hTop := hM.top hZα hOα hZO hvZO hZY hupd
   obtain ⟨τ, hτ⟩ := hupd.2.2
@@ -403,7 +404,7 @@ theorem Mint.post_hash (hM : Mint α O Y) {Z ZO ZY ρ' ρp π : WRes} (hZα : Z.
     (ResU.Comp.get_of_left_none hpp (hρ'Y m ψ eY)).symm.trans (hTop m ψ eY)
   have hpd : ResU.CompS (ρp.delDom Y) Y ρp := delDom_split hpY
   obtain ⟨G, hG, hGY⟩ := (ResU.CompS.assoc ρ' (ρp.delDom Y) Y π).mp ⟨ρp, hpd, hpp⟩
-  refine ⟨G, hG, hGY, ?_⟩
+  refine ⟨G, hpd, hG, hGY, ?_⟩
   -- `G ∈ Res_α`
   have hGπ : ∀ m, Y.get m = none → G.get m = π.get m := fun m eY =>
     (ResU.Comp.get_of_right_none hGY eY).symm
@@ -572,6 +573,178 @@ theorem Mint.post_hash (hM : Mint α O Y) {Z ZO ZY ρ' ρp π : WRes} (hZα : Z.
   obtain ⟨X, hX⟩ := (ResU.compS_defined_iff G O).mpr hGO
   exact ⟨hGO, X, hX, σGO, (ResU.Flat.split hX).mpr
     ⟨eG, e₂, E, aG, a₂, A, heG, he₂, hE, haG, ha₂, hA, hσGO⟩⟩
+
+/-! ### Building a mint: 6.64's cell, then one view at a time -/
+
+/-- `ℓ ↦ imm(ψ) ○ ℓ ↦ own(ψ.erase) = ℓ ↦ imm(ψ)`. -/
+theorem compR_single_imm_own {l : Loc} {ψ : CellU Loc Val} (_hk : ψ.kind = Kind.imm) :
+    ResU.CompR (ResU.single l ψ) (ResU.single l (CellU.ownOf ψ.erase)) (ResU.single l ψ) := by
+  classical
+  refine ResU.Comp.of_pointwise (fun _ _ ψ hc => ⟨ψ, hc⟩) (fun m => ?_)
+  by_cases hm : m = l
+  · subst hm
+    rw [ResU.single_get_self, ResU.single_get_self]
+    exact ⟨ψ, rfl, CellU.compR_own_right_of_erase rfl⟩
+  · rw [ResU.single_get_ne _ hm, ResU.single_get_ne _ hm]
+    rfl
+
+/-- `[TR]` 6.64's `ρᵢ = ℓ ↦ imm({α}, v, ρ_v)` is a mint over `ρ_v ● ℓ ↦ own(v)`. -/
+theorem mint_single {α : Life} {l : Loc} {v : Val} {ρv W : WRes}
+    {hv : ρv.InStratum (LSet.singleton α).join}
+    (hW : ResU.CompS ρv (ResU.single l (CellU.ownOf v)) W) (hvW : ResU.Valid W) :
+    Mint α W (ResU.single l (CellU.immOf (LSet.singleton α) v ρv hv)) := by
+  refine ⟨fun m ψ e => ?_, fun eO heO m ψ e => ?_, fun eO aO aY heO haO haY => ?_, ?_⟩
+  · obtain ⟨-, rfl⟩ := ResU.single_get_eq_some e
+    exact ⟨v, ρv, hv, rfl⟩
+  · obtain ⟨rfl, rfl⟩ := ResU.single_get_eq_some e
+    obtain ⟨e₁, e₂, he₁, he₂, hec⟩ := (ExS.split hW).mp heO
+    obtain rfl := ExS.functional he₂ (ExW.single_own m v)
+    have h₂ : (ResU.single m (CellU.ownOf v)).get m = some (CellU.ownOf v) :=
+      ResU.single_get_self _ _
+    exact (ResU.CompS.get_left_of_ne_imm (ResU.CompS.comm hec) h₂ (by simp)).2
+  · obtain ⟨e₁, e₂, he₁, he₂, hec⟩ := (ExS.split hW).mp heO
+    obtain rfl := ExS.functional he₂ (ExW.single_own l v)
+    obtain ⟨a₁, a₂, ha₁, ha₂, hac⟩ := (AgW.split hW).mp haO
+    obtain rfl := AgW.functional ha₂ (AgW.single_own l v)
+    have ha₁O : a₁ = aO := ResU.eq_of_comp_empty_right hac
+    rw [ha₁O] at ha₁
+    obtain ⟨ev, av, p₀, hev, hav, hp₀, hH⟩ := AgW.single_imm_inv haY
+    rw [ExR.functional hev (ExS.toExR he₁), AgW.functional hav ha₁] at hp₀
+    -- `p = ex(W) ○ ag(W) = ℓ ↦ own(v) ○ p₀`
+    obtain ⟨σ, eW, aW, heW, haW, hcW⟩ := hvW
+    rw [ExS.functional heW heO, AgW.functional haW haO] at hcW
+    have hpR : ResU.CompR eO aO σ := ResU.CompS.toCompR hcW
+    have hecR : ResU.CompR e₁ (ResU.single l (CellU.ownOf v)) eO := ResU.CompS.toCompR hec
+    obtain ⟨x, hx, hxσ⟩ := (ResU.CompR.assoc (ResU.single l (CellU.ownOf v)) e₁ aO σ).mpr
+      ⟨eO, ResU.CompR.comm hecR, hpR⟩
+    rw [ResU.CompR.functional hx hp₀] at hxσ
+    refine ⟨σ, hpR, ?_⟩
+    -- `H ○ (L ○ p₀) = (H ○ L) ○ p₀ = H ○ p₀`
+    have hHL := compR_single_imm_own (l := l)
+      (ψ := CellU.immOf (LSet.singleton α) v ρv hv) rfl
+    obtain ⟨y, hy, hyY⟩ := (ResU.CompR.assoc _ (ResU.single l (CellU.ownOf v)) p₀ aY).mpr
+      ⟨_, hHL, hH⟩
+    rw [ResU.CompR.functional hy hxσ] at hyY
+    exact hyY
+  · obtain ⟨-, ρ₀, hρ₀, σ, e, a, he, ha, hc⟩ :=
+      ResU.six34 (s := LSet.singleton α) (hs := hv) hW
+        (ResU.hash_symm (ResU.hash_empty_right hvW))
+    have h₀ := ResU.eq_of_comp_empty_left hρ₀
+    subst h₀
+    exact ⟨a, ha⟩
+
+/-- A `○`-factor of a composite that is `own(u)` at `m` is `own(u)` or absent there. -/
+theorem compR_factor_own {a b c : WRes} (h : ResU.CompR a b c) {m : Loc} {u : Val}
+    (hc : c.get m = some (CellU.ownOf u)) :
+    a.get m = none ∨ a.get m = some (CellU.ownOf u) := by
+  rcases ResU.Comp.get h m with ⟨f, -, -⟩ | ⟨χ, f₁, -, f⟩ | ⟨χ, f₁, -, -⟩ |
+      ⟨χ₁, χ₂, χ, f₁, f₂, f, hC⟩
+  · exact Or.inl f
+  · rw [hc] at f; cases Option.some.inj f; exact Or.inr f₁
+  · exact Or.inl f₁
+  · rw [hc] at f; cases Option.some.inj f
+    have hk : χ₁.kind = Kind.own := by
+      by_contra hne
+      exact (CellU.CompR.nonown_left hC hne).1 rfl
+    rw [f₁, CellU.eq_ownOf_of_kind hk, ← CellU.CompR.erase_left hC]
+    exact Or.inr rfl
+
+/-- The flattening `⦇O⦈` of a valid `O`, at `○`, carries `ex(O)`'s `own` cells. -/
+theorem flat_own_of_ex {O σ eO : WRes} (hσ : ResU.Flat O σ) (heO : ExS O eO) {m : Loc} {u : Val}
+    (h : eO.get m = some (CellU.ownOf u)) : σ.get m = some (CellU.ownOf u) := by
+  obtain ⟨e, a, he, ha, hc⟩ := hσ
+  rw [ExS.functional he heO] at hc
+  exact (ResU.CompS.get_left_of_ne_imm hc h (by simp)).2
+
+/-- `⦇w⦈_○` is a `○`-factor of `⦇O⦈` when `w ≤ O`. -/
+theorem flatR_le_of_le {w O σ : WRes} (hwO : ResU.Le w O) (hσ : ResU.Flat O σ)
+    {f : WRes} (hf : ResU.FlatR w f) : ∃ z, ResU.CompR f z σ := by
+  obtain ⟨r, hr⟩ := hwO
+  obtain ⟨eO, aO, heO, haO, hcO⟩ := hσ
+  obtain ⟨ew, er, hew, her, hec⟩ := (ExS.split hr).mp heO
+  obtain ⟨aw, ar, haw, har, hac⟩ := (AgW.split hr).mp haO
+  obtain ⟨a', e', ha', he', hf'⟩ := hf
+  rw [AgW.functional ha' haw, ExR.functional he' (ExS.toExR hew)] at hf'
+  obtain ⟨S₁, S₂, h₁, h₂, h₃⟩ := (ResU.CompR.exchange₄ ew er aw ar σ).mp
+    ⟨eO, aO, ResU.CompS.toCompR hec, hac, ResU.CompS.toCompR hcO⟩
+  rw [ResU.CompR.functional h₁ (ResU.CompR.comm hf')] at h₃
+  exact ⟨S₂, h₃⟩
+
+/-- **One more view.**  Adding to a mint `Y` over `O` the view `m ↦ imm({α}, u, w)` of an
+`own(u)` cell of `ex(O)` that `Y` does not hold, whose witness `w` is a sub-resource of `O`,
+gives a mint.  The new witness's walk is a factor of `⦇O⦈`, so `○` absorbs it. -/
+theorem Mint.add (hM : Mint α O Y) (hvO : ResU.Valid O) {m : Loc} {u : Val} {w : WRes}
+    {h : w.InStratum (LSet.singleton α).join}
+    (hm : ∀ eO, ExS O eO → eO.get m = some (CellU.ownOf u)) (hYm : Y.get m = none)
+    (hwO : ResU.Le w O) :
+    ∃ Y', ResU.CompS Y (ResU.single m (CellU.immOf (LSet.singleton α) u w h)) Y' ∧
+      Mint α O Y' := by
+  classical
+  set c := ResU.single m (CellU.immOf (LSet.singleton α) u w h) with hcdef
+  have hYc : ResU.CompatS Y c := ResU.Compat.of_disjoint (fun m' => by
+    by_cases hm' : m' = m
+    · exact Or.inl (hm' ▸ hYm)
+    · exact Or.inr (ResU.single_get_ne _ hm'))
+  obtain ⟨Y', hY'⟩ := (ResU.compS_defined_iff Y c).mpr hYc
+  -- `⦇O⦈`, the `p` of every clause
+  obtain ⟨σ, hσ⟩ := hvO
+  obtain ⟨eO₀, aO₀, heO₀, haO₀, hcO₀⟩ := hσ
+  have hσR : ResU.CompR eO₀ aO₀ σ := ResU.CompS.toCompR hcO₀
+  have hσflat : ResU.Flat O σ := ⟨eO₀, aO₀, heO₀, haO₀, hcO₀⟩
+  -- `⦇w⦈_○`, a factor of `σ`
+  have hvw : ResU.Valid w := by
+    obtain ⟨r, hr⟩ := hwO; exact (ResU.Valid.split hr ⟨σ, hσflat⟩).1
+  obtain ⟨σw, hσw⟩ := hvw
+  have hfw : ResU.FlatR w σw := ResU.six33 hσw
+  obtain ⟨z, hz⟩ := flatR_le_of_le hwO hσflat hfw
+  have hσσw : ResU.CompR σw σ σ := ResU.CompR.absorb hz
+  -- the cells of `Y′`
+  have hcell : ∀ m' ψ, Y'.get m' = some ψ →
+      (Y.get m' = some ψ) ∨ (m' = m ∧ ψ = CellU.immOf (LSet.singleton α) u w h) := by
+    intro m' ψ e
+    rcases ResU.Comp.get hY' m' with ⟨-, -, f⟩ | ⟨χ, f₁, -, f⟩ | ⟨χ, -, f₂, f⟩ |
+        ⟨χ₁, χ₂, χ, f₁, f₂, f, -⟩
+    · rw [f] at e; cases e
+    · rw [f] at e; cases Option.some.inj e; exact Or.inl f₁
+    · rw [f] at e; cases Option.some.inj e
+      obtain ⟨rfl, rfl⟩ := ResU.single_get_eq_some f₂; exact Or.inr ⟨rfl, rfl⟩
+    · obtain ⟨rfl, -⟩ := ResU.single_get_eq_some f₂; rw [hYm] at f₁; cases f₁
+  have hY'own : ∀ m' ψ, Y'.get m' = some ψ →
+      ψ.kind = Kind.imm ∧ σ.get m' = some (CellU.ownOf ψ.erase) := by
+    intro m' ψ e
+    rcases hcell m' ψ e with h' | ⟨rfl, rfl⟩
+    · exact ⟨hM.kind h', flat_own_of_ex hσflat heO₀ (hM.own eO₀ heO₀ m' ψ h')⟩
+    · exact ⟨rfl, flat_own_of_ex hσflat heO₀ (hm eO₀ heO₀)⟩
+  -- `aY`, `ac` and `aY ○ ac`
+  obtain ⟨aY, haY⟩ := hM.agDef
+  obtain ⟨p₁, hp₁, hYp₁⟩ := hM.ag eO₀ aO₀ aY heO₀ haO₀ haY
+  rw [ResU.CompR.functional hp₁ hσR] at hYp₁
+  have hcσw : ResU.CompatR c σw := by
+    intro m' ψ₁ ψ₂ e₁ e₂
+    obtain ⟨rfl, rfl⟩ := ResU.single_get_eq_some e₁
+    have hσm := flat_own_of_ex hσflat heO₀ (hm eO₀ heO₀)
+    rcases compR_factor_own hσσw hσm with h' | h'
+    · rw [h'] at e₂; cases e₂
+    · rw [h'] at e₂; cases Option.some.inj e₂
+      exact ⟨_, CellU.compR_own_right_of_erase rfl⟩
+  obtain ⟨ac, hac⟩ := (ResU.compR_defined_iff c σw).mpr hcσw
+  have hagc : AgW c ac := AgW.single_imm hfw hac
+  obtain ⟨C', hC', -, -⟩ := compR_imm_own_absorb hY'own
+  have hYcR : ResU.CompR Y c Y' := ResU.CompS.toCompR hY'
+  obtain ⟨A, B, hA, hB, hAB⟩ := (ResU.CompR.exchange₄ Y σ c σw C').mpr
+    ⟨Y', σ, hYcR, ResU.CompR.comm hσσw, hC'⟩
+  rw [ResU.CompR.functional hA hYp₁, ResU.CompR.functional hB hac] at hAB
+  have hagY' : AgW Y' C' := (AgW.split hY').mpr ⟨aY, ac, haY, hagc, hAB⟩
+  refine ⟨Y', hY', ⟨fun m' ψ e => ?_, fun eO heO m' ψ e => ?_, fun eO aO aY' heO haO haY' => ?_,
+    ⟨C', hagY'⟩⟩⟩
+  · rcases hcell m' ψ e with h' | ⟨rfl, rfl⟩
+    · exact hM.cell m' ψ h'
+    · exact ⟨u, w, h, rfl⟩
+  · rcases hcell m' ψ e with h' | ⟨rfl, rfl⟩
+    · exact hM.own eO heO m' ψ h'
+    · exact hm eO heO
+  · rw [ExS.functional heO heO₀, AgW.functional haO haO₀, AgW.functional haY' hagY']
+    exact ⟨σ, hσR, hC'⟩
 
 end BoCa.Views
 
