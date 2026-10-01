@@ -31,15 +31,16 @@ theorem noOwn_delDom {ρp Y : WRes} (h : NoOwn ρp) : NoOwn (ρp.delDom Y) := by
   | none => rw [ResU.delDom_get_of_none eY] at hl; exact noOwn_iff.mp h l ψ hl
   | some ζ => rw [ResU.delDom_get_of_some eY] at hl; cases hl
 
-/-- **The frame rule at a mint.**  If every owned resource `P` holds of can mint, at any `α` it
-outlives, an `S α` over itself, then
+/-- **The frame rule at a mint.**  If every valid owned resource `P` holds of can mint, at any `α`
+it outlives, an `S α` over itself, then
 
     P ⋆ (Иα. S α ─⋆ wp(e){[α](P ─⋆ Q̂)})  ⊨  wp(e){Q̂}.
 
 `[TR]` 6.64 is the instance `P = ℓ ↦ v ⋆ P̂(v)`, `S α = ℓ ↦ Imm α P̂` (one minted cell).
 `[about ours: `[TR]` 6.64's proof at a mint]` -/
 theorem wp_mint_frame (P : WProp) (S : Life → WProp) (e : Expr) (Q : Val → WProp)
-    (hmint : ∀ (α : Life) (ρo : WRes), P ρo → ρo.InStratum α → ∃ Y, Mint α ρo Y ∧ S α Y) :
+    (hmint : ∀ (α : Life) (ρo : WRes), P ρo → ρo.InStratum α → ResU.Valid ρo →
+      ∃ Y, Mint α ρo Y ∧ S α Y) :
     Entails (P ⋆ fresh (fun α => S α ─⋆ wp e (fun v' => box α (P ─⋆ Q v')))) (wp e Q) := by
   classical
   intro ρ hH2 ρf hH3
@@ -52,11 +53,11 @@ theorem wp_mint_frame (P : WProp) (S : Life → WProp) (e : Expr) (Q : Val → W
   obtain ⟨hPv, houto⟩ := hPo
   -- H10 and H11
   have houtb : ResU.InStratum A ρb := ResU.CompS.inStratum_right hcρ houtρ
-  -- the minted resource, in place of 6.64's `ρᵢ`
-  obtain ⟨Y, hM, hSY⟩ := hmint A ρo hPv houto
   -- ✓ρ
   obtain ⟨-, sρ, hsρ, hvsρ⟩ := id hH3
   have hvρ : ResU.Valid ρ := (ResU.Valid.split hsρ hvsρ).2
+  -- the minted resource, in place of 6.64's `ρᵢ`
+  obtain ⟨Y, hM, hSY⟩ := hmint A ρo hPv houto (ResU.Valid.split hcρ hvρ).1
   -- H12-H17: the compatibility block
   have hH12 : ResU.Hash ρb ρo := ⟨ResU.CompatS.symm hcρ.1, ρ, ResU.CompS.comm hcρ, hvρ⟩
   have hH13 : ResU.Hash ρb Y := hM.hash hH12
