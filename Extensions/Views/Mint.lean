@@ -1,0 +1,578 @@
+import Paper
+import Support
+
+/-!
+# Views — minting `imm` cells over an owned resource
+
+`[TR]` 6.64 (Imm Frame) runs its body at `ρ_b ● ρᵢ`, `ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))`, where the
+caller owned `ℓ ↦ own(v) ● ρ_P̂(v)`.  Its proof spends four facts about the one cell `ρᵢ` against
+the owned resource `W = ρ_P̂(v) ● ℓ ↦ own(v)`: 6.34 (`ρ # W ⇒ ρ # ρᵢ`), 6.26 with 6.8 (`ρᵢ` and
+`W` lower to one memory under a frame), 6.29 with 6.38 (`ρᵢ` is a top-level cell after the run,
+and what is left is compatible with `W`), and 6.39 (`↭` carried from `ρᵢ` back to `W`).
+
+This file states those four facts for a resource `Y` of several `imm` cells at one lifetime
+`α`, every one of which sits on an `own` cell of `ex(O)` for an owned `O`:
+
+* `Mint α O Y`: `Y`'s cells are `imm({α}, u, w)`, each on an `own(u)` cell of `ex(O)`, and
+  `ag(Y) = Y ○ ex(O)_○ ○ ag(O)` — `Y`'s witnesses are walks `O` already makes.
+* `mint_single`: `ρᵢ` is a mint over `W` (the shape 6.64 uses).
+* `Mint.flat`: for `Z # O`, `⦇Z ● Y⦈` is `⦇Z ● O⦈` with `Y`'s cells in place of the `own`
+  cells under them (6.34 and 6.26 together).
+* `Mint.hash`, `Mint.lower_iff`, `Mint.upd`: 6.34, 6.26/6.8 and 6.39 for `Y`.
+* `Mint.top`: 6.29 for `Y`.
+* `Mint.post_hash`: 6.38 for `Y`.
+
+`[about ours]`: an extension, not a transcription.
+-/
+
+noncomputable section
+
+namespace BoCa.Views
+open BoCa
+open BoCa.Fig16
+open BoCa.Fig16.BoLo
+
+/-- `Y` mints `imm` cells at `α` over the owned `O`: every cell of `Y` is `imm({α}, u, w)` and
+sits on an `own(u)` cell of `ex(O)`, and `ag(Y) = Y ○ (ex(O)_○ ○ ag(O))`.
+`[about ours: the facts 6.64's proof uses of its `ρᵢ`, at several cells]` -/
+structure Mint (α : Life) (O Y : WRes) : Prop where
+  cell : ∀ m ψ, Y.get m = some ψ →
+    ∃ (u : Val) (w : WRes) (h : w.InStratum (LSet.singleton α).join),
+      ψ = CellU.immOf (LSet.singleton α) u w h
+  own : ∀ eO, ExS O eO → ∀ m ψ, Y.get m = some ψ → eO.get m = some (CellU.ownOf ψ.erase)
+  ag : ∀ eO aO aY, ExS O eO → AgW O aO → AgW Y aY →
+    ∃ p, ResU.CompR eO aO p ∧ ResU.CompR Y p aY
+  agDef : ∃ aY, AgW Y aY
+
+namespace Mint
+
+variable {α : Life} {O Y : WRes}
+
+theorem kind (h : Mint α O Y) {m : Loc} {ψ : CellU Loc Val} (e : Y.get m = some ψ) :
+    ψ.kind = Kind.imm := by
+  obtain ⟨u, w, hw, rfl⟩ := h.cell m ψ e; rfl
+
+theorem exS (h : Mint α O Y) : ExS Y PMap.empty :=
+  ExW.empty_of_all_imm (fun _ _ e => h.kind e)
+
+end Mint
+
+/-! ### The normal form of `⦇Z ● Y⦈` -/
+
+/-- Over `○`, an `imm` cell absorbs the `own` cell beneath it. -/
+theorem compR_imm_own_absorb {Y B : WRes}
+    (hY : ∀ m ψ, Y.get m = some ψ →
+      ψ.kind = Kind.imm ∧ B.get m = some (CellU.ownOf ψ.erase)) :
+    ∃ C, ResU.CompR Y B C ∧ (∀ m, Y.get m = none → C.get m = B.get m) ∧
+      (∀ m ψ, Y.get m = some ψ → C.get m = some ψ) := by
+  have hcR : ResU.CompatR Y B := by
+    intro m ψ₁ ψ₂ e₁ e₂
+    obtain ⟨-, hB⟩ := hY m ψ₁ e₁
+    rw [hB] at e₂; cases Option.some.inj e₂
+    exact ⟨ψ₁, CellU.compR_own_right_of_erase rfl⟩
+  obtain ⟨C, hC⟩ := (ResU.compR_defined_iff Y B).mpr hcR
+  refine ⟨C, hC, fun m e => ResU.Comp.get_of_left_none hC e, fun m ψ e => ?_⟩
+  obtain ⟨-, hB⟩ := hY m ψ e
+  rcases ResU.Comp.get hC m with ⟨f, -, -⟩ | ⟨χ, f₁, f₂, f⟩ | ⟨χ, f₁, -, -⟩ |
+      ⟨χ₁, χ₂, χ, f₁, f₂, f, hc⟩
+  · rw [f] at e; cases e
+  · rw [hB] at f₂; cases f₂
+  · rw [f₁] at e; cases e
+  · rw [e] at f₁; cases Option.some.inj f₁
+    rw [hB] at f₂; cases Option.some.inj f₂
+    rw [f, CellU.compR_own_right hc]
+
+/-- `⦇Z ● Y⦈` for `Z # O`: `⦇Z ● O⦈` with each `own` cell under `Y` replaced by `Y`'s cell —
+`[TR]` 6.34's display (`⦇ρ ● ρᵢ⦈ = ex(ρ)_● ● (ρᵢ ○ ⦇ρ_v⦈_○ ○ ag(ρ))`) at several cells.
+`[about ours: 6.34's and 6.26's step at a mint]` -/
+theorem Mint.flat (hM : Mint α O Y) {Z ZO : WRes} (hZO : ResU.CompS Z O ZO) {σ : WRes}
+    (hσ : ResU.Flat ZO σ) :
+    ∃ ZY σ', ResU.CompS Z Y ZY ∧ ResU.Flat ZY σ' ∧
+      (∀ m, Y.get m = none → σ'.get m = σ.get m) ∧
+      (∀ m ψ, Y.get m = some ψ → σ'.get m = some ψ ∧ σ.get m = some (CellU.ownOf ψ.erase)) := by
+  obtain ⟨e₁, e₂, e, a₁, a₂, a, he₁, he₂, hec, ha₁, ha₂, hac, hc⟩ :=
+    (ResU.Flat.split hZO).mp hσ
+  have himm₁ : e₁.ImmFree := ExS.immFree he₁
+  have himm₂ : e₂.ImmFree := ExS.immFree he₂
+  have himm : e.ImmFree := ResU.ImmFree.compS hec himm₁ himm₂
+  -- `e₂ ▸◂ a` and `e₁ ▸◂ e₂ ● a`
+  obtain ⟨B, hB, hσB⟩ := (ResU.CompS.assoc e₁ e₂ a σ).mpr ⟨e, hec, hc⟩
+  have he₂a : ResU.CompatS e₂ a := hB.1
+  have hdisj₂ := ResU.CompatS.disjoint_of_immFree himm₂ he₂a
+  -- `e₂ ● a = a₁ ○ p`, `p = e₂ ○ a₂`
+  have hBR : ResU.CompR e₂ a B := ResU.CompS.toCompR hB
+  obtain ⟨p, hp, hpB⟩ :=
+    (ResU.CompR.assoc e₂ a₂ a₁ B).mp ⟨a, ResU.CompR.comm hac, hBR⟩
+  -- `ag(Y)`
+  obtain ⟨aY, haY⟩ := hM.agDef
+  obtain ⟨p', hp', hYp⟩ := hM.ag e₂ a₂ aY he₂ ha₂ haY
+  rw [ResU.CompR.functional hp' hp] at hYp
+  -- `Y`'s cells sit on `own` cells of `B`
+  have hYB : ∀ m ψ, Y.get m = some ψ →
+      ψ.kind = Kind.imm ∧ B.get m = some (CellU.ownOf ψ.erase) := by
+    intro m ψ e
+    have he₂m := hM.own e₂ he₂ m ψ e
+    refine ⟨hM.kind e, ?_⟩
+    rcases hdisj₂ m with h | h
+    · rw [h] at he₂m; cases he₂m
+    · exact (ResU.Comp.get_of_right_none hB h).trans he₂m
+  obtain ⟨C, hC, hCoff, hCon⟩ := compR_imm_own_absorb hYB
+  -- `ag(Z ● Y) = a₁ ○ aY = C`
+  have haC : ResU.CompR a₁ aY C := by
+    -- `Y ○ (p ○ a₁) = C`, regrouped
+    obtain ⟨x, hx, hxC⟩ := (ResU.CompR.assoc Y p a₁ C).mp ⟨B, hpB, hC⟩
+    obtain rfl : x = aY := ResU.CompR.functional hx hYp
+    exact ResU.CompR.comm hxC
+  -- `e₁ ▸◂ C`
+  have hBdom : ∀ m, B.get m = none ↔ C.get m = none := by
+    intro m
+    constructor
+    · intro h
+      cases eY : Y.get m with
+      | none => rw [hCoff m eY]; exact h
+      | some ψ => rw [(hYB m ψ eY).2] at h; cases h
+    · intro h
+      cases eY : Y.get m with
+      | none => rw [← hCoff m eY]; exact h
+      | some ψ => rw [hCon m ψ eY] at h; cases h
+  have he₁C : ResU.CompatS e₁ C := ResU.Compat.of_disjoint (fun m => by
+    rcases ResU.CompatS.disjoint_of_immFree himm₁ hσB.1 m with h | h
+    · exact Or.inl h
+    · exact Or.inr ((hBdom m).mp h))
+  obtain ⟨σ', hσ'⟩ := (ResU.compS_defined_iff e₁ C).mpr he₁C
+  -- `Z ● Y`
+  have hZY : ResU.CompatS Z Y := ResU.Compat.of_disjoint (fun m => by
+    cases eY : Y.get m with
+    | none => exact Or.inr rfl
+    | some ψ =>
+      refine Or.inl ?_
+      cases eZ : Z.get m with
+      | none => rfl
+      | some ζ =>
+        exfalso
+        have hBm := (hYB m ψ eY).2
+        have he₁m : e₁.get m = none := by
+          rcases ResU.CompatS.disjoint_of_immFree himm₁ hσB.1 m with h | h
+          · exact h
+          · rw [h] at hBm; cases hBm
+        have hσm : σ.get m = some (CellU.ownOf ψ.erase) :=
+          (ResU.Comp.get_of_left_none hσB he₁m).trans hBm
+        -- `Z(m)` reaches `⦇Z ● O⦈(m) = own`, so it is `own`, so it is in `ex(Z)`
+        obtain ⟨χ, hχ, hkχ, -⟩ := ResU.CompS.get_left hZO eZ
+        obtain ⟨χ', hχ', hkχ', -, -⟩ := ResU.Flat.get hσ hχ
+        rw [hσm] at hχ'; cases Option.some.inj hχ'
+        have hk' : ζ.kind ≠ Kind.imm := by
+          rw [← hkχ, ← hkχ']; simp
+        rw [ExS.get_of_ne_imm he₁ eZ hk'] at he₁m; cases he₁m)
+  obtain ⟨ZY, hZY'⟩ := (ResU.compS_defined_iff Z Y).mpr hZY
+  have hex : ExS ZY e₁ := (ExS.split hZY').mpr ⟨e₁, PMap.empty, he₁, hM.exS,
+    ResU.comp_empty_right e₁⟩
+  have hag : AgW ZY C := (AgW.split hZY').mpr ⟨a₁, aY, ha₁, haY, haC⟩
+  refine ⟨ZY, σ', hZY', ⟨e₁, C, hex, hag, hσ'⟩, fun m eY => ?_, fun m ψ eY => ?_⟩
+  · rcases ResU.CompatS.disjoint_of_immFree himm₁ hσB.1 m with h | h
+    · rw [ResU.Comp.get_of_left_none hσ' h, ResU.Comp.get_of_left_none hσB h, hCoff m eY]
+    · rw [ResU.Comp.get_of_right_none hσB h,
+        ResU.Comp.get_of_right_none hσ' ((hBdom m).mp h)]
+  · have hBm := (hYB m ψ eY).2
+    have he₁m : e₁.get m = none := by
+      rcases ResU.CompatS.disjoint_of_immFree himm₁ hσB.1 m with h | h
+      · exact h
+      · rw [h] at hBm; cases hBm
+    exact ⟨(ResU.Comp.get_of_left_none hσ' he₁m).trans (hCon m ψ eY),
+      (ResU.Comp.get_of_left_none hσB he₁m).trans hBm⟩
+
+/-- `[TR]` 6.34 at a mint: `Z # O ⇒ Z # Y`. -/
+theorem Mint.hash (hM : Mint α O Y) {Z : WRes} (h : ResU.Hash Z O) : ResU.Hash Z Y := by
+  obtain ⟨-, ZO, hZO, σ, hσ⟩ := h
+  obtain ⟨ZY, σ', hZY, hσ', -, -⟩ := hM.flat hZO hσ
+  exact ⟨hZY.1, ZY, hZY, σ', hσ'⟩
+
+/-- `[TR]` 6.26 with 6.8 at a mint: under a frame `F # O`, `F ● Y` and `F ● O` lower to the
+same memory. -/
+theorem Mint.lower_iff (hM : Mint α O Y) {F FO FY : WRes} (hFO : ResU.CompS F O FO)
+    (hvFO : ResU.Valid FO) (hFY : ResU.CompS F Y FY) (w : Loc → Option Val) :
+    ResU.Lower FY w ↔ ResU.Lower FO w := by
+  obtain ⟨σ, hσ⟩ := hvFO
+  obtain ⟨FY', σ', hFY', hσ', hoff, hon⟩ := hM.flat hFO hσ
+  obtain rfl : FY' = FY := ResU.CompS.functional hFY' hFY
+  have herase : ∀ l, (σ'.get l).map CellU.erase = (σ.get l).map CellU.erase := by
+    intro l
+    cases eY : Y.get l with
+    | none => rw [hoff l eY]
+    | some ψ => obtain ⟨h₁, h₂⟩ := hon l ψ eY; rw [h₁, h₂]; rfl
+  constructor
+  · rintro ⟨τ, hτ, hw⟩
+    obtain rfl : τ = σ' := ResU.Flat.functional hτ hσ'
+    exact ⟨σ, hσ, fun l => (hw l).trans (herase l)⟩
+  · rintro ⟨τ, hτ, hw⟩
+    obtain rfl : τ = σ := ResU.Flat.functional hτ hσ
+    exact ⟨σ', hσ', fun l => (hw l).trans (herase l).symm⟩
+
+/-- `[TR]` 6.39 at a mint: `Z ● Y ↭ Z′ ● Y` gives `Z ● O ↭ Z′ ● O`, for `Z, Z′ # O`. -/
+theorem Mint.upd (hM : Mint α O Y) {Z Z' ZO Z'O ZY Z'Y : WRes}
+    (hZO : ResU.CompS Z O ZO) (hvZO : ResU.Valid ZO)
+    (hZ'O : ResU.CompS Z' O Z'O) (hvZ'O : ResU.Valid Z'O)
+    (hZY : ResU.CompS Z Y ZY) (hZ'Y : ResU.CompS Z' Y Z'Y) (hupd : ResU.UpdV ZY Z'Y) :
+    ResU.UpdV ZO Z'O := by
+  obtain ⟨σ, hσ⟩ := hvZO
+  obtain ⟨τ, hτ⟩ := hvZ'O
+  obtain ⟨ZY₁, σ', hZY₁, hσ', hoff, hon⟩ := hM.flat hZO hσ
+  obtain ⟨Z'Y₁, τ', hZ'Y₁, hτ', hoff', hon'⟩ := hM.flat hZ'O hτ
+  obtain rfl : ZY₁ = ZY := ResU.CompS.functional hZY₁ hZY
+  obtain rfl : Z'Y₁ = Z'Y := ResU.CompS.functional hZ'Y₁ hZ'Y
+  obtain ⟨⟨hI, hMu⟩, -, -⟩ := hupd
+  refine ⟨⟨fun l s v χ h => ?_, fun l b P => ?_⟩, ⟨σ, hσ⟩, ⟨τ, hτ⟩⟩
+  · rw [ResU.flatAt_iff hσ, ResU.flatAt_iff hτ]
+    have hl := hI l s v χ h
+    rw [ResU.flatAt_iff hσ', ResU.flatAt_iff hτ'] at hl
+    cases eY : Y.get l with
+    | none => rw [← hoff l eY, ← hoff' l eY]; exact hl
+    | some ψ =>
+        rw [(hon l ψ eY).2, (hon' l ψ eY).2]
+  · have hl := hMu l b P
+    simp only [ResU.flatAt_iff hσ', ResU.flatAt_iff hτ'] at hl
+    simp only [ResU.flatAt_iff hσ, ResU.flatAt_iff hτ]
+    cases eY : Y.get l with
+    | none => rw [← hoff l eY, ← hoff' l eY]; exact hl
+    | some ψ =>
+        rw [(hon l ψ eY).2, (hon' l ψ eY).2]
+
+/-! ### After the run: `[TR]` 6.29 and 6.38 at a mint -/
+
+/-- `⦇π⦈` after a run from `Z ● Y` (`Z, O ∈ Res_α`): `Y`'s cells are there as they were, and
+every other cell is in `Res_α` — `[TR]` 6.29's *"all borrows in `⦇ρ′⦈` other than `ρᵢ` must be
+disjoint from `α`"*, at several cells. -/
+theorem Mint.post_flat (hM : Mint α O Y) {Z ZO ZY π τ : WRes} (hZα : Z.InStratum α)
+    (hOα : O.InStratum α) (hZO : ResU.CompS Z O ZO) (hvZO : ResU.Valid ZO)
+    (hZY : ResU.CompS Z Y ZY) (hupd : ResU.UpdV ZY π) (hτ : ResU.Flat π τ) :
+    (∀ m ψ, Y.get m = some ψ → τ.get m = some ψ) ∧
+      (∀ m, Y.get m = none → ∀ φ, τ.get m = some φ → φ.InStratum α) := by
+  obtain ⟨σ, hσ⟩ := hvZO
+  obtain ⟨ZY₁, σ', hZY₁, hσ', hoff, hon⟩ := hM.flat hZO hσ
+  obtain rfl : ZY₁ = ZY := ResU.CompS.functional hZY₁ hZY
+  have hσα : σ.InStratum α := BoLo.flat_inStratum hσ (ResU.CompS.inStratum hZO hZα hOα)
+  obtain ⟨⟨hI, hMu⟩, -, -⟩ := hupd
+  refine ⟨fun m ψ eY => ?_, fun m eY φ hφ => ?_⟩
+  · obtain ⟨u, w, hw, rfl⟩ := hM.cell m ψ eY
+    exact (ResU.flatAt_iff hτ _ _).mp
+      ((hI m _ u w hw).mp ((ResU.flatAt_iff hσ' _ _).mpr (hon m _ eY).1))
+  · rcases CellU.rep φ with ⟨u, rfl⟩ | ⟨t, u, χ, hh, rfl⟩ | ⟨b, u, χ, hh, P, hw, rfl⟩
+    · exact trivial
+    · have h' : σ'.get m = some (CellU.immOf t u χ hh) :=
+        (ResU.flatAt_iff hσ' _ _).mp ((hI m t u χ hh).mpr ((ResU.flatAt_iff hτ _ _).mpr hφ))
+      rw [hoff m eY] at h'
+      exact hσα m _ h'
+    · obtain ⟨u', χ', h', hw', hfa⟩ := (hMu m b P).mpr ⟨u, χ, hh, hw, (ResU.flatAt_iff hτ _ _).mpr hφ⟩
+      have h'' := (ResU.flatAt_iff hσ' _ _).mp hfa
+      rw [hoff m eY] at h''
+      exact (hσα m _ h'' : b ⊐ α)
+
+/-- No top-level cell of `π` is shorter than `α`. -/
+theorem Mint.post_not_shorter (hM : Mint α O Y) {π τ : WRes} (hτ : ResU.Flat π τ)
+    (hon : ∀ m ψ, Y.get m = some ψ → τ.get m = some ψ)
+    (hoff : ∀ m, Y.get m = none → ∀ φ, τ.get m = some φ → φ.InStratum α) :
+    ∀ m φ, π.get m = some φ → ¬ (φ.at < α) := by
+  intro m φ e
+  rcases CellU.rep φ with ⟨u, rfl⟩ | ⟨t, u, χ, hh, rfl⟩ | ⟨b, u, χ, hh, P, hw, rfl⟩
+  · simp only [CellU.at_ownOf]; exact not_lt_of_ge (Life.top_sqsubseteq α)
+  · obtain ⟨ζ, hζ, hkζ, -, -⟩ := ResU.Flat.get hτ e
+    obtain ⟨s, hs, heta⟩ := CellU.imm_eta (by rw [hkζ]; rfl)
+    have hζ' : τ.get m = some (CellU.immOf s ζ.erase ζ.wit hs) := hζ.trans (congrArg some heta)
+    have hsub : ∀ x, t.mem x → s.mem x := fun x hx => ResU.Flat.get_ls_imm hτ e hζ' hx
+    simp only [CellU.at_immOf]
+    cases eY : Y.get m with
+    | none =>
+        have hst : s.meet ⊐ α := hoff m eY _ hζ'
+        exact not_lt_of_ge (le_trans (le_of_lt hst) (s.meet_least _ (hsub _ t.meet_mem)))
+    | some ψ =>
+        obtain ⟨u', w, hw, rfl⟩ := hM.cell m ψ eY
+        rw [hon m _ eY] at hζ'
+        obtain ⟨hs', -, -⟩ := CellU.immOf_inj (Option.some.inj hζ')
+        have hm : s.mem t.meet := hsub _ t.meet_mem
+        rw [← hs'] at hm
+        have : t.meet = α := hm
+        rw [this]; exact lt_irrefl α
+  · have hτm := ResU.flat_get_of_ne_imm hτ e (by simp)
+    cases eY : Y.get m with
+    | none =>
+        have : b ⊐ α := hoff m eY _ hτm
+        simp only [CellU.at_mutOf]; exact not_lt_of_gt this
+    | some ψ =>
+        obtain ⟨u', w, hw', rfl⟩ := hM.cell m ψ eY
+        rw [hon m _ eY] at hτm
+        exact absurd (Option.some.inj hτm) (by simp [CellU.immOf, CellU.mutOf])
+
+/-- `[TR]` 6.29 at a mint: after a run from `Z ● Y`, every cell of `Y` is a top-level cell of
+`π`, unchanged. -/
+theorem Mint.top (hM : Mint α O Y) {Z ZO ZY π : WRes} (hZα : Z.InStratum α)
+    (hOα : O.InStratum α) (hZO : ResU.CompS Z O ZO) (hvZO : ResU.Valid ZO)
+    (hZY : ResU.CompS Z Y ZY) (hupd : ResU.UpdV ZY π) :
+    ∀ m ψ, Y.get m = some ψ → π.get m = some ψ := by
+  obtain ⟨τ, hτ⟩ := hupd.2.2
+  obtain ⟨hon, hoff⟩ := hM.post_flat hZα hOα hZO hvZO hZY hupd hτ
+  have hnb := hM.post_not_shorter hτ hon hoff
+  intro m ψ eY
+  obtain ⟨u, w, hw, rfl⟩ := hM.cell m ψ eY
+  obtain ⟨φ, t, hφ, ht, hmem⟩ := ResU.flat_imm_at_top_of_no_shorter hτ (hon m _ eY)
+    (CellU.lsOf_immOf _ _ _ _) rfl hnb
+  have hkφ : φ.kind = Kind.imm := CellU.kind_of_lsOf ht
+  obtain ⟨s, hs, heta⟩ := CellU.imm_eta hkφ
+  have hφ' : π.get m = some (CellU.immOf s φ.erase φ.wit hs) := hφ.trans (congrArg some heta)
+  have hsub : ∀ x, s.mem x → (LSet.singleton α).mem x := fun x hx =>
+    ResU.Flat.get_ls_imm hτ hφ' (hon m _ eY) hx
+  obtain ⟨χ, hχ, -, heχ, hwχ⟩ := ResU.Flat.get hτ hφ
+  rw [hon m _ eY] at hχ
+  cases Option.some.inj hχ
+  have hseq : s = LSet.singleton α := by
+    obtain ⟨y, hy⟩ := LSet.nonempty s
+    have hyα : y = α := hsub y hy
+    refine LSet.ext (fun x => ⟨fun hx => hsub x hx, fun hx => ?_⟩)
+    have : x = α := hx
+    rw [this, ← hyα]; exact hy
+  rw [hφ']
+  exact congrArg some (CellU.immOf_congr hseq heχ.symm (by rw [← hwχ]; simp) hs hw)
+
+/-- `ρ⁺ = ρ⁺ \ dom(Y) ● Y` when `ρ⁺` holds `Y`'s cells. -/
+theorem delDom_split {ρp Y : WRes} (h : ∀ m ψ, Y.get m = some ψ → ρp.get m = some ψ) :
+    ResU.CompS (ρp.delDom Y) Y ρp := by
+  refine ⟨ResU.Compat.of_disjoint (fun m => ?_), fun m => ?_⟩
+  · cases eY : Y.get m with
+    | none => exact Or.inr rfl
+    | some ψ => exact Or.inl (ResU.delDom_get_of_some eY)
+  · cases eY : Y.get m with
+    | none =>
+        show OptComp CellU.CompS ((ρp.delDom Y).get m) none (ρp.get m)
+        rw [ResU.delDom_get_of_none eY]
+        cases ρp.get m <;> rfl
+    | some ψ =>
+        show OptComp CellU.CompS ((ρp.delDom Y).get m) (some ψ) (ρp.get m)
+        rw [ResU.delDom_get_of_some eY, h m ψ eY]
+        rfl
+
+/-- After the run, a top-level cell of `π` off `Y`'s cells is in `Res_α`. -/
+theorem post_top_off {α : Life} {Y π τ : WRes} (hτ : ResU.Flat π τ)
+    (hoff : ∀ m, Y.get m = none → ∀ φ, τ.get m = some φ → φ.InStratum α) :
+    ∀ m, Y.get m = none → ∀ φ, π.get m = some φ → φ.InStratum α := by
+  intro m eY φ e
+  rcases CellU.rep φ with ⟨u, rfl⟩ | ⟨t, u, χ, hh, rfl⟩ | ⟨b, u, χ, hh, P, hw, rfl⟩
+  · exact trivial
+  · obtain ⟨ζ, hζ, hkζ, -, -⟩ := ResU.Flat.get hτ e
+    obtain ⟨s, hs, heta⟩ := CellU.imm_eta (by rw [hkζ]; rfl)
+    have hζ' : τ.get m = some (CellU.immOf s ζ.erase ζ.wit hs) := hζ.trans (congrArg some heta)
+    have hst : s.meet ⊐ α := hoff m eY _ hζ'
+    exact lt_of_lt_of_le hst (s.meet_least _ (ResU.Flat.get_ls_imm hτ e hζ' t.meet_mem))
+  · exact hoff m eY _ (ResU.flat_get_of_ne_imm hτ e (by simp))
+
+/-- `[TR]` 6.38 at a mint: after a run from `Z ● Y` to `ρ′ ● ρ⁺`, with `Z, O ∈ Res_α` and
+`ρ′ ∈ Res_α`, `ρ′ ● ρ⁺ \ dom(Y)` is compatible with `O`, and `ρ′ ● ρ⁺ = (ρ′ ● ρ⁺ \ dom(Y)) ● Y`.
+The printed proof's ancestor step is kept: a location of `ex(O)` in the aliasable walk of
+`ρ′ ● ρ⁺ \ dom(Y)` sits beneath an `imm` cell there, which `↭` carries back to `⦇Z ● O⦈`, where
+it is `Z`'s or `O`'s and its walk avoids `ex(O)`.  `[about ours: 6.38's proof at a mint]` -/
+theorem Mint.post_hash (hM : Mint α O Y) {Z ZO ZY ρ' ρp π : WRes} (hZα : Z.InStratum α)
+    (hOα : O.InStratum α) (hZO : ResU.CompS Z O ZO) (hvZO : ResU.Valid ZO)
+    (hZY : ResU.CompS Z Y ZY) (hpp : ResU.CompS ρ' ρp π) (hρ'α : ρ'.InStratum α)
+    (hupd : ResU.UpdV ZY π) :
+    ∃ G, ResU.CompS ρ' (ρp.delDom Y) G ∧ ResU.CompS G Y π ∧ ResU.Hash G O := by
+  classical
+  have hTop := hM.top hZα hOα hZO hvZO hZY hupd
+  obtain ⟨τ, hτ⟩ := hupd.2.2
+  obtain ⟨hon, hoff⟩ := hM.post_flat hZα hOα hZO hvZO hZY hupd hτ
+  have hTopOff := post_top_off hτ hoff
+  -- `ρ′` holds no cell of `Y`'s
+  have hρ'Y : ∀ m ψ, Y.get m = some ψ → ρ'.get m = none := by
+    intro m ψ eY
+    cases e' : ρ'.get m with
+    | none => rfl
+    | some ζ =>
+        exfalso
+        obtain ⟨u, w, hw, rfl⟩ := hM.cell m ψ eY
+        have hπm := hTop m _ eY
+        obtain ⟨χ, hχ, hkχ, -⟩ := ResU.CompS.get_left hpp e'
+        rw [hπm] at hχ; cases Option.some.inj hχ
+        have hkζ : ζ.kind = Kind.imm := by rw [← hkχ]; rfl
+        obtain ⟨s, hs, heta⟩ := CellU.imm_eta hkζ
+        have e'' : ρ'.get m = some (CellU.immOf s ζ.erase ζ.wit hs) :=
+          e'.trans (congrArg some heta)
+        have hmem : (LSet.singleton α).mem s.meet :=
+          ResU.CompR.get_ls_imm (ResU.CompS.toCompR hpp) e'' hπm s.meet_mem
+        have hsα : s.meet = α := hmem
+        have := hρ'α m _ e''
+        rw [CellU.inStratum_immOf, hsα] at this
+        exact lt_irrefl α this
+  have hpY : ∀ m ψ, Y.get m = some ψ → ρp.get m = some ψ := fun m ψ eY =>
+    (ResU.Comp.get_of_left_none hpp (hρ'Y m ψ eY)).symm.trans (hTop m ψ eY)
+  have hpd : ResU.CompS (ρp.delDom Y) Y ρp := delDom_split hpY
+  obtain ⟨G, hG, hGY⟩ := (ResU.CompS.assoc ρ' (ρp.delDom Y) Y π).mp ⟨ρp, hpd, hpp⟩
+  refine ⟨G, hG, hGY, ?_⟩
+  -- `G ∈ Res_α`
+  have hGπ : ∀ m, Y.get m = none → G.get m = π.get m := fun m eY =>
+    (ResU.Comp.get_of_right_none hGY eY).symm
+  have hGnone : ∀ m ψ, Y.get m = some ψ → G.get m = none := fun m ψ eY =>
+    (ResU.Comp.eq_none_iff hG m).mpr ⟨hρ'Y m ψ eY, ResU.delDom_get_of_some eY⟩
+  have hGα : G.InStratum α := by
+    intro m φ e
+    cases eY : Y.get m with
+    | none => exact hTopOff m eY φ ((hGπ m eY).symm.trans e)
+    | some ψ => rw [hGnone m ψ eY] at e; cases e
+  -- the walks
+  obtain ⟨σ, hσ⟩ := hvZO
+  obtain ⟨e₁, e₂, e, a₁, a₂, a, he₁, he₂, hec, ha₁, ha₂, hac, hc⟩ :=
+    (ResU.Flat.split hZO).mp hσ
+  obtain ⟨eG, eY, eπ, aG, aY, aπ, heG, heY, heπ, haG, haY, haπ, hcπ⟩ :=
+    (ResU.Flat.split hGY).mp hτ
+  obtain rfl : eY = PMap.empty := ExS.functional heY hM.exS
+  obtain rfl : eG = eπ := ResU.eq_of_comp_empty_right heπ
+  obtain ⟨p, hp, hYp⟩ := hM.ag e₂ a₂ aY he₂ ha₂ haY
+  have himm₁ : e₁.ImmFree := ExS.immFree he₁
+  have himm₂ : e₂.ImmFree := ExS.immFree he₂
+  have himmE : e.ImmFree := ResU.ImmFree.compS hec himm₁ himm₂
+  have himmG : eG.ImmFree := ExS.immFree heG
+  -- F1: `ex(O)` avoids `ag(Z)` and `ag(O)`
+  have hF1 : ∀ m, e₂.get m = none ∨ (a₁.get m = none ∧ a₂.get m = none) := by
+    intro m
+    rcases ResU.CompatS.disjoint_of_immFree himmE hc.1 m with h | h
+    · exact Or.inl ((ResU.Comp.eq_none_iff hec m).mp h).2
+    · exact Or.inr ((ResU.Comp.eq_none_iff hac m).mp h)
+  -- `⦇G⦈` and `⦇G⦈ ∈ Res_α`
+  have hvG : ResU.Valid G := (ResU.Valid.split hGY ⟨τ, hτ⟩).1
+  obtain ⟨σG, eG', aG', heG', haG', hσGc⟩ := hvG
+  obtain rfl : eG = eG' := ExS.functional heG heG'
+  obtain rfl : aG = aG' := AgW.functional haG haG'
+  have hσG : ResU.Flat G σG := ⟨eG, aG, heG, haG, hσGc⟩
+  have hσGα : σG.InStratum α := BoLo.flat_inStratum hσG hGα
+  obtain ⟨σG₁, σY, hσG₁, hσY, hCompR⟩ := BoLo.flat_compR hGY hτ
+  obtain rfl : σG = σG₁ := ResU.Flat.functional hσG hσG₁
+  -- F4: an `imm` cell of `⦇G⦈` is, over its witness, one of `ag(Z)` or of `ag(O)`
+  have hF4 : ∀ m ψ, σG.get m = some ψ → ψ.kind = Kind.imm →
+      (∃ φ, a₁.get m = some φ ∧ φ.kind = Kind.imm ∧ φ.wit = ψ.wit) ∨
+        (∃ φ, a₂.get m = some φ ∧ φ.kind = Kind.imm ∧ φ.wit = ψ.wit) := by
+    intro m ψ hψ hk
+    obtain ⟨χ₀, hχ₀, hkχ₀, -, hwχ₀⟩ := ResU.CompR.get_imm_left hCompR hψ hk
+    obtain ⟨s₀, hs₀, heta₀⟩ := CellU.imm_eta hkχ₀
+    have hχ₀' : τ.get m = some (CellU.immOf s₀ χ₀.erase χ₀.wit hs₀) :=
+      hχ₀.trans (congrArg some heta₀)
+    obtain ⟨ZY₁, σ', hZY₁, hσ', hoffσ, honσ⟩ := hM.flat hZO hσ
+    obtain rfl : ZY₁ = ZY := ResU.CompS.functional hZY₁ hZY
+    have hupdm : σ'.get m = some (CellU.immOf s₀ χ₀.erase χ₀.wit hs₀) :=
+      (ResU.flatAt_iff hσ' m _).mp
+        ((hupd.1.1 m s₀ χ₀.erase χ₀.wit hs₀).mpr ⟨τ, hτ, hχ₀'⟩)
+    cases eYm : Y.get m with
+    | some ψY =>
+        exfalso
+        obtain ⟨u, w, hw, rfl⟩ := hM.cell m ψY eYm
+        rw [(honσ m _ eYm).1] at hupdm
+        obtain ⟨hs₀e, -, -⟩ := CellU.immOf_inj (Option.some.inj hupdm)
+        obtain ⟨sψ, hsψ, hetaψ⟩ := CellU.imm_eta hk
+        have hψ' : σG.get m = some (CellU.immOf sψ ψ.erase ψ.wit hsψ) :=
+          hψ.trans (congrArg some hetaψ)
+        have hmem : s₀.mem sψ.meet :=
+          ResU.CompR.get_ls_imm hCompR hψ' hχ₀' sψ.meet_mem
+        rw [← hs₀e] at hmem
+        have hα' : sψ.meet = α := hmem
+        have := hσGα m _ hψ'
+        rw [CellU.inStratum_immOf, hα'] at this
+        exact lt_irrefl α this
+    | none =>
+        rw [hoffσ m eYm] at hupdm
+        have ham : a.get m = some (CellU.immOf s₀ χ₀.erase χ₀.wit hs₀) :=
+          ResU.ag_eq_flat_at_imm ((ExS.split hZO).mpr ⟨e₁, e₂, he₁, he₂, hec⟩) hc hupdm
+            (CellU.kind_immOf _ _ _ _)
+        rcases ResU.CompR.imm_source hac ham with ⟨s₂, h₂, hg₂⟩ | ⟨s₃, h₃, hg₃⟩
+        · exact Or.inl ⟨_, hg₂, CellU.kind_immOf _ _ _ _, by rw [CellU.wit_immOf]; exact hwχ₀⟩
+        · exact Or.inr ⟨_, hg₃, CellU.kind_immOf _ _ _ _, by rw [CellU.wit_immOf]; exact hwχ₀⟩
+  -- the ancestor step: `ex(O)` avoids `ag(G)`
+  have hkey : ∀ m, e₂.get m = none ∨ aG.get m = none := by
+    intro m
+    cases hmW : e₂.get m with
+    | none => exact Or.inl rfl
+    | some ψW =>
+      cases hmG : aG.get m with
+      | none => exact Or.inr rfl
+      | some ψG =>
+        exfalso
+        have hno : a₁.get m = none ∧ a₂.get m = none := by
+          rcases hF1 m with h | h
+          · rw [h] at hmW; cases hmW
+          · exact h
+        rcases AgW.dom_split haG hσG hmG with
+          ⟨φ, hφ, hkφ⟩ | ⟨m', χc, f, hm', hkχ, hf, hsf⟩
+        · rcases hF4 m φ hφ hkφ with ⟨φ', hφ', -, -⟩ | ⟨φ', hφ', -, -⟩
+          · rw [hno.1] at hφ'; cases hφ'
+          · rw [hno.2] at hφ'; cases hφ'
+        · have hσGm' : σG.get m' = some χc :=
+            ResU.CompS.get_right_of_immFree hσGc himmG hm'
+          rcases hF4 m' χc hσGm' hkχ with ⟨φ', hφ', hkφ', hwφ'⟩ | ⟨φ', hφ', hkφ', hwφ'⟩
+          · obtain ⟨s', hs', heta'⟩ := CellU.imm_eta hkφ'
+            obtain ⟨ev₀, av₀, p₀, z₀, hev₀, hav₀, hcp₀, hz₀⟩ :=
+              AgW.flat_imm_wit_le ha₁ m' s' φ'.erase φ'.wit hs'
+                (hφ'.trans (congrArg some heta'))
+            obtain rfl : f = p₀ :=
+              ResU.FlatR.functional (by rw [hwφ']; exact hf)
+                ⟨av₀, ev₀, hav₀, hev₀, ResU.CompR.comm hcp₀⟩
+            rw [((ResU.Comp.eq_none_iff hz₀ m).mp hno.1).1] at hsf; cases hsf
+          · obtain ⟨s', hs', heta'⟩ := CellU.imm_eta hkφ'
+            obtain ⟨ev₀, av₀, p₀, z₀, hev₀, hav₀, hcp₀, hz₀⟩ :=
+              AgW.flat_imm_wit_le ha₂ m' s' φ'.erase φ'.wit hs'
+                (hφ'.trans (congrArg some heta'))
+            obtain rfl : f = p₀ :=
+              ResU.FlatR.functional (by rw [hwφ']; exact hf)
+                ⟨av₀, ev₀, hav₀, hev₀, ResU.CompR.comm hcp₀⟩
+            rw [((ResU.Comp.eq_none_iff hz₀ m).mp hno.2).1] at hsf; cases hsf
+  -- `ag(G) ○ ag(O)`, a factor of `ag(π)` regrouped
+  obtain ⟨YE, hYE, hYEa⟩ := (ResU.CompR.assoc Y e₂ a₂ aY).mp ⟨p, hp, hYp⟩
+  obtain ⟨A, hA, hAπ⟩ := (ResU.CompR.assoc aG a₂ YE aπ).mp
+    ⟨aY, ResU.CompR.comm hYEa, haπ⟩
+  have himmG' : eG.restrict Kind.imm = PMap.empty := (ResU.restrict_imm_empty_iff eG).mpr himmG
+  obtain ⟨hcA, hcYE⟩ := ResU.CompatS.of_compR_left himmG' hAπ hcπ.1
+  obtain ⟨-, hce₂⟩ := ResU.CompatS.of_compR_left himmG' hYE hcYE
+  have hce₂aG : ResU.CompatS e₂ aG := ResU.Compat.of_disjoint hkey
+  have hce₂a₂ : ResU.CompatS e₂ a₂ := ResU.Compat.of_disjoint (fun m => by
+    rcases hF1 m with h | h
+    · exact Or.inl h
+    · exact Or.inr h.2)
+  have hce₂A : ResU.CompatS e₂ A := ResU.six37 hce₂aG hce₂a₂ hA
+  obtain ⟨E, hE⟩ := (ResU.compS_defined_iff eG e₂).mpr hce₂
+  have hcEA : ResU.CompatS E A := ResU.Compat.of_disjoint (fun m => by
+    rcases ResU.CompatS.disjoint_of_immFree himmG hcA m with h' | h'
+    · rcases ResU.CompatS.disjoint_of_immFree himm₂ hce₂A m with h'' | h''
+      · exact Or.inl ((ResU.Comp.eq_none_iff hE m).mpr ⟨h', h''⟩)
+      · exact Or.inr h''
+    · exact Or.inr h')
+  obtain ⟨σGO, hσGO⟩ := (ResU.compS_defined_iff E A).mpr hcEA
+  -- `G ▸◂ O`
+  have hGO : ResU.CompatS G O := by
+    intro m ψ₁ ψ₂ hg₁ hg₂
+    by_cases hk₂ : ψ₂.kind = Kind.imm
+    · obtain ⟨χ₂, hχ₂, hkχ₂, heχ₂, hwχ₂⟩ := AgW.get_imm ha₂ hg₂ hk₂
+      by_cases hk₁ : ψ₁.kind = Kind.imm
+      · obtain ⟨χ₁, hχ₁, hkχ₁, heχ₁, hwχ₁⟩ := AgW.get_imm haG hg₁ hk₁
+        obtain ⟨ξ, hξ⟩ := hA.1 m χ₁ χ₂ hχ₁ hχ₂
+        obtain ⟨-, he₁', hw₁'⟩ := CellU.CompR.imm_left hξ hkχ₁
+        obtain ⟨-, he₂', hw₂'⟩ := CellU.CompR.imm_left (CellU.CompR.comm hξ) hkχ₂
+        exact CellU.compatS_iff.mpr ⟨hk₁, hk₂,
+          heχ₁.symm.trans (he₁'.symm.trans (he₂'.trans heχ₂)),
+          hwχ₁.symm.trans (hw₁'.symm.trans (hw₂'.trans hwχ₂))⟩
+      · exfalso
+        have hex₁ := ExS.get_of_ne_imm heG hg₁ hk₁
+        obtain ⟨χ, hχ, hkχ, -, -⟩ := ResU.CompR.get_imm_right hA hχ₂ hkχ₂
+        rcases ResU.CompatS.disjoint_of_immFree himmG hcA m with h | h
+        · rw [h] at hex₁; cases hex₁
+        · rw [h] at hχ; cases hχ
+    · exfalso
+      have hex : e₂.get m = some ψ₂ := ExS.get_of_ne_imm he₂ hg₂ hk₂
+      by_cases hk₁ : ψ₁.kind = Kind.imm
+      · obtain ⟨χ₁, hχ₁, -, -, -⟩ := AgW.get_imm haG hg₁ hk₁
+        rcases hkey m with h | h
+        · rw [h] at hex; cases hex
+        · rw [h] at hχ₁; cases hχ₁
+      · have hex₁ := ExS.get_of_ne_imm heG hg₁ hk₁
+        rcases ResU.CompatS.disjoint_of_immFree himmG hce₂ m with h | h
+        · rw [h] at hex₁; cases hex₁
+        · rw [h] at hex; cases hex
+  obtain ⟨X, hX⟩ := (ResU.compS_defined_iff G O).mpr hGO
+  exact ⟨hGO, X, hX, σGO, (ResU.Flat.split hX).mpr
+    ⟨eG, e₂, E, aG, a₂, A, heG, he₂, hE, haG, ha₂, hA, hσGO⟩⟩
+
+end BoCa.Views
+
+end
