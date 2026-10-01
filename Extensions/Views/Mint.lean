@@ -746,6 +746,40 @@ theorem Mint.add (hM : Mint α O Y) (hvO : ResU.Valid O) {m : Loc} {u : Val} {w 
   · rw [ExS.functional heO heO₀, AgW.functional haO haO₀, AgW.functional haY' hagY']
     exact ⟨σ, hσR, hC'⟩
 
+/-! ### What `↭` keeps under an `imm` cell -/
+
+/-- **Frozen under an `imm` ancestor.**  If `ρ ↭ π` and `⦇ρ⦈` holds an `imm` cell over the
+witness `w`, every cell of `w`'s walk `⦇w⦈_○` is still there in `⦇π⦈`, with its value: what an
+`imm` cell reaches through owned pointers is frozen by every run, at every valid resource.
+This is RustBelt's persistence of a sharing predicate, and it is `[TR]` p. 5's `↭` clause (1)
+with the ancestor accounting of 6.48's proof (`ResU.flat_imm_wit_factor`).  The views a mint
+adds are `imm` cells over such walks. -/
+theorem frozen_under_imm {ρ π σ τ : WRes} (hupd : ResU.UpdV ρ π) (hσ : ResU.Flat ρ σ)
+    (hτ : ResU.Flat π τ) {l : Loc} {s : LSet} {v : Val} {w : WRes} {h : w.InStratum s.join}
+    (hc : σ.get l = some (CellU.immOf s v w h)) {f : WRes} (hf : ResU.FlatR w f) {m : Loc}
+    {ψ : CellU Loc Val} (hm : f.get m = some ψ) :
+    ∃ χ, τ.get m = some χ ∧ χ.erase = ψ.erase := by
+  have hτl : τ.get l = some (CellU.immOf s v w h) :=
+    (ResU.flatAt_iff hτ _ _).mp ((hupd.1.1 l s v w h).mp ((ResU.flatAt_iff hσ _ _).mpr hc))
+  obtain ⟨eπ, aπ, heπ, haπ, hcπ⟩ := hτ
+  obtain ⟨ev, av, p, z, hev, hav, hp, hz⟩ :=
+    ResU.flat_imm_wit_factor heπ haπ hcπ hτl
+  obtain rfl : f = p := ResU.FlatR.functional hf ⟨av, ev, hav, hev, ResU.CompR.comm hp⟩
+  obtain ⟨χ, eχ, heχ⟩ : ∃ χ, aπ.get m = some χ ∧ χ.erase = ψ.erase := by
+    rcases ResU.Comp.get hz m with ⟨g, -, -⟩ | ⟨χ, g₁, -, g⟩ | ⟨χ, g₁, -, -⟩ |
+        ⟨χ₁, χ₂, χ, g₁, -, g, hC⟩
+    · rw [g] at hm; cases hm
+    · rw [g₁] at hm; cases Option.some.inj hm; exact ⟨_, g, rfl⟩
+    · rw [g₁] at hm; cases hm
+    · rw [g₁] at hm; cases Option.some.inj hm; exact ⟨_, g, CellU.CompR.erase_left hC⟩
+  have heπm : eπ.get m = none := by
+    cases e : eπ.get m with
+    | none => rfl
+    | some ξ =>
+        have := ResU.CompatS.right_eq_none hcπ.1 e (ExS.immFree heπ m ξ e)
+        rw [eχ] at this; cases this
+  exact ⟨χ, (ResU.Comp.get_of_left_none hcπ heπm).trans eχ, heχ⟩
+
 end BoCa.Views
 
 end
