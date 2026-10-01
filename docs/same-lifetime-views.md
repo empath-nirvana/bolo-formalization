@@ -4,147 +4,198 @@
 the same lifetime `@a`? This is Rust's `&'a Box<T> → &'a T`. If it can, a stored iterator over a
 borrowed linked structure keeps one type, `Imm @a Node`, as it advances.
 
-**Answer.** No. The printed model excludes it, and so does the transcription. The exclusion
-comes from the conjunct `ρ ↭ ρ′ ● ρ⁺` of `[TR]` p. 6's `wp`, read through the `imm` clause of
-`↭` (`[TR]` p. 5; `[CONF]` Fig. 18b, clause (1)). It holds at every run, at every lifetime, and
-for every expression. No frame rule and no typed-world invariant is involved. The printed
-statics agree: `withload` gives the pointee only at a fresh `'b ⊏ ⊓Δ`, inside a callback whose
-result is `['b] T₂`.
+**Answer.** The printed rules make no such view, and a conservative extension does. `[TR]`'s
+proof rules create an `imm` cell in two places only: 6.64 (Imm Frame) makes the one cell
+`ℓ ↦ imm({α}, v, ρ_P̂(v))`, and 6.150 (`↺` rule) makes views of a borrow's payload at a *fresh*
+`β`, shorter than everything around it. No run creates an `imm` cell (`↭`'s clause (1)). So the
+only read through an `Imm`, `withload`, gives the pointee at a fresh `'b`, and each step down a
+borrowed list is a new, shorter lifetime. The extension changes *when* views are made, not what
+a run may do. At the frame where the program owns `ℓ ↦ v ⋆ 𝒱⟦T⟧δ(v)`, it makes 6.64's cell and,
+at the same `α`, a view of every location `v` reaches through owned pointers. This is RustBelt's
+sharing predicate for `Box`. `[TR]` p. 6's `wp` and p. 5's `↭` are unchanged, and every printed
+rule still holds as it is. With the views in place, `deref ≜ λx. load x` has type
+`Shr α (Ref T) ⊸ Shr α T`, and iterating it keeps `α`.
 
 Lean: `Extensions/Views/` (`lake build Views`; `scripts/check-views.sh`). Every declaration
-depends only on `propext`, `Classical.choice` and `Quot.sound`. The library under `Paper/` and
-`Support/` is unchanged.
+depends only on `propext`, `Classical.choice` and `Quot.sound` (138 declarations). The library
+under `Paper/` and `Support/` is unchanged.
 
-## 1. What is printed
+## 1. The printed rules (first pass, still in force)
 
-**The statics** (`[TR]` p. 3; `[CONF]` Fig. 8, p. 415:10).
+`Extensions/Views/Pointee.lean` and `Extensions/Views/Typed.lean` are statements about the
+printed rules, and they stand.
+
+- `upd_imm_of_top`, `wp_view_preexists`: a run returns no top-level `imm` cell that `⦇ρ⦈` lacked
+  (`↭`'s clause (1), right to left; `[CONF]` Fig. 18b; `[TR]` p. 5 read under §12.39). These
+  quantify over every valid `ρ`. They are positive facts about `[TR]` p. 6's `wp`, so they hold
+  at arising resources too.
+- `no_view_of_pointee`, `no_closed_projection`: from `ptrBorrow α ℓ ℓ₁ =
+  ℓ ↦ imm({α}, ℓ₁, ℓ₁ ↦ own(()))`, no expression returns `𝒱⟦Imm @b 1⟧`. That resource is the one
+  6.64 makes from `ℓ ↦ own(ℓ₁) ● ℓ₁ ↦ own(())`. `Typed.no_projection` builds it as a typed world
+  (`TW.empty`, three allocations, `TW.immFrame`), so it arises.
+- `frame_view_excluded` (6.38 at a frame) and `mut_view_excluded` (`↭`'s `mut` clause) quantify
+  over every valid resource. `mut_view_excluded`'s cell `ℓ ↦ mut(b, v, ρ_w, P̂)` is the one 6.65
+  makes, so it arises.
+
+What these establish is narrower than the first pass stated. A view the start of a run lacks
+cannot appear during the run. They say nothing about a view made at the frame, before the run
+starts. The first pass's §3 ("Why a frame-exit change cannot lift it") is right about the exit.
+The extension changes the frame's entry instead.
+
+## 2. The extension
+
+**The shared borrow** (`Extensions/Views/Shared.lean`).
 
 ```
-Δ ⊢ withload : Imm @a T₁ ⊸ (∀'b ⊏ ⊓Δ. Imm̲ 'b T₁ ⊸ ['b] T₂) ⊸ T₂
-Imm̲ 'b (Ref T)     ≜ Imm 'b T
-Imm̲ 'b (Imm @a T)  ≜ Imm @a T
+shrV α (Ref T) δ v ≜ ∃ℓ u. ⌜v = ℓ⌝ ⋆ ℓ ↦ Imm α (u′. ⌜u′ = u⌝ ∧ 𝒱⟦T⟧δ(u′)) ⋆ shrV α T δ u
+shrV α (T₁ ⊗ T₂) δ v, shrV α (T₁ ⊕ T₂) δ v, shrV α ([@a] T) δ v   componentwise
+shrV α 1 δ v ≜ ⌜v = ()⌝,   shrV α T δ v ≜ emp   at ⊸, ∀, Imm, Mut, Unk
+shrDen α T δ ≜ shrV α (Ref T) δ
 ```
 
-`withload` is the only axiom that reads through an `Imm`. At `T₁ = Ref T` its callback receives
-`Imm 'b T`, with `'b` shorter than every lifetime in `Δ`, `@a` included. The callback's result
-is `['b] T₂` with `'b` not free in `T₂`. `Δ ⊢ Imm 'b T ⊐ 'b` would need `'b ⊐ 'b`. So the view
-cannot leave the callback, and `⊑Imm` (p. 2) only shortens a lifetime, so it cannot be raised
-back to `@a`. The prose gives the reason ([CONF] p. 415:9): a standard `load` "could be exploited
-to free a nested linear reference twice", so `withload` "provides a new borrow of the nested
-linear reference", "reborrowing internal references at the fresh lifetime `'b`". A nested borrow
-is the contrast: "in the case of a nested borrow, aliases to the inner borrow `Imm a T` are
-allowed to exist anyway", so `Imm̲ 'b (Imm @a T) ≜ Imm @a T` keeps `@a`. The same page derives
-`load : Imm a T ⊸ T` for every `T` with `Imm̲ 'b T = T`. That covers `T = Imm @c U`, but no `T`
-that contains a `Ref`.
+`shrDen α T δ (ℓ)` is `[TR]` p. 4's `ℓ ↦ Imm α 𝒱⟦T⟧δ` (pinned to the stored value) together with a
+view at `α` of each pointee, and each view's witness is the pointee's own payload. `shrV α T δ`
+is the shared reading of `Imm̲ 'a T` (`[TR]` p. 3): `Ref T ↦ Imm 'a T`, componentwise through
+`⊗`, `⊕`, `[@a]`, and nothing at `⊸`/`∀`.
 
-**The model.**
+**Minting** (`Extensions/Views/Mint.lean`). `Mint α O Y` says three things. Every cell of `Y` is
+`imm({α}, u, w)` and sits on an `own(u)` cell of `ex(O)`. `ag(Y) = Y ○ ex(O)_○ ○ ag(O)`. And `ag(Y)`
+is defined. 6.64's cell is a mint over `ρ_v ● ℓ ↦ own(v)` (`mint_single`). Adding the view of an
+`own` cell of `ex(O)`, whose witness is a sub-resource of `O`, keeps a mint (`Mint.add`).
+`mint_views` and `mint_shr_of` build `shrDen`'s resource that way, by induction on the type.
 
-- `𝒱⟦Imm @a T⟧δ(v) ≜ ∃ℓ. ⌜v = ℓ⌝ ⋆ ℓ ↦ Imm @aδ 𝒱⟦T⟧δ` and `𝒱⟦Ref T⟧δ(v) ≜ ∃ℓ,v′. ⌜v = ℓ⌝ ⋆
-  ℓ ↦ v′ ⋆ 𝒱⟦T⟧δ(v′)` (`[TR]` p. 4). The witness of an `Imm @a (Ref T)` cell therefore holds
-  `ℓ₁ ↦ own(v′)` for the pointee `ℓ₁`.
-- `⦇ρ⦈ ≜ ex(ρ)_● ● ag(ρ)` (`[TR]` p. 5). `ag` walks an `imm` witness through `ex(ρ′)_○ ○ ag(ρ′)`,
-  so `⦇ℓ ↦ imm(ᾱ, ℓ₁, ℓ₁ ↦ own(v′))⦈(ℓ₁) = own(v′)`.
-- `ρ₁ ↭ ρ₂`, clause (1) ([CONF] Fig. 18b): `⦇ρ₁⦈(ℓ) = imm(ᾱ, v, ρ) ⇔ ⦇ρ₂⦈(ℓ) = imm(ᾱ, v, ρ)`.
-  Below the figure: "requires that all reachable immutable borrows are preserved with their value
-  `v` witness `ρ` exactly as is".
-- `wp(e){Q̂}(ρ) ≜ ∀ρ_f # ρ. ∃ρ′ # ρ_f, ρ⁺ # (ρ_f ● ρ′), v. … ∧ ρ ↭ ρ′ ● ρ⁺ ∧ ρ⁺|own = ∅ ∧
-  Q̂(v)(ρ′)` (`[TR]` p. 6).
+**The frame rule** (`Extensions/Views/Frame.lean`). `wp_mint_frame` is 6.64 with a mint in place
+of the one cell. Its proof follows `Fig16.LogRel.wp_I_frame` step for step. The four facts that
+proof spends about its cell are proved at a mint:
 
-**The frame rules.** 6.64 (Imm Frame, p. 22) runs its body from `ρ_b ● ρᵢ`, where
-`ρᵢ = ℓ ↦ imm({α}, v, ρ_P̂(v))`, and carries H21, `ρ_b ● ρᵢ ↭ ρ′ ● ρ⁺`. Its H28 is 6.38
-(p. 12): under H1–H6, `ρ′ ● ρ⁺/ℓ # ρ_v ● ℓ ↦ own(v)`, so at a frame's end no cell of `ρ′ ● ρ⁺`
-lies where the escrow `ρ_v` holds an `own` cell. 6.65 (Mut Frame, p. 24) has the same shape:
-its body runs from `ρ_b ● ρ_m`, and it carries H21 `↭` and H27 via 6.24. 6.66 (Anti Frame,
-p. 25) re-establishes `ℓ ↦ Mut α P̂` around a run.
+| 6.64's step | at one cell (library) | at a mint |
+|---|---|---|
+| H13, H15 (6.34) | `ResU.six34` | `Mint.hash` |
+| H34 (6.26 with 6.8) | `ResU.lower_swap_imm_own` | `Mint.lower_iff` |
+| H26 (6.29) | `ResU.six29` | `Mint.top` |
+| H28 (6.38) | `ResU.six38` | `Mint.post_hash` |
+| H35 (6.39) | `ResU.six39` | `Mint.upd` |
 
-**What the printed rules say.** A view is an `imm` cell in the post-resource `ρ′`. By clause
-(1) of `↭`, read right to left, that cell is already an `imm` cell of `⦇ρ⦈`, with the same
-value and witness, where `ρ` is the resource the run started at. A run can therefore return a
-view only if the view existed before the run. At `Imm @a (Ref T)`, the pointee is `own` in
-`⦇ρ⦈`, so no run returns a view of it. At `Imm @a (Imm @c U)`, the inner borrow is already
-`imm` in `⦇ρ⦈`, so returning it is not excluded. The two clauses of `Imm̲` match this. Views are
-made only inside a scope that ends before the enclosing run's `↭` is checked: 6.64's `ρᵢ` and
-6.150's `↺_α` image, which 6.52 removes before 6.59's final `↭`.
+`Mint.flat` is the normal form behind 6.34, 6.26 and 6.39: `⦇Z ● Y⦈` is `⦇Z ● O⦈` with `Y`'s cells
+in place of the `own` cells beneath them. `Mint.post_hash` keeps 6.38's ancestor step. A
+location of `ex(O)` in the aliasable walk of the post-resource sits beneath an `imm` cell
+(`AgW.nonimm_beneath_imm`). `↭` carries that cell back to `⦇Z ● O⦈`, where its walk avoids
+`ex(O)` (`AgW.flat_imm_wit_le`). `wp_I_frame_of_mint` recovers `[TR]` 6.64 as printed, as the
+one-cell instance.
 
-## 2. What the transcription does
+**The rules** (`Shared.lean`, `Uses.lean`):
 
-| Printed object | Lean | Tag | Bearing on the argument |
-|---|---|---|---|
-| `wp`, row 5.33 | `Fig16.BoLo.wp` | `[repair]`, which concerns only `→*` (§12.42, D6) | The argument does not use the run |
-| `↭`, row 5.27 | `Fig16.ResU.UpdV`, `UpdImm` | `[repair]` §12.39 | [TR] p. 5 prints the right-hand side of clause (1) as a three-argument `mut(β̄, v, ρ)`. It is read as `imm`, which [CONF] Fig. 18b prints. The `⇔` is printed in both documents |
-| `↭`'s guard | `UpdV` / `Upd` | D3 | Inside `wp` the two are the same proposition (`wp_eq_wpU`) |
-| `⦇ρ⦈`, rows 5.20–5.22 | `ExS`, `AgW`, `ResU.Flat` | `[repair]` §12.36, G6 | The comprehensions are read as families indexed by locations. No clause changes |
-| `⋈`, row 5.14 | `CellU.CompatR` | `[repair]` §12.35 | Read as the domain of `○`. Clause (5), `imm ○ own = imm`, is as printed |
-| `ℓ ↦ Imm α P̂`, row 5.30 | `Fig16.BoLo.ptoImm` | `[variant]` §12.67(a), `⊓β̄` for `⊔β̄` | The argument reads no lifetime, so it is the same at either bound |
-| `Imm̲`, row 2.49 | `Ty.immReborrow` | `[as printed]` | Clauses (5) and (6) are `immReborrow_ref` and `immReborrow_imm` (`rfl`) |
-| 6.34, 6.38, 6.64 | `ResU.six34`, `ResU.six38`, `wp_I_frameX` | proved | Used as printed |
+- `wp_S_frame`: `ℓ ↦ v ⋆ 𝒱⟦T⟧δ(v) ⋆ (Иα. Shr α T(ℓ) ─⋆ wp(e){[α](ℓ ↦ v ⋆ 𝒱⟦T⟧δ(v) ─⋆ Q̂)}) ⊨ wp(e){Q̂}`.
+- `wp_load_S`: `load ℓ` from `Shr α T(ℓ)` returns the stored value with `shrV α T δ`, at `α`.
+- `deref_sem`, `deref_closed`: `deref ≜ λx. load x` takes `Shr α (Ref T)` to `Shr α T`. At `∅` it
+  satisfies `∀w. Shr α (Ref T)(w) ─⋆ ℰ⟦Shr α T⟧(deref w)`, `𝒱⟦−⊸−⟧`'s clause with `shrDen` at both ends.
+- `derefN_sem`: `n` successive `deref`s take `Shr α (Refⁿ S)` to `Shr α S`, at one `α`.
+- `shrV_copy` (copy), `wp_S_forget` (forget), `shrV_mono` (`⊑Imm`), and `shrDen_head`: the head is
+  `𝒱⟦Imm @a T⟧δ` and the rest is own-free.
+- `minted_projection`: at `ℓ ↦ own(ℓ₁) ● ℓ₁ ↦ own(())`, the shared borrow is the first pass's
+  `ptrBorrow α ℓ ℓ₁` plus one own-free cell at `ℓ₁`. From it, `deref ℓ` returns
+  `𝒱⟦Imm @a 1⟧δ`. `no_view_of_pointee` says no expression does that from `ptrBorrow α ℓ ℓ₁` alone.
 
-No entry in `docs/adjudications.md` changes `↭`, `ag`, 6.38, the frame rules or `reb_α` in a way
-that this argument depends on. §12.67(b), the subset reading of `reb_α`'s `imm` clause, affects
-only the images that 6.150 makes. Those images live inside a scope and are never returned.
-`[TR]` 6.40 is the one untranscribed row in §6.2. Nothing here uses it, and the frame rules do
-not cite it.
+## 3. Why it is sound
 
-## 3. Verdict: (a), the exclusion is printed
+`wp` and `↭` are `[TR]` p. 6's and p. 5's, so every rule proved about them holds unchanged. That
+includes bind (6.135), the update lemmas (6.47–6.50), the frame rules (6.64–6.66), the reborrow
+rule and its surgery (6.150, 6.52–6.59), and adequacy. The extension adds no relation. Its new
+obligations are the five facts in the table above, and they are proved. No hypothesis restricts
+the frames: the frame rule holds at every `ρ_f # ρ`. The views are made from resources the frame
+owns, so no frame can hold a cell at their locations (`Mint.hash`).
 
-The rule that forces it is the right-to-left direction of `↭`'s `imm` clause ([CONF] Fig. 18b
-(1); [TR] p. 5 read under §12.39), applied in `[TR]` p. 6's `wp` conjunct `ρ ↭ ρ′ ● ρ⁺`. That
-`⦇·⦈` of an `Imm @a (Ref T)` cell holds the pointee as `own` follows from 4.7, 4.8 and `ag`'s
-third factor. `[TR]` 6.38 gives the same conclusion at a 6.64 frame. Each claim below is
-machine-checked, with every hypothesis discharged.
+**The frozen fact.** What a shared borrow needs to stay valid is that the pointees are frozen
+while `α` lives. That follows from the printed `↭` at every valid resource, arising or not.
+`frozen_under_imm` shows that if `ρ ↭ π` and `⦇ρ⦈` has an `imm` cell over `w`, every cell of
+`⦇w⦈_○` is in `⦇π⦈` with its value. The proof is `↭`'s clause (1) with 6.48's ancestor
+accounting (`ResU.flat_imm_wit_factor`). This is RustBelt's persistence of a sharing predicate.
+No new invariant is introduced.
 
-`Extensions/Views/Pointee.lean`, at the literal printed definitions:
+**Coherence with printed views.** Each minted view's witness is the owning payload's sub-resource,
+the witness 6.150's `own` clause gives that location (`ResU.RebAt`). So minted views agree with
+the views a later 6.150 makes there ([CONF] 415:19: *"immutable cells ψ₁, ψ₂ at the same location
+must all have the same witness"*). The alternative, a view with an empty witness (a finer
+partition), would disagree with them, as §12.68's configuration does. Not machine-checked here:
+`withload` (`wp_reborrow`, `RebEscrow`) applied to a shared borrow's head inside the frame.
 
-- `upd_imm_of_top`: if `ρ ↭ π` and `π(m)` is `imm`, then `⦇ρ⦈(m)` is `imm` with the same value
-  and witness.
-- `wp_view_preexists`: `wp e {Q̂}` at a valid `ρ` has a run whose `ρ′` satisfies `Q̂`, and every
-  top-level `imm` cell of that `ρ′` is such a cell of `⦇ρ⦈`.
-- `ptrBorrow_vDen`, `ptrBorrow_valid`: `ℓ ↦ imm({α}, ℓ₁, ℓ₁ ↦ own(()))` is a valid member of
-  `𝒱⟦Imm @a (Ref 1)⟧δ(ℓ)` (validity via 6.34).
-- `no_view_of_pointee`: for every `e`, every `@b` and every `δ′`,
-  `¬ wp e {𝒱⟦Imm @b 1⟧δ′}` at that resource. `@b = @a` is included, and so is any shorter
-  lifetime.
-- `no_closed_projection`: `𝒱⟦Imm @a (Ref 1) ⊸ Imm @b 1⟧δ` has no member at `∅`.
-- `frame_view_excluded`, `ptrBorrow_frame_excluded`: 6.38 at a frame whose borrow is the whole
-  resource. A borrow `ℓ ↦ imm({α}, v, ρv)` updates to no own-free resource with a cell where
-  `ρv` holds `own`.
-- `mut_view_excluded`: the `mut` clause excludes a new `mut` cell at a location the witness of
-  a `mut` borrow owns, at every lifetime and predicate. This is the `Mut` analogue (`Mut @a
-  (Ref T) → Mut @a T`), and it excludes the two-way split as well.
+## 4. The typed world
 
-`Extensions/Views/Typed.lean`, at the typed world (§12.72):
+`Fig16.LogRel.fundamentalProperty` is proved at the typed world (`Fig16.LogRel.Typed.TW`,
+§12.72), the family of resources the printed operations produce. The share frame is not one of
+those operations. `minted_not_nestLife` (`Extensions/Views/Nest.lean`) builds the share frame's
+resource for `2 ↦ own(1) ● 1 ↦ own(0) ● 0 ↦ own(())` and shows it fails
+`Fig16.LogRel.Typed.NestLife` at the frame's record. The view at `0` is not shorter than the view
+at `1`, because both are at `α`. So `minted_not_TW`: no `TW` world holding that record is this
+resource.
 
-- `Typed.no_projection`: no `proj` meets the specification "from `vP (Imm 'x (Ref 1 ⊗ Ref 1))`
-  at `ℓ`, `wpTS (proj ℓ)` returns `vP (Imm 'x 1)` at the pair's first component". The
-  configuration is built from `TW.empty`: three `wpTS_alloc` runs, then `TW.immFrame` (6.64's
-  entry). The last step is `frame_view_excluded`.
+`NestLife` records that every view below an existing view comes from 6.150 at a fresh, shorter
+`β`. `FrameLife`'s second clause records the same of a frame's lineage, and `TW.reb`/`TW.rebDeep`
+take `β` below the whole world. Bringing the share frame into the typed world means three
+changes in place, with no new predicate:
 
-**Why a frame-exit change cannot lift it.** `no_view_of_pointee` mentions no frame, no typed
-world and no 6.38. It is refuted at the run that would return the view, through `wp`'s own `↭`
-conjunct. A change to 6.64's exit, such as subtracting the frame's image at its own lifetime, is
-reached only after that run has ended. So it leaves the refutation as it is. The repaired relation
-(`SemX`/`wpTS`) keeps the conjunct verbatim and restricts only the frames `ρ_f`, so it excludes
-the view too (`Typed.no_projection`). To admit the view, `wp`'s `↭` conjunct itself would have to
-change, at every run. That is a different logic. Bind (6.49), 6.38/6.39 in the frame rules and
-6.59 in the reborrow rule all consume the conjunct. No printed reading gives such a relation, and
-none is proposed here.
+1. relax `NestLife` and `FrameLife`'s second clause from `⊏` to `⊑`;
+2. add the share frame's entry and exit to `TW`, with `TW.inv`, `TW.valid` and `TW.linLife` cases;
+3. prove the frame at `wpTS`.
 
-## 4. Practical consequence
+The minted views appear to have the shape `DeepInv`, `JointAt` and `JointDeep` ask of views at
+chain positions: each view's witness is the pointee's payload, and the views at one level form
+one reborrow image of the level above, at `β₀ = α`. This is not machine-checked.
 
-The obstruction is a property of `wp` and holds at every type. So it carries over to any
-extension (records, `μ`) that keeps `[TR]` p. 6's `wp`.
+This was not done here. It changes `Support/TypedWorld/`, the world family 6.151 rests on
+(§12.72). A `Support/` change was refused by this session's permissions, so the decision is the
+user's. It would also not, by itself, extend the syntactic Fundamental Property. A program that
+uses a shared borrow needs a type for it, either a new type former or a deep reading of `Imm`.
+That changes `[TR]` p. 1's `Ty` or p. 4's `𝒱⟦Imm⟧`, which is a design decision.
 
-- **A stored iterator over a borrowed, `Ref`-linked list**, whose state is a view of the rest at
-  `@a`: not typable, and semantically uninhabited. Each step through an owned link is a
-  `withload` at a fresh `'b` that is strictly shorter than the last. A view at `'b` lives only
-  inside its callback, so the iterator's state has no fixed type across steps. Inside one
-  callback, a view at `'b` can be used and stored at `'b` for that callback's extent.
-- **`fold_imm` returning views of nodes reached through owned links**: excluded in the same way.
-  The callback's result `['b] T₂` cannot mention `'b`, and `no_view_of_pointee` excludes every
-  semantic substitute.
-- **What is admitted.** A structure whose links are themselves borrows keeps its lifetime at
-  each step. With `Imm̲ 'b (Imm @a T) ≜ Imm @a T` and [CONF] p. 415:9's derived `load`, a list
-  whose tail field has type `Imm @a Node` can be traversed at the fixed type `Imm @a Node`, and
-  those inner borrows can be returned at `@a`. The cost is that such a spine must be built out
-  of borrows, by borrowing each node separately. It cannot be read off an owned `Ref`-linked
-  list, because that reading is exactly the excluded view.
+Read informally, the relaxation looks cheap. The strict `NestLife` is consumed once, in
+`ti_endReb`, to show that no child view outlives the end of its parent's reborrow. That argument
+still closes with `⊑`, because the remaining world is in `Res_β`. The other places that mention
+it (`ti_frame`, `nm_reb_like`, `ti_end`) establish it, and a strict bound implies the weak one.
+`FrameLife`'s second clause is consumed in `not_rel_lineage` and `witLB_of`, and each needs only
+`⊑`. `frameLife_reb_like` establishes it. This is not machine-checked.
+
+## 5. The `Mut` analogue
+
+With `[TR]` p. 4's `Mut`, a closed `Mut @a (Ref T) ⊸ Mut @a T` would have to put a `mut` cell at a
+location the witness of the borrow's `mut` cell owns. `↭`'s `mut` clause excludes that
+(`mut_view_excluded`, at 6.65's cell, which arises). The route that works for `Imm` is to make
+the pointee's borrow at the frame, while the pointer cell stays frozen for `α`. That needs more
+than the `Imm` case:
+
+- the frozen pointer cell is an `imm` cell whose witness is not the full payload, so it is not a
+  mint;
+- the pointee's `mut` cell must be folded back at the exit, which is 6.65's half, not 6.64's;
+- a cell holding a pair with a pointer field (a list node) cannot be split into a frozen part and
+  a `mut` part. The `mut` predicate would have to pin the pointer component.
+
+None of this is built here. With `[TR]`'s rules as they are, `Mut` through `Ref` stays at a
+fresh lifetime per step: `withbor` on the pointee, with `withswap` to reach it.
+
+## 6. Practical consequence
+
+- **A stored iterator over an owned, `Ref`-linked list.** Share the list once
+  (`wp_S_frame`). The iterator's state is `Shr α Node`, and each step is `deref` (or `wp_load_S`
+  and a field projection), which returns `Shr α Next` at the same `α` (`derefN_sem`). The state
+  can be copied (`shrV_copy`), stored and returned within `α`'s frame. The calculus has no
+  recursive types, so `derefN_sem` is stated for `Refⁿ S`. Every lemma is generic in the type,
+  so it applies to each unrolling.
+- **`fold_imm` returning views of nodes.** Within one share frame, a fold can return
+  `Shr α Node` values at the frame's `α`. Under `[TR]`'s `withload`, each level is a callback at
+  a fresh `'b`, and nothing at `'b` leaves it.
+- **Mixing with printed code.** The head of a shared borrow is a `[TR]` `Imm`
+  (`shrDen_head`), and the views can be forgotten (`wp_S_forget`). So printed rules about `Imm`
+  apply to it. The FP-level account of programs that type shared borrows is the open step of §4.
+- **Mutable iteration** (`IterMut`) is §5's open design.
+
+## 7. Lean index
+
+| File | Contents |
+|---|---|
+| `Pointee.lean` | first pass: the printed `↭` and `wp` make no same-lifetime view |
+| `Typed.lean` | first pass: the same at the typed world |
+| `Mint.lean` | `Mint`; `Mint.flat`, `.hash`, `.lower_iff`, `.upd`, `.post_flat`, `.top`, `.post_hash`; `mint_single`, `Mint.add`; `frozen_under_imm` |
+| `Frame.lean` | `wp_mint_frame` |
+| `Shared.lean` | `shrV`, `shrDen`, `mint_views`, `mint_shr_of`, `mint_shr`, `wp_S_frame`, `wp_load_S`, `derefV`, `deref_sem`, `deref_closed`, `shrV_noOwn`, `wp_S_forget`, `shrV_mono`, `shrDen_head` |
+| `Uses.lean` | `wp_I_frame_of_mint`, `shrV_copy`, `refN`, `derefN`, `derefN_sem`, `minted_projection` |
+| `Nest.lean` | `minted_not_nestLife`, `minted_not_TW` |
