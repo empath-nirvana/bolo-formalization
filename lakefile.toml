@@ -25,3 +25,9 @@ srcDir = "comparator"
 [[lean_lib]]
 name = "Purity"
 srcDir = "Extensions"
+
+# Same-lifetime views of a borrowed pointee against the printed model
+# (docs/same-lifetime-views.md).  Not a default target; nothing imports it.
+[[lean_lib]]
+name = "Views"
+srcDir = "Extensions"
